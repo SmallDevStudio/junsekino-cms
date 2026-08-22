@@ -1,7 +1,9 @@
 import "server-only";
 
 import { adminAuth, adminDb } from "@/lib/firebase/admin";
+
 import { AUTH_SESSION } from "@/constants/auth";
+
 import { USER_STATUS } from "@/constants/roles";
 
 export async function getUserByUid(uid) {
@@ -99,6 +101,8 @@ export async function verifyPlatformSession(sessionCookie) {
       },
     };
   } catch (error) {
+    console.error("Verify platform session error:", error);
+
     return null;
   }
 }
