@@ -20,7 +20,24 @@ export function hasPermission({
 
   const rolePermissions = getRolePermissions(role);
 
-  const resolvedPermissions = new Set([...rolePermissions, ...permissions]);
+  const resolvedPermissions = new Set([
+    ...rolePermissions,
+    ...(permissions || []),
+  ]);
 
   return resolvedPermissions.has(permission);
+}
+
+export function resolvePermissions({
+  isSuperAdmin = false,
+  role = null,
+  permissions = [],
+}) {
+  if (isSuperAdmin) {
+    return ["*"];
+  }
+
+  return Array.from(
+    new Set([...getRolePermissions(role), ...(permissions || [])]),
+  );
 }

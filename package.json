@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "firebase:dev": "firebase use dev",
+    "firebase:indexes": "firebase deploy --only firestore:indexes",
+    "firebase:rules": "firebase deploy --only firestore:rules",
+    "firebase:storage": "firebase deploy --only storage"
   },
   "dependencies": {
     "clsx": "^2.1.1",

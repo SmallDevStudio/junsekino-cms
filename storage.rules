@@ -1,0 +1,18 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    /*
+     * Storage access is denied by default.
+     *
+     * Media access will be implemented
+     * through authenticated server APIs
+     * and controlled public delivery.
+     */
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
