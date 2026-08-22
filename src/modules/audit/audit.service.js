@@ -83,6 +83,10 @@ export const AUDIT_ACTIONS = {
 
   PEOPLE_DELETE: "PEOPLE_DELETE",
 
+  PEOPLE_PUBLISH: "PEOPLE_PUBLISH",
+
+  PEOPLE_UNPUBLISH: "PEOPLE_UNPUBLISH",
+
   // =====================================================
   // MEDIA
   // =====================================================
