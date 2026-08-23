@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["http://localhost:3000", "https://junsekino.vercel.app"],
+    "method": ["GET", "PUT", "HEAD"],
+    "responseHeader": ["Content-Type", "ETag", "x-goog-generation"],
+    "maxAgeSeconds": 3600
+  }
+]
