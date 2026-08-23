@@ -8,11 +8,15 @@ import sharp from "sharp";
 import {
   ALLOWED_IMAGE_MIME_TYPES,
   MAX_MEDIA_FILE_SIZE,
+  MEDIA_PUBLIC_URL_EXPIRES_MS,
   MEDIA_READ_URL_EXPIRES_MS,
   MEDIA_UPLOAD_URL_EXPIRES_MS,
+  MEDIA_VARIANT_KEYS,
 } from "@/constants/media";
 
 import { getMediaBucket } from "@/lib/firebase/storage";
+
+import { processMediaImage } from "./media-processor";
 
 import {
   createMediaDocumentRef,
@@ -20,6 +24,7 @@ import {
   getMediaById,
   listMediaRecords,
   markMediaFailed,
+  markMediaProcessing,
   markMediaReady,
   softDeleteMediaRecord,
   updateMediaRecord,
@@ -63,6 +68,10 @@ function validateSize(size) {
   }
 }
 
+function calculateSha256(buffer) {
+  return crypto.createHash("sha256").update(buffer).digest("hex");
+}
+
 export async function createMediaUpload({ companyId, input, currentUser }) {
   validateMimeType(input.mimeType);
 
@@ -74,11 +83,11 @@ export async function createMediaUpload({ companyId, input, currentUser }) {
 
   const safeFileName = sanitizeFileName(input.fileName);
 
-  const objectPath = `companies/${companyId}/originals/${mediaId}/${safeFileName}`;
+  const storagePath = `companies/${companyId}/originals/${mediaId}/${safeFileName}`;
 
   const bucket = getMediaBucket();
 
-  const file = bucket.file(objectPath);
+  const file = bucket.file(storagePath);
 
   const [uploadUrl] = await file.getSignedUrl({
     version: "v4",
@@ -105,7 +114,7 @@ export async function createMediaUpload({ companyId, input, currentUser }) {
 
       fileName: safeFileName,
 
-      storagePath: objectPath,
+      storagePath,
 
       mimeType: input.mimeType,
 
@@ -166,7 +175,7 @@ export async function finalizeMedia({ companyId, mediaId, currentUser }) {
     return serializeFirestoreDocument(media);
   }
 
-  if (media.status !== "uploading") {
+  if (media.status !== "uploading" && media.status !== "failed") {
     throw new Error("MEDIA_INVALID_STATUS");
   }
 
@@ -181,11 +190,11 @@ export async function finalizeMedia({ companyId, mediaId, currentUser }) {
       throw new Error("MEDIA_FILE_NOT_UPLOADED");
     }
 
-    const [metadata] = await file.getMetadata();
+    const [storageMetadata] = await file.getMetadata();
 
-    const actualMimeType = metadata.contentType || null;
+    const actualMimeType = storageMetadata.contentType || null;
 
-    const actualSize = Number(metadata.size || 0);
+    const actualSize = Number(storageMetadata.size || 0);
 
     validateMimeType(actualMimeType);
 
@@ -199,15 +208,29 @@ export async function finalizeMedia({ companyId, mediaId, currentUser }) {
       throw new Error("MEDIA_SIZE_MISMATCH");
     }
 
+    await markMediaProcessing({
+      companyId,
+      mediaId,
+
+      userId: currentUser.uid,
+    });
+
     const [buffer] = await file.download();
 
-    const imageMetadata = await sharp(buffer).metadata();
+    const metadata = await sharp(buffer).metadata();
 
-    if (!imageMetadata.width || !imageMetadata.height) {
+    if (!metadata.width || !metadata.height) {
       throw new Error("MEDIA_INVALID_IMAGE");
     }
 
-    const checksum = crypto.createHash("sha256").update(buffer).digest("hex");
+    const checksum = calculateSha256(buffer);
+
+    const processing = await processMediaImage({
+      companyId,
+      mediaId,
+
+      originalBuffer: buffer,
+    });
 
     const result = await markMediaReady({
       companyId,
@@ -218,17 +241,19 @@ export async function finalizeMedia({ companyId, mediaId, currentUser }) {
       data: {
         size: actualSize,
 
-        width: imageMetadata.width,
+        width: processing.original.width,
 
-        height: imageMetadata.height,
+        height: processing.original.height,
 
-        format: imageMetadata.format || null,
+        format: processing.original.format,
 
-        storageGeneration: metadata.generation || null,
+        orientation: processing.original.orientation,
+
+        storageGeneration: storageMetadata.generation || null,
 
         checksum,
 
-        failureReason: null,
+        variants: processing.variants,
       },
     });
 
@@ -353,6 +378,12 @@ export async function updateMedia({ companyId, mediaId, input, currentUser }) {
   return after;
 }
 
+/*
+ * ADMIN ONLY
+ *
+ * Returns temporary access to the
+ * private original image.
+ */
 export async function createTemporaryMediaReadUrl({ companyId, mediaId }) {
   const media = await getMediaById({
     companyId,
@@ -380,6 +411,65 @@ export async function createTemporaryMediaReadUrl({ companyId, mediaId }) {
   };
 }
 
+/*
+ * PUBLIC WEBSITE
+ *
+ * Original images are explicitly
+ * forbidden.
+ */
+export async function createPublicMediaVariantUrl({
+  companyId,
+  mediaId,
+  variant,
+}) {
+  if (!MEDIA_VARIANT_KEYS.includes(variant)) {
+    throw new Error("MEDIA_VARIANT_NOT_FOUND");
+  }
+
+  const media = await getMediaById({
+    companyId,
+    mediaId,
+  });
+
+  if (!media || media.deletedAt || media.status !== "ready") {
+    throw new Error("MEDIA_NOT_FOUND");
+  }
+
+  const variantData = media.variants?.[variant];
+
+  if (!variantData || !variantData.storagePath) {
+    throw new Error("MEDIA_VARIANT_NOT_FOUND");
+  }
+
+  const file = getMediaBucket().file(variantData.storagePath);
+
+  const [url] = await file.getSignedUrl({
+    version: "v4",
+
+    action: "read",
+
+    expires: Date.now() + MEDIA_PUBLIC_URL_EXPIRES_MS,
+  });
+
+  return {
+    url,
+
+    variant: {
+      key: variant,
+
+      width: variantData.width,
+
+      height: variantData.height,
+
+      size: variantData.size,
+
+      mimeType: variantData.mimeType,
+    },
+
+    expiresIn: MEDIA_PUBLIC_URL_EXPIRES_MS,
+  };
+}
+
 export async function deleteMedia({ companyId, mediaId, currentUser }) {
   const before = await softDeleteMediaRecord({
     companyId,
@@ -387,15 +477,6 @@ export async function deleteMedia({ companyId, mediaId, currentUser }) {
 
     userId: currentUser.uid,
   });
-
-  /*
-   * Original file is intentionally
-   * retained for now.
-   *
-   * A later cleanup job can permanently
-   * delete archived files after a
-   * retention period.
-   */
 
   await createAuditLogSafe({
     userId: currentUser.uid,

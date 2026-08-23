@@ -1,48 +1,26 @@
 import { NextResponse } from "next/server";
 
-import { PERMISSIONS } from "@/constants/permissions";
-
-import { getCompanyPermission } from "@/lib/auth/company-guards";
-
-import { isTrustedOrigin } from "@/lib/auth/origin";
+import { MEDIA_VARIANT_KEYS } from "@/constants/media";
 
 import { companyIdSchema } from "@/modules/company/company.schema";
 
-import { mediaIdSchema, updateMediaSchema } from "@/modules/media/media.schema";
+import { mediaIdSchema } from "@/modules/media/media.schema";
 
-import {
-  deleteMedia,
-  getMedia,
-  updateMedia,
-} from "@/modules/media/media.service";
-
-async function resolveParams(context) {
-  const params = await context.params;
-
-  const company = companyIdSchema.safeParse(params.companyId);
-
-  const media = mediaIdSchema.safeParse(params.mediaId);
-
-  if (!company.success || !media.success) {
-    return null;
-  }
-
-  return {
-    companyId: company.data,
-
-    mediaId: media.data,
-  };
-}
+import { createPublicMediaVariantUrl } from "@/modules/media/media.service";
 
 export async function GET(request, context) {
   try {
-    const params = await resolveParams(context);
+    const params = await context.params;
 
-    if (!params) {
+    const company = companyIdSchema.safeParse(params.companyId);
+
+    const media = mediaIdSchema.safeParse(params.mediaId);
+
+    if (!company.success || !media.success) {
       return NextResponse.json(
         {
           success: false,
-          message: "Invalid request parameters.",
+          message: "Invalid media request.",
         },
         {
           status: 400,
@@ -50,38 +28,55 @@ export async function GET(request, context) {
       );
     }
 
-    const access = await getCompanyPermission({
-      companyId: params.companyId,
+    const { searchParams } = new URL(request.url);
 
-      permission: PERMISSIONS.MEDIA_VIEW,
-    });
+    const variant = searchParams.get("variant") || "large";
 
-    if (!access.authorized) {
+    if (!MEDIA_VARIANT_KEYS.includes(variant)) {
       return NextResponse.json(
         {
           success: false,
-          message: access.reason,
+
+          message: "Invalid media variant.",
         },
         {
-          status: access.user ? 403 : 401,
+          status: 400,
         },
       );
     }
 
-    const data = await getMedia({
-      companyId: params.companyId,
+    const result = await createPublicMediaVariantUrl({
+      companyId: company.data,
 
-      mediaId: params.mediaId,
+      mediaId: media.data,
+
+      variant,
     });
 
-    return NextResponse.json({
-      success: true,
-      data,
+    const response = NextResponse.redirect(result.url, {
+      status: 307,
     });
+
+    /*
+     * Cache redirect for only
+     * a short period because the
+     * signed URL itself expires.
+     */
+    response.headers.set(
+      "Cache-Control",
+      "public, s-maxage=300, stale-while-revalidate=60",
+    );
+
+    response.headers.set("X-Robots-Tag", "index");
+
+    return response;
   } catch (error) {
-    console.error("Get media error:", error);
+    console.error("Public media error:", error);
 
-    if (error.message === "MEDIA_NOT_FOUND") {
+    if (
+      error.message === "MEDIA_NOT_FOUND" ||
+      error.message === "MEDIA_VARIANT_NOT_FOUND"
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -97,198 +92,6 @@ export async function GET(request, context) {
       {
         success: false,
         message: "Unable to retrieve media.",
-      },
-      {
-        status: 500,
-      },
-    );
-  }
-}
-
-export async function PATCH(request, context) {
-  try {
-    if (!isTrustedOrigin(request)) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Invalid request origin.",
-        },
-        {
-          status: 403,
-        },
-      );
-    }
-
-    const params = await resolveParams(context);
-
-    if (!params) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Invalid request parameters.",
-        },
-        {
-          status: 400,
-        },
-      );
-    }
-
-    const access = await getCompanyPermission({
-      companyId: params.companyId,
-
-      permission: PERMISSIONS.MEDIA_UPDATE,
-    });
-
-    if (!access.authorized) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: access.reason,
-        },
-        {
-          status: access.user ? 403 : 401,
-        },
-      );
-    }
-
-    const body = await request.json();
-
-    const validation = updateMediaSchema.safeParse(body);
-
-    if (!validation.success) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Invalid media data.",
-          errors: validation.error.flatten().fieldErrors,
-        },
-        {
-          status: 400,
-        },
-      );
-    }
-
-    if (Object.keys(validation.data).length === 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "No media data supplied.",
-        },
-        {
-          status: 400,
-        },
-      );
-    }
-
-    const data = await updateMedia({
-      companyId: params.companyId,
-
-      mediaId: params.mediaId,
-
-      input: validation.data,
-
-      currentUser: access.user,
-    });
-
-    return NextResponse.json({
-      success: true,
-      data,
-    });
-  } catch (error) {
-    console.error("Update media error:", error);
-
-    return NextResponse.json(
-      {
-        success: false,
-        message:
-          error.message === "MEDIA_NOT_FOUND"
-            ? "Media not found."
-            : "Unable to update media.",
-      },
-      {
-        status: error.message === "MEDIA_NOT_FOUND" ? 404 : 500,
-      },
-    );
-  }
-}
-
-export async function DELETE(request, context) {
-  try {
-    if (!isTrustedOrigin(request)) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Invalid request origin.",
-        },
-        {
-          status: 403,
-        },
-      );
-    }
-
-    const params = await resolveParams(context);
-
-    if (!params) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Invalid request parameters.",
-        },
-        {
-          status: 400,
-        },
-      );
-    }
-
-    const access = await getCompanyPermission({
-      companyId: params.companyId,
-
-      permission: PERMISSIONS.MEDIA_DELETE,
-    });
-
-    if (!access.authorized) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: access.reason,
-        },
-        {
-          status: access.user ? 403 : 401,
-        },
-      );
-    }
-
-    const data = await deleteMedia({
-      companyId: params.companyId,
-
-      mediaId: params.mediaId,
-
-      currentUser: access.user,
-    });
-
-    return NextResponse.json({
-      success: true,
-      data,
-    });
-  } catch (error) {
-    console.error("Delete media error:", error);
-
-    if (error.message === "MEDIA_NOT_FOUND") {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Media not found.",
-        },
-        {
-          status: 404,
-        },
-      );
-    }
-
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Unable to delete media.",
       },
       {
         status: 500,

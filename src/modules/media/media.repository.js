@@ -21,6 +21,7 @@ export async function getMediaById({ companyId, mediaId }) {
 
   return {
     id: snapshot.id,
+
     ...snapshot.data(),
   };
 }
@@ -30,6 +31,7 @@ export async function listMediaRecords({ companyId, includeDeleted = false }) {
 
   let items = snapshot.docs.map((document) => ({
     id: document.id,
+
     ...document.data(),
   }));
 
@@ -53,6 +55,8 @@ export async function createPendingMediaRecord({
 
     status: "uploading",
 
+    variants: {},
+
     createdAt: FieldValue.serverTimestamp(),
 
     createdBy: userId,
@@ -60,6 +64,10 @@ export async function createPendingMediaRecord({
     updatedAt: FieldValue.serverTimestamp(),
 
     updatedBy: userId,
+
+    uploadedAt: null,
+
+    processedAt: null,
 
     deletedAt: null,
 
@@ -69,6 +77,26 @@ export async function createPendingMediaRecord({
   return getMediaById({
     companyId,
     mediaId,
+  });
+}
+
+export async function markMediaProcessing({ companyId, mediaId, userId }) {
+  const ref = getMediaCollection(companyId).doc(mediaId);
+
+  const snapshot = await ref.get();
+
+  if (!snapshot.exists || snapshot.data().deletedAt) {
+    throw new Error("MEDIA_NOT_FOUND");
+  }
+
+  await ref.update({
+    status: "processing",
+
+    failureReason: null,
+
+    updatedAt: FieldValue.serverTimestamp(),
+
+    updatedBy: userId,
   });
 }
 
@@ -83,6 +111,7 @@ export async function markMediaReady({ companyId, mediaId, data, userId }) {
 
   const before = {
     id: snapshot.id,
+
     ...snapshot.data(),
   };
 
@@ -91,7 +120,11 @@ export async function markMediaReady({ companyId, mediaId, data, userId }) {
 
     status: "ready",
 
+    failureReason: null,
+
     uploadedAt: FieldValue.serverTimestamp(),
+
+    processedAt: FieldValue.serverTimestamp(),
 
     updatedAt: FieldValue.serverTimestamp(),
 
@@ -140,6 +173,7 @@ export async function updateMediaRecord({ companyId, mediaId, data, userId }) {
 
   const before = {
     id: snapshot.id,
+
     ...snapshot.data(),
   };
 
@@ -173,6 +207,7 @@ export async function softDeleteMediaRecord({ companyId, mediaId, userId }) {
 
   const before = {
     id: snapshot.id,
+
     ...snapshot.data(),
   };
 
