@@ -5,30 +5,21 @@ import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 
 export const AUDIT_ACTIONS = {
-  // =====================================================
   // COMPANY
-  // =====================================================
-
   COMPANY_CREATE: "COMPANY_CREATE",
 
   COMPANY_UPDATE: "COMPANY_UPDATE",
 
   COMPANY_DELETE: "COMPANY_DELETE",
 
-  // =====================================================
-  // USER / MEMBERSHIP
-  // =====================================================
-
+  // USER
   USER_CREATE: "USER_CREATE",
 
   USER_UPDATE: "USER_UPDATE",
 
   USER_DELETE: "USER_DELETE",
 
-  // =====================================================
   // PROJECT
-  // =====================================================
-
   PROJECT_CREATE: "PROJECT_CREATE",
 
   PROJECT_UPDATE: "PROJECT_UPDATE",
@@ -41,10 +32,7 @@ export const AUDIT_ACTIONS = {
 
   PROJECT_UNPUBLISH: "PROJECT_UNPUBLISH",
 
-  // =====================================================
   // NEWS
-  // =====================================================
-
   NEWS_CREATE: "NEWS_CREATE",
 
   NEWS_UPDATE: "NEWS_UPDATE",
@@ -57,10 +45,7 @@ export const AUDIT_ACTIONS = {
 
   NEWS_UNPUBLISH: "NEWS_UNPUBLISH",
 
-  // =====================================================
   // PAGE
-  // =====================================================
-
   PAGE_CREATE: "PAGE_CREATE",
 
   PAGE_UPDATE: "PAGE_UPDATE",
@@ -73,10 +58,7 @@ export const AUDIT_ACTIONS = {
 
   PAGE_UNPUBLISH: "PAGE_UNPUBLISH",
 
-  // =====================================================
   // PEOPLE
-  // =====================================================
-
   PEOPLE_CREATE: "PEOPLE_CREATE",
 
   PEOPLE_UPDATE: "PEOPLE_UPDATE",
@@ -87,10 +69,33 @@ export const AUDIT_ACTIONS = {
 
   PEOPLE_UNPUBLISH: "PEOPLE_UNPUBLISH",
 
-  // =====================================================
-  // MEDIA
-  // =====================================================
+  // AWARD
+  AWARD_CREATE: "AWARD_CREATE",
 
+  AWARD_UPDATE: "AWARD_UPDATE",
+
+  AWARD_DELETE: "AWARD_DELETE",
+
+  AWARD_PUBLISH: "AWARD_PUBLISH",
+
+  AWARD_SCHEDULE: "AWARD_SCHEDULE",
+
+  AWARD_UNPUBLISH: "AWARD_UNPUBLISH",
+
+  // PUBLIC CONTENT
+  PUBLIC_CREATE: "PUBLIC_CREATE",
+
+  PUBLIC_UPDATE: "PUBLIC_UPDATE",
+
+  PUBLIC_DELETE: "PUBLIC_DELETE",
+
+  PUBLIC_PUBLISH: "PUBLIC_PUBLISH",
+
+  PUBLIC_SCHEDULE: "PUBLIC_SCHEDULE",
+
+  PUBLIC_UNPUBLISH: "PUBLIC_UNPUBLISH",
+
+  // MEDIA
   MEDIA_UPLOAD: "MEDIA_UPLOAD",
 
   MEDIA_UPDATE: "MEDIA_UPDATE",
@@ -98,13 +103,6 @@ export const AUDIT_ACTIONS = {
   MEDIA_DELETE: "MEDIA_DELETE",
 };
 
-/**
- * Strict audit writer.
- *
- * Use this when audit logging is part of
- * the operation contract and failure
- * should propagate.
- */
 export async function createAuditLog({
   userId,
   companyId = null,
@@ -160,14 +158,6 @@ export async function createAuditLog({
   return auditRef.id;
 }
 
-/**
- * Safe audit writer for CMS operations.
- *
- * Core CMS operations should not return
- * HTTP 500 after the database operation
- * already succeeded merely because the
- * audit log failed.
- */
 export async function createAuditLogSafe(payload) {
   try {
     return await createAuditLog(payload);

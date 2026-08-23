@@ -1,4 +1,4 @@
-export const PAGE_STATUS = {
+export const AWARD_STATUS = {
   DRAFT: "draft",
   REVIEW: "review",
   SCHEDULED: "scheduled",
@@ -6,29 +6,9 @@ export const PAGE_STATUS = {
   ARCHIVED: "archived",
 };
 
-export const PAGE_STATUSES = Object.values(PAGE_STATUS);
+export const AWARD_STATUSES = Object.values(AWARD_STATUS);
 
-export const PAGE_TYPE = {
-  HOME: "home",
-
-  STANDARD: "standard",
-
-  ABOUT: "about",
-
-  CONTACT: "contact",
-
-  SERVICES: "services",
-
-  STUDIO: "studio",
-
-  AWARDS: "awards",
-
-  CUSTOM: "custom",
-};
-
-export const PAGE_TYPES = Object.values(PAGE_TYPE);
-
-export const DEFAULT_PAGE_SEO = {
+export const DEFAULT_AWARD_SEO = {
   th: {
     title: "",
     description: "",

@@ -2,14 +2,55 @@ import { z } from "zod";
 
 import { PROJECT_STATUSES } from "@/constants/project";
 
-const nullableString = z.union([z.string(), z.null()]).optional();
+const nullableStringSchema = z.union([z.string(), z.null()]);
 
-const localizedString = z.object({
+const localizedStringSchema = z.object({
   th: z.string().default(""),
+
   en: z.string().default(""),
 });
 
-const localizedSeo = z.object({
+const localizedCreditSchema = z.object({
+  th: z.string().trim().max(250).default(""),
+
+  en: z.string().trim().max(250).default(""),
+});
+
+const projectCreditsSchema = z.object({
+  architecture: z.array(localizedCreditSchema).default([]),
+
+  interior: z.array(localizedCreditSchema).default([]),
+
+  landscape: z.array(localizedCreditSchema).default([]),
+
+  consultant: z.array(localizedCreditSchema).default([]),
+});
+
+const areaSchema = z.object({
+  value: z.union([z.number().nonnegative(), z.null()]).default(null),
+
+  unit: z.enum(["sqm", "sqft"]).default("sqm"),
+});
+
+const projectInfoSchema = z.object({
+  location: localizedStringSchema.optional(),
+
+  designYear: z
+    .union([z.number().int().min(1900).max(2200), z.null()])
+    .default(null),
+
+  completionYear: z
+    .union([z.number().int().min(1900).max(2200), z.null()])
+    .default(null),
+
+  area: areaSchema.optional(),
+
+  client: localizedStringSchema.optional(),
+
+  credits: projectCreditsSchema.optional(),
+});
+
+const localizedSeoSchema = z.object({
   title: z.string().max(70).default(""),
 
   description: z.string().max(180).default(""),
@@ -20,23 +61,25 @@ const localizedSeo = z.object({
 
   ogDescription: z.string().max(200).default(""),
 
-  ogImage: nullableString,
+  ogImage: nullableStringSchema.optional(),
 });
 
 const seoSchema = z.object({
-  th: localizedSeo,
-  en: localizedSeo,
+  th: localizedSeoSchema,
+
+  en: localizedSeoSchema,
 
   index: z.boolean().default(true),
+
   follow: z.boolean().default(true),
 });
 
 const projectImageSchema = z.object({
   mediaId: z.string().min(1),
 
-  alt: localizedString.optional(),
+  alt: localizedStringSchema.optional(),
 
-  caption: localizedString.optional(),
+  caption: localizedStringSchema.optional(),
 });
 
 const baseProjectSchema = z.object({
@@ -45,36 +88,21 @@ const baseProjectSchema = z.object({
     .trim()
     .min(2)
     .max(150)
-    .regex(
-      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-      "Slug must contain lowercase letters, numbers and hyphens only.",
-    ),
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Invalid project slug."),
 
-  title: z.object({
-    th: z.string().trim().max(200).default(""),
+  title: localizedStringSchema,
 
-    en: z.string().trim().max(200).default(""),
-  }),
+  excerpt: localizedStringSchema.optional(),
 
-  excerpt: localizedString.optional(),
+  content: localizedStringSchema.optional(),
 
-  content: localizedString.optional(),
+  categoryId: z.union([z.string().min(1), z.null()]).default(null),
 
-  location: localizedString.optional(),
+  subCategoryId: z.union([z.string().min(1), z.null()]).default(null),
 
-  client: z.string().trim().max(200).default(""),
-
-  completionYear: z
-    .union([z.number().int().min(1900).max(2200), z.null()])
-    .optional(),
-
-  projectType: z.string().trim().max(100).default(""),
-
-  categories: z.array(z.string()).default([]),
+  projectInfo: projectInfoSchema.optional(),
 
   tags: z.array(z.string().trim().min(1).max(100)).default([]),
-
-  architects: z.array(z.string()).default([]),
 
   featuredImage: z.union([projectImageSchema, z.null()]).optional(),
 

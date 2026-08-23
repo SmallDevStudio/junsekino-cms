@@ -34,6 +34,7 @@ export async function GET(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Invalid company ID.",
         },
         {
@@ -52,6 +53,7 @@ export async function GET(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: access.reason,
         },
         {
@@ -66,10 +68,15 @@ export async function GET(request, context) {
 
     const search = searchParams.get("search");
 
+    const categoryId = searchParams.get("categoryId");
+
+    const subCategoryId = searchParams.get("subCategoryId");
+
     if (status && !PROJECT_STATUSES.includes(status)) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Invalid project status.",
         },
         {
@@ -80,12 +87,19 @@ export async function GET(request, context) {
 
     const projects = await listProjects({
       companyId,
+
       status,
+
       search,
+
+      categoryId,
+
+      subCategoryId,
     });
 
     return NextResponse.json({
       success: true,
+
       data: projects,
     });
   } catch (error) {
@@ -94,6 +108,7 @@ export async function GET(request, context) {
     return NextResponse.json(
       {
         success: false,
+
         message: "Unable to retrieve projects.",
       },
       {
@@ -109,6 +124,7 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Invalid request origin.",
         },
         {
@@ -123,6 +139,7 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Invalid company ID.",
         },
         {
@@ -141,6 +158,7 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: access.reason,
         },
         {
@@ -179,6 +197,7 @@ export async function POST(request, context) {
     return NextResponse.json(
       {
         success: true,
+
         data: project,
       },
       {
@@ -192,6 +211,7 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "This project slug is already in use.",
         },
         {
@@ -204,7 +224,34 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Project title is required in at least one language.",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    const categoryErrors = {
+      PROJECT_CATEGORY_REQUIRED:
+        "Project category is required when a sub-category is selected.",
+
+      PROJECT_CATEGORY_NOT_FOUND: "Project category not found or inactive.",
+
+      PROJECT_SUBCATEGORY_NOT_FOUND:
+        "Project sub-category not found or inactive.",
+
+      PROJECT_SUBCATEGORY_INVALID_PARENT:
+        "The selected sub-category does not belong to the selected category.",
+    };
+
+    if (categoryErrors[error.message]) {
+      return NextResponse.json(
+        {
+          success: false,
+
+          message: categoryErrors[error.message],
         },
         {
           status: 400,
@@ -215,6 +262,7 @@ export async function POST(request, context) {
     return NextResponse.json(
       {
         success: false,
+
         message: "Unable to create project.",
       },
       {

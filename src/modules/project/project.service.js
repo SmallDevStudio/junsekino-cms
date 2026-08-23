@@ -12,16 +12,25 @@ import {
   updateProjectRecord,
 } from "./project.repository";
 
-import { createAuditLog } from "@/modules/audit/audit.service";
+import { getProjectCategoryById } from "./project-category.repository";
+
+import {
+  AUDIT_ACTIONS,
+  createAuditLogSafe,
+} from "@/modules/audit/audit.service";
 
 import { serializeFirestoreDocument } from "@/utils/firestore";
 
 function mergeLocalized(defaults = {}, value = {}) {
   return {
-    th: value.th ?? defaults.th ?? "",
+    th: value?.th ?? defaults?.th ?? "",
 
-    en: value.en ?? defaults.en ?? "",
+    en: value?.en ?? defaults?.en ?? "",
   };
+}
+
+function normalizeLocalizedArray(items = []) {
+  return items.map((item) => mergeLocalized({}, item));
 }
 
 function mergeSeo(seo = {}) {
@@ -41,6 +50,96 @@ function mergeSeo(seo = {}) {
   };
 }
 
+function normalizeProjectInfo(projectInfo = {}) {
+  return {
+    location: mergeLocalized({}, projectInfo.location),
+
+    designYear: projectInfo.designYear ?? null,
+
+    completionYear: projectInfo.completionYear ?? null,
+
+    area: {
+      value: projectInfo.area?.value ?? null,
+
+      unit: projectInfo.area?.unit || "sqm",
+    },
+
+    client: mergeLocalized({}, projectInfo.client),
+
+    credits: {
+      architecture: normalizeLocalizedArray(
+        projectInfo.credits?.architecture || [],
+      ),
+
+      interior: normalizeLocalizedArray(projectInfo.credits?.interior || []),
+
+      landscape: normalizeLocalizedArray(projectInfo.credits?.landscape || []),
+
+      consultant: normalizeLocalizedArray(
+        projectInfo.credits?.consultant || [],
+      ),
+    },
+  };
+}
+
+function mergeProjectInfo(existing = {}, incoming = {}) {
+  return {
+    location: incoming.location
+      ? mergeLocalized(existing.location, incoming.location)
+      : existing.location || mergeLocalized(),
+
+    designYear:
+      incoming.designYear !== undefined
+        ? incoming.designYear
+        : (existing.designYear ?? null),
+
+    completionYear:
+      incoming.completionYear !== undefined
+        ? incoming.completionYear
+        : (existing.completionYear ?? null),
+
+    area: incoming.area
+      ? {
+          value:
+            incoming.area.value !== undefined
+              ? incoming.area.value
+              : (existing.area?.value ?? null),
+
+          unit: incoming.area.unit || existing.area?.unit || "sqm",
+        }
+      : existing.area || {
+          value: null,
+          unit: "sqm",
+        },
+
+    client: incoming.client
+      ? mergeLocalized(existing.client, incoming.client)
+      : existing.client || mergeLocalized(),
+
+    credits: {
+      architecture:
+        incoming.credits?.architecture !== undefined
+          ? normalizeLocalizedArray(incoming.credits.architecture)
+          : existing.credits?.architecture || [],
+
+      interior:
+        incoming.credits?.interior !== undefined
+          ? normalizeLocalizedArray(incoming.credits.interior)
+          : existing.credits?.interior || [],
+
+      landscape:
+        incoming.credits?.landscape !== undefined
+          ? normalizeLocalizedArray(incoming.credits.landscape)
+          : existing.credits?.landscape || [],
+
+      consultant:
+        incoming.credits?.consultant !== undefined
+          ? normalizeLocalizedArray(incoming.credits.consultant)
+          : existing.credits?.consultant || [],
+    },
+  };
+}
+
 function normalizeProjectInput(input) {
   return {
     ...input,
@@ -53,17 +152,13 @@ function normalizeProjectInput(input) {
 
     content: mergeLocalized({}, input.content),
 
-    location: mergeLocalized({}, input.location),
+    categoryId: input.categoryId || null,
 
-    client: input.client || "",
+    subCategoryId: input.subCategoryId || null,
 
-    projectType: input.projectType || "",
-
-    categories: input.categories || [],
+    projectInfo: normalizeProjectInfo(input.projectInfo),
 
     tags: Array.from(new Set(input.tags || [])),
-
-    architects: input.architects || [],
 
     featuredImage: input.featuredImage ?? null,
 
@@ -71,15 +166,15 @@ function normalizeProjectInput(input) {
 
     featured: input.featured === true,
 
-    status: input.status || PROJECT_STATUS.DRAFT,
+    status: PROJECT_STATUS.DRAFT,
 
-    scheduledAt: input.scheduledAt ?? null,
+    scheduledAt: null,
 
     seo: mergeSeo(input.seo),
   };
 }
 
-function validateProjectLanguages(project) {
+function validateProjectTitle(project) {
   const hasThai = Boolean(project.title?.th?.trim());
 
   const hasEnglish = Boolean(project.title?.en?.trim());
@@ -90,14 +185,60 @@ function validateProjectLanguages(project) {
 }
 
 function validatePublishableProject(project) {
-  validateProjectLanguages(project);
+  validateProjectTitle(project);
 
-  const hasAnyContent =
+  const hasContent =
     Boolean(project.content?.th?.trim()) ||
     Boolean(project.content?.en?.trim());
 
-  if (!hasAnyContent) {
+  if (!hasContent) {
     throw new Error("PROJECT_CONTENT_REQUIRED");
+  }
+}
+
+async function validateProjectCategories({
+  companyId,
+  categoryId,
+  subCategoryId,
+}) {
+  if (!categoryId) {
+    if (subCategoryId) {
+      throw new Error("PROJECT_CATEGORY_REQUIRED");
+    }
+
+    return;
+  }
+
+  const category = await getProjectCategoryById({
+    companyId,
+
+    categoryId,
+  });
+
+  if (!category || category.deletedAt || category.status !== "active") {
+    throw new Error("PROJECT_CATEGORY_NOT_FOUND");
+  }
+
+  if (!subCategoryId) {
+    return;
+  }
+
+  const subCategory = await getProjectCategoryById({
+    companyId,
+
+    categoryId: subCategoryId,
+  });
+
+  if (
+    !subCategory ||
+    subCategory.deletedAt ||
+    subCategory.status !== "active"
+  ) {
+    throw new Error("PROJECT_SUBCATEGORY_NOT_FOUND");
+  }
+
+  if (subCategory.parentId !== categoryId) {
+    throw new Error("PROJECT_SUBCATEGORY_INVALID_PARENT");
   }
 }
 
@@ -105,6 +246,8 @@ export async function listProjects({
   companyId,
   status = null,
   search = null,
+  categoryId = null,
+  subCategoryId = null,
 }) {
   let projects = await listProjectRecords({
     companyId,
@@ -114,6 +257,16 @@ export async function listProjects({
     projects = projects.filter((project) => project.status === status);
   }
 
+  if (categoryId) {
+    projects = projects.filter((project) => project.categoryId === categoryId);
+  }
+
+  if (subCategoryId) {
+    projects = projects.filter(
+      (project) => project.subCategoryId === subCategoryId,
+    );
+  }
+
   if (search) {
     const keyword = search.trim().toLowerCase();
 
@@ -121,9 +274,18 @@ export async function listProjects({
       const values = [
         project.title?.th,
         project.title?.en,
+
         project.slug,
-        project.client,
-        project.projectType,
+
+        project.projectInfo?.location?.th,
+
+        project.projectInfo?.location?.en,
+
+        project.projectInfo?.client?.th,
+
+        project.projectInfo?.client?.en,
+
+        ...(project.tags || []),
       ]
         .filter(Boolean)
         .join(" ")
@@ -158,34 +320,34 @@ export async function getProject({ companyId, projectId }) {
 }
 
 export async function createProject({ companyId, input, currentUser }) {
-  const projectData = normalizeProjectInput(input);
+  const data = normalizeProjectInput(input);
 
-  validateProjectLanguages(projectData);
+  validateProjectTitle(data);
 
-  /*
-   * Content should not become
-   * published directly from
-   * the regular create endpoint.
-   */
+  await validateProjectCategories({
+    companyId,
 
-  projectData.status = PROJECT_STATUS.DRAFT;
+    categoryId: data.categoryId,
 
-  projectData.scheduledAt = null;
+    subCategoryId: data.subCategoryId,
+  });
 
   const project = await createProjectRecord({
     companyId,
 
-    data: projectData,
+    data,
 
     userId: currentUser.uid,
   });
 
-  await createAuditLog({
+  const serialized = serializeFirestoreDocument(project);
+
+  await createAuditLogSafe({
     userId: currentUser.uid,
 
     companyId,
 
-    action: "PROJECT_CREATE",
+    action: AUDIT_ACTIONS.PROJECT_CREATE,
 
     resource: "project",
 
@@ -193,10 +355,10 @@ export async function createProject({ companyId, input, currentUser }) {
 
     before: null,
 
-    after: serializeFirestoreDocument(project),
+    after: serialized,
   });
 
-  return serializeFirestoreDocument(project);
+  return serialized;
 }
 
 export async function updateProject({
@@ -234,8 +396,11 @@ export async function updateProject({
     updateData.content = mergeLocalized(existing.content, input.content);
   }
 
-  if (input.location) {
-    updateData.location = mergeLocalized(existing.location, input.location);
+  if (input.projectInfo) {
+    updateData.projectInfo = mergeProjectInfo(
+      existing.projectInfo,
+      input.projectInfo,
+    );
   }
 
   if (input.seo) {
@@ -255,22 +420,31 @@ export async function updateProject({
     });
   }
 
-  /*
-   * Publishing state is controlled
-   * only by dedicated endpoints.
-   */
+  if (input.tags) {
+    updateData.tags = Array.from(new Set(input.tags));
+  }
 
   delete updateData.status;
   delete updateData.scheduledAt;
   delete updateData.publishedAt;
   delete updateData.publishedBy;
+  delete updateData.deletedAt;
+  delete updateData.deletedBy;
 
   const preview = {
     ...existing,
     ...updateData,
   };
 
-  validateProjectLanguages(preview);
+  validateProjectTitle(preview);
+
+  await validateProjectCategories({
+    companyId,
+
+    categoryId: preview.categoryId,
+
+    subCategoryId: preview.subCategoryId,
+  });
 
   const result = await updateProjectRecord({
     companyId,
@@ -281,23 +455,27 @@ export async function updateProject({
     userId: currentUser.uid,
   });
 
-  await createAuditLog({
+  const before = serializeFirestoreDocument(result.before);
+
+  const after = serializeFirestoreDocument(result.after);
+
+  await createAuditLogSafe({
     userId: currentUser.uid,
 
     companyId,
 
-    action: "PROJECT_UPDATE",
+    action: AUDIT_ACTIONS.PROJECT_UPDATE,
 
     resource: "project",
 
     resourceId: projectId,
 
-    before: serializeFirestoreDocument(result.before),
+    before,
 
-    after: serializeFirestoreDocument(result.after),
+    after,
   });
 
-  return serializeFirestoreDocument(result.after);
+  return after;
 }
 
 export async function publishProject({
@@ -306,43 +484,56 @@ export async function publishProject({
   scheduledAt = null,
   currentUser,
 }) {
-  const project = await getProjectById({
+  const existing = await getProjectById({
     companyId,
     projectId,
   });
 
-  if (!project || project.deletedAt) {
+  if (!existing || existing.deletedAt) {
     throw new Error("PROJECT_NOT_FOUND");
   }
 
-  validatePublishableProject(project);
+  validatePublishableProject(existing);
+
+  await validateProjectCategories({
+    companyId,
+
+    categoryId: existing.categoryId,
+
+    subCategoryId: existing.subCategoryId,
+  });
 
   const result = await publishProjectRecord({
     companyId,
     projectId,
-
     scheduledAt,
 
     userId: currentUser.uid,
   });
 
-  await createAuditLog({
+  const before = serializeFirestoreDocument(result.before);
+
+  const after = serializeFirestoreDocument(result.after);
+
+  await createAuditLogSafe({
     userId: currentUser.uid,
 
     companyId,
 
-    action: scheduledAt ? "PROJECT_SCHEDULE" : "PROJECT_PUBLISH",
+    action: scheduledAt
+      ? AUDIT_ACTIONS.PROJECT_SCHEDULE
+      : AUDIT_ACTIONS.PROJECT_PUBLISH,
 
     resource: "project",
 
     resourceId: projectId,
 
-    before: serializeFirestoreDocument(result.before),
+    before,
 
-    after: serializeFirestoreDocument(result.after),
+    after,
   });
 
-  return serializeFirestoreDocument(result.after);
+  return after;
 }
 
 export async function unpublishProject({ companyId, projectId, currentUser }) {
@@ -353,23 +544,27 @@ export async function unpublishProject({ companyId, projectId, currentUser }) {
     userId: currentUser.uid,
   });
 
-  await createAuditLog({
+  const before = serializeFirestoreDocument(result.before);
+
+  const after = serializeFirestoreDocument(result.after);
+
+  await createAuditLogSafe({
     userId: currentUser.uid,
 
     companyId,
 
-    action: "PROJECT_UNPUBLISH",
+    action: AUDIT_ACTIONS.PROJECT_UNPUBLISH,
 
     resource: "project",
 
     resourceId: projectId,
 
-    before: serializeFirestoreDocument(result.before),
+    before,
 
-    after: serializeFirestoreDocument(result.after),
+    after,
   });
 
-  return serializeFirestoreDocument(result.after);
+  return after;
 }
 
 export async function deleteProject({ companyId, projectId, currentUser }) {
@@ -380,12 +575,12 @@ export async function deleteProject({ companyId, projectId, currentUser }) {
     userId: currentUser.uid,
   });
 
-  await createAuditLog({
+  await createAuditLogSafe({
     userId: currentUser.uid,
 
     companyId,
 
-    action: "PROJECT_DELETE",
+    action: AUDIT_ACTIONS.PROJECT_DELETE,
 
     resource: "project",
 
@@ -400,6 +595,7 @@ export async function deleteProject({ companyId, projectId, currentUser }) {
 
   return {
     id: projectId,
+
     deleted: true,
   };
 }
