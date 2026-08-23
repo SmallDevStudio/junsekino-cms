@@ -62,30 +62,86 @@ async function validateProjectRelation({ companyId, projectId }) {
 }
 
 function validateAward(award) {
-  if (!award.title?.th?.trim() && !award.title?.en?.trim()) {
+  const hasTitle =
+    Boolean(award.title?.th?.trim()) || Boolean(award.title?.en?.trim());
+
+  if (!hasTitle) {
     throw new Error("AWARD_TITLE_REQUIRED");
   }
 
-  if (
-    !award.awardInfo?.name?.th?.trim() &&
-    !award.awardInfo?.name?.en?.trim()
-  ) {
+  const hasAwardName =
+    Boolean(award.awardInfo?.name?.th?.trim()) ||
+    Boolean(award.awardInfo?.name?.en?.trim());
+
+  if (!hasAwardName) {
     throw new Error("AWARD_NAME_REQUIRED");
   }
 }
 
-export async function listAwards({ companyId, status = null, search = null }) {
+function normalizeAwardInput(input) {
+  return {
+    ...input,
+
+    slug: input.slug.trim().toLowerCase(),
+
+    title: mergeLocalized({}, input.title),
+
+    projectId: input.projectId || null,
+
+    awardInfo: {
+      name: mergeLocalized({}, input.awardInfo?.name),
+
+      organization: mergeLocalized({}, input.awardInfo?.organization),
+
+      year: input.awardInfo?.year ?? null,
+
+      category: mergeLocalized({}, input.awardInfo?.category),
+
+      level: mergeLocalized({}, input.awardInfo?.level),
+    },
+
+    excerpt: mergeLocalized({}, input.excerpt),
+
+    content: mergeLocalized({}, input.content),
+
+    featuredImage: input.featuredImage ?? null,
+
+    gallery: input.gallery || [],
+
+    featured: input.featured === true,
+
+    seo: mergeSeo(input.seo),
+  };
+}
+
+export async function listAwards({
+  companyId,
+  status = null,
+  search = null,
+  projectId = null,
+  year = null,
+}) {
   let items = await listAwardRecords(companyId);
 
   if (status) {
     items = items.filter((item) => item.status === status);
   }
 
-  if (search) {
-    const keyword = search.toLowerCase().trim();
+  if (projectId) {
+    items = items.filter((item) => item.projectId === projectId);
+  }
 
-    items = items.filter((item) =>
-      [
+  if (year) {
+    items = items.filter(
+      (item) => Number(item.awardInfo?.year) === Number(year),
+    );
+  }
+
+  if (search) {
+    const keyword = search.trim().toLowerCase();
+
+    items = items.filter((item) => {
+      const searchable = [
         item.title?.th,
         item.title?.en,
 
@@ -97,42 +153,54 @@ export async function listAwards({ companyId, status = null, search = null }) {
 
         item.awardInfo?.organization?.en,
 
+        item.awardInfo?.category?.th,
+
+        item.awardInfo?.category?.en,
+
         item.slug,
       ]
         .filter(Boolean)
         .join(" ")
-        .toLowerCase()
-        .includes(keyword),
-    );
+        .toLowerCase();
+
+      return searchable.includes(keyword);
+    });
   }
 
-  items.sort((a, b) => (b.awardInfo?.year || 0) - (a.awardInfo?.year || 0));
+  items.sort((a, b) => {
+    const yearA = a.awardInfo?.year || 0;
+
+    const yearB = b.awardInfo?.year || 0;
+
+    if (yearA !== yearB) {
+      return yearB - yearA;
+    }
+
+    const dateA = a.updatedAt?.toMillis?.() || 0;
+
+    const dateB = b.updatedAt?.toMillis?.() || 0;
+
+    return dateB - dateA;
+  });
 
   return items.map(serializeFirestoreDocument);
 }
 
+export async function getAward({ companyId, awardId }) {
+  const award = await getAwardById({
+    companyId,
+    awardId,
+  });
+
+  if (!award || award.deletedAt) {
+    throw new Error("AWARD_NOT_FOUND");
+  }
+
+  return serializeFirestoreDocument(award);
+}
+
 export async function createAward({ companyId, input, currentUser }) {
-  const data = {
-    ...input,
-
-    slug: input.slug.trim().toLowerCase(),
-
-    title: mergeLocalized({}, input.title),
-
-    excerpt: mergeLocalized({}, input.excerpt),
-
-    content: mergeLocalized({}, input.content),
-
-    projectId: input.projectId || null,
-
-    featuredImage: input.featuredImage ?? null,
-
-    gallery: input.gallery || [],
-
-    featured: input.featured === true,
-
-    seo: mergeSeo(input.seo),
-  };
+  const data = normalizeAwardInput(input);
 
   validateAward(data);
 
@@ -206,29 +274,27 @@ export async function updateAward({ companyId, awardId, input, currentUser }) {
       ...existing.awardInfo,
       ...input.awardInfo,
 
-      name: mergeLocalized(
-        existing.awardInfo?.name,
+      name: input.awardInfo.name
+        ? mergeLocalized(existing.awardInfo?.name, input.awardInfo?.name)
+        : existing.awardInfo?.name,
 
-        input.awardInfo?.name,
-      ),
+      organization: input.awardInfo.organization
+        ? mergeLocalized(
+            existing.awardInfo?.organization,
+            input.awardInfo?.organization,
+          )
+        : existing.awardInfo?.organization,
 
-      organization: mergeLocalized(
-        existing.awardInfo?.organization,
+      category: input.awardInfo.category
+        ? mergeLocalized(
+            existing.awardInfo?.category,
+            input.awardInfo?.category,
+          )
+        : existing.awardInfo?.category,
 
-        input.awardInfo?.organization,
-      ),
-
-      category: mergeLocalized(
-        existing.awardInfo?.category,
-
-        input.awardInfo?.category,
-      ),
-
-      level: mergeLocalized(
-        existing.awardInfo?.level,
-
-        input.awardInfo?.level,
-      ),
+      level: input.awardInfo.level
+        ? mergeLocalized(existing.awardInfo?.level, input.awardInfo?.level)
+        : existing.awardInfo?.level,
     };
   }
 
@@ -278,6 +344,10 @@ export async function updateAward({ companyId, awardId, input, currentUser }) {
     userId: currentUser.uid,
   });
 
+  const before = serializeFirestoreDocument(result.before);
+
+  const after = serializeFirestoreDocument(result.after);
+
   await createAuditLogSafe({
     userId: currentUser.uid,
 
@@ -289,10 +359,130 @@ export async function updateAward({ companyId, awardId, input, currentUser }) {
 
     resourceId: awardId,
 
-    before: serializeFirestoreDocument(result.before),
+    before,
 
-    after: serializeFirestoreDocument(result.after),
+    after,
   });
 
-  return serializeFirestoreDocument(result.after);
+  return after;
+}
+
+export async function publishAward({
+  companyId,
+  awardId,
+  scheduledAt = null,
+  currentUser,
+}) {
+  const existing = await getAwardById({
+    companyId,
+    awardId,
+  });
+
+  if (!existing || existing.deletedAt) {
+    throw new Error("AWARD_NOT_FOUND");
+  }
+
+  validateAward(existing);
+
+  await validateProjectRelation({
+    companyId,
+
+    projectId: existing.projectId,
+  });
+
+  const result = await publishAwardRecord({
+    companyId,
+    awardId,
+    scheduledAt,
+
+    userId: currentUser.uid,
+  });
+
+  const before = serializeFirestoreDocument(result.before);
+
+  const after = serializeFirestoreDocument(result.after);
+
+  await createAuditLogSafe({
+    userId: currentUser.uid,
+
+    companyId,
+
+    action: scheduledAt
+      ? AUDIT_ACTIONS.AWARD_SCHEDULE
+      : AUDIT_ACTIONS.AWARD_PUBLISH,
+
+    resource: "award",
+
+    resourceId: awardId,
+
+    before,
+
+    after,
+  });
+
+  return after;
+}
+
+export async function unpublishAward({ companyId, awardId, currentUser }) {
+  const result = await unpublishAwardRecord({
+    companyId,
+    awardId,
+
+    userId: currentUser.uid,
+  });
+
+  const before = serializeFirestoreDocument(result.before);
+
+  const after = serializeFirestoreDocument(result.after);
+
+  await createAuditLogSafe({
+    userId: currentUser.uid,
+
+    companyId,
+
+    action: AUDIT_ACTIONS.AWARD_UNPUBLISH,
+
+    resource: "award",
+
+    resourceId: awardId,
+
+    before,
+
+    after,
+  });
+
+  return after;
+}
+
+export async function deleteAward({ companyId, awardId, currentUser }) {
+  const before = await softDeleteAwardRecord({
+    companyId,
+    awardId,
+
+    userId: currentUser.uid,
+  });
+
+  await createAuditLogSafe({
+    userId: currentUser.uid,
+
+    companyId,
+
+    action: AUDIT_ACTIONS.AWARD_DELETE,
+
+    resource: "award",
+
+    resourceId: awardId,
+
+    before: serializeFirestoreDocument(before),
+
+    after: {
+      deleted: true,
+    },
+  });
+
+  return {
+    id: awardId,
+
+    deleted: true,
+  };
 }
