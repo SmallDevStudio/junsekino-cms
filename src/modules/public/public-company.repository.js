@@ -2,31 +2,10 @@ import "server-only";
 
 import { adminDb } from "@/lib/firebase/admin";
 
+import { resolveCompanyBySlug } from "@/modules/company/company-slug.repository";
+
 export async function getPublicCompanyBySlug(companySlug) {
-  const snapshot = await adminDb
-    .collection("companies")
-    .where("slug", "==", companySlug)
-    .where("status", "==", "active")
-    .limit(1)
-    .get();
-
-  if (snapshot.empty) {
-    return null;
-  }
-
-  const document = snapshot.docs[0];
-
-  const data = document.data();
-
-  if (data.deletedAt) {
-    return null;
-  }
-
-  return {
-    id: document.id,
-
-    ...data,
-  };
+  return resolveCompanyBySlug(companySlug);
 }
 
 export async function getPublicCompanySettings(companyId) {
@@ -35,15 +14,22 @@ export async function getPublicCompanySettings(companyId) {
     .doc(companyId)
     .collection("settings");
 
-  const [navigation, branding, seo, social] = await Promise.all([
-    settingsRef.doc("navigation").get(),
+  const [navigation, branding, seo, social, analytics, contact, privacy] =
+    await Promise.all([
+      settingsRef.doc("navigation").get(),
 
-    settingsRef.doc("branding").get(),
+      settingsRef.doc("branding").get(),
 
-    settingsRef.doc("seo").get(),
+      settingsRef.doc("seo").get(),
 
-    settingsRef.doc("social").get(),
-  ]);
+      settingsRef.doc("social").get(),
+
+      settingsRef.doc("analytics").get(),
+
+      settingsRef.doc("contact").get(),
+
+      settingsRef.doc("privacy").get(),
+    ]);
 
   return {
     navigation: navigation.exists ? navigation.data() : null,
@@ -53,5 +39,11 @@ export async function getPublicCompanySettings(companyId) {
     seo: seo.exists ? seo.data() : null,
 
     social: social.exists ? social.data() : null,
+
+    analytics: analytics.exists ? analytics.data() : null,
+
+    contact: contact.exists ? contact.data() : null,
+
+    privacy: privacy.exists ? privacy.data() : null,
   };
 }

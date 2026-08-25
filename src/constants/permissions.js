@@ -123,4 +123,22 @@ export const PERMISSIONS = {
   // =====================================================
 
   AUDIT_VIEW: "audit.view",
+
+  // =====================================================
+  // FORM
+  // =====================================================
+
+  FORM_VIEW: "form.view",
+  FORM_CREATE: "form.create",
+  FORM_UPDATE: "form.update",
+  FORM_DELETE: "form.delete",
+  FORM_SUBMISSION_VIEW: "formSubmission.view",
+  FORM_SUBMISSION_UPDATE: "formSubmission.update",
+  POPUP_VIEW: "popup.view",
+  POPUP_CREATE: "popup.create",
+  POPUP_UPDATE: "popup.update",
+  POPUP_DELETE: "popup.delete",
+  ANALYTICS_VIEW: "analytics.view",
+  NOTIFICATION_VIEW: "notification.view",
+  NOTIFICATION_UPDATE: "notification.update",
 };

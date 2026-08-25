@@ -25,10 +25,38 @@ export async function GET(request, context) {
 
     const data = await getPublicCompany(companySlug);
 
+    /*
+     * API-level redirect information.
+     *
+     * The actual website route can
+     * later issue permanentRedirect().
+     */
+
+    if (data.redirect) {
+      return NextResponse.json(
+        {
+          success: true,
+
+          redirect: true,
+
+          redirectTo: data.redirectTo,
+        },
+        {
+          status: 200,
+        },
+      );
+    }
+
     return NextResponse.json({
       success: true,
 
-      data,
+      redirect: false,
+
+      data: {
+        company: data.company,
+
+        settings: data.settings,
+      },
     });
   } catch (error) {
     console.error("Public company error:", error);
