@@ -1,0 +1,86 @@
+import "server-only";
+
+import {
+  createNotificationRecord,
+  listNotificationRecords,
+} from "./notification.repository";
+
+import { serializeFirestoreDocument } from "@/utils/firestore";
+
+export async function createFormSubmissionNotification({
+  companyId,
+  form,
+  submission,
+}) {
+  if (form.settings?.notifyEmployees === false) {
+    return null;
+  }
+
+  const title = {
+    th:
+      form.type === "contact"
+        ? "มีข้อความติดต่อใหม่"
+        : form.type === "career"
+          ? "มีใบสมัครงานใหม่"
+          : form.type === "survey"
+            ? "มีแบบสอบถามใหม่"
+            : "มีการส่งแบบฟอร์มใหม่",
+
+    en:
+      form.type === "contact"
+        ? "New contact message"
+        : form.type === "career"
+          ? "New job application"
+          : form.type === "survey"
+            ? "New survey response"
+            : "New form submission",
+  };
+
+  const record = await createNotificationRecord({
+    companyId,
+
+    data: {
+      type: "form_submission",
+
+      level: "info",
+
+      title,
+
+      message: {
+        th: form.name?.th || "แบบฟอร์ม",
+
+        en: form.name?.en || "Form",
+      },
+
+      resource: {
+        type: "formSubmission",
+
+        id: submission.id,
+
+        formId: form.id,
+      },
+
+      audience: {
+        roles: [
+          "TENANT_OWNER",
+          "TENANT_ADMIN",
+          "TENANT_USER",
+          "SUPERADMIN",
+          "ADMIN",
+          "EDITOR",
+        ],
+      },
+    },
+  });
+
+  return record;
+}
+
+export async function listCompanyNotifications({ companyId, limit = 50 }) {
+  const items = await listNotificationRecords({
+    companyId,
+    limit,
+  });
+
+  return items.map(serializeFirestoreDocument);
+}
