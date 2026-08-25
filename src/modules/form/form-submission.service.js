@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getFormById, getFormBySlug } from "./form.repository";
+import { getFormBySlug } from "./form.repository";
 
 import {
   checkSubmissionRateLimit,
@@ -52,18 +52,16 @@ function validateText({ field, value }) {
   }
 
   if (validation.pattern) {
+    let regex;
+
     try {
-      const regex = new RegExp(validation.pattern);
-
-      if (!regex.test(value)) {
-        throw new Error(`FORM_FIELD_PATTERN_INVALID:${field.id}`);
-      }
-    } catch (error) {
-      if (error.message?.startsWith("FORM_FIELD_")) {
-        throw error;
-      }
-
+      regex = new RegExp(validation.pattern);
+    } catch {
       throw new Error(`FORM_FIELD_CONFIGURATION_INVALID:${field.id}`);
+    }
+
+    if (!regex.test(value)) {
+      throw new Error(`FORM_FIELD_PATTERN_INVALID:${field.id}`);
     }
   }
 }
@@ -74,9 +72,7 @@ function validateEmail({ field, value }) {
     value,
   });
 
-  const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-
-  if (!valid) {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
     throw new Error(`FORM_FIELD_EMAIL_INVALID:${field.id}`);
   }
 }
@@ -107,8 +103,14 @@ function validateOption({ field, value }) {
   }
 }
 
+/*
+ * Returns both sanitized values
+ * and attachment claims.
+ */
 function validateFormValues({ form, values }) {
   const cleaned = {};
+
+  const attachmentBindings = [];
 
   for (const field of form.fields || []) {
     if (field.enabled === false) {
@@ -166,6 +168,7 @@ function validateFormValues({ form, values }) {
           field,
           value,
         });
+
         break;
 
       case "checkbox":
@@ -177,6 +180,7 @@ function validateFormValues({ form, values }) {
           for (const selected of value) {
             validateOption({
               field,
+
               value: selected,
             });
           }
@@ -192,11 +196,20 @@ function validateFormValues({ form, values }) {
 
       case "file":
         /*
-         * File uploads will use
-         * a separate private signed
-         * upload workflow.
+         * Public client sends the
+         * finalized attachment ID.
          */
-        throw new Error("FORM_FILE_UPLOAD_NOT_READY");
+        if (typeof value !== "string" || !value.trim()) {
+          throw new Error(`FORM_FIELD_FILE_INVALID:${field.id}`);
+        }
+
+        attachmentBindings.push({
+          fieldId: field.id,
+
+          attachmentId: value.trim(),
+        });
+
+        break;
 
       default:
         throw new Error(`FORM_FIELD_TYPE_UNSUPPORTED:${field.id}`);
@@ -205,7 +218,11 @@ function validateFormValues({ form, values }) {
     cleaned[field.id] = value;
   }
 
-  return cleaned;
+  return {
+    values: cleaned,
+
+    attachmentBindings,
+  };
 }
 
 function resolveLegalVersions(legal) {
@@ -256,13 +273,6 @@ export async function submitPublicForm({
     throw new Error("FORM_NOT_FOUND");
   }
 
-  /*
-   * Honeypot.
-   *
-   * Return fake success at route
-   * level instead of revealing bot
-   * detection.
-   */
   if (input.website?.trim()) {
     throw new Error("FORM_HONEYPOT_TRIGGERED");
   }
@@ -288,7 +298,7 @@ export async function submitPublicForm({
     legal,
   });
 
-  const values = validateFormValues({
+  const validated = validateFormValues({
     form,
 
     values: input.values,
@@ -299,6 +309,10 @@ export async function submitPublicForm({
   const submission = await createSubmissionRecord({
     companyId,
 
+    visitorHash,
+
+    attachmentBindings: validated.attachmentBindings,
+
     data: {
       formId: form.id,
 
@@ -308,14 +322,13 @@ export async function submitPublicForm({
 
       formName: form.name,
 
-      /*
-       * Snapshot of form version
-       * semantics at submission
-       * time.
-       */
       fieldsSnapshot: form.fields,
 
-      values,
+      values: validated.values,
+
+      attachmentIds: validated.attachmentBindings.map(
+        (item) => item.attachmentId,
+      ),
 
       legalVersions,
 
@@ -335,15 +348,11 @@ export async function submitPublicForm({
 
   const serialized = serializeFirestoreDocument(submission);
 
-  /*
-   * Notifications should never make
-   * a valid visitor submission fail.
-   */
-
   try {
     await createFormSubmissionNotification({
       companyId,
       form,
+
       submission: serialized,
     });
   } catch (error) {
@@ -365,6 +374,7 @@ export async function submitPublicForm({
 
     email = {
       sent: false,
+
       error: error.message,
     };
   }

@@ -11,6 +11,13 @@ function getSubmissionCollection(companyId) {
     .collection("formSubmissions");
 }
 
+function getAttachmentCollection(companyId) {
+  return adminDb
+    .collection("companies")
+    .doc(companyId)
+    .collection("formAttachments");
+}
+
 function getRateLimitCollection(companyId) {
   return adminDb
     .collection("companies")
@@ -55,9 +62,7 @@ export async function listSubmissionRecords({
     items = items.filter((item) => item.status === status);
   }
 
-  items = items.filter((item) => !item.deletedAt);
-
-  return items;
+  return items.filter((item) => !item.deletedAt);
 }
 
 export async function checkSubmissionRateLimit({
@@ -66,9 +71,6 @@ export async function checkSubmissionRateLimit({
   visitorHash,
   limit = 5,
 }) {
-  /*
-   * One bucket per hour.
-   */
   const bucket = Math.floor(Date.now() / (60 * 60 * 1000));
 
   const ref = getRateLimitCollection(companyId).doc(
@@ -87,8 +89,6 @@ export async function checkSubmissionRateLimit({
     count = existing;
 
     if (existing >= limit) {
-      allowed = false;
-
       return;
     }
 
@@ -120,31 +120,111 @@ export async function checkSubmissionRateLimit({
   };
 }
 
-export async function createSubmissionRecord({ companyId, data }) {
-  const ref = getSubmissionCollection(companyId).doc();
+/*
+ * Creates the submission and claims all
+ * private attachments atomically.
+ *
+ * attachmentBindings:
+ * [
+ *   {
+ *     attachmentId,
+ *     fieldId
+ *   }
+ * ]
+ */
+export async function createSubmissionRecord({
+  companyId,
+  data,
+  attachmentBindings = [],
+  visitorHash,
+}) {
+  const submissionRef = getSubmissionCollection(companyId).doc();
 
-  await ref.set({
-    ...data,
+  const attachmentRefs = attachmentBindings.map((binding) =>
+    getAttachmentCollection(companyId).doc(binding.attachmentId),
+  );
 
-    status: "new",
+  await adminDb.runTransaction(async (transaction) => {
+    /*
+     * IMPORTANT:
+     * all Firestore reads occur
+     * before the first write.
+     */
 
-    createdAt: FieldValue.serverTimestamp(),
+    const attachmentSnapshots =
+      attachmentRefs.length > 0
+        ? await transaction.getAll(...attachmentRefs)
+        : [];
 
-    updatedAt: FieldValue.serverTimestamp(),
+    for (let index = 0; index < attachmentBindings.length; index += 1) {
+      const binding = attachmentBindings[index];
 
-    assignedTo: null,
+      const snapshot = attachmentSnapshots[index];
 
-    readAt: null,
+      if (!snapshot.exists) {
+        throw new Error(`FORM_ATTACHMENT_NOT_FOUND:${binding.fieldId}`);
+      }
 
-    resolvedAt: null,
+      const attachment = snapshot.data();
 
-    deletedAt: null,
+      if (attachment.deletedAt || attachment.status !== "ready") {
+        throw new Error(`FORM_ATTACHMENT_NOT_READY:${binding.fieldId}`);
+      }
+
+      if (attachment.visitorHash !== visitorHash) {
+        throw new Error(`FORM_ATTACHMENT_NOT_FOUND:${binding.fieldId}`);
+      }
+
+      if (attachment.formId !== data.formId) {
+        throw new Error(`FORM_ATTACHMENT_FORM_MISMATCH:${binding.fieldId}`);
+      }
+
+      if (attachment.fieldId !== binding.fieldId) {
+        throw new Error(`FORM_ATTACHMENT_FIELD_MISMATCH:${binding.fieldId}`);
+      }
+
+      if (attachment.submissionId) {
+        throw new Error(`FORM_ATTACHMENT_ALREADY_ATTACHED:${binding.fieldId}`);
+      }
+    }
+
+    transaction.set(submissionRef, {
+      ...data,
+
+      status: "new",
+
+      createdAt: FieldValue.serverTimestamp(),
+
+      updatedAt: FieldValue.serverTimestamp(),
+
+      assignedTo: null,
+
+      readAt: null,
+
+      resolvedAt: null,
+
+      deletedAt: null,
+    });
+
+    for (let index = 0; index < attachmentBindings.length; index += 1) {
+      const attachmentRef = attachmentRefs[index];
+
+      transaction.update(attachmentRef, {
+        status: "attached",
+
+        submissionId: submissionRef.id,
+
+        attachedAt: FieldValue.serverTimestamp(),
+
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+    }
   });
 
   return getSubmissionById({
     companyId,
 
-    submissionId: ref.id,
+    submissionId: submissionRef.id,
   });
 }
 
