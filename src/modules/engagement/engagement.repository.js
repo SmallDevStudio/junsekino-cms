@@ -1,8 +1,12 @@
 import "server-only";
 
+import crypto from "node:crypto";
+
 import { FieldValue } from "firebase-admin/firestore";
 
 import { adminDb } from "@/lib/firebase/admin";
+
+const VIEW_WINDOW_MS = 30 * 60 * 1000;
 
 function getStatsRef({ companyId, contentType, contentId }) {
   return adminDb
@@ -40,6 +44,34 @@ function getDailyVisitorRef({
     .doc(companyId)
     .collection("analyticsVisitors")
     .doc(`${dateKey}_${contentType}_${contentId}_${visitorHash}`);
+}
+
+function getViewWindowKey({ contentType, contentId, visitorHash }) {
+  const bucket = Math.floor(Date.now() / VIEW_WINDOW_MS);
+
+  return crypto
+    .createHash("sha256")
+    .update(`${contentType}:${contentId}:${visitorHash}:${bucket}`)
+    .digest("hex");
+}
+
+function getViewCooldownRef({
+  companyId,
+  contentType,
+  contentId,
+  visitorHash,
+}) {
+  const key = getViewWindowKey({
+    contentType,
+    contentId,
+    visitorHash,
+  });
+
+  return adminDb
+    .collection("companies")
+    .doc(companyId)
+    .collection("viewCooldowns")
+    .doc(key);
 }
 
 export async function getEngagementStats({
@@ -120,16 +152,15 @@ export async function likeContentRecord({
   let changed = false;
 
   await adminDb.runTransaction(async (transaction) => {
-    const reactionSnapshot = await transaction.get(reactionRef);
+    const reaction = await transaction.get(reactionRef);
 
-    if (reactionSnapshot.exists) {
+    if (reaction.exists) {
       return;
     }
 
     transaction.set(reactionRef, {
       contentType,
       contentId,
-
       visitorHash,
 
       reaction: "like",
@@ -145,10 +176,6 @@ export async function likeContentRecord({
 
         likes: FieldValue.increment(1),
 
-        views: FieldValue.increment(0),
-
-        shares: FieldValue.increment(0),
-
         updatedAt: FieldValue.serverTimestamp(),
       },
       {
@@ -162,16 +189,9 @@ export async function likeContentRecord({
         date: dateKey,
 
         contentType,
-
         contentId,
 
         likes: FieldValue.increment(1),
-
-        views: FieldValue.increment(0),
-
-        shares: FieldValue.increment(0),
-
-        uniqueVisitors: FieldValue.increment(0),
 
         updatedAt: FieldValue.serverTimestamp(),
       },
@@ -218,31 +238,26 @@ export async function unlikeContentRecord({
   let changed = false;
 
   await adminDb.runTransaction(async (transaction) => {
-    /*
-     * All reads before writes.
-     */
+    const [reaction, stats, daily] = await transaction.getAll(
+      reactionRef,
+      statsRef,
+      dailyRef,
+    );
 
-    const [reactionSnapshot, statsSnapshot, dailySnapshot] =
-      await transaction.getAll(reactionRef, statsRef, dailyRef);
-
-    if (!reactionSnapshot.exists) {
+    if (!reaction.exists) {
       return;
     }
 
-    const currentLikes = statsSnapshot.exists
-      ? statsSnapshot.data().likes || 0
-      : 0;
+    const likes = stats.exists ? stats.data().likes || 0 : 0;
 
-    const currentDailyLikes = dailySnapshot.exists
-      ? dailySnapshot.data().likes || 0
-      : 0;
+    const dailyLikes = daily.exists ? daily.data().likes || 0 : 0;
 
     transaction.delete(reactionRef);
 
     transaction.set(
       statsRef,
       {
-        likes: Math.max(currentLikes - 1, 0),
+        likes: Math.max(likes - 1, 0),
 
         updatedAt: FieldValue.serverTimestamp(),
       },
@@ -257,10 +272,9 @@ export async function unlikeContentRecord({
         date: dateKey,
 
         contentType,
-
         contentId,
 
-        likes: Math.max(currentDailyLikes - 1, 0),
+        likes: Math.max(dailyLikes - 1, 0),
 
         updatedAt: FieldValue.serverTimestamp(),
       },
@@ -326,7 +340,6 @@ export async function incrementShareRecord({
       date: dateKey,
 
       contentType,
-
       contentId,
 
       shares: FieldValue.increment(1),
@@ -342,9 +355,7 @@ export async function incrementShareRecord({
     type: "share",
 
     contentType,
-
     contentId,
-
     channel,
 
     createdAt: FieldValue.serverTimestamp(),
@@ -358,9 +369,13 @@ export async function incrementViewRecord({
   contentType,
   contentId,
   dateKey,
-  visitorHash = null,
+  visitorHash,
   countUnique = false,
 }) {
+  if (!visitorHash) {
+    throw new Error("VIEW_VISITOR_REQUIRED");
+  }
+
   const statsRef = getStatsRef({
     companyId,
     contentType,
@@ -374,61 +389,65 @@ export async function incrementViewRecord({
     contentId,
   });
 
-  if (!countUnique || !visitorHash) {
-    const batch = adminDb.batch();
-
-    batch.set(
-      statsRef,
-      {
-        contentType,
-        contentId,
-
-        views: FieldValue.increment(1),
-
-        updatedAt: FieldValue.serverTimestamp(),
-      },
-      {
-        merge: true,
-      },
-    );
-
-    batch.set(
-      dailyRef,
-      {
-        date: dateKey,
-
-        contentType,
-
-        contentId,
-
-        views: FieldValue.increment(1),
-
-        updatedAt: FieldValue.serverTimestamp(),
-      },
-      {
-        merge: true,
-      },
-    );
-
-    await batch.commit();
-
-    return {
-      unique: false,
-    };
-  }
-
-  const visitorRef = getDailyVisitorRef({
+  const cooldownRef = getViewCooldownRef({
     companyId,
-    dateKey,
     contentType,
     contentId,
     visitorHash,
   });
 
+  const uniqueRef = countUnique
+    ? getDailyVisitorRef({
+        companyId,
+        dateKey,
+        contentType,
+        contentId,
+        visitorHash,
+      })
+    : null;
+
+  let counted = false;
+
   let unique = false;
 
   await adminDb.runTransaction(async (transaction) => {
-    const visitorSnapshot = await transaction.get(visitorRef);
+    const refs = [cooldownRef];
+
+    if (uniqueRef) {
+      refs.push(uniqueRef);
+    }
+
+    const snapshots = await transaction.getAll(...refs);
+
+    const cooldownSnapshot = snapshots[0];
+
+    /*
+     * Same visitor/content/window
+     * has already been counted.
+     */
+    if (cooldownSnapshot.exists) {
+      return;
+    }
+
+    let uniqueSnapshot = null;
+
+    if (uniqueRef) {
+      uniqueSnapshot = snapshots[1];
+    }
+
+    transaction.set(cooldownRef, {
+      contentType,
+      contentId,
+
+      /*
+       * Do not store visitorHash
+       * again in this record.
+       */
+
+      createdAt: FieldValue.serverTimestamp(),
+
+      expiresAt: new Date(Date.now() + VIEW_WINDOW_MS + 5 * 60 * 1000),
+    });
 
     transaction.set(
       statsRef,
@@ -449,7 +468,6 @@ export async function incrementViewRecord({
       date: dateKey,
 
       contentType,
-
       contentId,
 
       views: FieldValue.increment(1),
@@ -457,16 +475,20 @@ export async function incrementViewRecord({
       updatedAt: FieldValue.serverTimestamp(),
     };
 
-    if (!visitorSnapshot.exists) {
+    if (uniqueRef && !uniqueSnapshot.exists) {
       dailyData.uniqueVisitors = FieldValue.increment(1);
 
-      transaction.set(visitorRef, {
+      transaction.set(uniqueRef, {
         date: dateKey,
 
         contentType,
-
         contentId,
 
+        /*
+         * Pseudonymous hash,
+         * only created with
+         * Analytics consent.
+         */
         visitorHash,
 
         createdAt: FieldValue.serverTimestamp(),
@@ -478,9 +500,12 @@ export async function incrementViewRecord({
     transaction.set(dailyRef, dailyData, {
       merge: true,
     });
+
+    counted = true;
   });
 
   return {
+    counted,
     unique,
   };
 }

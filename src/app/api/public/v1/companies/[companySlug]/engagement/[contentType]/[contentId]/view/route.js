@@ -31,9 +31,14 @@ export async function POST(request, context) {
 
     const consent = getConsent(request);
 
-    const visitorHash = consent.analytics
-      ? hashVisitorId(visitor.visitorId)
-      : null;
+    /*
+     * Used for operational
+     * deduplication regardless of
+     * Analytics consent.
+     *
+     * Raw visitorId is never stored.
+     */
+    const visitorHash = hashVisitorId(visitor.visitorId);
 
     const data = await viewContent({
       companyId: route.company.id,
@@ -44,20 +49,13 @@ export async function POST(request, context) {
 
       visitorHash,
 
-      analyticsConsent: consent.analytics,
+      analyticsConsent: consent.analytics === true,
     });
 
     const response = NextResponse.json({
       success: true,
       data,
     });
-
-    /*
-     * Visitor cookie is also needed
-     * for functional features such as
-     * Likes, therefore it is not tied
-     * exclusively to analytics consent.
-     */
 
     if (visitor.isNew) {
       attachVisitorCookie({
