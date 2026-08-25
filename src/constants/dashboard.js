@@ -1,0 +1,14 @@
+export const DASHBOARD_RANGE = {
+  TODAY: "today",
+  SEVEN_DAYS: "7d",
+  THIRTY_DAYS: "30d",
+  THIS_MONTH: "month",
+};
+
+export const DASHBOARD_RANGES = Object.values(DASHBOARD_RANGE);
+
+export const DASHBOARD_DEFAULT_RANGE = DASHBOARD_RANGE.SEVEN_DAYS;
+
+export const DASHBOARD_TOP_CONTENT_LIMIT = 10;
+
+export const DASHBOARD_RECENT_LIMIT = 10;
