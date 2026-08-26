@@ -1,11 +1,14 @@
 "use client";
 
-import { LoaderCircle, Send, Trash2, Undo2, X } from "lucide-react";
+import { LoaderCircle, X } from "lucide-react";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { cn } from "@/utils/cn";
+
+import ProjectCategorySection from "./ProjectCategorySection";
+import ProjectMediaSection from "./ProjectMediaSection";
 
 function emptyLocalized() {
   return {
@@ -17,7 +20,9 @@ function emptyLocalized() {
 function emptyProjectInfo() {
   return {
     location: emptyLocalized(),
+
     designYear: null,
+
     completionYear: null,
 
     area: {
@@ -39,11 +44,15 @@ function emptyProjectInfo() {
 function emptyForm() {
   return {
     slug: "",
+
     title: emptyLocalized(),
+
     excerpt: emptyLocalized(),
+
     content: emptyLocalized(),
 
     categoryId: null,
+
     subCategoryId: null,
 
     projectInfo: emptyProjectInfo(),
@@ -51,6 +60,7 @@ function emptyForm() {
     tags: [],
 
     featuredImage: null,
+
     gallery: [],
 
     featured: false,
@@ -169,6 +179,12 @@ export default function ProjectEditor({
 
   const [tagInput, setTagInput] = useState("");
 
+  /*
+   * ------------------------------------------------
+   * Reset editor when opened / project changes
+   * ------------------------------------------------
+   */
+
   useEffect(() => {
     if (!open) {
       return;
@@ -185,31 +201,15 @@ export default function ProjectEditor({
     };
   }, [open, project]);
 
-  const rootCategories = useMemo(
-    () =>
-      categories.filter(
-        (category) =>
-          !category.parentId &&
-          category.status === "active" &&
-          !category.deletedAt,
-      ),
-    [categories],
-  );
-
-  const subCategories = useMemo(
-    () =>
-      categories.filter(
-        (category) =>
-          category.parentId === form.categoryId &&
-          category.status === "active" &&
-          !category.deletedAt,
-      ),
-    [categories, form.categoryId],
-  );
-
   if (!open) {
     return null;
   }
+
+  /*
+   * ------------------------------------------------
+   * Localized fields
+   * ------------------------------------------------
+   */
 
   function updateLocalized(field, language, value) {
     setForm((current) => ({
@@ -217,6 +217,7 @@ export default function ProjectEditor({
 
       [field]: {
         ...current[field],
+
         [language]: value,
       },
     }));
@@ -231,11 +232,18 @@ export default function ProjectEditor({
 
         [field]: {
           ...current.projectInfo[field],
+
           [language]: value,
         },
       },
     }));
   }
+
+  /*
+   * ------------------------------------------------
+   * Tags
+   * ------------------------------------------------
+   */
 
   function addTag() {
     const value = tagInput.trim();
@@ -267,6 +275,12 @@ export default function ProjectEditor({
     }));
   }
 
+  /*
+   * ------------------------------------------------
+   * Save
+   * ------------------------------------------------
+   */
+
   async function handleSave() {
     if (!companyId) {
       return;
@@ -278,7 +292,9 @@ export default function ProjectEditor({
       return;
     }
 
-    if (!form.slug.trim()) {
+    const normalizedSlug = slugify(form.slug);
+
+    if (!normalizedSlug) {
       toast.error("Project slug is required.");
 
       return;
@@ -294,7 +310,7 @@ export default function ProjectEditor({
         : `/api/v1/companies/${companyId}/projects`;
 
       const payload = {
-        slug: slugify(form.slug),
+        slug: normalizedSlug,
 
         title: form.title,
 
@@ -347,6 +363,12 @@ export default function ProjectEditor({
     }
   }
 
+  /*
+   * ------------------------------------------------
+   * UI
+   * ------------------------------------------------
+   */
+
   return (
     <div className="fixed inset-0 z-[160] flex justify-end">
       <button
@@ -357,6 +379,8 @@ export default function ProjectEditor({
       />
 
       <div className="relative z-10 flex h-full w-full max-w-5xl flex-col bg-[var(--admin-surface)] shadow-2xl">
+        {/* Header */}
+
         <header className="flex h-20 shrink-0 items-center justify-between border-b border-[var(--admin-border)] px-5 sm:px-8">
           <div>
             <h2 className="text-lg font-semibold tracking-[-0.02em] text-[var(--admin-foreground)]">
@@ -371,13 +395,19 @@ export default function ProjectEditor({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-[var(--admin-muted)] transition hover:bg-[var(--admin-hover)]"
+            disabled={saving}
+            aria-label="Close"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-[var(--admin-muted)] transition hover:bg-[var(--admin-hover)] disabled:opacity-50"
           >
             <X size={18} />
           </button>
         </header>
 
+        {/* Content */}
+
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6 sm:px-8 sm:py-8">
+          {/* Basic Information */}
+
           <section>
             <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
               Basic Information
@@ -394,7 +424,7 @@ export default function ProjectEditor({
                   onChange={(event) =>
                     updateLocalized("title", "th", event.target.value)
                   }
-                  className="mt-2 h-11 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none focus:border-[var(--company-primary)]"
+                  className="mt-2 h-11 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)] focus:ring-2 focus:ring-[var(--company-primary-soft)]"
                 />
               </label>
 
@@ -413,13 +443,14 @@ export default function ProjectEditor({
 
                       title: {
                         ...current.title,
+
                         en: value,
                       },
 
                       slug: current.slug || slugify(value),
                     }));
                   }}
-                  className="mt-2 h-11 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none focus:border-[var(--company-primary)]"
+                  className="mt-2 h-11 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)] focus:ring-2 focus:ring-[var(--company-primary-soft)]"
                 />
               </label>
             </div>
@@ -439,73 +470,63 @@ export default function ProjectEditor({
                   }))
                 }
                 placeholder="house-project-2026"
-                className="mt-2 h-11 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none focus:border-[var(--company-primary)]"
+                className="mt-2 h-11 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)] focus:ring-2 focus:ring-[var(--company-primary-soft)]"
               />
+
+              <p className="mt-1.5 text-[10px] text-[var(--admin-muted-light)]">
+                Lowercase letters, numbers and hyphens only.
+              </p>
             </label>
           </section>
 
-          <section className="mt-10">
-            <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
-              Category
-            </h3>
+          {/* Category */}
 
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <label>
-                <span className="text-xs font-medium text-[var(--admin-muted)]">
-                  Category
-                </span>
+          <ProjectCategorySection
+            companyId={companyId}
+            categories={categories}
+            categoryId={form.categoryId}
+            subCategoryId={form.subCategoryId}
+            onCategoryChange={(categoryId) =>
+              setForm((current) => ({
+                ...current,
 
-                <select
-                  value={form.categoryId || ""}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
+                categoryId,
 
-                      categoryId: event.target.value || null,
+                subCategoryId: null,
+              }))
+            }
+            onSubCategoryChange={(subCategoryId) =>
+              setForm((current) => ({
+                ...current,
 
-                      subCategoryId: null,
-                    }))
-                  }
-                  className="mt-2 h-11 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm"
-                >
-                  <option value="">No category</option>
+                subCategoryId,
+              }))
+            }
+          />
 
-                  {rootCategories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name?.en || category.name?.th || category.slug}
-                    </option>
-                  ))}
-                </select>
-              </label>
+          {/* Media */}
 
-              <label>
-                <span className="text-xs font-medium text-[var(--admin-muted)]">
-                  Sub-category
-                </span>
+          <ProjectMediaSection
+            companyId={companyId}
+            featuredImage={form.featuredImage}
+            gallery={form.gallery}
+            onFeaturedImageChange={(featuredImage) =>
+              setForm((current) => ({
+                ...current,
 
-                <select
-                  value={form.subCategoryId || ""}
-                  disabled={!form.categoryId}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
+                featuredImage,
+              }))
+            }
+            onGalleryChange={(gallery) =>
+              setForm((current) => ({
+                ...current,
 
-                      subCategoryId: event.target.value || null,
-                    }))
-                  }
-                  className="mt-2 h-11 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm disabled:opacity-50"
-                >
-                  <option value="">No sub-category</option>
+                gallery,
+              }))
+            }
+          />
 
-                  {subCategories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name?.en || category.name?.th || category.slug}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-          </section>
+          {/* Project Information */}
 
           <section className="mt-10">
             <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
@@ -527,7 +548,7 @@ export default function ProjectEditor({
                       event.target.value,
                     )
                   }
-                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] px-3 text-sm"
+                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
                 />
               </label>
 
@@ -545,7 +566,7 @@ export default function ProjectEditor({
                       event.target.value,
                     )
                   }
-                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] px-3 text-sm"
+                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
                 />
               </label>
 
@@ -570,7 +591,7 @@ export default function ProjectEditor({
                       },
                     }))
                   }
-                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] px-3 text-sm"
+                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
                 />
               </label>
 
@@ -595,7 +616,7 @@ export default function ProjectEditor({
                       },
                     }))
                   }
-                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] px-3 text-sm"
+                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
                 />
               </label>
 
@@ -621,7 +642,7 @@ export default function ProjectEditor({
                       },
                     }))
                   }
-                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] px-3 text-sm"
+                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
                 />
               </label>
 
@@ -645,15 +666,53 @@ export default function ProjectEditor({
                       },
                     }))
                   }
-                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] px-3 text-sm"
+                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
                 >
                   <option value="sqm">sqm</option>
 
                   <option value="sqft">sqft</option>
                 </select>
               </label>
+
+              <label>
+                <span className="text-xs text-[var(--admin-muted)]">
+                  Client — Thai
+                </span>
+
+                <input
+                  value={form.projectInfo.client.th}
+                  onChange={(event) =>
+                    updateProjectInfoLocalized(
+                      "client",
+                      "th",
+                      event.target.value,
+                    )
+                  }
+                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
+                />
+              </label>
+
+              <label>
+                <span className="text-xs text-[var(--admin-muted)]">
+                  Client — English
+                </span>
+
+                <input
+                  value={form.projectInfo.client.en}
+                  onChange={(event) =>
+                    updateProjectInfoLocalized(
+                      "client",
+                      "en",
+                      event.target.value,
+                    )
+                  }
+                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
+                />
+              </label>
             </div>
           </section>
+
+          {/* Content */}
 
           <section className="mt-10">
             <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
@@ -672,7 +731,7 @@ export default function ProjectEditor({
                   onChange={(event) =>
                     updateLocalized("excerpt", "th", event.target.value)
                   }
-                  className="mt-2 w-full rounded-xl border border-[var(--admin-border)] p-3 text-sm"
+                  className="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
                 />
               </label>
 
@@ -687,7 +746,7 @@ export default function ProjectEditor({
                   onChange={(event) =>
                     updateLocalized("excerpt", "en", event.target.value)
                   }
-                  className="mt-2 w-full rounded-xl border border-[var(--admin-border)] p-3 text-sm"
+                  className="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
                 />
               </label>
 
@@ -702,7 +761,7 @@ export default function ProjectEditor({
                   onChange={(event) =>
                     updateLocalized("content", "th", event.target.value)
                   }
-                  className="mt-2 w-full rounded-xl border border-[var(--admin-border)] p-3 text-sm"
+                  className="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
                 />
               </label>
 
@@ -717,16 +776,22 @@ export default function ProjectEditor({
                   onChange={(event) =>
                     updateLocalized("content", "en", event.target.value)
                   }
-                  className="mt-2 w-full rounded-xl border border-[var(--admin-border)] p-3 text-sm"
+                  className="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
                 />
               </label>
             </div>
           </section>
 
+          {/* Tags */}
+
           <section className="mt-10">
             <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
               Tags
             </h3>
+
+            <p className="mt-1 text-xs leading-5 text-[var(--admin-muted)]">
+              Add keywords used for classification, search and related content.
+            </p>
 
             <div className="mt-4 flex gap-2">
               <input
@@ -735,17 +800,18 @@ export default function ProjectEditor({
                 onKeyDown={(event) => {
                   if (event.key === "Enter") {
                     event.preventDefault();
+
                     addTag();
                   }
                 }}
                 placeholder="architecture"
-                className="h-10 flex-1 rounded-xl border border-[var(--admin-border)] px-3 text-sm"
+                className="h-10 flex-1 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
               />
 
               <button
                 type="button"
                 onClick={addTag}
-                className="h-10 rounded-xl border border-[var(--admin-border)] px-4 text-xs font-medium"
+                className="h-10 rounded-xl border border-[var(--admin-border)] px-4 text-xs font-medium text-[var(--admin-foreground)] transition hover:bg-[var(--admin-hover)]"
               >
                 Add
               </button>
@@ -758,7 +824,8 @@ export default function ProjectEditor({
                     key={tag}
                     type="button"
                     onClick={() => removeTag(tag)}
-                    className="rounded-full bg-[var(--admin-hover)] px-3 py-1 text-xs text-[var(--admin-foreground)]"
+                    title="Remove tag"
+                    className="rounded-full bg-[var(--admin-hover)] px-3 py-1 text-xs text-[var(--admin-foreground)] transition hover:bg-red-50 hover:text-red-600"
                   >
                     {tag} ×
                   </button>
@@ -767,8 +834,10 @@ export default function ProjectEditor({
             )}
           </section>
 
-          <section className="mt-10">
-            <label className="flex items-center gap-3">
+          {/* Featured */}
+
+          <section className="mt-10 border-t border-[var(--admin-border)] pt-8">
+            <label className="flex items-start gap-3">
               <input
                 type="checkbox"
                 checked={form.featured}
@@ -779,21 +848,31 @@ export default function ProjectEditor({
                     featured: event.target.checked,
                   }))
                 }
+                className="mt-0.5"
               />
 
-              <span className="text-sm text-[var(--admin-foreground)]">
-                Featured Project
+              <span>
+                <span className="block text-sm font-medium text-[var(--admin-foreground)]">
+                  Featured Project
+                </span>
+
+                <span className="mt-1 block text-xs leading-5 text-[var(--admin-muted)]">
+                  Mark this project as featured for highlighted sections of the
+                  website.
+                </span>
               </span>
             </label>
           </section>
         </div>
 
-        <footer className="flex shrink-0 items-center justify-end gap-2 border-t border-[var(--admin-border)] px-5 py-4 sm:px-8">
+        {/* Footer */}
+
+        <footer className="flex shrink-0 items-center justify-end gap-2 border-t border-[var(--admin-border)] bg-[var(--admin-surface)] px-5 py-4 sm:px-8">
           <button
             type="button"
             onClick={onClose}
             disabled={saving}
-            className="h-10 rounded-xl px-4 text-sm font-medium text-[var(--admin-muted)] hover:bg-[var(--admin-hover)]"
+            className="h-10 rounded-xl px-4 text-sm font-medium text-[var(--admin-muted)] transition hover:bg-[var(--admin-hover)] hover:text-[var(--admin-foreground)] disabled:opacity-50"
           >
             Cancel
           </button>
@@ -804,11 +883,18 @@ export default function ProjectEditor({
             disabled={saving}
             className={cn(
               "inline-flex h-10 min-w-24 items-center justify-center gap-2",
+
               "rounded-xl",
+
               "bg-[var(--company-primary)] px-5",
+
               "text-sm font-medium",
+
               "text-[var(--company-primary-foreground)]",
-              "disabled:opacity-50",
+
+              "transition hover:opacity-90",
+
+              "disabled:cursor-not-allowed disabled:opacity-50",
             )}
           >
             {saving && <LoaderCircle size={15} className="animate-spin" />}
