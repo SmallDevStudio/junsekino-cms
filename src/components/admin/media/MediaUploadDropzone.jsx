@@ -10,11 +10,12 @@ import {
   XCircle,
 } from "lucide-react";
 
+import {
+  ALLOWED_IMAGE_MIME_TYPES,
+  MAX_MEDIA_FILE_SIZE,
+} from "@/constants/media";
+
 import { cn } from "@/utils/cn";
-
-const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-
-const MAX_FILE_SIZE = 20 * 1024 * 1024;
 
 function formatBytes(bytes) {
   if (!Number.isFinite(bytes)) {
@@ -60,6 +61,7 @@ function uploadWithProgress({ url, method, headers, file, onProgress }) {
     xhr.addEventListener("load", () => {
       if (xhr.status >= 200 && xhr.status < 300) {
         resolve();
+
         return;
       }
 
@@ -97,10 +99,11 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
   async function uploadFile(file) {
     const localId = `${Date.now()}-${Math.random()}`;
 
-    if (!ACCEPTED_TYPES.includes(file.type)) {
+    if (!ALLOWED_IMAGE_MIME_TYPES.includes(file.type)) {
       setUploads((current) => [
         {
           localId,
+
           fileName: file.name,
 
           size: file.size,
@@ -118,7 +121,7 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
       return;
     }
 
-    if (file.size > MAX_FILE_SIZE) {
+    if (file.size > MAX_MEDIA_FILE_SIZE) {
       setUploads((current) => [
         {
           localId,
@@ -131,7 +134,7 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
 
           progress: 0,
 
-          error: "File exceeds 20 MB.",
+          error: `File exceeds ${formatBytes(MAX_MEDIA_FILE_SIZE)}.`,
         },
 
         ...current,
@@ -239,7 +242,7 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
         progress: 100,
       });
 
-      await onUploaded?.();
+      await onUploaded?.(finalized.data);
     } catch (error) {
       console.error("Media upload error:", error);
 
@@ -274,22 +277,29 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
         onClick={() => inputRef.current?.click()}
         onDragEnter={(event) => {
           event.preventDefault();
+
           setDragging(true);
         }}
         onDragOver={(event) => {
           event.preventDefault();
+
           setDragging(true);
         }}
         onDragLeave={(event) => {
           event.preventDefault();
+
           setDragging(false);
         }}
         onDrop={handleDrop}
         className={cn(
           "flex w-full flex-col items-center justify-center",
+
           "rounded-2xl border border-dashed",
+
           "px-6 py-10",
+
           "text-center transition",
+
           dragging
             ? "border-[var(--company-primary)] bg-[var(--company-primary-soft)]"
             : "border-[var(--admin-border)] bg-[var(--admin-surface)] hover:border-[var(--company-primary)]",
@@ -298,8 +308,11 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
         <div
           className={cn(
             "flex h-12 w-12 items-center justify-center",
+
             "rounded-2xl",
+
             "bg-[var(--company-primary-soft)]",
+
             "text-[var(--company-primary)]",
           )}
         >
@@ -311,7 +324,7 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
         </div>
 
         <div className="mt-1 text-xs text-[var(--admin-muted)]">
-          JPG, PNG or WebP • up to 20 MB
+          JPG, PNG, WebP or AVIF • up to {formatBytes(MAX_MEDIA_FILE_SIZE)}
         </div>
       </button>
 
@@ -319,7 +332,7 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
         ref={inputRef}
         type="file"
         multiple
-        accept="image/jpeg,image/png,image/webp"
+        accept={ALLOWED_IMAGE_MIME_TYPES.join(",")}
         className="hidden"
         onChange={(event) => {
           processFiles(event.target.files);
@@ -335,6 +348,7 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
               key={upload.localId}
               className={cn(
                 "flex items-center gap-4 px-4 py-3",
+
                 index !== uploads.length - 1 &&
                   "border-b border-[var(--admin-border)]",
               )}

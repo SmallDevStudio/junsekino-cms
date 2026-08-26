@@ -5,18 +5,25 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Archive,
   CalendarClock,
+  CalendarX2,
   CircleDot,
   FolderKanban,
   LoaderCircle,
   Plus,
   RefreshCw,
+  RotateCcw,
   Search,
+  Send,
+  Trash2,
 } from "lucide-react";
 
 import { useCompanyWorkspace } from "@/components/admin/company/CompanyWorkspaceProvider";
 import { cn } from "@/utils/cn";
 
+import ProjectDeleteDialog from "./ProjectDeleteDialog";
 import ProjectEditor from "./ProjectEditor";
+import ProjectPublishDialog from "./ProjectPublishDialog";
+import ProjectUnpublishDialog from "./ProjectUnpublishDialog";
 
 const STATUS_OPTIONS = [
   {
@@ -95,12 +102,33 @@ function formatDate(value) {
   }).format(date);
 }
 
+function formatDateTime(value) {
+  if (!value) {
+    return null;
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return new Intl.DateTimeFormat("en", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
+}
+
 function StatusBadge({ status }) {
   const styles = {
     draft: "border-neutral-200 bg-neutral-50 text-neutral-600",
+
     review: "border-blue-200 bg-blue-50 text-blue-700",
+
     scheduled: "border-amber-200 bg-amber-50 text-amber-700",
+
     published: "border-emerald-200 bg-emerald-50 text-emerald-700",
+
     archived: "border-neutral-200 bg-neutral-100 text-neutral-500",
   };
 
@@ -126,24 +154,73 @@ export default function ProjectManager() {
   } = useCompanyWorkspace();
 
   const [projects, setProjects] = useState([]);
+
   const [categories, setCategories] = useState([]);
 
   const [loading, setLoading] = useState(false);
+
   const [refreshing, setRefreshing] = useState(false);
+
   const [error, setError] = useState(null);
 
   const [search, setSearch] = useState("");
+
   const [statusFilter, setStatusFilter] = useState("");
+
   const [categoryFilter, setCategoryFilter] = useState("");
 
+  /*
+   * ------------------------------------------------
+   * Editor
+   * ------------------------------------------------
+   */
+
   const [editorOpen, setEditorOpen] = useState(false);
+
   const [editingProject, setEditingProject] = useState(null);
+
+  /*
+   * ------------------------------------------------
+   * Publish
+   * ------------------------------------------------
+   */
+
+  const [publishDialogOpen, setPublishDialogOpen] = useState(false);
+
+  const [publishingProject, setPublishingProject] = useState(null);
+
+  /*
+   * ------------------------------------------------
+   * Unpublish / Cancel Schedule
+   * ------------------------------------------------
+   */
+
+  const [unpublishDialogOpen, setUnpublishDialogOpen] = useState(false);
+
+  const [unpublishingProject, setUnpublishingProject] = useState(null);
+
+  /*
+   * ------------------------------------------------
+   * Delete
+   * ------------------------------------------------
+   */
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const [deletingProject, setDeletingProject] = useState(null);
+
+  /*
+   * ------------------------------------------------
+   * Load
+   * ------------------------------------------------
+   */
 
   const loadData = useCallback(
     async ({ silent = false } = {}) => {
       if (!activeCompanyId) {
         setProjects([]);
         setCategories([]);
+
         return;
       }
 
@@ -189,6 +266,7 @@ export default function ProjectManager() {
         }
 
         setProjects(normalizeArray(projectsPayload));
+
         setCategories(normalizeArray(categoriesPayload));
       } catch (loadError) {
         console.error("Load projects error:", loadError);
@@ -196,6 +274,7 @@ export default function ProjectManager() {
         setError(loadError?.message || "Unable to retrieve projects.");
       } finally {
         setLoading(false);
+
         setRefreshing(false);
       }
     },
@@ -215,6 +294,12 @@ export default function ProjectManager() {
       window.clearTimeout(timeoutId);
     };
   }, [activeCompanyId, loadData]);
+
+  /*
+   * ------------------------------------------------
+   * Derived Data
+   * ------------------------------------------------
+   */
 
   const categoryMap = useMemo(() => {
     return new Map(categories.map((category) => [category.id, category]));
@@ -254,9 +339,11 @@ export default function ProjectManager() {
         project.excerpt?.en,
 
         project.projectInfo?.location?.th,
+
         project.projectInfo?.location?.en,
 
         project.projectInfo?.client?.th,
+
         project.projectInfo?.client?.en,
 
         ...(project.tags || []),
@@ -297,29 +384,141 @@ export default function ProjectManager() {
     );
   }, [projects]);
 
+  /*
+   * ------------------------------------------------
+   * Editor Handlers
+   * ------------------------------------------------
+   */
+
   function handleCreateProject() {
     setEditingProject(null);
+
     setEditorOpen(true);
   }
 
   function handleEditProject(project) {
     setEditingProject(project);
+
     setEditorOpen(true);
   }
 
   function handleCloseEditor() {
     setEditorOpen(false);
+
     setEditingProject(null);
   }
 
   async function handleProjectSaved() {
     setEditorOpen(false);
+
     setEditingProject(null);
 
     await loadData({
       silent: true,
     });
   }
+
+  /*
+   * ------------------------------------------------
+   * Publish Handlers
+   * ------------------------------------------------
+   */
+
+  function handleOpenPublish(project) {
+    setPublishingProject(project);
+
+    setPublishDialogOpen(true);
+  }
+
+  function handleClosePublish() {
+    setPublishDialogOpen(false);
+
+    setPublishingProject(null);
+  }
+
+  /*
+   * ------------------------------------------------
+   * Unpublish Handlers
+   * ------------------------------------------------
+   */
+
+  function handleOpenUnpublish(project) {
+    setUnpublishingProject(project);
+
+    setUnpublishDialogOpen(true);
+  }
+
+  function handleCloseUnpublish() {
+    setUnpublishDialogOpen(false);
+
+    setUnpublishingProject(null);
+  }
+
+  /*
+   * ------------------------------------------------
+   * Publish / Unpublish Completed
+   * ------------------------------------------------
+   */
+
+  async function handleLifecycleCompleted() {
+    setPublishDialogOpen(false);
+
+    setPublishingProject(null);
+
+    setUnpublishDialogOpen(false);
+
+    setUnpublishingProject(null);
+
+    await loadData({
+      silent: true,
+    });
+  }
+
+  /*
+   * ------------------------------------------------
+   * Delete Handlers
+   * ------------------------------------------------
+   */
+
+  function handleOpenDelete(project) {
+    /*
+     * Published and Scheduled projects
+     * must return to Draft first.
+     *
+     * This keeps the content lifecycle explicit
+     * and prevents accidental removal of live content.
+     */
+
+    if (project.status === "published" || project.status === "scheduled") {
+      return;
+    }
+
+    setDeletingProject(project);
+
+    setDeleteDialogOpen(true);
+  }
+
+  function handleCloseDelete() {
+    setDeleteDialogOpen(false);
+
+    setDeletingProject(null);
+  }
+
+  async function handleDeleteCompleted() {
+    setDeleteDialogOpen(false);
+
+    setDeletingProject(null);
+
+    await loadData({
+      silent: true,
+    });
+  }
+
+  /*
+   * ------------------------------------------------
+   * Workspace States
+   * ------------------------------------------------
+   */
 
   if (companyLoading) {
     return (
@@ -349,7 +548,7 @@ export default function ProjectManager() {
   return (
     <div>
       {/* =========================================================
-          Page Header
+          Header
       ========================================================= */}
 
       <div
@@ -603,6 +802,9 @@ export default function ProjectManager() {
 
             const location = getLocalizedName(project.projectInfo?.location);
 
+            const canDelete =
+              project.status === "draft" || project.status === "review";
+
             return (
               <article
                 key={project.id}
@@ -649,13 +851,27 @@ export default function ProjectManager() {
                       <span>{project.projectInfo.completionYear}</span>
                     )}
 
+                    {project.status === "scheduled" && project.scheduledAt && (
+                      <span className="text-amber-600">
+                        Scheduled {formatDateTime(project.scheduledAt)}
+                      </span>
+                    )}
+
+                    {project.status === "published" && project.publishedAt && (
+                      <span className="text-emerald-600">
+                        Published {formatDate(project.publishedAt)}
+                      </span>
+                    )}
+
                     {project.updatedAt && (
                       <span>Updated {formatDate(project.updatedAt)}</span>
                     )}
                   </div>
                 </div>
 
-                <div className="flex shrink-0 items-center gap-2">
+                {/* Actions */}
+
+                <div className="flex shrink-0 flex-wrap items-center gap-2">
                   <button
                     type="button"
                     onClick={() => handleEditProject(project)}
@@ -663,6 +879,60 @@ export default function ProjectManager() {
                   >
                     Edit
                   </button>
+
+                  {(project.status === "draft" ||
+                    project.status === "review") && (
+                    <button
+                      type="button"
+                      onClick={() => handleOpenPublish(project)}
+                      className={cn(
+                        "inline-flex h-9 items-center gap-2",
+                        "rounded-xl",
+                        "bg-[var(--company-primary)] px-3",
+                        "text-xs font-medium",
+                        "text-[var(--company-primary-foreground)]",
+                        "transition hover:opacity-90",
+                      )}
+                    >
+                      <Send size={13} />
+                      Publish
+                    </button>
+                  )}
+
+                  {project.status === "scheduled" && (
+                    <button
+                      type="button"
+                      onClick={() => handleOpenUnpublish(project)}
+                      className="inline-flex h-9 items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 text-xs font-medium text-amber-700 transition hover:bg-amber-100"
+                    >
+                      <CalendarX2 size={13} />
+                      Cancel Schedule
+                    </button>
+                  )}
+
+                  {project.status === "published" && (
+                    <button
+                      type="button"
+                      onClick={() => handleOpenUnpublish(project)}
+                      className="inline-flex h-9 items-center gap-2 rounded-xl border border-[var(--admin-border)] px-3 text-xs font-medium text-[var(--admin-foreground)] transition hover:bg-[var(--admin-hover)]"
+                    >
+                      <RotateCcw size={13} />
+                      Unpublish
+                    </button>
+                  )}
+
+                  {canDelete && (
+                    <button
+                      type="button"
+                      onClick={() => handleOpenDelete(project)}
+                      aria-label={`Delete ${getProjectTitle(project)}`}
+                      title="Delete project"
+                      className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 text-xs font-medium text-red-600 transition hover:bg-red-100 hover:text-red-700"
+                    >
+                      <Trash2 size={13} />
+                      Delete
+                    </button>
+                  )}
                 </div>
               </article>
             );
@@ -672,7 +942,6 @@ export default function ProjectManager() {
 
       {/* =========================================================
           Project Editor
-          One editor instance for both Create and Edit.
       ========================================================= */}
 
       <ProjectEditor
@@ -682,6 +951,42 @@ export default function ProjectManager() {
         categories={categories}
         onClose={handleCloseEditor}
         onSaved={handleProjectSaved}
+      />
+
+      {/* =========================================================
+          Publish / Schedule
+      ========================================================= */}
+
+      <ProjectPublishDialog
+        open={publishDialogOpen}
+        companyId={activeCompanyId}
+        project={publishingProject}
+        onClose={handleClosePublish}
+        onCompleted={handleLifecycleCompleted}
+      />
+
+      {/* =========================================================
+          Unpublish / Cancel Schedule
+      ========================================================= */}
+
+      <ProjectUnpublishDialog
+        open={unpublishDialogOpen}
+        companyId={activeCompanyId}
+        project={unpublishingProject}
+        onClose={handleCloseUnpublish}
+        onCompleted={handleLifecycleCompleted}
+      />
+
+      {/* =========================================================
+          Delete
+      ========================================================= */}
+
+      <ProjectDeleteDialog
+        open={deleteDialogOpen}
+        companyId={activeCompanyId}
+        project={deletingProject}
+        onClose={handleCloseDelete}
+        onCompleted={handleDeleteCompleted}
       />
     </div>
   );

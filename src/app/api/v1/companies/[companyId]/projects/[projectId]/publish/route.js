@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { PERMISSIONS } from "@/constants/permissions";
 
 import { getCompanyPermission } from "@/lib/auth/company-guards";
-
 import { isTrustedOrigin } from "@/lib/auth/origin";
 
 import { companyIdSchema } from "@/modules/company/company.schema";
@@ -39,6 +38,7 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Invalid request origin.",
         },
         {
@@ -53,6 +53,7 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Invalid request parameters.",
         },
         {
@@ -71,6 +72,7 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: access.reason,
         },
         {
@@ -110,6 +112,7 @@ export async function POST(request, context) {
 
     return NextResponse.json({
       success: true,
+
       data: project,
     });
   } catch (error) {
@@ -117,8 +120,19 @@ export async function POST(request, context) {
 
     const badRequestErrors = [
       "PROJECT_TITLE_REQUIRED",
+
       "PROJECT_CONTENT_REQUIRED",
+
+      "PROJECT_CATEGORY_REQUIRED",
+
+      "PROJECT_CATEGORY_NOT_FOUND",
+
+      "PROJECT_SUBCATEGORY_NOT_FOUND",
+
+      "PROJECT_SUBCATEGORY_INVALID_PARENT",
+
       "INVALID_SCHEDULE_DATE",
+
       "SCHEDULE_MUST_BE_FUTURE",
     ];
 
@@ -126,6 +140,7 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: error.message,
         },
         {
@@ -138,6 +153,7 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Project not found.",
         },
         {
@@ -146,9 +162,12 @@ export async function POST(request, context) {
       );
     }
 
+    console.error("Unexpected publish project error:", error);
+
     return NextResponse.json(
       {
         success: false,
+
         message: "Unable to publish project.",
       },
       {

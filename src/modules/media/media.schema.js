@@ -30,6 +30,16 @@ export const createMediaUploadSchema = z.object({
   caption: localizedStringSchema.optional(),
 });
 
+export const importMediaUrlSchema = z.object({
+  url: z.string().trim().url("Invalid image URL.").max(4000),
+
+  usage: z.enum(Object.values(MEDIA_USAGE)).default(MEDIA_USAGE.GENERAL),
+
+  alt: localizedStringSchema.optional(),
+
+  caption: localizedStringSchema.optional(),
+});
+
 export const finalizeMediaSchema = z.object({});
 
 export const updateMediaSchema = z.object({

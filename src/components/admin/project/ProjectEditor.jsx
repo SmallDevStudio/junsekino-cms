@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { cn } from "@/utils/cn";
 
 import ProjectCategorySection from "./ProjectCategorySection";
+import ProjectCreditsSection from "./ProjectCreditsSection";
 import ProjectMediaSection from "./ProjectMediaSection";
 
 function emptyLocalized() {
@@ -112,18 +113,25 @@ function normalizeProject(project) {
 
       client: {
         th: project.projectInfo?.client?.th || "",
-
         en: project.projectInfo?.client?.en || "",
       },
 
       credits: {
-        architecture: project.projectInfo?.credits?.architecture || [],
+        architecture: Array.isArray(project.projectInfo?.credits?.architecture)
+          ? project.projectInfo.credits.architecture
+          : [],
 
-        interior: project.projectInfo?.credits?.interior || [],
+        interior: Array.isArray(project.projectInfo?.credits?.interior)
+          ? project.projectInfo.credits.interior
+          : [],
 
-        landscape: project.projectInfo?.credits?.landscape || [],
+        landscape: Array.isArray(project.projectInfo?.credits?.landscape)
+          ? project.projectInfo.credits.landscape
+          : [],
 
-        consultant: project.projectInfo?.credits?.consultant || [],
+        consultant: Array.isArray(project.projectInfo?.credits?.consultant)
+          ? project.projectInfo.credits.consultant
+          : [],
       },
     },
 
@@ -181,7 +189,7 @@ export default function ProjectEditor({
 
   /*
    * ------------------------------------------------
-   * Reset editor when opened / project changes
+   * Reset editor
    * ------------------------------------------------
    */
 
@@ -362,12 +370,6 @@ export default function ProjectEditor({
       setSaving(false);
     }
   }
-
-  /*
-   * ------------------------------------------------
-   * UI
-   * ------------------------------------------------
-   */
 
   return (
     <div className="fixed inset-0 z-[160] flex justify-end">
@@ -712,6 +714,23 @@ export default function ProjectEditor({
             </div>
           </section>
 
+          {/* Credits */}
+
+          <ProjectCreditsSection
+            credits={form.projectInfo.credits}
+            onChange={(credits) =>
+              setForm((current) => ({
+                ...current,
+
+                projectInfo: {
+                  ...current.projectInfo,
+
+                  credits,
+                },
+              }))
+            }
+          />
+
           {/* Content */}
 
           <section className="mt-10">
@@ -883,17 +902,11 @@ export default function ProjectEditor({
             disabled={saving}
             className={cn(
               "inline-flex h-10 min-w-24 items-center justify-center gap-2",
-
               "rounded-xl",
-
               "bg-[var(--company-primary)] px-5",
-
               "text-sm font-medium",
-
               "text-[var(--company-primary-foreground)]",
-
               "transition hover:opacity-90",
-
               "disabled:cursor-not-allowed disabled:opacity-50",
             )}
           >
