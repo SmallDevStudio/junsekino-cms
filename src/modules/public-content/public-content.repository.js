@@ -27,7 +27,6 @@ export async function getPublicContentById({ companyId, contentId }) {
 
   return {
     id: snapshot.id,
-
     ...snapshot.data(),
   };
 }
@@ -57,7 +56,6 @@ export async function listPublicContentRecords(companyId) {
   return snapshot.docs
     .map((document) => ({
       id: document.id,
-
       ...document.data(),
     }))
     .filter((item) => !item.deletedAt);
@@ -72,7 +70,11 @@ export async function createPublicContentRecord({ companyId, data, userId }) {
     const slugSnapshot = await transaction.get(slugRef);
 
     if (slugSnapshot.exists) {
-      throw new Error("PUBLIC_SLUG_EXISTS");
+      const error = new Error("PUBLIC_SLUG_EXISTS");
+
+      error.slug = data.slug;
+
+      throw error;
     }
 
     transaction.set(contentRef, {
@@ -108,7 +110,6 @@ export async function createPublicContentRecord({ companyId, data, userId }) {
 
   return getPublicContentById({
     companyId,
-
     contentId: contentRef.id,
   });
 }
@@ -132,7 +133,6 @@ export async function updatePublicContentRecord({
 
     before = {
       id: snapshot.id,
-
       ...snapshot.data(),
     };
 
@@ -148,7 +148,11 @@ export async function updatePublicContentRecord({
       const existing = await transaction.get(newSlugRef);
 
       if (existing.exists) {
-        throw new Error("PUBLIC_SLUG_EXISTS");
+        const error = new Error("PUBLIC_SLUG_EXISTS");
+
+        error.slug = newSlug;
+
+        throw error;
       }
 
       transaction.delete(oldSlugRef);
@@ -195,7 +199,6 @@ export async function publishPublicContentRecord({
 
   const before = {
     id: snapshot.id,
-
     ...snapshot.data(),
   };
 
@@ -264,7 +267,6 @@ export async function unpublishPublicContentRecord({
 
   const before = {
     id: snapshot.id,
-
     ...snapshot.data(),
   };
 
@@ -307,7 +309,6 @@ export async function softDeletePublicContentRecord({
 
   const before = {
     id: snapshot.id,
-
     ...snapshot.data(),
   };
 

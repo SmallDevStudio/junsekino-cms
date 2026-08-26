@@ -5,6 +5,7 @@ import { adminDb } from "@/lib/firebase/admin";
 const SLUG_COLLECTIONS = Object.freeze({
   project: "projectSlugs",
   award: "awardSlugs",
+  publicContent: "publicContentSlugs",
 });
 
 function normalizeSlug(value) {
@@ -30,6 +31,10 @@ function getSlugCollection({ companyId, contentType }) {
     .collection("companies")
     .doc(companyId)
     .collection(collectionName);
+}
+
+function getOwnerId(data) {
+  return data?.projectId || data?.awardId || data?.contentId || null;
 }
 
 export async function findAvailableSlug({
@@ -62,9 +67,7 @@ export async function findAvailableSlug({
     }
 
     if (excludeContentId) {
-      const data = snapshot.data();
-
-      const ownerId = data?.projectId || data?.awardId || null;
+      const ownerId = getOwnerId(snapshot.data());
 
       if (ownerId === excludeContentId) {
         return candidate;

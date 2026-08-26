@@ -2,43 +2,50 @@ import { NextResponse } from "next/server";
 
 import { PERMISSIONS } from "@/constants/permissions";
 
-import {
-  PUBLIC_CONTENT_STATUSES,
-  PUBLIC_CONTENT_TYPES,
-  PUBLIC_PROVIDERS,
-} from "@/constants/public-content";
-
 import { getCompanyPermission } from "@/lib/auth/company-guards";
 import { isTrustedOrigin } from "@/lib/auth/origin";
 
 import { companyIdSchema } from "@/modules/company/company.schema";
 
-import { createPublicContentSchema } from "@/modules/public-content/public-content.schema";
+import {
+  publicContentIdSchema,
+  updatePublicContentSchema,
+} from "@/modules/public-content/public-content.schema";
 
 import {
-  createPublicContent,
-  listPublicContents,
+  deletePublicContent,
+  getPublicContent,
+  updatePublicContent,
 } from "@/modules/public-content/public-content.service";
 
 import { findAvailableSlug } from "@/modules/shared/slug-suggestion.service";
 
-async function resolveCompanyId(context) {
+async function resolveParams(context) {
   const params = await context.params;
 
-  const result = companyIdSchema.safeParse(params.companyId);
+  const company = companyIdSchema.safeParse(params.companyId);
 
-  return result.success ? result.data : null;
+  const content = publicContentIdSchema.safeParse(params.contentId);
+
+  if (!company.success || !content.success) {
+    return null;
+  }
+
+  return {
+    companyId: company.data,
+    contentId: content.data,
+  };
 }
 
 export async function GET(request, context) {
   try {
-    const companyId = await resolveCompanyId(context);
+    const params = await resolveParams(context);
 
-    if (!companyId) {
+    if (!params) {
       return NextResponse.json(
         {
           success: false,
-          message: "Invalid company ID.",
+          message: "Invalid request parameters.",
         },
         {
           status: 400,
@@ -47,7 +54,8 @@ export async function GET(request, context) {
     }
 
     const access = await getCompanyPermission({
-      companyId,
+      companyId: params.companyId,
+
       permission: PERMISSIONS.PUBLIC_VIEW,
     });
 
@@ -63,58 +71,10 @@ export async function GET(request, context) {
       );
     }
 
-    const { searchParams } = new URL(request.url);
+    const data = await getPublicContent({
+      companyId: params.companyId,
 
-    const status = searchParams.get("status");
-
-    const contentType = searchParams.get("contentType");
-
-    const provider = searchParams.get("provider");
-
-    const search = searchParams.get("search");
-
-    if (status && !PUBLIC_CONTENT_STATUSES.includes(status)) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Invalid status.",
-        },
-        {
-          status: 400,
-        },
-      );
-    }
-
-    if (contentType && !PUBLIC_CONTENT_TYPES.includes(contentType)) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Invalid content type.",
-        },
-        {
-          status: 400,
-        },
-      );
-    }
-
-    if (provider && !PUBLIC_PROVIDERS.includes(provider)) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Invalid provider.",
-        },
-        {
-          status: 400,
-        },
-      );
-    }
-
-    const data = await listPublicContents({
-      companyId,
-      status,
-      contentType,
-      provider,
-      search,
+      contentId: params.contentId,
     });
 
     return NextResponse.json({
@@ -122,7 +82,19 @@ export async function GET(request, context) {
       data,
     });
   } catch (error) {
-    console.error("List public content error:", error);
+    console.error("Get public content error:", error);
+
+    if (error.message === "PUBLIC_CONTENT_NOT_FOUND") {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Public content not found.",
+        },
+        {
+          status: 404,
+        },
+      );
+    }
 
     return NextResponse.json(
       {
@@ -136,8 +108,8 @@ export async function GET(request, context) {
   }
 }
 
-export async function POST(request, context) {
-  let companyId = null;
+export async function PATCH(request, context) {
+  let params = null;
 
   try {
     if (!isTrustedOrigin(request)) {
@@ -152,13 +124,13 @@ export async function POST(request, context) {
       );
     }
 
-    companyId = await resolveCompanyId(context);
+    params = await resolveParams(context);
 
-    if (!companyId) {
+    if (!params) {
       return NextResponse.json(
         {
           success: false,
-          message: "Invalid company ID.",
+          message: "Invalid request parameters.",
         },
         {
           status: 400,
@@ -167,8 +139,9 @@ export async function POST(request, context) {
     }
 
     const access = await getCompanyPermission({
-      companyId,
-      permission: PERMISSIONS.PUBLIC_CREATE,
+      companyId: params.companyId,
+
+      permission: PERMISSIONS.PUBLIC_UPDATE,
     });
 
     if (!access.authorized) {
@@ -185,12 +158,13 @@ export async function POST(request, context) {
 
     const body = await request.json();
 
-    const validation = createPublicContentSchema.safeParse(body);
+    const validation = updatePublicContentSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Invalid public content data.",
 
           errors: validation.error.flatten().fieldErrors,
@@ -201,33 +175,36 @@ export async function POST(request, context) {
       );
     }
 
-    const data = await createPublicContent({
-      companyId,
+    const data = await updatePublicContent({
+      companyId: params.companyId,
+
+      contentId: params.contentId,
+
       input: validation.data,
+
       currentUser: access.user,
     });
 
-    return NextResponse.json(
-      {
-        success: true,
-        data,
-      },
-      {
-        status: 201,
-      },
-    );
+    return NextResponse.json({
+      success: true,
+      data,
+    });
   } catch (error) {
-    console.error("Create public content error:", error);
+    console.error("Update public content error:", error);
 
     if (error.message === "PUBLIC_SLUG_EXISTS") {
       let suggestedSlug = null;
 
       try {
-        if (companyId && error.slug) {
+        if (params?.companyId && error.slug) {
           suggestedSlug = await findAvailableSlug({
-            companyId,
+            companyId: params.companyId,
+
             contentType: "publicContent",
+
             slug: error.slug,
+
+            excludeContentId: params.contentId,
           });
         }
       } catch (suggestionError) {
@@ -251,6 +228,8 @@ export async function POST(request, context) {
     }
 
     const messages = {
+      PUBLIC_CONTENT_NOT_FOUND: [404, "Public content not found."],
+
       PUBLIC_TITLE_REQUIRED: [400, "Title is required."],
 
       PUBLIC_ARTICLE_CONTENT_REQUIRED: [400, "Article content is required."],
@@ -275,7 +254,95 @@ export async function POST(request, context) {
     return NextResponse.json(
       {
         success: false,
-        message: "Unable to create public content.",
+        message: "Unable to update public content.",
+      },
+      {
+        status: 500,
+      },
+    );
+  }
+}
+
+export async function DELETE(request, context) {
+  try {
+    if (!isTrustedOrigin(request)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid request origin.",
+        },
+        {
+          status: 403,
+        },
+      );
+    }
+
+    const params = await resolveParams(context);
+
+    if (!params) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid request parameters.",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    const access = await getCompanyPermission({
+      companyId: params.companyId,
+
+      permission: PERMISSIONS.PUBLIC_DELETE,
+    });
+
+    if (!access.authorized) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: access.reason,
+        },
+        {
+          status: access.user ? 403 : 401,
+        },
+      );
+    }
+
+    const data = await deletePublicContent({
+      companyId: params.companyId,
+
+      contentId: params.contentId,
+
+      currentUser: access.user,
+    });
+
+    return NextResponse.json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    console.error("Delete public content error:", error);
+
+    if (
+      error.message === "PUBLIC_CONTENT_NOT_FOUND" ||
+      error.message === "PUBLIC_CONTENT_ALREADY_DELETED"
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Public content not found.",
+        },
+        {
+          status: 404,
+        },
+      );
+    }
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Unable to delete public content.",
       },
       {
         status: 500,

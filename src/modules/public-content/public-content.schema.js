@@ -8,7 +8,6 @@ import {
 
 const localizedString = z.object({
   th: z.string().default(""),
-
   en: z.string().default(""),
 });
 
@@ -44,12 +43,38 @@ const seoSchema = z.object({
   follow: z.boolean().default(true),
 });
 
+const externalMetadataSchema = z.object({
+  title: z.string().max(1000).default(""),
+
+  description: z.string().max(10000).default(""),
+
+  authorName: z.string().max(1000).default(""),
+
+  authorUrl: z.union([z.string().url(), z.null()]).default(null),
+
+  thumbnailUrl: z.union([z.string().url(), z.null()]).default(null),
+
+  thumbnailWidth: z
+    .union([z.number().int().positive(), z.null()])
+    .default(null),
+
+  thumbnailHeight: z
+    .union([z.number().int().positive(), z.null()])
+    .default(null),
+
+  publishedAt: z.union([z.string(), z.null()]).default(null),
+
+  duration: z.union([z.string(), z.null()]).default(null),
+});
+
 const sourceSchema = z.object({
   provider: z.union([z.enum(PUBLIC_PROVIDERS), z.null()]).default(null),
 
   sourceUrl: z.union([z.string().url(), z.literal(""), z.null()]).default(null),
 
   externalId: z.union([z.string(), z.null()]).default(null),
+
+  metadata: z.union([externalMetadataSchema, z.null()]).optional(),
 });
 
 const baseSchema = z.object({

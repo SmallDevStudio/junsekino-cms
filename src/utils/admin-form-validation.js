@@ -179,3 +179,51 @@ export function validateAwardForm(form) {
 
   return errors;
 }
+
+function isValidUrl(value) {
+  if (!hasText(value)) {
+    return false;
+  }
+
+  try {
+    const url = new URL(value);
+
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+export function validatePublicContentForm(form) {
+  const errors = {};
+
+  if (!hasLocalizedText(form?.title)) {
+    errors.title = "Enter the content title in Thai or English.";
+  }
+
+  if (!hasText(form?.slug)) {
+    errors.slug = "Public content slug is required.";
+  }
+
+  if (!["article", "video", "embed"].includes(form?.contentType)) {
+    errors.contentType = "Select a content type.";
+  }
+
+  if (form?.contentType === "article" && !hasLocalizedText(form?.content)) {
+    errors.content = "Enter article content in Thai or English.";
+  }
+
+  if (form?.contentType === "video" || form?.contentType === "embed") {
+    if (!hasText(form?.source?.provider)) {
+      errors.sourceProvider = "Select a media provider.";
+    }
+
+    if (!hasText(form?.source?.sourceUrl)) {
+      errors.sourceUrl = "Source URL is required.";
+    } else if (!isValidUrl(form.source.sourceUrl)) {
+      errors.sourceUrl = "Enter a valid http:// or https:// URL.";
+    }
+  }
+
+  return errors;
+}

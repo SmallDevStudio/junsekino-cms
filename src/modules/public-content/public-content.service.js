@@ -25,7 +25,6 @@ import { serializeFirestoreDocument } from "@/utils/firestore";
 function mergeLocalized(existing = {}, incoming = {}) {
   return {
     th: incoming?.th ?? existing?.th ?? "",
-
     en: incoming?.en ?? existing?.en ?? "",
   };
 }
@@ -44,6 +43,32 @@ function mergeSeo(seo = {}) {
       ...DEFAULT_PUBLIC_SEO.en,
       ...(seo.en || {}),
     },
+  };
+}
+
+function normalizeExternalMetadata(metadata = null) {
+  if (!metadata) {
+    return null;
+  }
+
+  return {
+    title: metadata.title || "",
+
+    description: metadata.description || "",
+
+    authorName: metadata.authorName || "",
+
+    authorUrl: metadata.authorUrl || null,
+
+    thumbnailUrl: metadata.thumbnailUrl || null,
+
+    thumbnailWidth: metadata.thumbnailWidth ?? null,
+
+    thumbnailHeight: metadata.thumbnailHeight ?? null,
+
+    publishedAt: metadata.publishedAt || null,
+
+    duration: metadata.duration || null,
   };
 }
 
@@ -92,6 +117,8 @@ function normalizeInput(input) {
       sourceUrl: input.source?.sourceUrl || null,
 
       externalId: input.source?.externalId || null,
+
+      metadata: normalizeExternalMetadata(input.source?.metadata),
     },
 
     featuredImage: input.featuredImage ?? null,
@@ -136,6 +163,8 @@ export async function listPublicContents({
         item.title?.en,
         item.slug,
         item.source?.provider,
+        item.source?.metadata?.title,
+        item.source?.metadata?.authorName,
         ...(item.tags || []),
       ]
         .filter(Boolean)
@@ -236,8 +265,19 @@ export async function updatePublicContent({
 
   if (input.source) {
     data.source = {
-      ...existing.source,
-      ...input.source,
+      provider: input.source.provider ?? existing.source?.provider ?? null,
+
+      sourceUrl: input.source.sourceUrl ?? existing.source?.sourceUrl ?? null,
+
+      externalId:
+        input.source.externalId ?? existing.source?.externalId ?? null,
+
+      metadata:
+        input.source.metadata === null
+          ? null
+          : normalizeExternalMetadata(
+              input.source.metadata ?? existing.source?.metadata,
+            ),
     };
   }
 
