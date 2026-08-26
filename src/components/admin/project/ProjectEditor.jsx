@@ -1,7 +1,6 @@
 "use client";
 
 import { LoaderCircle, X } from "lucide-react";
-
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -10,6 +9,7 @@ import { cn } from "@/utils/cn";
 import ProjectCategorySection from "./ProjectCategorySection";
 import ProjectCreditsSection from "./ProjectCreditsSection";
 import ProjectMediaSection from "./ProjectMediaSection";
+import ProjectSeoSection from "./ProjectSeoSection";
 
 function emptyLocalized() {
   return {
@@ -18,21 +18,56 @@ function emptyLocalized() {
   };
 }
 
+function emptySeoLanguage() {
+  return {
+    title: "",
+    description: "",
+    keywords: [],
+    ogTitle: "",
+    ogDescription: "",
+    ogImage: null,
+  };
+}
+
+function emptySeo() {
+  return {
+    th: emptySeoLanguage(),
+    en: emptySeoLanguage(),
+    index: true,
+    follow: true,
+  };
+}
+
+function normalizeSeoLanguage(value) {
+  return {
+    title: value?.title || "",
+    description: value?.description || "",
+    keywords: Array.isArray(value?.keywords) ? value.keywords : [],
+    ogTitle: value?.ogTitle || "",
+    ogDescription: value?.ogDescription || "",
+    ogImage: value?.ogImage || null,
+  };
+}
+
+function normalizeSeo(value) {
+  return {
+    th: normalizeSeoLanguage(value?.th),
+    en: normalizeSeoLanguage(value?.en),
+    index: value?.index !== false,
+    follow: value?.follow !== false,
+  };
+}
+
 function emptyProjectInfo() {
   return {
     location: emptyLocalized(),
-
     designYear: null,
-
     completionYear: null,
-
     area: {
       value: null,
       unit: "sqm",
     },
-
     client: emptyLocalized(),
-
     credits: {
       architecture: [],
       interior: [],
@@ -45,26 +80,17 @@ function emptyProjectInfo() {
 function emptyForm() {
   return {
     slug: "",
-
     title: emptyLocalized(),
-
     excerpt: emptyLocalized(),
-
     content: emptyLocalized(),
-
     categoryId: null,
-
     subCategoryId: null,
-
     projectInfo: emptyProjectInfo(),
-
     tags: [],
-
     featuredImage: null,
-
     gallery: [],
-
     featured: false,
+    seo: emptySeo(),
   };
 }
 
@@ -92,7 +118,6 @@ function normalizeProject(project) {
     },
 
     categoryId: project.categoryId || null,
-
     subCategoryId: project.subCategoryId || null,
 
     projectInfo: {
@@ -102,12 +127,10 @@ function normalizeProject(project) {
       },
 
       designYear: project.projectInfo?.designYear ?? null,
-
       completionYear: project.projectInfo?.completionYear ?? null,
 
       area: {
         value: project.projectInfo?.area?.value ?? null,
-
         unit: project.projectInfo?.area?.unit || "sqm",
       },
 
@@ -136,12 +159,10 @@ function normalizeProject(project) {
     },
 
     tags: Array.isArray(project.tags) ? project.tags : [],
-
     featuredImage: project.featuredImage || null,
-
     gallery: Array.isArray(project.gallery) ? project.gallery : [],
-
     featured: project.featured === true,
+    seo: normalizeSeo(project.seo),
   };
 }
 
@@ -182,16 +203,8 @@ export default function ProjectEditor({
   onSaved,
 }) {
   const [form, setForm] = useState(() => normalizeProject(project));
-
   const [saving, setSaving] = useState(false);
-
   const [tagInput, setTagInput] = useState("");
-
-  /*
-   * ------------------------------------------------
-   * Reset editor
-   * ------------------------------------------------
-   */
 
   useEffect(() => {
     if (!open) {
@@ -200,7 +213,6 @@ export default function ProjectEditor({
 
     const timeoutId = window.setTimeout(() => {
       setForm(normalizeProject(project));
-
       setTagInput("");
     }, 0);
 
@@ -213,19 +225,12 @@ export default function ProjectEditor({
     return null;
   }
 
-  /*
-   * ------------------------------------------------
-   * Localized fields
-   * ------------------------------------------------
-   */
-
   function updateLocalized(field, language, value) {
     setForm((current) => ({
       ...current,
 
       [field]: {
         ...current[field],
-
         [language]: value,
       },
     }));
@@ -240,18 +245,11 @@ export default function ProjectEditor({
 
         [field]: {
           ...current.projectInfo[field],
-
           [language]: value,
         },
       },
     }));
   }
-
-  /*
-   * ------------------------------------------------
-   * Tags
-   * ------------------------------------------------
-   */
 
   function addTag() {
     const value = tagInput.trim();
@@ -267,7 +265,6 @@ export default function ProjectEditor({
 
       return {
         ...current,
-
         tags: [...current.tags, value],
       };
     });
@@ -278,16 +275,9 @@ export default function ProjectEditor({
   function removeTag(tag) {
     setForm((current) => ({
       ...current,
-
       tags: current.tags.filter((item) => item !== tag),
     }));
   }
-
-  /*
-   * ------------------------------------------------
-   * Save
-   * ------------------------------------------------
-   */
 
   async function handleSave() {
     if (!companyId) {
@@ -296,7 +286,6 @@ export default function ProjectEditor({
 
     if (!form.title.th.trim() && !form.title.en.trim()) {
       toast.error("Project title is required.");
-
       return;
     }
 
@@ -304,7 +293,6 @@ export default function ProjectEditor({
 
     if (!normalizedSlug) {
       toast.error("Project slug is required.");
-
       return;
     }
 
@@ -319,26 +307,17 @@ export default function ProjectEditor({
 
       const payload = {
         slug: normalizedSlug,
-
         title: form.title,
-
         excerpt: form.excerpt,
-
         content: form.content,
-
         categoryId: form.categoryId || null,
-
         subCategoryId: form.subCategoryId || null,
-
         projectInfo: form.projectInfo,
-
         tags: form.tags,
-
         featuredImage: form.featuredImage,
-
         gallery: form.gallery,
-
         featured: form.featured,
+        seo: form.seo,
       };
 
       const response = await fetch(url, {
@@ -349,7 +328,6 @@ export default function ProjectEditor({
         },
 
         credentials: "include",
-
         body: JSON.stringify(payload),
       });
 
@@ -381,8 +359,6 @@ export default function ProjectEditor({
       />
 
       <div className="relative z-10 flex h-full w-full max-w-5xl flex-col bg-[var(--admin-surface)] shadow-2xl">
-        {/* Header */}
-
         <header className="flex h-20 shrink-0 items-center justify-between border-b border-[var(--admin-border)] px-5 sm:px-8">
           <div>
             <h2 className="text-lg font-semibold tracking-[-0.02em] text-[var(--admin-foreground)]">
@@ -405,11 +381,7 @@ export default function ProjectEditor({
           </button>
         </header>
 
-        {/* Content */}
-
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6 sm:px-8 sm:py-8">
-          {/* Basic Information */}
-
           <section>
             <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
               Basic Information
@@ -445,7 +417,6 @@ export default function ProjectEditor({
 
                       title: {
                         ...current.title,
-
                         en: value,
                       },
 
@@ -467,7 +438,6 @@ export default function ProjectEditor({
                 onChange={(event) =>
                   setForm((current) => ({
                     ...current,
-
                     slug: event.target.value,
                   }))
                 }
@@ -481,8 +451,6 @@ export default function ProjectEditor({
             </label>
           </section>
 
-          {/* Category */}
-
           <ProjectCategorySection
             companyId={companyId}
             categories={categories}
@@ -491,22 +459,17 @@ export default function ProjectEditor({
             onCategoryChange={(categoryId) =>
               setForm((current) => ({
                 ...current,
-
                 categoryId,
-
                 subCategoryId: null,
               }))
             }
             onSubCategoryChange={(subCategoryId) =>
               setForm((current) => ({
                 ...current,
-
                 subCategoryId,
               }))
             }
           />
-
-          {/* Media */}
 
           <ProjectMediaSection
             companyId={companyId}
@@ -515,20 +478,16 @@ export default function ProjectEditor({
             onFeaturedImageChange={(featuredImage) =>
               setForm((current) => ({
                 ...current,
-
                 featuredImage,
               }))
             }
             onGalleryChange={(gallery) =>
               setForm((current) => ({
                 ...current,
-
                 gallery,
               }))
             }
           />
-
-          {/* Project Information */}
 
           <section className="mt-10">
             <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
@@ -588,7 +547,6 @@ export default function ProjectEditor({
 
                       projectInfo: {
                         ...current.projectInfo,
-
                         designYear: normalizeYear(event.target.value),
                       },
                     }))
@@ -613,7 +571,6 @@ export default function ProjectEditor({
 
                       projectInfo: {
                         ...current.projectInfo,
-
                         completionYear: normalizeYear(event.target.value),
                       },
                     }))
@@ -638,7 +595,6 @@ export default function ProjectEditor({
 
                         area: {
                           ...current.projectInfo.area,
-
                           value: normalizeArea(event.target.value),
                         },
                       },
@@ -662,7 +618,6 @@ export default function ProjectEditor({
 
                         area: {
                           ...current.projectInfo.area,
-
                           unit: event.target.value,
                         },
                       },
@@ -671,7 +626,6 @@ export default function ProjectEditor({
                   className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
                 >
                   <option value="sqm">sqm</option>
-
                   <option value="sqft">sqft</option>
                 </select>
               </label>
@@ -714,8 +668,6 @@ export default function ProjectEditor({
             </div>
           </section>
 
-          {/* Credits */}
-
           <ProjectCreditsSection
             credits={form.projectInfo.credits}
             onChange={(credits) =>
@@ -724,14 +676,11 @@ export default function ProjectEditor({
 
                 projectInfo: {
                   ...current.projectInfo,
-
                   credits,
                 },
               }))
             }
           />
-
-          {/* Content */}
 
           <section className="mt-10">
             <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
@@ -801,8 +750,6 @@ export default function ProjectEditor({
             </div>
           </section>
 
-          {/* Tags */}
-
           <section className="mt-10">
             <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
               Tags
@@ -819,7 +766,6 @@ export default function ProjectEditor({
                 onKeyDown={(event) => {
                   if (event.key === "Enter") {
                     event.preventDefault();
-
                     addTag();
                   }
                 }}
@@ -853,8 +799,6 @@ export default function ProjectEditor({
             )}
           </section>
 
-          {/* Featured */}
-
           <section className="mt-10 border-t border-[var(--admin-border)] pt-8">
             <label className="flex items-start gap-3">
               <input
@@ -863,7 +807,6 @@ export default function ProjectEditor({
                 onChange={(event) =>
                   setForm((current) => ({
                     ...current,
-
                     featured: event.target.checked,
                   }))
                 }
@@ -882,9 +825,18 @@ export default function ProjectEditor({
               </span>
             </label>
           </section>
-        </div>
 
-        {/* Footer */}
+          <ProjectSeoSection
+            companyId={companyId}
+            seo={form.seo}
+            onChange={(seo) =>
+              setForm((current) => ({
+                ...current,
+                seo,
+              }))
+            }
+          />
+        </div>
 
         <footer className="flex shrink-0 items-center justify-end gap-2 border-t border-[var(--admin-border)] bg-[var(--admin-surface)] px-5 py-4 sm:px-8">
           <button

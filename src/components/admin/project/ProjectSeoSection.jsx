@@ -1,125 +1,24 @@
 "use client";
 
-import { Globe2, Image as ImageIcon, Plus, Search, X } from "lucide-react";
-
-import { useMemo, useState } from "react";
+import { Image as ImageIcon, Search, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 import MediaPicker from "@/components/admin/media/MediaPicker";
 import { cn } from "@/utils/cn";
 
-function emptyLocalizedSeo() {
-  return {
-    title: "",
-    description: "",
-    keywords: [],
-    ogTitle: "",
-    ogDescription: "",
-    ogImage: null,
-  };
-}
-
-export function createEmptyProjectSeo() {
-  return {
-    th: emptyLocalizedSeo(),
-    en: emptyLocalizedSeo(),
-
-    index: true,
-    follow: true,
-  };
-}
-
-export function normalizeProjectSeo(seo) {
-  const fallback = createEmptyProjectSeo();
-
-  return {
-    th: {
-      title: seo?.th?.title || "",
-
-      description: seo?.th?.description || "",
-
-      keywords: Array.isArray(seo?.th?.keywords) ? seo.th.keywords : [],
-
-      ogTitle: seo?.th?.ogTitle || "",
-
-      ogDescription: seo?.th?.ogDescription || "",
-
-      ogImage: seo?.th?.ogImage || null,
-    },
-
-    en: {
-      title: seo?.en?.title || "",
-
-      description: seo?.en?.description || "",
-
-      keywords: Array.isArray(seo?.en?.keywords) ? seo.en.keywords : [],
-
-      ogTitle: seo?.en?.ogTitle || "",
-
-      ogDescription: seo?.en?.ogDescription || "",
-
-      ogImage: seo?.en?.ogImage || null,
-    },
-
-    index: seo?.index ?? fallback.index,
-
-    follow: seo?.follow ?? fallback.follow,
-  };
-}
-
-function CharacterCount({ value = "", max, recommended }) {
-  const length = value?.length || 0;
-
-  const warning = recommended && length > recommended;
-
-  const invalid = length > max;
-
-  return (
-    <span
-      className={cn(
-        "text-[10px]",
-        invalid
-          ? "font-medium text-red-600"
-          : warning
-            ? "text-amber-600"
-            : "text-[var(--admin-muted-light)]",
-      )}
-    >
-      {length}/{max}
-    </span>
-  );
-}
-
-function KeywordEditor({ keywords = [], onChange }) {
+function KeywordEditor({ value = [], onChange }) {
   const [input, setInput] = useState("");
 
-  function normalizeKeyword(value) {
-    return value.trim().replace(/\s+/g, " ");
-  }
-
   function addKeyword() {
-    const keyword = normalizeKeyword(input);
+    const keyword = input.trim();
 
-    if (!keyword) {
-      return;
-    }
-
-    const exists = keywords.some(
-      (item) => item.toLowerCase() === keyword.toLowerCase(),
-    );
-
-    if (exists) {
+    if (!keyword || value.includes(keyword)) {
       setInput("");
-
       return;
     }
 
-    onChange?.([...keywords, keyword]);
-
+    onChange([...value, keyword]);
     setInput("");
-  }
-
-  function removeKeyword(keyword) {
-    onChange?.(keywords.filter((item) => item !== keyword));
   }
 
   return (
@@ -131,517 +30,332 @@ function KeywordEditor({ keywords = [], onChange }) {
           onKeyDown={(event) => {
             if (event.key === "Enter") {
               event.preventDefault();
-
-              addKeyword();
-            }
-
-            if (event.key === "," && input.trim()) {
-              event.preventDefault();
-
               addKeyword();
             }
           }}
-          maxLength={100}
           placeholder="architecture"
-          className={cn(
-            "h-10 min-w-0 flex-1 rounded-xl",
-            "border border-[var(--admin-border)]",
-            "bg-[var(--admin-surface)] px-3",
-            "text-sm text-[var(--admin-foreground)]",
-            "outline-none transition",
-            "placeholder:text-[var(--admin-muted-light)]",
-            "focus:border-[var(--company-primary)]",
-            "focus:ring-2 focus:ring-[var(--company-primary-soft)]",
-          )}
+          className="h-10 flex-1 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
         />
 
         <button
           type="button"
           onClick={addKeyword}
-          className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl border border-[var(--admin-border)] px-3 text-xs font-medium text-[var(--admin-foreground)] transition hover:bg-[var(--admin-hover)]"
+          className="h-10 rounded-xl border border-[var(--admin-border)] px-4 text-xs font-medium text-[var(--admin-foreground)] transition hover:bg-[var(--admin-hover)]"
         >
-          <Plus size={13} />
           Add
         </button>
       </div>
 
-      {keywords.length > 0 && (
+      {value.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
-          {keywords.map((keyword) => (
+          {value.map((keyword) => (
             <button
               key={keyword}
               type="button"
-              onClick={() => removeKeyword(keyword)}
+              onClick={() => onChange(value.filter((item) => item !== keyword))}
               title="Remove keyword"
-              className="inline-flex items-center gap-1.5 rounded-full bg-[var(--admin-hover)] px-3 py-1.5 text-[11px] text-[var(--admin-foreground)] transition hover:bg-red-50 hover:text-red-600"
+              className="rounded-full bg-[var(--admin-hover)] px-3 py-1 text-xs text-[var(--admin-foreground)] transition hover:bg-red-50 hover:text-red-600"
             >
-              {keyword}
-
-              <X size={11} />
+              {keyword} ×
             </button>
           ))}
         </div>
       )}
-
-      <p className="mt-2 text-[10px] leading-4 text-[var(--admin-muted-light)]">
-        Press Enter or comma to add a keyword. Duplicate keywords are ignored.
-      </p>
     </div>
   );
 }
 
-function SeoPreview({ title, description, slug }) {
-  const previewTitle = title?.trim() || "Project title";
+function SeoLanguagePanel({ language, value, onChange }) {
+  const languageLabel = language === "th" ? "Thai" : "English";
 
-  const previewDescription =
-    description?.trim() || "Project SEO description will appear here.";
-
-  const previewSlug = slug || "project-slug";
-
-  return (
-    <div className="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-background)] p-4">
-      <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.12em] text-[var(--admin-muted-light)]">
-        <Search size={12} />
-        Search Preview
-      </div>
-
-      <div className="mt-3 text-[11px] text-emerald-700">
-        junsekino.com › projects › {previewSlug}
-      </div>
-
-      <div className="mt-1 line-clamp-1 text-[16px] font-medium text-blue-700">
-        {previewTitle}
-      </div>
-
-      <p className="mt-1 line-clamp-2 text-xs leading-5 text-[var(--admin-muted)]">
-        {previewDescription}
-      </p>
-    </div>
-  );
-}
-
-function OgImageControl({ companyId, mediaId, onChange, language }) {
-  const [pickerOpen, setPickerOpen] = useState(false);
-
-  return (
-    <>
-      <div className="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-background)] p-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 text-xs font-medium text-[var(--admin-foreground)]">
-              <ImageIcon size={14} />
-              Open Graph Image
-            </div>
-
-            {mediaId ? (
-              <p className="mt-1 truncate text-[10px] text-[var(--admin-muted)]">
-                Media ID: {mediaId}
-              </p>
-            ) : (
-              <p className="mt-1 text-[10px] leading-4 text-[var(--admin-muted)]">
-                No custom image. The public website can fall back to the project
-                cover image.
-              </p>
-            )}
-          </div>
-
-          <div className="flex shrink-0 gap-2">
-            {mediaId && (
-              <button
-                type="button"
-                onClick={() => onChange?.(null)}
-                className="h-9 rounded-xl border border-[var(--admin-border)] px-3 text-xs font-medium text-red-600 transition hover:bg-red-50"
-              >
-                Remove
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={() => setPickerOpen(true)}
-              className="h-9 rounded-xl border border-[var(--admin-border)] px-3 text-xs font-medium text-[var(--admin-foreground)] transition hover:bg-[var(--admin-hover)]"
-            >
-              {mediaId ? "Change" : "Select Image"}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <MediaPicker
-        open={pickerOpen}
-        companyId={companyId}
-        selectedIds={mediaId ? [mediaId] : []}
-        multiple={false}
-        title={`Select ${language.toUpperCase()} social image`}
-        onClose={() => setPickerOpen(false)}
-        onConfirm={(media) => {
-          if (!media?.id) {
-            return;
-          }
-
-          onChange?.(media.id);
-        }}
-      />
-    </>
-  );
-}
-
-function LocalizedSeoEditor({ language, value, companyId, slug, onChange }) {
-  const labels =
-    language === "th"
-      ? {
-          language: "Thai",
-          title: "SEO Title — Thai",
-          description: "Meta Description — Thai",
-          keywords: "Keywords — Thai",
-          ogTitle: "Open Graph Title — Thai",
-          ogDescription: "Open Graph Description — Thai",
-        }
-      : {
-          language: "English",
-          title: "SEO Title — English",
-          description: "Meta Description — English",
-          keywords: "Keywords — English",
-          ogTitle: "Open Graph Title — English",
-          ogDescription: "Open Graph Description — English",
-        };
-
-  function updateField(field, nextValue) {
-    onChange?.({
+  function update(field, fieldValue) {
+    onChange({
       ...value,
-      [field]: nextValue,
+      [field]: fieldValue,
     });
   }
 
   return (
-    <div>
-      <div className="flex items-center gap-2">
-        <Globe2 size={15} className="text-[var(--company-primary)]" />
-
-        <div className="text-xs font-semibold text-[var(--admin-foreground)]">
-          {labels.language} SEO
-        </div>
+    <div className="rounded-2xl border border-[var(--admin-border)] p-4 sm:p-5">
+      <div className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--admin-muted)]">
+        {languageLabel}
       </div>
 
-      <div className="mt-4 space-y-5">
-        {/* SEO title */}
-
+      <div className="mt-4 space-y-4">
         <label className="block">
           <div className="flex items-center justify-between gap-3">
             <span className="text-xs font-medium text-[var(--admin-muted)]">
-              {labels.title}
+              SEO Title
             </span>
 
-            <CharacterCount value={value.title} recommended={60} max={70} />
+            <span className="text-[10px] text-[var(--admin-muted-light)]">
+              {value.title.length}/70
+            </span>
           </div>
 
           <input
             value={value.title}
-            onChange={(event) => updateField("title", event.target.value)}
             maxLength={70}
-            placeholder="Project name | Junsekino"
-            className={cn(
-              "mt-2 h-11 w-full rounded-xl",
-              "border border-[var(--admin-border)]",
-              "bg-[var(--admin-surface)] px-3",
-              "text-sm text-[var(--admin-foreground)]",
-              "outline-none transition",
-              "placeholder:text-[var(--admin-muted-light)]",
-              "focus:border-[var(--company-primary)]",
-              "focus:ring-2 focus:ring-[var(--company-primary-soft)]",
-            )}
+            onChange={(event) => update("title", event.target.value)}
+            className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
           />
-
-          <p className="mt-1.5 text-[10px] text-[var(--admin-muted-light)]">
-            Recommended around 50–60 characters.
-          </p>
         </label>
-
-        {/* Meta description */}
 
         <label className="block">
           <div className="flex items-center justify-between gap-3">
             <span className="text-xs font-medium text-[var(--admin-muted)]">
-              {labels.description}
+              Meta Description
             </span>
 
-            <CharacterCount
-              value={value.description}
-              recommended={160}
-              max={180}
-            />
+            <span className="text-[10px] text-[var(--admin-muted-light)]">
+              {value.description.length}/180
+            </span>
           </div>
 
           <textarea
             rows={4}
             value={value.description}
-            onChange={(event) => updateField("description", event.target.value)}
             maxLength={180}
-            placeholder="A concise description of the project..."
-            className={cn(
-              "mt-2 w-full rounded-xl",
-              "border border-[var(--admin-border)]",
-              "bg-[var(--admin-surface)] p-3",
-              "text-sm text-[var(--admin-foreground)]",
-              "outline-none transition",
-              "placeholder:text-[var(--admin-muted-light)]",
-              "focus:border-[var(--company-primary)]",
-              "focus:ring-2 focus:ring-[var(--company-primary-soft)]",
-            )}
+            onChange={(event) => update("description", event.target.value)}
+            className="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
           />
         </label>
 
-        {/* Search preview */}
-
-        <SeoPreview
-          title={value.title}
-          description={value.description}
-          slug={slug}
-        />
-
-        {/* Keywords */}
-
         <div>
-          <div className="text-xs font-medium text-[var(--admin-muted)]">
-            {labels.keywords}
+          <div className="mb-2 text-xs font-medium text-[var(--admin-muted)]">
+            SEO Keywords
           </div>
 
-          <div className="mt-2">
-            <KeywordEditor
-              keywords={value.keywords}
-              onChange={(keywords) => updateField("keywords", keywords)}
-            />
-          </div>
+          <KeywordEditor
+            value={value.keywords}
+            onChange={(keywords) => update("keywords", keywords)}
+          />
         </div>
 
-        {/* Open Graph */}
+        <label className="block">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-xs font-medium text-[var(--admin-muted)]">
+              Open Graph Title
+            </span>
 
-        <div className="border-t border-[var(--admin-border)] pt-5">
-          <div className="text-xs font-semibold text-[var(--admin-foreground)]">
-            Social Sharing
+            <span className="text-[10px] text-[var(--admin-muted-light)]">
+              {value.ogTitle.length}/100
+            </span>
           </div>
 
-          <p className="mt-1 text-[11px] leading-5 text-[var(--admin-muted)]">
-            Open Graph metadata is used when the project is shared on social
-            platforms.
-          </p>
+          <input
+            value={value.ogTitle}
+            maxLength={100}
+            onChange={(event) => update("ogTitle", event.target.value)}
+            className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
+          />
+        </label>
 
-          <label className="mt-4 block">
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-xs font-medium text-[var(--admin-muted)]">
-                {labels.ogTitle}
-              </span>
+        <label className="block">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-xs font-medium text-[var(--admin-muted)]">
+              Open Graph Description
+            </span>
 
-              <CharacterCount value={value.ogTitle} max={100} />
-            </div>
-
-            <input
-              value={value.ogTitle}
-              onChange={(event) => updateField("ogTitle", event.target.value)}
-              maxLength={100}
-              placeholder="Leave blank to use SEO title"
-              className={cn(
-                "mt-2 h-11 w-full rounded-xl",
-                "border border-[var(--admin-border)]",
-                "bg-[var(--admin-surface)] px-3",
-                "text-sm text-[var(--admin-foreground)]",
-                "outline-none transition",
-                "placeholder:text-[var(--admin-muted-light)]",
-                "focus:border-[var(--company-primary)]",
-                "focus:ring-2 focus:ring-[var(--company-primary-soft)]",
-              )}
-            />
-          </label>
-
-          <label className="mt-4 block">
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-xs font-medium text-[var(--admin-muted)]">
-                {labels.ogDescription}
-              </span>
-
-              <CharacterCount value={value.ogDescription} max={200} />
-            </div>
-
-            <textarea
-              rows={3}
-              value={value.ogDescription}
-              onChange={(event) =>
-                updateField("ogDescription", event.target.value)
-              }
-              maxLength={200}
-              placeholder="Leave blank to use meta description"
-              className={cn(
-                "mt-2 w-full rounded-xl",
-                "border border-[var(--admin-border)]",
-                "bg-[var(--admin-surface)] p-3",
-                "text-sm text-[var(--admin-foreground)]",
-                "outline-none transition",
-                "placeholder:text-[var(--admin-muted-light)]",
-                "focus:border-[var(--company-primary)]",
-                "focus:ring-2 focus:ring-[var(--company-primary-soft)]",
-              )}
-            />
-          </label>
-
-          <div className="mt-4">
-            <OgImageControl
-              companyId={companyId}
-              mediaId={value.ogImage}
-              language={language}
-              onChange={(ogImage) => updateField("ogImage", ogImage)}
-            />
+            <span className="text-[10px] text-[var(--admin-muted-light)]">
+              {value.ogDescription.length}/200
+            </span>
           </div>
-        </div>
+
+          <textarea
+            rows={4}
+            value={value.ogDescription}
+            maxLength={200}
+            onChange={(event) => update("ogDescription", event.target.value)}
+            className="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
+          />
+        </label>
       </div>
     </div>
   );
 }
 
-export default function ProjectSeoSection({ companyId, seo, slug, onChange }) {
-  const normalizedSeo = useMemo(() => normalizeProjectSeo(seo), [seo]);
+export default function ProjectSeoSection({ companyId, seo, onChange }) {
+  const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
 
-  const [activeLanguage, setActiveLanguage] = useState("en");
-
-  function updateLocalized(language, value) {
-    onChange?.({
-      ...normalizedSeo,
-
+  function updateLanguage(language, value) {
+    onChange({
+      ...seo,
       [language]: value,
     });
   }
 
-  function updateRobots(field, value) {
-    onChange?.({
-      ...normalizedSeo,
-
-      [field]: value,
-    });
-  }
-
   return (
-    <section className="mt-10 border-t border-[var(--admin-border)] pt-8">
-      <div>
-        <div className="flex items-center gap-2">
-          <Search size={16} className="text-[var(--company-primary)]" />
-
-          <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
-            Search Engine Optimization
-          </h3>
-        </div>
-
-        <p className="mt-1 max-w-2xl text-xs leading-5 text-[var(--admin-muted)]">
-          Control how this project is described to search engines and social
-          platforms.
-        </p>
-      </div>
-
-      {/* Robots */}
-
-      <div className="mt-5 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-background)] p-4">
-        <div className="text-xs font-semibold text-[var(--admin-foreground)]">
-          Search Visibility
-        </div>
-
-        <p className="mt-1 text-[11px] leading-5 text-[var(--admin-muted)]">
-          These settings control robots directives for the public project page.
-        </p>
-
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3">
-            <input
-              type="checkbox"
-              checked={normalizedSeo.index}
-              onChange={(event) => updateRobots("index", event.target.checked)}
-              className="mt-0.5"
-            />
-
-            <span>
-              <span className="block text-xs font-medium text-[var(--admin-foreground)]">
-                Allow indexing
-              </span>
-
-              <span className="mt-1 block text-[10px] leading-4 text-[var(--admin-muted)]">
-                Search engines may include this project in search results.
-              </span>
-            </span>
-          </label>
-
-          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3">
-            <input
-              type="checkbox"
-              checked={normalizedSeo.follow}
-              onChange={(event) => updateRobots("follow", event.target.checked)}
-              className="mt-0.5"
-            />
-
-            <span>
-              <span className="block text-xs font-medium text-[var(--admin-foreground)]">
-                Allow link following
-              </span>
-
-              <span className="mt-1 block text-[10px] leading-4 text-[var(--admin-muted)]">
-                Search engines may follow links from this page.
-              </span>
-            </span>
-          </label>
-        </div>
-
-        {!normalizedSeo.index && (
-          <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-[11px] leading-5 text-amber-700">
-            This project will request
-            <strong> noindex</strong>. It may not appear in search engine
-            results.
+    <>
+      <section className="mt-10 border-t border-[var(--admin-border)] pt-8">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--company-primary-soft)] text-[var(--company-primary)]">
+            <Search size={17} />
           </div>
-        )}
-      </div>
 
-      {/* Language tabs */}
+          <div>
+            <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
+              Search Engine Optimization
+            </h3>
 
-      <div className="mt-6 flex border-b border-[var(--admin-border)]">
-        {[
-          {
-            value: "en",
-            label: "English",
-          },
-          {
-            value: "th",
-            label: "Thai",
-          },
-        ].map((option) => {
-          const active = activeLanguage === option.value;
+            <p className="mt-1 text-xs leading-5 text-[var(--admin-muted)]">
+              Configure search engine metadata and social sharing information
+              for this project.
+            </p>
+          </div>
+        </div>
 
-          return (
+        <div className="mt-5 grid gap-4 xl:grid-cols-2">
+          <SeoLanguagePanel
+            language="th"
+            value={seo.th}
+            onChange={(value) => updateLanguage("th", value)}
+          />
+
+          <SeoLanguagePanel
+            language="en"
+            value={seo.en}
+            onChange={(value) => updateLanguage("en", value)}
+          />
+        </div>
+
+        <div className="mt-5 rounded-2xl border border-[var(--admin-border)] p-4 sm:p-5">
+          <div className="text-xs font-medium text-[var(--admin-foreground)]">
+            Open Graph Image
+          </div>
+
+          <p className="mt-1 text-[11px] leading-5 text-[var(--admin-muted)]">
+            Optional image used when this project is shared on social media.
+          </p>
+
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
             <button
-              key={option.value}
               type="button"
-              onClick={() => setActiveLanguage(option.value)}
+              onClick={() => setMediaPickerOpen(true)}
               className={cn(
-                "relative px-4 py-3",
-                "text-xs font-medium transition",
-                active
-                  ? "text-[var(--company-primary)]"
-                  : "text-[var(--admin-muted)] hover:text-[var(--admin-foreground)]",
+                "inline-flex h-10 items-center justify-center gap-2",
+                "rounded-xl border border-[var(--admin-border)]",
+                "px-4 text-xs font-medium text-[var(--admin-foreground)]",
+                "transition hover:bg-[var(--admin-hover)]",
               )}
             >
-              {option.label}
+              <ImageIcon size={15} />
 
-              {active && (
-                <span className="absolute inset-x-0 bottom-0 h-0.5 bg-[var(--company-primary)]" />
-              )}
+              {seo.en.ogImage || seo.th.ogImage
+                ? "Change Image"
+                : "Select Image"}
             </button>
-          );
-        })}
-      </div>
 
-      <div className="mt-6">
-        <LocalizedSeoEditor
-          language={activeLanguage}
-          value={normalizedSeo[activeLanguage]}
-          companyId={companyId}
-          slug={slug}
-          onChange={(value) => updateLocalized(activeLanguage, value)}
-        />
-      </div>
-    </section>
+            {(seo.en.ogImage || seo.th.ogImage) && (
+              <>
+                <div className="min-w-0 flex-1 truncate text-[11px] text-[var(--admin-muted)]">
+                  Media ID: {seo.en.ogImage || seo.th.ogImage}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    onChange({
+                      ...seo,
+                      th: {
+                        ...seo.th,
+                        ogImage: null,
+                      },
+                      en: {
+                        ...seo.en,
+                        ogImage: null,
+                      },
+                    })
+                  }
+                  className="inline-flex h-9 items-center justify-center gap-2 self-start rounded-xl px-3 text-xs font-medium text-red-500 transition hover:bg-red-50 sm:self-auto"
+                >
+                  <Trash2 size={14} />
+                  Remove
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-[var(--admin-border)] p-4">
+            <input
+              type="checkbox"
+              checked={seo.index}
+              onChange={(event) =>
+                onChange({
+                  ...seo,
+                  index: event.target.checked,
+                })
+              }
+              className="mt-0.5"
+            />
+
+            <span>
+              <span className="block text-sm font-medium text-[var(--admin-foreground)]">
+                Allow Indexing
+              </span>
+
+              <span className="mt-1 block text-xs leading-5 text-[var(--admin-muted)]">
+                Allow search engines to include this project in search results.
+              </span>
+            </span>
+          </label>
+
+          <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-[var(--admin-border)] p-4">
+            <input
+              type="checkbox"
+              checked={seo.follow}
+              onChange={(event) =>
+                onChange({
+                  ...seo,
+                  follow: event.target.checked,
+                })
+              }
+              className="mt-0.5"
+            />
+
+            <span>
+              <span className="block text-sm font-medium text-[var(--admin-foreground)]">
+                Follow Links
+              </span>
+
+              <span className="mt-1 block text-xs leading-5 text-[var(--admin-muted)]">
+                Allow search engines to follow links contained on this project
+                page.
+              </span>
+            </span>
+          </label>
+        </div>
+      </section>
+
+      <MediaPicker
+        open={mediaPickerOpen}
+        companyId={companyId}
+        selectedIds={
+          seo.en.ogImage || seo.th.ogImage
+            ? [seo.en.ogImage || seo.th.ogImage]
+            : []
+        }
+        multiple={false}
+        title="Select Open Graph image"
+        onClose={() => setMediaPickerOpen(false)}
+        onConfirm={(media) => {
+          const mediaId = media?.id || null;
+
+          onChange({
+            ...seo,
+            th: {
+              ...seo.th,
+              ogImage: mediaId,
+            },
+            en: {
+              ...seo.en,
+              ogImage: mediaId,
+            },
+          });
+        }}
+      />
+    </>
   );
 }
