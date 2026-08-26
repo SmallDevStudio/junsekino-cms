@@ -9,6 +9,7 @@ import {
   CircleDot,
   FolderKanban,
   LoaderCircle,
+  Pencil,
   Plus,
   RefreshCw,
   RotateCcw,
@@ -18,6 +19,13 @@ import {
 } from "lucide-react";
 
 import { useCompanyWorkspace } from "@/components/admin/company/CompanyWorkspaceProvider";
+
+import ActionButton from "@/components/admin/ui/ActionButton";
+import ActionButtonGroup from "@/components/admin/ui/ActionButtonGroup";
+import StatusBadge from "@/components/admin/ui/StatusBadge";
+
+import { useAdminUiPreferences } from "@/components/admin/ui/AdminUiPreferencesProvider";
+
 import { cn } from "@/utils/cn";
 
 import ProjectDeleteDialog from "./ProjectDeleteDialog";
@@ -119,33 +127,6 @@ function formatDateTime(value) {
   }).format(date);
 }
 
-function StatusBadge({ status }) {
-  const styles = {
-    draft: "border-neutral-200 bg-neutral-50 text-neutral-600",
-
-    review: "border-blue-200 bg-blue-50 text-blue-700",
-
-    scheduled: "border-amber-200 bg-amber-50 text-amber-700",
-
-    published: "border-emerald-200 bg-emerald-50 text-emerald-700",
-
-    archived: "border-neutral-200 bg-neutral-100 text-neutral-500",
-  };
-
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center rounded-full border",
-        "px-2.5 py-1",
-        "text-[10px] font-semibold uppercase tracking-[0.08em]",
-        styles[status] || "border-neutral-200 bg-neutral-50 text-neutral-500",
-      )}
-    >
-      {status || "unknown"}
-    </span>
-  );
-}
-
 export default function ProjectManager() {
   const {
     activeCompany,
@@ -153,20 +134,19 @@ export default function ProjectManager() {
     loading: companyLoading,
   } = useCompanyWorkspace();
 
-  const [projects, setProjects] = useState([]);
+  const { actionDisplay, tooltipEnabled, tooltipDelay, density } =
+    useAdminUiPreferences();
 
+  const [projects, setProjects] = useState([]);
   const [categories, setCategories] = useState([]);
 
   const [loading, setLoading] = useState(false);
-
   const [refreshing, setRefreshing] = useState(false);
 
   const [error, setError] = useState(null);
 
   const [search, setSearch] = useState("");
-
   const [statusFilter, setStatusFilter] = useState("");
-
   const [categoryFilter, setCategoryFilter] = useState("");
 
   /*
@@ -176,7 +156,6 @@ export default function ProjectManager() {
    */
 
   const [editorOpen, setEditorOpen] = useState(false);
-
   const [editingProject, setEditingProject] = useState(null);
 
   /*
@@ -186,7 +165,6 @@ export default function ProjectManager() {
    */
 
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
-
   const [publishingProject, setPublishingProject] = useState(null);
 
   /*
@@ -196,7 +174,6 @@ export default function ProjectManager() {
    */
 
   const [unpublishDialogOpen, setUnpublishDialogOpen] = useState(false);
-
   const [unpublishingProject, setUnpublishingProject] = useState(null);
 
   /*
@@ -206,8 +183,18 @@ export default function ProjectManager() {
    */
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
   const [deletingProject, setDeletingProject] = useState(null);
+
+  /*
+   * ------------------------------------------------
+   * UI Preference
+   * ------------------------------------------------
+   */
+
+  const actionSize = density === "compact" ? "small" : "default";
+
+  const rowPadding =
+    density === "compact" ? "p-4" : density === "spacious" ? "p-6" : "p-5";
 
   /*
    * ------------------------------------------------
@@ -266,7 +253,6 @@ export default function ProjectManager() {
         }
 
         setProjects(normalizeArray(projectsPayload));
-
         setCategories(normalizeArray(categoriesPayload));
       } catch (loadError) {
         console.error("Load projects error:", loadError);
@@ -274,7 +260,6 @@ export default function ProjectManager() {
         setError(loadError?.message || "Unable to retrieve projects.");
       } finally {
         setLoading(false);
-
         setRefreshing(false);
       }
     },
@@ -339,11 +324,9 @@ export default function ProjectManager() {
         project.excerpt?.en,
 
         project.projectInfo?.location?.th,
-
         project.projectInfo?.location?.en,
 
         project.projectInfo?.client?.th,
-
         project.projectInfo?.client?.en,
 
         ...(project.tags || []),
@@ -392,25 +375,21 @@ export default function ProjectManager() {
 
   function handleCreateProject() {
     setEditingProject(null);
-
     setEditorOpen(true);
   }
 
   function handleEditProject(project) {
     setEditingProject(project);
-
     setEditorOpen(true);
   }
 
   function handleCloseEditor() {
     setEditorOpen(false);
-
     setEditingProject(null);
   }
 
   async function handleProjectSaved() {
     setEditorOpen(false);
-
     setEditingProject(null);
 
     await loadData({
@@ -426,13 +405,11 @@ export default function ProjectManager() {
 
   function handleOpenPublish(project) {
     setPublishingProject(project);
-
     setPublishDialogOpen(true);
   }
 
   function handleClosePublish() {
     setPublishDialogOpen(false);
-
     setPublishingProject(null);
   }
 
@@ -444,13 +421,11 @@ export default function ProjectManager() {
 
   function handleOpenUnpublish(project) {
     setUnpublishingProject(project);
-
     setUnpublishDialogOpen(true);
   }
 
   function handleCloseUnpublish() {
     setUnpublishDialogOpen(false);
-
     setUnpublishingProject(null);
   }
 
@@ -462,11 +437,9 @@ export default function ProjectManager() {
 
   async function handleLifecycleCompleted() {
     setPublishDialogOpen(false);
-
     setPublishingProject(null);
 
     setUnpublishDialogOpen(false);
-
     setUnpublishingProject(null);
 
     await loadData({
@@ -481,32 +454,21 @@ export default function ProjectManager() {
    */
 
   function handleOpenDelete(project) {
-    /*
-     * Published and Scheduled projects
-     * must return to Draft first.
-     *
-     * This keeps the content lifecycle explicit
-     * and prevents accidental removal of live content.
-     */
-
     if (project.status === "published" || project.status === "scheduled") {
       return;
     }
 
     setDeletingProject(project);
-
     setDeleteDialogOpen(true);
   }
 
   function handleCloseDelete() {
     setDeleteDialogOpen(false);
-
     setDeletingProject(null);
   }
 
   async function handleDeleteCompleted() {
     setDeleteDialogOpen(false);
-
     setDeletingProject(null);
 
     await loadData({
@@ -578,45 +540,34 @@ export default function ProjectManager() {
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
+        <ActionButtonGroup>
+          <ActionButton
+            icon={RefreshCw}
+            label="Refresh"
+            tone="neutral"
+            display={actionDisplay}
+            tooltip={tooltipEnabled}
+            tooltipDelay={tooltipDelay}
+            size={actionSize}
+            loading={refreshing}
             onClick={() =>
               loadData({
                 silent: true,
               })
             }
-            disabled={refreshing}
-            className={cn(
-              "inline-flex h-10 items-center justify-center gap-2",
-              "rounded-xl",
-              "border border-[var(--admin-border)]",
-              "bg-[var(--admin-surface)] px-4",
-              "text-sm font-medium text-[var(--admin-foreground)]",
-              "transition hover:bg-[var(--admin-hover)]",
-              "disabled:cursor-not-allowed disabled:opacity-60",
-            )}
-          >
-            <RefreshCw size={15} className={cn(refreshing && "animate-spin")} />
-            Refresh
-          </button>
+          />
 
-          <button
-            type="button"
+          <ActionButton
+            icon={Plus}
+            label="New Project"
+            tone="primary"
+            display={actionDisplay}
+            tooltip={tooltipEnabled}
+            tooltipDelay={tooltipDelay}
+            size={actionSize}
             onClick={handleCreateProject}
-            className={cn(
-              "inline-flex h-10 items-center justify-center gap-2",
-              "rounded-xl",
-              "bg-[var(--company-primary)] px-4",
-              "text-sm font-medium",
-              "text-[var(--company-primary-foreground)]",
-              "transition hover:opacity-90",
-            )}
-          >
-            <Plus size={16} />
-            New Project
-          </button>
-        </div>
+          />
+        </ActionButtonGroup>
       </div>
 
       {/* =========================================================
@@ -715,6 +666,8 @@ export default function ProjectManager() {
             "bg-[var(--admin-surface)] px-3",
             "text-sm text-[var(--admin-foreground)]",
             "outline-none",
+            "focus:border-[var(--company-primary)]",
+            "focus:ring-2 focus:ring-[var(--company-primary-soft)]",
           )}
         >
           {STATUS_OPTIONS.map((option) => (
@@ -733,6 +686,8 @@ export default function ProjectManager() {
             "bg-[var(--admin-surface)] px-3",
             "text-sm text-[var(--admin-foreground)]",
             "outline-none",
+            "focus:border-[var(--company-primary)]",
+            "focus:ring-2 focus:ring-[var(--company-primary-soft)]",
           )}
         >
           <option value="">All categories</option>
@@ -809,7 +764,8 @@ export default function ProjectManager() {
               <article
                 key={project.id}
                 className={cn(
-                  "flex flex-col gap-4 p-5",
+                  "flex flex-col gap-4",
+                  rowPadding,
                   "lg:flex-row lg:items-center",
                   index !== filteredProjects.length - 1 &&
                     "border-b border-[var(--admin-border)]",
@@ -821,10 +777,13 @@ export default function ProjectManager() {
                       {getProjectTitle(project)}
                     </h2>
 
-                    <StatusBadge status={project.status} />
+                    <StatusBadge
+                      status={project.status}
+                      size={density === "compact" ? "small" : "default"}
+                    />
 
                     {project.featured && (
-                      <span className="rounded-full bg-[var(--company-primary-soft)] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.08em] text-[var(--company-primary)]">
+                      <span className="rounded-full border border-[var(--company-primary-border)] bg-[var(--company-primary-soft)] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.08em] text-[var(--company-primary)]">
                         Featured
                       </span>
                     )}
@@ -871,69 +830,71 @@ export default function ProjectManager() {
 
                 {/* Actions */}
 
-                <div className="flex shrink-0 flex-wrap items-center gap-2">
-                  <button
-                    type="button"
+                <ActionButtonGroup className="shrink-0" align="end">
+                  <ActionButton
+                    icon={Pencil}
+                    label="Edit"
+                    tone="edit"
+                    display={actionDisplay}
+                    tooltip={tooltipEnabled}
+                    tooltipDelay={tooltipDelay}
+                    size={actionSize}
                     onClick={() => handleEditProject(project)}
-                    className="h-9 rounded-xl border border-[var(--admin-border)] px-3 text-xs font-medium text-[var(--admin-foreground)] transition hover:bg-[var(--admin-hover)]"
-                  >
-                    Edit
-                  </button>
+                  />
 
                   {(project.status === "draft" ||
                     project.status === "review") && (
-                    <button
-                      type="button"
+                    <ActionButton
+                      icon={Send}
+                      label="Publish"
+                      tone="primary"
+                      display={actionDisplay}
+                      tooltip={tooltipEnabled}
+                      tooltipDelay={tooltipDelay}
+                      size={actionSize}
                       onClick={() => handleOpenPublish(project)}
-                      className={cn(
-                        "inline-flex h-9 items-center gap-2",
-                        "rounded-xl",
-                        "bg-[var(--company-primary)] px-3",
-                        "text-xs font-medium",
-                        "text-[var(--company-primary-foreground)]",
-                        "transition hover:opacity-90",
-                      )}
-                    >
-                      <Send size={13} />
-                      Publish
-                    </button>
+                    />
                   )}
 
                   {project.status === "scheduled" && (
-                    <button
-                      type="button"
+                    <ActionButton
+                      icon={CalendarX2}
+                      label="Cancel Schedule"
+                      tone="warning"
+                      display={actionDisplay}
+                      tooltip={tooltipEnabled}
+                      tooltipDelay={tooltipDelay}
+                      size={actionSize}
                       onClick={() => handleOpenUnpublish(project)}
-                      className="inline-flex h-9 items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 text-xs font-medium text-amber-700 transition hover:bg-amber-100"
-                    >
-                      <CalendarX2 size={13} />
-                      Cancel Schedule
-                    </button>
+                    />
                   )}
 
                   {project.status === "published" && (
-                    <button
-                      type="button"
+                    <ActionButton
+                      icon={RotateCcw}
+                      label="Unpublish"
+                      tone="warning"
+                      display={actionDisplay}
+                      tooltip={tooltipEnabled}
+                      tooltipDelay={tooltipDelay}
+                      size={actionSize}
                       onClick={() => handleOpenUnpublish(project)}
-                      className="inline-flex h-9 items-center gap-2 rounded-xl border border-[var(--admin-border)] px-3 text-xs font-medium text-[var(--admin-foreground)] transition hover:bg-[var(--admin-hover)]"
-                    >
-                      <RotateCcw size={13} />
-                      Unpublish
-                    </button>
+                    />
                   )}
 
                   {canDelete && (
-                    <button
-                      type="button"
+                    <ActionButton
+                      icon={Trash2}
+                      label="Delete"
+                      tone="danger"
+                      display={actionDisplay}
+                      tooltip={tooltipEnabled}
+                      tooltipDelay={tooltipDelay}
+                      size={actionSize}
                       onClick={() => handleOpenDelete(project)}
-                      aria-label={`Delete ${getProjectTitle(project)}`}
-                      title="Delete project"
-                      className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 text-xs font-medium text-red-600 transition hover:bg-red-100 hover:text-red-700"
-                    >
-                      <Trash2 size={13} />
-                      Delete
-                    </button>
+                    />
                   )}
-                </div>
+                </ActionButtonGroup>
               </article>
             );
           })}

@@ -1,18 +1,17 @@
 import { NextResponse } from "next/server";
 
 import { PERMISSIONS } from "@/constants/permissions";
-
 import { PROJECT_STATUSES } from "@/constants/project";
 
 import { getCompanyPermission } from "@/lib/auth/company-guards";
-
 import { isTrustedOrigin } from "@/lib/auth/origin";
 
 import { companyIdSchema } from "@/modules/company/company.schema";
 
 import { createProjectSchema } from "@/modules/project/project.schema";
-
 import { createProject, listProjects } from "@/modules/project/project.service";
+
+import { findAvailableSlug } from "@/modules/shared/slug-suggestion.service";
 
 async function resolveCompanyId(context) {
   const params = await context.params;
@@ -34,7 +33,6 @@ export async function GET(request, context) {
       return NextResponse.json(
         {
           success: false,
-
           message: "Invalid company ID.",
         },
         {
@@ -45,7 +43,6 @@ export async function GET(request, context) {
 
     const access = await getCompanyPermission({
       companyId,
-
       permission: PERMISSIONS.PROJECT_VIEW,
     });
 
@@ -53,7 +50,6 @@ export async function GET(request, context) {
       return NextResponse.json(
         {
           success: false,
-
           message: access.reason,
         },
         {
@@ -76,7 +72,6 @@ export async function GET(request, context) {
       return NextResponse.json(
         {
           success: false,
-
           message: "Invalid project status.",
         },
         {
@@ -87,19 +82,14 @@ export async function GET(request, context) {
 
     const projects = await listProjects({
       companyId,
-
       status,
-
       search,
-
       categoryId,
-
       subCategoryId,
     });
 
     return NextResponse.json({
       success: true,
-
       data: projects,
     });
   } catch (error) {
@@ -108,7 +98,6 @@ export async function GET(request, context) {
     return NextResponse.json(
       {
         success: false,
-
         message: "Unable to retrieve projects.",
       },
       {
@@ -119,12 +108,13 @@ export async function GET(request, context) {
 }
 
 export async function POST(request, context) {
+  let companyId = null;
+
   try {
     if (!isTrustedOrigin(request)) {
       return NextResponse.json(
         {
           success: false,
-
           message: "Invalid request origin.",
         },
         {
@@ -133,13 +123,12 @@ export async function POST(request, context) {
       );
     }
 
-    const companyId = await resolveCompanyId(context);
+    companyId = await resolveCompanyId(context);
 
     if (!companyId) {
       return NextResponse.json(
         {
           success: false,
-
           message: "Invalid company ID.",
         },
         {
@@ -150,7 +139,6 @@ export async function POST(request, context) {
 
     const access = await getCompanyPermission({
       companyId,
-
       permission: PERMISSIONS.PROJECT_CREATE,
     });
 
@@ -158,7 +146,6 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
-
           message: access.reason,
         },
         {
@@ -175,9 +162,7 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
-
           message: "Invalid project data.",
-
           errors: validation.error.flatten().fieldErrors,
         },
         {
@@ -188,16 +173,13 @@ export async function POST(request, context) {
 
     const project = await createProject({
       companyId,
-
       input: validation.data,
-
       currentUser: access.user,
     });
 
     return NextResponse.json(
       {
         success: true,
-
         data: project,
       },
       {
@@ -208,11 +190,26 @@ export async function POST(request, context) {
     console.error("Create project error:", error);
 
     if (error.message === "PROJECT_SLUG_EXISTS") {
+      let suggestedSlug = null;
+
+      try {
+        if (companyId && error.slug) {
+          suggestedSlug = await findAvailableSlug({
+            companyId,
+            contentType: "project",
+            slug: error.slug,
+          });
+        }
+      } catch (suggestionError) {
+        console.error("Project slug suggestion error:", suggestionError);
+      }
+
       return NextResponse.json(
         {
           success: false,
-
+          code: "PROJECT_SLUG_EXISTS",
           message: "This project slug is already in use.",
+          suggestedSlug,
         },
         {
           status: 409,
@@ -224,7 +221,6 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
-
           message: "Project title is required in at least one language.",
         },
         {
@@ -250,7 +246,6 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
-
           message: categoryErrors[error.message],
         },
         {
@@ -262,7 +257,6 @@ export async function POST(request, context) {
     return NextResponse.json(
       {
         success: false,
-
         message: "Unable to create project.",
       },
       {

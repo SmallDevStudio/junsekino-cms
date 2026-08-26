@@ -1,10 +1,23 @@
 "use client";
 
 import { LoaderCircle, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import FormField from "@/components/admin/form/FormField";
+import TagInput from "@/components/admin/tag/TagInput";
+
+import {
+  clearFieldError,
+  focusFirstInvalidField,
+  getFieldError,
+  getInvalidFieldClass,
+  hasErrors,
+  normalizeServerFieldErrors,
+  validateProjectForm,
+} from "@/utils/admin-form-validation";
 import { cn } from "@/utils/cn";
+import { slugify } from "@/utils/slug";
 
 import ProjectCategorySection from "./ProjectCategorySection";
 import ProjectCreditsSection from "./ProjectCreditsSection";
@@ -61,13 +74,17 @@ function normalizeSeo(value) {
 function emptyProjectInfo() {
   return {
     location: emptyLocalized(),
+
     designYear: null,
     completionYear: null,
+
     area: {
       value: null,
       unit: "sqm",
     },
+
     client: emptyLocalized(),
+
     credits: {
       architecture: [],
       interior: [],
@@ -83,9 +100,12 @@ function emptyForm() {
     title: emptyLocalized(),
     excerpt: emptyLocalized(),
     content: emptyLocalized(),
+
     categoryId: null,
     subCategoryId: null,
+
     projectInfo: emptyProjectInfo(),
+
     tags: [],
     featuredImage: null,
     gallery: [],
@@ -127,10 +147,12 @@ function normalizeProject(project) {
       },
 
       designYear: project.projectInfo?.designYear ?? null,
+
       completionYear: project.projectInfo?.completionYear ?? null,
 
       area: {
         value: project.projectInfo?.area?.value ?? null,
+
         unit: project.projectInfo?.area?.unit || "sqm",
       },
 
@@ -159,23 +181,63 @@ function normalizeProject(project) {
     },
 
     tags: Array.isArray(project.tags) ? project.tags : [],
+
     featuredImage: project.featuredImage || null,
+
     gallery: Array.isArray(project.gallery) ? project.gallery : [],
+
     featured: project.featured === true,
+
     seo: normalizeSeo(project.seo),
   };
 }
 
-function slugify(value) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+function normalizeArray(payload) {
+  if (Array.isArray(payload?.data)) {
+    return payload.data;
+  }
+
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  return [];
+}
+
+function extractTagSuggestions(projects) {
+  const tags = new Map();
+
+  for (const item of projects) {
+    if (!Array.isArray(item?.tags)) {
+      continue;
+    }
+
+    for (const rawTag of item.tags) {
+      const tag = String(rawTag || "")
+        .trim()
+        .replace(/\s+/g, " ");
+
+      if (!tag) {
+        continue;
+      }
+
+      const key = tag.toLowerCase();
+
+      if (!tags.has(key)) {
+        tags.set(key, tag);
+      }
+    }
+  }
+
+  return [...tags.values()].sort((a, b) =>
+    a.localeCompare(b, "en", {
+      sensitivity: "base",
+    }),
+  );
 }
 
 function normalizeYear(value) {
-  if (value === "") {
+  if (value === "" || value === null || value === undefined) {
     return null;
   }
 
@@ -185,7 +247,7 @@ function normalizeYear(value) {
 }
 
 function normalizeArea(value) {
-  if (value === "") {
+  if (value === "" || value === null || value === undefined) {
     return null;
   }
 
@@ -203,8 +265,12 @@ export default function ProjectEditor({
   onSaved,
 }) {
   const [form, setForm] = useState(() => normalizeProject(project));
+
   const [saving, setSaving] = useState(false);
-  const [tagInput, setTagInput] = useState("");
+  const [tagSuggestions, setTagSuggestions] = useState([]);
+  const [errors, setErrors] = useState({});
+
+  const slugManuallyEditedRef = useRef(false);
 
   useEffect(() => {
     if (!open) {
@@ -213,13 +279,61 @@ export default function ProjectEditor({
 
     const timeoutId = window.setTimeout(() => {
       setForm(normalizeProject(project));
-      setTagInput("");
+      setErrors({});
+
+      slugManuallyEditedRef.current = Boolean(project?.id);
     }, 0);
 
     return () => {
       window.clearTimeout(timeoutId);
     };
   }, [open, project]);
+
+  useEffect(() => {
+    if (!open || !companyId) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const timeoutId = window.setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `/api/v1/companies/${companyId}/projects`,
+          {
+            method: "GET",
+            cache: "no-store",
+            credentials: "include",
+          },
+        );
+
+        const payload = await response.json();
+
+        if (!response.ok || payload?.success === false) {
+          throw new Error(
+            payload?.message || "Unable to retrieve project tags.",
+          );
+        }
+
+        if (cancelled) {
+          return;
+        }
+
+        setTagSuggestions(extractTagSuggestions(normalizeArray(payload)));
+      } catch (error) {
+        console.error("Load project tag suggestions error:", error);
+
+        if (!cancelled) {
+          setTagSuggestions([]);
+        }
+      }
+    }, 0);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, [open, companyId]);
 
   if (!open) {
     return null;
@@ -234,6 +348,10 @@ export default function ProjectEditor({
         [language]: value,
       },
     }));
+
+    if (field === "title") {
+      clearFieldError(setErrors, "title");
+    }
   }
 
   function updateProjectInfoLocalized(field, language, value) {
@@ -251,95 +369,183 @@ export default function ProjectEditor({
     }));
   }
 
-  function addTag() {
-    const value = tagInput.trim();
+  function applyValidationErrors(validationErrors) {
+    setErrors(validationErrors);
 
-    if (!value) {
-      return;
-    }
+    focusFirstInvalidField(validationErrors);
 
-    setForm((current) => {
-      if (current.tags.includes(value)) {
-        return current;
-      }
-
-      return {
-        ...current,
-        tags: [...current.tags, value],
-      };
-    });
-
-    setTagInput("");
-  }
-
-  function removeTag(tag) {
-    setForm((current) => ({
-      ...current,
-      tags: current.tags.filter((item) => item !== tag),
-    }));
+    toast.error("Please complete the required fields.");
   }
 
   async function handleSave() {
-    if (!companyId) {
+    if (!companyId || saving) {
       return;
     }
 
-    if (!form.title.th.trim() && !form.title.en.trim()) {
-      toast.error("Project title is required.");
+    const normalizedForm = {
+      ...form,
+      slug: slugify(form.slug),
+    };
+
+    const validationErrors = validateProjectForm(normalizedForm);
+
+    if (hasErrors(validationErrors)) {
+      applyValidationErrors(validationErrors);
       return;
     }
 
-    const normalizedSlug = slugify(form.slug);
+    const editing = Boolean(project?.id);
 
-    if (!normalizedSlug) {
-      toast.error("Project slug is required.");
-      return;
-    }
+    const url = editing
+      ? `/api/v1/companies/${companyId}/projects/${project.id}`
+      : `/api/v1/companies/${companyId}/projects`;
 
-    try {
-      setSaving(true);
+    function createPayload(slug) {
+      return {
+        slug,
 
-      const editing = Boolean(project?.id);
-
-      const url = editing
-        ? `/api/v1/companies/${companyId}/projects/${project.id}`
-        : `/api/v1/companies/${companyId}/projects`;
-
-      const payload = {
-        slug: normalizedSlug,
         title: form.title,
         excerpt: form.excerpt,
         content: form.content,
+
         categoryId: form.categoryId || null,
         subCategoryId: form.subCategoryId || null,
-        projectInfo: form.projectInfo,
+
+        projectInfo: {
+          ...form.projectInfo,
+
+          designYear: normalizeYear(form.projectInfo.designYear),
+
+          completionYear: normalizeYear(form.projectInfo.completionYear),
+
+          area: {
+            ...form.projectInfo.area,
+            value: normalizeArea(form.projectInfo.area.value),
+          },
+        },
+
         tags: form.tags,
         featuredImage: form.featuredImage,
         gallery: form.gallery,
         featured: form.featured,
         seo: form.seo,
       };
+    }
 
-      const response = await fetch(url, {
-        method: editing ? "PATCH" : "POST",
+    try {
+      setSaving(true);
+      setErrors({});
 
-        headers: {
-          "Content-Type": "application/json",
-        },
+      let currentSlug = normalizedForm.slug;
+      let conflictAttempts = 0;
 
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
+      const maxConflictAttempts = 5;
 
-      const result = await response.json();
+      while (conflictAttempts <= maxConflictAttempts) {
+        const response = await fetch(url, {
+          method: editing ? "PATCH" : "POST",
 
-      if (!response.ok || result?.success === false) {
-        throw new Error(result?.message || "Unable to save project.");
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          credentials: "include",
+
+          body: JSON.stringify(createPayload(currentSlug)),
+        });
+
+        let result = null;
+
+        try {
+          result = await response.json();
+        } catch {
+          result = null;
+        }
+
+        if (response.ok && result?.success !== false) {
+          setForm((current) => ({
+            ...current,
+            slug: currentSlug,
+          }));
+
+          slugManuallyEditedRef.current = true;
+
+          toast.success(editing ? "Project updated." : "Project created.");
+
+          await onSaved?.(result?.data);
+
+          return;
+        }
+
+        const serverErrors = normalizeServerFieldErrors(result?.errors);
+
+        if (hasErrors(serverErrors)) {
+          setErrors(serverErrors);
+          focusFirstInvalidField(serverErrors);
+        }
+
+        const slugConflict =
+          response.status === 409 &&
+          (result?.code === "PROJECT_SLUG_EXISTS" ||
+            String(result?.message || "")
+              .toLowerCase()
+              .includes("slug"));
+
+        if (!slugConflict) {
+          throw new Error(result?.message || "Unable to save project.");
+        }
+
+        const suggestedSlug = slugify(result?.suggestedSlug);
+
+        if (!suggestedSlug || suggestedSlug === currentSlug) {
+          const slugErrors = {
+            slug: "This slug is already in use.",
+          };
+
+          setErrors(slugErrors);
+          focusFirstInvalidField(slugErrors);
+
+          toast.error(
+            "This slug is already in use and no alternative slug is currently available.",
+          );
+
+          return;
+        }
+
+        const confirmed = window.confirm(
+          `The slug "${currentSlug}" is already in use.\n\n` +
+            `Would you like to use "${suggestedSlug}" instead?`,
+        );
+
+        if (!confirmed) {
+          const slugErrors = {
+            slug: "This slug is already in use.",
+          };
+
+          setErrors(slugErrors);
+          focusFirstInvalidField(slugErrors);
+
+          return;
+        }
+
+        currentSlug = suggestedSlug;
+        conflictAttempts += 1;
+
+        setForm((current) => ({
+          ...current,
+          slug: suggestedSlug,
+        }));
+
+        slugManuallyEditedRef.current = true;
+
+        clearFieldError(setErrors, "slug");
+
+        if (conflictAttempts > maxConflictAttempts) {
+          throw new Error(
+            "Unable to reserve an available slug. Please enter another slug.",
+          );
+        }
       }
-
-      toast.success(editing ? "Project updated." : "Project created.");
-
-      await onSaved?.(result.data);
     } catch (error) {
       console.error("Save project error:", error);
 
@@ -349,12 +555,36 @@ export default function ProjectEditor({
     }
   }
 
+  const inputClass = cn(
+    "h-11 w-full rounded-xl",
+    "border border-[var(--admin-border)]",
+    "bg-[var(--admin-surface)] px-3",
+    "text-sm text-[var(--admin-foreground)]",
+    "outline-none transition",
+    "placeholder:text-[var(--admin-muted-light)]",
+    "focus:border-[var(--company-primary)]",
+    "focus:ring-2 focus:ring-[var(--company-primary-soft)]",
+  );
+
+  const smallInputClass = cn(inputClass, "h-10");
+
+  const textareaClass = cn(
+    "w-full rounded-xl",
+    "border border-[var(--admin-border)]",
+    "bg-[var(--admin-surface)] p-3",
+    "text-sm text-[var(--admin-foreground)]",
+    "outline-none transition",
+    "placeholder:text-[var(--admin-muted-light)]",
+    "focus:border-[var(--company-primary)]",
+    "focus:ring-2 focus:ring-[var(--company-primary-soft)]",
+  );
+
   return (
     <div className="fixed inset-0 z-[160] flex justify-end">
       <button
         type="button"
         aria-label="Close project editor"
-        onClick={onClose}
+        onClick={saving ? undefined : onClose}
         className="absolute inset-0 bg-black/30 backdrop-blur-[1px]"
       />
 
@@ -387,28 +617,34 @@ export default function ProjectEditor({
               Basic Information
             </h3>
 
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <label>
-                <span className="text-xs font-medium text-[var(--admin-muted)]">
-                  Title — Thai
-                </span>
+            <p className="mt-1 text-xs leading-5 text-[var(--admin-muted)]">
+              Enter the project title and URL. Fields marked with * are
+              required.
+            </p>
 
+            <div
+              data-form-field="title"
+              className="mt-4 grid gap-4 sm:grid-cols-2"
+            >
+              <FormField
+                label="Title — Thai"
+                required
+                error={getFieldError(errors, "title")}
+              >
                 <input
                   value={form.title.th}
+                  aria-invalid={Boolean(errors.title)}
                   onChange={(event) =>
                     updateLocalized("title", "th", event.target.value)
                   }
-                  className="mt-2 h-11 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)] focus:ring-2 focus:ring-[var(--company-primary-soft)]"
+                  className={cn(inputClass, getInvalidFieldClass(errors.title))}
                 />
-              </label>
+              </FormField>
 
-              <label>
-                <span className="text-xs font-medium text-[var(--admin-muted)]">
-                  Title — English
-                </span>
-
+              <FormField label="Title — English" required>
                 <input
                   value={form.title.en}
+                  aria-invalid={Boolean(errors.title)}
                   onChange={(event) => {
                     const value = event.target.value;
 
@@ -420,35 +656,49 @@ export default function ProjectEditor({
                         en: value,
                       },
 
-                      slug: current.slug || slugify(value),
+                      slug:
+                        !project && !slugManuallyEditedRef.current
+                          ? slugify(value)
+                          : current.slug,
                     }));
+
+                    clearFieldError(setErrors, "title");
+
+                    if (!project && !slugManuallyEditedRef.current) {
+                      clearFieldError(setErrors, "slug");
+                    }
                   }}
-                  className="mt-2 h-11 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)] focus:ring-2 focus:ring-[var(--company-primary-soft)]"
+                  className={cn(inputClass, getInvalidFieldClass(errors.title))}
                 />
-              </label>
+              </FormField>
             </div>
 
-            <label className="mt-4 block">
-              <span className="text-xs font-medium text-[var(--admin-muted)]">
-                Slug
-              </span>
+            <div data-form-field="slug" className="mt-4">
+              <FormField
+                label="Slug"
+                required
+                error={getFieldError(errors, "slug")}
+                hint="Lowercase letters, numbers and hyphens only."
+              >
+                <input
+                  value={form.slug}
+                  aria-invalid={Boolean(errors.slug)}
+                  onChange={(event) => {
+                    slugManuallyEditedRef.current = true;
 
-              <input
-                value={form.slug}
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-                    slug: event.target.value,
-                  }))
-                }
-                placeholder="house-project-2026"
-                className="mt-2 h-11 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)] focus:ring-2 focus:ring-[var(--company-primary-soft)]"
-              />
+                    setForm((current) => ({
+                      ...current,
 
-              <p className="mt-1.5 text-[10px] text-[var(--admin-muted-light)]">
-                Lowercase letters, numbers and hyphens only.
-              </p>
-            </label>
+                      slug: slugify(event.target.value),
+                    }));
+
+                    clearFieldError(setErrors, "slug");
+                  }}
+                  placeholder="house-project-2026"
+                  className={cn(inputClass, getInvalidFieldClass(errors.slug))}
+                />
+              </FormField>
+            </div>
           </section>
 
           <ProjectCategorySection
@@ -495,11 +745,7 @@ export default function ProjectEditor({
             </h3>
 
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <label>
-                <span className="text-xs text-[var(--admin-muted)]">
-                  Location — Thai
-                </span>
-
+              <FormField label="Location — Thai">
                 <input
                   value={form.projectInfo.location.th}
                   onChange={(event) =>
@@ -509,15 +755,11 @@ export default function ProjectEditor({
                       event.target.value,
                     )
                   }
-                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
+                  className={smallInputClass}
                 />
-              </label>
+              </FormField>
 
-              <label>
-                <span className="text-xs text-[var(--admin-muted)]">
-                  Location — English
-                </span>
-
+              <FormField label="Location — English">
                 <input
                   value={form.projectInfo.location.en}
                   onChange={(event) =>
@@ -527,15 +769,11 @@ export default function ProjectEditor({
                       event.target.value,
                     )
                   }
-                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
+                  className={smallInputClass}
                 />
-              </label>
+              </FormField>
 
-              <label>
-                <span className="text-xs text-[var(--admin-muted)]">
-                  Design Year
-                </span>
-
+              <FormField label="Design Year">
                 <input
                   type="number"
                   min="1900"
@@ -547,19 +785,16 @@ export default function ProjectEditor({
 
                       projectInfo: {
                         ...current.projectInfo,
-                        designYear: normalizeYear(event.target.value),
+
+                        designYear: event.target.value,
                       },
                     }))
                   }
-                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
+                  className={smallInputClass}
                 />
-              </label>
+              </FormField>
 
-              <label>
-                <span className="text-xs text-[var(--admin-muted)]">
-                  Completion Year
-                </span>
-
+              <FormField label="Completion Year">
                 <input
                   type="number"
                   min="1900"
@@ -571,17 +806,16 @@ export default function ProjectEditor({
 
                       projectInfo: {
                         ...current.projectInfo,
-                        completionYear: normalizeYear(event.target.value),
+
+                        completionYear: event.target.value,
                       },
                     }))
                   }
-                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
+                  className={smallInputClass}
                 />
-              </label>
+              </FormField>
 
-              <label>
-                <span className="text-xs text-[var(--admin-muted)]">Area</span>
-
+              <FormField label="Area">
                 <input
                   type="number"
                   min="0"
@@ -595,18 +829,17 @@ export default function ProjectEditor({
 
                         area: {
                           ...current.projectInfo.area,
-                          value: normalizeArea(event.target.value),
+
+                          value: event.target.value,
                         },
                       },
                     }))
                   }
-                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
+                  className={smallInputClass}
                 />
-              </label>
+              </FormField>
 
-              <label>
-                <span className="text-xs text-[var(--admin-muted)]">Unit</span>
-
+              <FormField label="Unit">
                 <select
                   value={form.projectInfo.area.unit}
                   onChange={(event) =>
@@ -618,23 +851,21 @@ export default function ProjectEditor({
 
                         area: {
                           ...current.projectInfo.area,
+
                           unit: event.target.value,
                         },
                       },
                     }))
                   }
-                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
+                  className={smallInputClass}
                 >
                   <option value="sqm">sqm</option>
+
                   <option value="sqft">sqft</option>
                 </select>
-              </label>
+              </FormField>
 
-              <label>
-                <span className="text-xs text-[var(--admin-muted)]">
-                  Client — Thai
-                </span>
-
+              <FormField label="Client — Thai">
                 <input
                   value={form.projectInfo.client.th}
                   onChange={(event) =>
@@ -644,15 +875,11 @@ export default function ProjectEditor({
                       event.target.value,
                     )
                   }
-                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
+                  className={smallInputClass}
                 />
-              </label>
+              </FormField>
 
-              <label>
-                <span className="text-xs text-[var(--admin-muted)]">
-                  Client — English
-                </span>
-
+              <FormField label="Client — English">
                 <input
                   value={form.projectInfo.client.en}
                   onChange={(event) =>
@@ -662,9 +889,9 @@ export default function ProjectEditor({
                       event.target.value,
                     )
                   }
-                  className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
+                  className={smallInputClass}
                 />
-              </label>
+              </FormField>
             </div>
           </section>
 
@@ -688,65 +915,49 @@ export default function ProjectEditor({
             </h3>
 
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <label>
-                <span className="text-xs text-[var(--admin-muted)]">
-                  Excerpt — Thai
-                </span>
-
+              <FormField label="Excerpt — Thai">
                 <textarea
                   rows={4}
                   value={form.excerpt.th}
                   onChange={(event) =>
                     updateLocalized("excerpt", "th", event.target.value)
                   }
-                  className="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
+                  className={textareaClass}
                 />
-              </label>
+              </FormField>
 
-              <label>
-                <span className="text-xs text-[var(--admin-muted)]">
-                  Excerpt — English
-                </span>
-
+              <FormField label="Excerpt — English">
                 <textarea
                   rows={4}
                   value={form.excerpt.en}
                   onChange={(event) =>
                     updateLocalized("excerpt", "en", event.target.value)
                   }
-                  className="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
+                  className={textareaClass}
                 />
-              </label>
+              </FormField>
 
-              <label>
-                <span className="text-xs text-[var(--admin-muted)]">
-                  Content — Thai
-                </span>
-
+              <FormField label="Content — Thai">
                 <textarea
                   rows={10}
                   value={form.content.th}
                   onChange={(event) =>
                     updateLocalized("content", "th", event.target.value)
                   }
-                  className="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
+                  className={textareaClass}
                 />
-              </label>
+              </FormField>
 
-              <label>
-                <span className="text-xs text-[var(--admin-muted)]">
-                  Content — English
-                </span>
-
+              <FormField label="Content — English">
                 <textarea
                   rows={10}
                   value={form.content.en}
                   onChange={(event) =>
                     updateLocalized("content", "en", event.target.value)
                   }
-                  className="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
+                  className={textareaClass}
                 />
-              </label>
+              </FormField>
             </div>
           </section>
 
@@ -759,44 +970,19 @@ export default function ProjectEditor({
               Add keywords used for classification, search and related content.
             </p>
 
-            <div className="mt-4 flex gap-2">
-              <input
-                value={tagInput}
-                onChange={(event) => setTagInput(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault();
-                    addTag();
-                  }
-                }}
+            <div className="mt-4">
+              <TagInput
+                value={form.tags}
+                suggestions={tagSuggestions}
                 placeholder="architecture"
-                className="h-10 flex-1 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none transition focus:border-[var(--company-primary)]"
+                onChange={(tags) =>
+                  setForm((current) => ({
+                    ...current,
+                    tags,
+                  }))
+                }
               />
-
-              <button
-                type="button"
-                onClick={addTag}
-                className="h-10 rounded-xl border border-[var(--admin-border)] px-4 text-xs font-medium text-[var(--admin-foreground)] transition hover:bg-[var(--admin-hover)]"
-              >
-                Add
-              </button>
             </div>
-
-            {form.tags.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-2">
-                {form.tags.map((tag) => (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={() => removeTag(tag)}
-                    title="Remove tag"
-                    className="rounded-full bg-[var(--admin-hover)] px-3 py-1 text-xs text-[var(--admin-foreground)] transition hover:bg-red-50 hover:text-red-600"
-                  >
-                    {tag} ×
-                  </button>
-                ))}
-              </div>
-            )}
           </section>
 
           <section className="mt-10 border-t border-[var(--admin-border)] pt-8">
@@ -807,10 +993,11 @@ export default function ProjectEditor({
                 onChange={(event) =>
                   setForm((current) => ({
                     ...current,
+
                     featured: event.target.checked,
                   }))
                 }
-                className="mt-0.5"
+                className="mt-0.5 h-4 w-4 accent-[var(--company-primary)]"
               />
 
               <span>
@@ -864,7 +1051,7 @@ export default function ProjectEditor({
           >
             {saving && <LoaderCircle size={15} className="animate-spin" />}
 
-            {saving ? "Saving..." : "Save"}
+            {saving ? "Saving..." : project ? "Save Changes" : "Create Project"}
           </button>
         </footer>
       </div>

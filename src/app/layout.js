@@ -1,4 +1,20 @@
+import { Questrial, Sarabun } from "next/font/google";
+
 import "./globals.css";
+
+const questrial = Questrial({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-questrial",
+  display: "swap",
+});
+
+const sarabun = Sarabun({
+  subsets: ["thai", "latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-sarabun",
+  display: "swap",
+});
 
 export const metadata = {
   title: {
@@ -11,7 +27,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${questrial.variable} ${sarabun.variable}`}
+    >
       <body>{children}</body>
     </html>
   );

@@ -72,7 +72,11 @@ export async function createProjectRecord({ companyId, data, userId }) {
     const slugSnapshot = await transaction.get(slugRef);
 
     if (slugSnapshot.exists) {
-      throw new Error("PROJECT_SLUG_EXISTS");
+      const error = new Error("PROJECT_SLUG_EXISTS");
+
+      error.slug = data.slug;
+
+      throw error;
     }
 
     transaction.set(projectRef, {
@@ -149,7 +153,11 @@ export async function updateProjectRecord({
       const newSlugSnapshot = await transaction.get(newSlugRef);
 
       if (newSlugSnapshot.exists) {
-        throw new Error("PROJECT_SLUG_EXISTS");
+        const error = new Error("PROJECT_SLUG_EXISTS");
+
+        error.slug = newSlug;
+
+        throw error;
       }
 
       transaction.delete(oldSlugRef);

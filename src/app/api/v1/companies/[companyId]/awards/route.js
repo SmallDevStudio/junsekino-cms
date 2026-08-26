@@ -1,18 +1,17 @@
 import { NextResponse } from "next/server";
 
+import { AWARD_STATUSES } from "@/constants/award";
 import { PERMISSIONS } from "@/constants/permissions";
 
-import { AWARD_STATUSES } from "@/constants/award";
-
 import { getCompanyPermission } from "@/lib/auth/company-guards";
-
 import { isTrustedOrigin } from "@/lib/auth/origin";
+
+import { createAwardSchema } from "@/modules/award/award.schema";
+import { createAward, listAwards } from "@/modules/award/award.service";
 
 import { companyIdSchema } from "@/modules/company/company.schema";
 
-import { createAwardSchema } from "@/modules/award/award.schema";
-
-import { createAward, listAwards } from "@/modules/award/award.service";
+import { findAvailableSlug } from "@/modules/shared/slug-suggestion.service";
 
 async function resolveCompanyId(context) {
   const params = await context.params;
@@ -40,7 +39,6 @@ export async function GET(request, context) {
 
     const access = await getCompanyPermission({
       companyId,
-
       permission: PERMISSIONS.AWARD_VIEW,
     });
 
@@ -106,6 +104,8 @@ export async function GET(request, context) {
 }
 
 export async function POST(request, context) {
+  let companyId = null;
+
   try {
     if (!isTrustedOrigin(request)) {
       return NextResponse.json(
@@ -119,7 +119,7 @@ export async function POST(request, context) {
       );
     }
 
-    const companyId = await resolveCompanyId(context);
+    companyId = await resolveCompanyId(context);
 
     if (!companyId) {
       return NextResponse.json(
@@ -135,7 +135,6 @@ export async function POST(request, context) {
 
     const access = await getCompanyPermission({
       companyId,
-
       permission: PERMISSIONS.AWARD_CREATE,
     });
 
@@ -159,9 +158,7 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
-
           message: "Invalid award data.",
-
           errors: validation.error.flatten().fieldErrors,
         },
         {
@@ -172,9 +169,7 @@ export async function POST(request, context) {
 
     const award = await createAward({
       companyId,
-
       input: validation.data,
-
       currentUser: access.user,
     });
 
@@ -190,9 +185,35 @@ export async function POST(request, context) {
   } catch (error) {
     console.error("Create award error:", error);
 
-    const errors = {
-      AWARD_SLUG_EXISTS: [409, "Award slug is already in use."],
+    if (error.message === "AWARD_SLUG_EXISTS") {
+      let suggestedSlug = null;
 
+      try {
+        if (companyId && error.slug) {
+          suggestedSlug = await findAvailableSlug({
+            companyId,
+            contentType: "award",
+            slug: error.slug,
+          });
+        }
+      } catch (suggestionError) {
+        console.error("Award slug suggestion error:", suggestionError);
+      }
+
+      return NextResponse.json(
+        {
+          success: false,
+          code: "AWARD_SLUG_EXISTS",
+          message: "Award slug is already in use.",
+          suggestedSlug,
+        },
+        {
+          status: 409,
+        },
+      );
+    }
+
+    const errors = {
       AWARD_PROJECT_NOT_FOUND: [400, "Linked project not found."],
 
       AWARD_TITLE_REQUIRED: [400, "Award title is required."],

@@ -1,8 +1,36 @@
 @import "tailwindcss";
 
 :root {
+  /*
+   * ------------------------------------------------
+   * Typography
+   * ------------------------------------------------
+   *
+   * Questrial is the primary Latin / English typeface.
+   * Sarabun provides Thai glyphs and is also available
+   * explicitly for Thai-first UI where required.
+   */
+
+  --font-latin: var(--font-questrial);
+  --font-thai: var(--font-sarabun);
+
+  --font-ui:
+    var(--font-questrial), var(--font-sarabun), Arial, Helvetica, sans-serif;
+
+  /*
+   * ------------------------------------------------
+   * Global
+   * ------------------------------------------------
+   */
+
   --background: #ffffff;
   --foreground: #111111;
+
+  /*
+   * ------------------------------------------------
+   * Public Brand
+   * ------------------------------------------------
+   */
 
   --brand-primary: #111111;
   --brand-secondary: #ffffff;
@@ -12,7 +40,9 @@
   --brand-text: #111111;
 
   /*
+   * ------------------------------------------------
    * Admin Design System
+   * ------------------------------------------------
    */
 
   --admin-background: #f7f7f8;
@@ -28,14 +58,60 @@
   --admin-icon: #a1a1aa;
 
   /*
-   * Company theme.
-   * These values will later be injected
-   * from the active company settings.
+   * ------------------------------------------------
+   * Company Brand Theme
+   * ------------------------------------------------
+   *
+   * CompanyTheme injects these values when the
+   * active company changes.
    */
 
   --company-primary: #18181b;
-  --company-primary-foreground: #ffffff;
+  --company-primary-hover: #27272a;
   --company-primary-soft: #f4f4f5;
+  --company-primary-foreground: #ffffff;
+
+  /*
+   * ------------------------------------------------
+   * Semantic UI Colors
+   * ------------------------------------------------
+   *
+   * Semantic colors must remain independent from
+   * company branding so their meaning stays
+   * consistent across every workspace.
+   */
+
+  --status-draft-bg: #f4f4f5;
+  --status-draft-border: #d4d4d8;
+  --status-draft-text: #52525b;
+
+  --status-review-bg: #eff6ff;
+  --status-review-border: #bfdbfe;
+  --status-review-text: #1d4ed8;
+
+  --status-scheduled-bg: #fffbeb;
+  --status-scheduled-border: #fde68a;
+  --status-scheduled-text: #b45309;
+
+  --status-published-bg: #ecfdf5;
+  --status-published-border: #a7f3d0;
+  --status-published-text: #047857;
+
+  --status-unpublished-bg: #fff7ed;
+  --status-unpublished-border: #fed7aa;
+  --status-unpublished-text: #c2410c;
+
+  --status-archived-bg: #f1f5f9;
+  --status-archived-border: #cbd5e1;
+  --status-archived-text: #475569;
+
+  --status-danger-bg: #fef2f2;
+  --status-danger-border: #fecaca;
+  --status-danger-text: #b91c1c;
+
+  --status-info-bg: #eff6ff;
+  --status-info-border: #bfdbfe;
+  --status-info-text: #1d4ed8;
 }
 
 * {
@@ -52,16 +128,45 @@ body {
   background: var(--background);
   color: var(--foreground);
 
-  font-family: Arial, Helvetica, sans-serif;
+  /*
+   * Questrial handles Latin characters.
+   * Thai characters automatically fall back
+   * to Sarabun because Questrial has no Thai glyphs.
+   */
+
+  font-family: var(--font-ui);
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
+
+/*
+ * Explicit typography utilities.
+ *
+ * Most components should use the default font-ui.
+ * These utilities are available when content language
+ * is explicitly known.
+ */
+
+.font-latin {
+  font-family: var(--font-questrial), Arial, Helvetica, sans-serif;
+}
+
+.font-thai {
+  font-family: var(--font-sarabun), Arial, Helvetica, sans-serif;
+}
+
+/*
+ * Native form controls do not consistently inherit
+ * typography across every browser/platform.
+ */
 
 button,
 input,
 textarea,
-select {
+select,
+option {
   font: inherit;
 }
 
@@ -74,6 +179,10 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: not-allowed;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -83,7 +192,23 @@ img {
   max-width: 100%;
 }
 
+/*
+ * Company-aware selection.
+ */
+
 ::selection {
   background: var(--company-primary);
   color: var(--company-primary-foreground);
+}
+
+/*
+ * Accessible keyboard focus.
+ *
+ * Components may provide their own focus treatment,
+ * but native controls still receive company branding.
+ */
+
+:where(button, a, input, textarea, select):focus-visible {
+  outline: 2px solid var(--company-primary);
+  outline-offset: 2px;
 }

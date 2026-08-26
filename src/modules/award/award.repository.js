@@ -50,7 +50,11 @@ export async function createAwardRecord({ companyId, data, userId }) {
     const slugSnapshot = await transaction.get(slugRef);
 
     if (slugSnapshot.exists) {
-      throw new Error("AWARD_SLUG_EXISTS");
+      const error = new Error("AWARD_SLUG_EXISTS");
+
+      error.slug = data.slug;
+
+      throw error;
     }
 
     transaction.set(awardRef, {
@@ -121,7 +125,11 @@ export async function updateAwardRecord({ companyId, awardId, data, userId }) {
       const existing = await transaction.get(newSlugRef);
 
       if (existing.exists) {
-        throw new Error("AWARD_SLUG_EXISTS");
+        const error = new Error("AWARD_SLUG_EXISTS");
+
+        error.slug = newSlug;
+
+        throw error;
       }
 
       transaction.delete(oldSlugRef);
