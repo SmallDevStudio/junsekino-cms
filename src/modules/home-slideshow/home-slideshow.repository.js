@@ -20,7 +20,6 @@ export async function getHomeSlideshowById({ companyId, slideshowId }) {
 
   return {
     id: snapshot.id,
-
     ...snapshot.data(),
   };
 }
@@ -31,7 +30,6 @@ export async function listHomeSlideshowRecords(companyId) {
   return snapshot.docs
     .map((document) => ({
       id: document.id,
-
       ...document.data(),
     }))
     .filter((item) => !item.deletedAt);
@@ -46,25 +44,20 @@ export async function createHomeSlideshowRecord({ companyId, data, userId }) {
     status: "draft",
 
     createdAt: FieldValue.serverTimestamp(),
-
     createdBy: userId,
 
     updatedAt: FieldValue.serverTimestamp(),
-
     updatedBy: userId,
 
     publishedAt: null,
-
     publishedBy: null,
 
     deletedAt: null,
-
     deletedBy: null,
   });
 
   return getHomeSlideshowById({
     companyId,
-
     slideshowId: ref.id,
   });
 }
@@ -85,7 +78,6 @@ export async function updateHomeSlideshowRecord({
 
   const before = {
     id: snapshot.id,
-
     ...snapshot.data(),
   };
 
@@ -93,7 +85,6 @@ export async function updateHomeSlideshowRecord({
     ...data,
 
     updatedAt: FieldValue.serverTimestamp(),
-
     updatedBy: userId,
   });
 
@@ -112,37 +103,53 @@ export async function publishHomeSlideshowRecord({
   slideshowId,
   userId,
 }) {
-  const targetRef = getCollection(companyId).doc(slideshowId);
+  const collectionRef = getCollection(companyId);
 
-  const allSnapshot = await getCollection(companyId).get();
+  const targetRef = collectionRef.doc(slideshowId);
 
-  let before = null;
-
-  await adminDb.runTransaction(async (transaction) => {
+  /*
+   * IMPORTANT
+   *
+   * Firestore transaction reads must happen
+   * before transaction writes.
+   *
+   * We read the target and current published
+   * slideshows inside the same transaction so
+   * publishing remains atomic.
+   */
+  const result = await adminDb.runTransaction(async (transaction) => {
     const targetSnapshot = await transaction.get(targetRef);
 
     if (!targetSnapshot.exists || targetSnapshot.data().deletedAt) {
       throw new Error("HOME_SLIDESHOW_NOT_FOUND");
     }
 
-    before = {
+    const before = {
       id: targetSnapshot.id,
-
       ...targetSnapshot.data(),
     };
 
     /*
-     * Auto-unpublish every other
+     * Only query currently published records.
+     *
+     * This is normally zero or one document.
+     */
+    const publishedQuery = collectionRef.where("status", "==", "published");
+
+    const publishedSnapshot = await transaction.get(publishedQuery);
+
+    /*
+     * Unpublish every other currently
      * published slideshow.
      */
-    for (const document of allSnapshot.docs) {
+    for (const document of publishedSnapshot.docs) {
       if (document.id === slideshowId) {
         continue;
       }
 
       const data = document.data();
 
-      if (data.deletedAt || data.status !== "published") {
+      if (data.deletedAt) {
         continue;
       }
 
@@ -150,7 +157,6 @@ export async function publishHomeSlideshowRecord({
         status: "draft",
 
         publishedAt: null,
-
         publishedBy: null,
 
         updatedAt: FieldValue.serverTimestamp(),
@@ -170,10 +176,14 @@ export async function publishHomeSlideshowRecord({
 
       updatedBy: userId,
     });
+
+    return {
+      before,
+    };
   });
 
   return {
-    before,
+    before: result.before,
 
     after: await getHomeSlideshowById({
       companyId,
@@ -197,7 +207,6 @@ export async function deleteHomeSlideshowRecord({
 
   const before = {
     id: snapshot.id,
-
     ...snapshot.data(),
   };
 
@@ -209,11 +218,9 @@ export async function deleteHomeSlideshowRecord({
     status: "archived",
 
     deletedAt: FieldValue.serverTimestamp(),
-
     deletedBy: userId,
 
     updatedAt: FieldValue.serverTimestamp(),
-
     updatedBy: userId,
   });
 
@@ -228,7 +235,6 @@ export async function getPublishedHomeSlideshow(companyId) {
   const items = snapshot.docs
     .map((document) => ({
       id: document.id,
-
       ...document.data(),
     }))
     .filter((item) => !item.deletedAt);
@@ -241,8 +247,7 @@ export async function getPublishedHomeSlideshow(companyId) {
    * Safety guard.
    *
    * Normally there is exactly one
-   * published slideshow because
-   * publish uses replacement logic.
+   * published slideshow.
    */
   items.sort(
     (a, b) =>
