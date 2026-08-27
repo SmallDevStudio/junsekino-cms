@@ -63,7 +63,7 @@ export const ADMIN_NAVIGATION = [
       {
         id: "public",
         label: "Public",
-        href: "/admin/public",
+        href: "/admin/public-contents",
         icon: Newspaper,
       },
       {

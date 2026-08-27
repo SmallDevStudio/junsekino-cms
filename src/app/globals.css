@@ -11,11 +11,12 @@
    * explicitly for Thai-first UI where required.
    */
 
-  --font-latin: var(--font-questrial);
+  --font-latin: var(--font-century-gothic);
   --font-thai: var(--font-sarabun);
 
   --font-ui:
-    var(--font-questrial), var(--font-sarabun), Arial, Helvetica, sans-serif;
+    var(--font-century-gothic), var(--font-sarabun), Arial, Helvetica,
+    sans-serif;
 
   /*
    * ------------------------------------------------
@@ -134,7 +135,8 @@ body {
    * to Sarabun because Questrial has no Thai glyphs.
    */
 
-  font-family: var(--font-ui);
+  font-family:
+    var(--font-century-gothic), var(--font-sarabun), Arial, sans-serif;
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -150,7 +152,8 @@ body {
  */
 
 .font-latin {
-  font-family: var(--font-questrial), Arial, Helvetica, sans-serif;
+  font-family:
+    var(--font-century-gothic), var(--font-sarabun), Arial, sans-serif;
 }
 
 .font-thai {

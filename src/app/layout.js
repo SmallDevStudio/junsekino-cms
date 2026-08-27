@@ -1,12 +1,14 @@
-import { Questrial, Sarabun } from "next/font/google";
+import localFont from "next/font/local";
+import { Sarabun } from "next/font/google";
 
 import "./globals.css";
 
-const questrial = Questrial({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-questrial",
+const centuryGothic = localFont({
+  src: "./fonts/CenturyGothic.otf",
+  variable: "--font-century-gothic",
   display: "swap",
+  weight: "400",
+  style: "normal",
 });
 
 const sarabun = Sarabun({
@@ -30,7 +32,7 @@ export default function RootLayout({ children }) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${questrial.variable} ${sarabun.variable}`}
+      className={`${centuryGothic.variable} ${sarabun.variable}`}
     >
       <body>{children}</body>
     </html>

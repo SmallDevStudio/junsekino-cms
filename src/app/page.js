@@ -1,13 +1,17 @@
-export default function HomePage() {
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-white px-6 text-black">
-      <div className="text-center">
-        <h1 className="text-4xl font-semibold tracking-tight">Junsekino</h1>
+import PublicEntrance from "@/components/public/PublicEntrance";
 
-        <p className="mt-3 text-sm text-neutral-500">
-          Multi-Company Content Platform
-        </p>
-      </div>
-    </main>
-  );
+import { listPublicCompanies } from "@/modules/public/public-company-directory.service";
+
+export const metadata = {
+  title: "Junsekino",
+
+  description: "Junsekino architecture and design.",
+};
+
+export const revalidate = 300;
+
+export default async function HomePage() {
+  const companies = await listPublicCompanies();
+
+  return <PublicEntrance companies={companies} />;
 }
