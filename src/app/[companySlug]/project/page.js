@@ -4,6 +4,8 @@ import PublicProjectIndex from "@/components/public/project/PublicProjectIndex";
 
 import { getPublicCompany } from "@/modules/public/public-company.service";
 
+import { getPublicProjectSearchData } from "@/modules/public/public-project-search.service";
+
 import { getPublicProjectIndex } from "@/modules/public/public-project.service";
 
 function normalizeSlug(value) {
@@ -11,6 +13,12 @@ function normalizeSlug(value) {
     .trim()
     .toLowerCase();
 }
+
+/*
+ * =========================================================
+ * METADATA
+ * =========================================================
+ */
 
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
@@ -36,6 +44,12 @@ export async function generateMetadata({ params }) {
   }
 }
 
+/*
+ * =========================================================
+ * PROJECT PAGE
+ * =========================================================
+ */
+
 export default async function PublicProjectPage({ params }) {
   const resolvedParams = await params;
 
@@ -57,20 +71,42 @@ export default async function PublicProjectPage({ params }) {
     throw error;
   }
 
+  /*
+   * Handle legacy / previous company slug.
+   */
   if (companyData.redirect) {
     permanentRedirect(`/${companyData.redirectTo}/project`);
   }
 
-  const data = await getPublicProjectIndex({
-    companyId: companyData.company.id,
+  const companyId = companyData.company.id;
 
-    limitPerCategory: 6,
-  });
+  /*
+   * Load both datasets in parallel:
+   *
+   * 1. Project Index
+   *    - grouped by category
+   *    - maximum 6 projects/category
+   *
+   * 2. Search Dataset
+   *    - every published project
+   */
+  const [projectIndex, searchProjects] = await Promise.all([
+    getPublicProjectIndex({
+      companyId,
+
+      limitPerCategory: 6,
+    }),
+
+    getPublicProjectSearchData({
+      companyId,
+    }),
+  ]);
 
   return (
     <PublicProjectIndex
       companySlug={companySlug}
-      sections={data.sections}
+      sections={projectIndex.sections}
+      searchProjects={searchProjects}
       locale="en"
     />
   );
