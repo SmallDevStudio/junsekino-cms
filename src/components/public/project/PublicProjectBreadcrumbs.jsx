@@ -17,8 +17,13 @@ function getLocalizedValue(value, locale = "en") {
 export default function PublicProjectBreadcrumbs({
   companySlug,
   category = null,
+  project = null,
   locale = "en",
 }) {
+  const categoryName = getLocalizedValue(category?.name, locale);
+
+  const projectTitle = getLocalizedValue(project?.title, locale);
+
   return (
     <nav
       aria-label="Breadcrumb"
@@ -38,9 +43,9 @@ export default function PublicProjectBreadcrumbs({
       <Link
         href={`/${companySlug}`}
         className="
-          text-black/30
-          transition-opacity
-          hover:opacity-60
+          text-black/25
+          transition-colors
+          hover:text-black/55
         "
       >
         Home
@@ -48,30 +53,17 @@ export default function PublicProjectBreadcrumbs({
 
       <span className="text-black/15">/</span>
 
-      {category ? (
-        <>
-          <Link
-            href={`/${companySlug}/project`}
-            className="
-              text-black/30
-              transition-opacity
-              hover:opacity-60
-            "
-          >
-            Project
-          </Link>
-
-          <span className="text-black/15">/</span>
-
-          <span
-            className="font-medium"
-            style={{
-              color: "var(--public-primary)",
-            }}
-          >
-            {getLocalizedValue(category.name, locale)}
-          </span>
-        </>
+      {category || project ? (
+        <Link
+          href={`/${companySlug}/project`}
+          className="
+            text-black/25
+            transition-colors
+            hover:text-black/55
+          "
+        >
+          Project
+        </Link>
       ) : (
         <span
           className="font-medium"
@@ -81,6 +73,53 @@ export default function PublicProjectBreadcrumbs({
         >
           Project
         </span>
+      )}
+
+      {category && (
+        <>
+          <span className="text-black/15">/</span>
+
+          {project ? (
+            <Link
+              href={`/${companySlug}/project/${category.slug}`}
+              className="
+                text-black/25
+                transition-colors
+                hover:text-black/55
+              "
+            >
+              {categoryName}
+            </Link>
+          ) : (
+            <span
+              className="font-medium"
+              style={{
+                color: "var(--public-primary)",
+              }}
+            >
+              {categoryName}
+            </span>
+          )}
+        </>
+      )}
+
+      {project && (
+        <>
+          <span className="text-black/15">/</span>
+
+          <span
+            className="
+              max-w-[260px]
+              truncate
+              font-medium
+            "
+            style={{
+              color: "var(--public-primary)",
+            }}
+          >
+            {projectTitle}
+          </span>
+        </>
       )}
     </nav>
   );

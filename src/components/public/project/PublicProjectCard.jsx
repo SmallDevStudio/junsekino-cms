@@ -42,22 +42,11 @@ export default function PublicProjectCard({
     mediaId,
   });
 
-  /*
-   * Project detail route will be built
-   * in the next step.
-   */
-  const href = `/${companySlug}/project-detail/${project.slug}`;
+  const href = `/${companySlug}/project/${project.slug}`;
 
   return (
     <article>
-      <Link
-        href={href}
-        className="
-          group
-          block
-          text-center
-        "
-      >
+      <Link href={href} className="group block text-center">
         <div
           className="
             relative

@@ -32,44 +32,72 @@ function resolveBranding(company, settings) {
 
   const fallbackPrimary = getBrandFallback(company);
 
+  /*
+   * IMPORTANT
+   *
+   * Company document is now the primary
+   * source of truth for public brand colors.
+   *
+   * This keeps:
+   *
+   * - company selector
+   * - company switcher
+   * - public header
+   * - active navigation
+   * - slideshow dots
+   * - breadcrumbs
+   * - project accents
+   *
+   * using the exact same company color.
+   *
+   * settings/branding remains as a
+   * compatibility fallback for older data.
+   */
   const primaryColor =
-    settingsBranding?.colors?.primary ||
-    settingsBranding?.primaryColor ||
     companyBranding?.colors?.primary ||
     companyBranding?.primaryColor ||
+    settingsBranding?.colors?.primary ||
+    settingsBranding?.primaryColor ||
     fallbackPrimary;
+
+  const secondaryColor =
+    companyBranding?.colors?.secondary ||
+    settingsBranding?.colors?.secondary ||
+    "#ffffff";
+
+  const accentColor =
+    companyBranding?.colors?.accent ||
+    settingsBranding?.colors?.accent ||
+    "#d4d4d4";
+
+  const backgroundColor =
+    companyBranding?.colors?.background ||
+    companyBranding?.backgroundColor ||
+    settingsBranding?.colors?.background ||
+    settingsBranding?.backgroundColor ||
+    "#ffffff";
+
+  const surfaceColor =
+    companyBranding?.colors?.surface ||
+    settingsBranding?.colors?.surface ||
+    "#f7f7f7";
 
   return {
     primaryColor,
 
-    secondaryColor:
-      settingsBranding?.colors?.secondary ||
-      companyBranding?.colors?.secondary ||
-      "#ffffff",
+    secondaryColor,
 
-    accentColor:
-      settingsBranding?.colors?.accent ||
-      companyBranding?.colors?.accent ||
-      "#d4d4d4",
+    accentColor,
 
-    backgroundColor:
-      settingsBranding?.colors?.background ||
-      settingsBranding?.backgroundColor ||
-      companyBranding?.colors?.background ||
-      companyBranding?.backgroundColor ||
-      "#ffffff",
+    backgroundColor,
 
-    surfaceColor:
-      settingsBranding?.colors?.surface ||
-      companyBranding?.colors?.surface ||
-      "#f7f7f7",
+    surfaceColor,
 
     /*
-     * Main readable text stays neutral.
+     * Normal website copy stays neutral.
      *
-     * Company primary color is reserved
-     * for selected navigation, accents,
-     * active states and highlights.
+     * Brand primary is used for active /
+     * highlighted visual states.
      */
     textColor: "#111111",
   };
@@ -92,7 +120,6 @@ function resolveNavigation(settings) {
 function resolveSocial(company, settings) {
   return {
     ...(company?.social || {}),
-
     ...(settings?.social || {}),
   };
 }
