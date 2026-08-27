@@ -305,3 +305,22 @@ export async function softDeleteAwardRecord({ companyId, awardId, userId }) {
 
   return before;
 }
+
+export async function getAwardBySlug({ companyId, slug }) {
+  const slugSnapshot = await getAwardSlugsCollection(companyId).doc(slug).get();
+
+  if (!slugSnapshot.exists) {
+    return null;
+  }
+
+  const data = slugSnapshot.data();
+
+  if (!data.awardId) {
+    return null;
+  }
+
+  return getAwardById({
+    companyId,
+    awardId: data.awardId,
+  });
+}

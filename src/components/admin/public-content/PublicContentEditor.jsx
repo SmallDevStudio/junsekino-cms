@@ -4,7 +4,6 @@ import {
   Check,
   ExternalLink,
   FileText,
-  ImagePlus,
   LoaderCircle,
   PlaySquare,
   RefreshCw,
@@ -329,24 +328,6 @@ function formatIsoDuration(value) {
   return [minutes, String(seconds).padStart(2, "0")].join(":");
 }
 
-function createImportedImage(media, metadata) {
-  return {
-    mediaId: media.id,
-
-    alt: {
-      th: "",
-      en: metadata.title || "",
-    },
-
-    caption: {
-      th: "",
-      en: metadata.authorName
-        ? `YouTube thumbnail — ${metadata.authorName}`
-        : "YouTube thumbnail",
-    },
-  };
-}
-
 export default function PublicContentEditor({
   open,
   companyId,
@@ -359,10 +340,6 @@ export default function PublicContentEditor({
   const [saving, setSaving] = useState(false);
 
   const [metadataLoading, setMetadataLoading] = useState(false);
-
-  const [importingThumbnail, setImportingThumbnail] = useState(false);
-
-  const [importedThumbnailMedia, setImportedThumbnailMedia] = useState(null);
 
   const [errors, setErrors] = useState({});
 
@@ -383,8 +360,6 @@ export default function PublicContentEditor({
       setForm(nextForm);
 
       setErrors({});
-
-      setImportedThumbnailMedia(null);
 
       slugManuallyEditedRef.current = Boolean(item?.id);
 
@@ -481,8 +456,6 @@ export default function PublicContentEditor({
             }
           : current.source,
     }));
-
-    setImportedThumbnailMedia(null);
 
     lastResolvedUrlRef.current = "";
 
@@ -657,103 +630,6 @@ export default function PublicContentEditor({
     }
   }
 
-  async function importThumbnail() {
-    if (
-      !companyId ||
-      importingThumbnail ||
-      !metadata.thumbnailUrl ||
-      importedThumbnailMedia
-    ) {
-      return;
-    }
-
-    try {
-      setImportingThumbnail(true);
-
-      const response = await fetch(
-        `/api/v1/companies/${companyId}/media/import-url`,
-        {
-          method: "POST",
-
-          credentials: "include",
-
-          headers: {
-            "Content-Type": "application/json",
-          },
-
-          body: JSON.stringify({
-            url: metadata.thumbnailUrl,
-
-            usage: "public",
-
-            alt: {
-              th: "",
-              en: metadata.title || "",
-            },
-
-            caption: {
-              th: "",
-              en: metadata.authorName
-                ? `YouTube thumbnail — ${metadata.authorName}`
-                : "YouTube thumbnail",
-            },
-          }),
-        },
-      );
-
-      let result = null;
-
-      try {
-        result = await response.json();
-      } catch {
-        result = null;
-      }
-
-      if (!response.ok || result?.success === false || !result?.data?.id) {
-        throw new Error(result?.message || "Unable to import thumbnail.");
-      }
-
-      setImportedThumbnailMedia(result.data);
-
-      toast.success("Thumbnail imported to Media Library.");
-    } catch (error) {
-      console.error("Import YouTube thumbnail error:", error);
-
-      toast.error(error?.message || "Unable to import thumbnail.");
-    } finally {
-      setImportingThumbnail(false);
-    }
-  }
-
-  function useImportedThumbnailAsCover() {
-    if (!importedThumbnailMedia?.id) {
-      return;
-    }
-
-    if (
-      form.featuredImage?.mediaId &&
-      form.featuredImage.mediaId !== importedThumbnailMedia.id
-    ) {
-      const confirmed = window.confirm(
-        "This content already has a cover image.\n\nReplace the current cover image with the imported YouTube thumbnail?",
-      );
-
-      if (!confirmed) {
-        return;
-      }
-    }
-
-    const image = createImportedImage(importedThumbnailMedia, metadata);
-
-    setForm((current) => ({
-      ...current,
-
-      featuredImage: image,
-    }));
-
-    toast.success("YouTube thumbnail set as cover image.");
-  }
-
   function createPayload(slug) {
     return {
       slug,
@@ -830,7 +706,7 @@ export default function PublicContentEditor({
   async function handleSubmit(event) {
     event.preventDefault();
 
-    if (!companyId || saving || importingThumbnail) {
+    if (!companyId || saving) {
       return;
     }
 
@@ -991,11 +867,7 @@ export default function PublicContentEditor({
 
   const metadata = form.source.metadata || emptyMetadata();
 
-  const importedThumbnailIsCover =
-    Boolean(importedThumbnailMedia?.id) &&
-    form.featuredImage?.mediaId === importedThumbnailMedia.id;
-
-  const busy = saving || metadataLoading || importingThumbnail;
+  const busy = saving || metadataLoading;
 
   return (
     <div className="fixed inset-0 z-[200]">
@@ -1219,8 +1091,6 @@ export default function PublicContentEditor({
 
                             lastResolvedUrlRef.current = "";
 
-                            setImportedThumbnailMedia(null);
-
                             setForm((current) => ({
                               ...current,
 
@@ -1386,59 +1256,30 @@ export default function PublicContentEditor({
                       )}
 
                       <div className="mt-5 border-t border-[var(--admin-border)] pt-4">
-                        {!importedThumbnailMedia ? (
-                          <button
-                            type="button"
-                            disabled={importingThumbnail}
-                            onClick={importThumbnail}
-                            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[var(--company-primary)] px-4 text-xs font-medium text-[var(--company-primary-foreground)] transition hover:bg-[var(--company-primary-hover)] disabled:cursor-not-allowed disabled:opacity-60"
-                          >
-                            {importingThumbnail ? (
-                              <LoaderCircle
-                                size={15}
-                                className="animate-spin"
-                              />
-                            ) : (
-                              <ImagePlus size={15} />
-                            )}
+                        <div className="flex items-start gap-3 rounded-xl bg-[var(--company-primary-soft)] p-3">
+                          <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--company-primary)] text-[var(--company-primary-foreground)]">
+                            <Check size={14} />
+                          </span>
 
-                            {importingThumbnail
-                              ? "Importing..."
-                              : "Import to Media Library"}
-                          </button>
-                        ) : (
-                          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <div className="inline-flex items-center gap-2 text-xs font-medium text-[var(--admin-foreground)]">
-                              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--company-primary-soft)] text-[var(--company-primary)]">
-                                <Check size={14} />
-                              </span>
-                              Imported to Media Library
+                          <div>
+                            <div className="text-xs font-medium text-[var(--admin-foreground)]">
+                              Automatic YouTube Cover
                             </div>
 
-                            <button
-                              type="button"
-                              disabled={importedThumbnailIsCover}
-                              onClick={useImportedThumbnailAsCover}
-                              className={cn(
-                                "inline-flex h-10 items-center justify-center gap-2 rounded-xl px-4 text-xs font-medium transition",
+                            <p className="mt-1 text-[11px] leading-5 text-[var(--admin-muted)]">
+                              This YouTube thumbnail will automatically be used
+                              as the cover when no custom featured image is
+                              selected below.
+                            </p>
 
-                                importedThumbnailIsCover
-                                  ? "cursor-default border border-[var(--company-primary)] bg-[var(--company-primary-soft)] text-[var(--company-primary)]"
-                                  : "bg-[var(--company-primary)] text-[var(--company-primary-foreground)] hover:bg-[var(--company-primary-hover)]",
-                              )}
-                            >
-                              {importedThumbnailIsCover ? (
-                                <Check size={15} />
-                              ) : (
-                                <ImagePlus size={15} />
-                              )}
-
-                              {importedThumbnailIsCover
-                                ? "Used as Cover"
-                                : "Use as Cover"}
-                            </button>
+                            {form.featuredImage?.mediaId && (
+                              <p className="mt-2 text-[11px] font-medium text-[var(--company-primary)]">
+                                A custom cover is currently selected and will
+                                override the YouTube thumbnail.
+                              </p>
+                            )}
                           </div>
-                        )}
+                        </div>
                       </div>
                     </div>
                   </div>
