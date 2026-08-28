@@ -10,6 +10,11 @@ export const ADMIN_DENSITY = {
   SPACIOUS: "spacious",
 };
 
+export const ADMIN_LOCALE = {
+  EN: "en",
+  TH: "th",
+};
+
 export const ADMIN_UI_DEFAULTS = {
   actionDisplay: ADMIN_ACTION_DISPLAY.ICON_LABEL,
 
@@ -18,19 +23,35 @@ export const ADMIN_UI_DEFAULTS = {
   tooltipDelay: 300,
 
   density: ADMIN_DENSITY.COMFORTABLE,
+
+  /*
+   * Admin interface language.
+   *
+   * This is different from
+   * public website languages.
+   */
+  locale: ADMIN_LOCALE.EN,
+
+  /*
+   * Desktop sidebar state.
+   */
+  sidebarCollapsed: false,
 };
 
 export const ADMIN_ACTION_DISPLAY_OPTIONS = [
   {
     value: ADMIN_ACTION_DISPLAY.ICON_LABEL,
+
     label: "Icon + Text",
   },
   {
     value: ADMIN_ACTION_DISPLAY.ICON,
+
     label: "Icon only",
   },
   {
     value: ADMIN_ACTION_DISPLAY.LABEL,
+
     label: "Text only",
   },
 ];
@@ -38,15 +59,31 @@ export const ADMIN_ACTION_DISPLAY_OPTIONS = [
 export const ADMIN_DENSITY_OPTIONS = [
   {
     value: ADMIN_DENSITY.COMPACT,
+
     label: "Compact",
   },
   {
     value: ADMIN_DENSITY.COMFORTABLE,
+
     label: "Comfortable",
   },
   {
     value: ADMIN_DENSITY.SPACIOUS,
+
     label: "Spacious",
+  },
+];
+
+export const ADMIN_LOCALE_OPTIONS = [
+  {
+    value: ADMIN_LOCALE.EN,
+    label: "English",
+    shortLabel: "EN",
+  },
+  {
+    value: ADMIN_LOCALE.TH,
+    label: "ไทย",
+    shortLabel: "TH",
   },
 ];
 

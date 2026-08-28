@@ -136,6 +136,13 @@ function createBorderColor(hex) {
 
 function getPrimaryColor(company) {
   const candidates = [
+    // Current Firestore structure — use this first
+    company?.colors?.primary,
+
+    // Possible nested branding structure
+    company?.branding?.colors?.primary,
+
+    // Legacy compatibility
     company?.primaryColor,
     company?.color,
 

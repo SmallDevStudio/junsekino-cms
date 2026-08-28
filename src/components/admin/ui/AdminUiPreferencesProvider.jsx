@@ -6,23 +6,31 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
 import {
   ADMIN_ACTION_DISPLAY,
   ADMIN_DENSITY,
+  ADMIN_LOCALE,
   ADMIN_UI_DEFAULTS,
 } from "@/constants/admin-ui";
 
 const AdminUiPreferencesContext = createContext(null);
+
+/*
+ * =========================================================
+ * HELPERS
+ * =========================================================
+ */
 
 function getUserId(user) {
   return user?.uid || user?.id || user?.userId || "anonymous";
 }
 
 function getStorageKey(user) {
-  return `junsekino.admin.uiPreferences.${getUserId(user)}`;
+  return `junsekino.admin.preferences.${getUserId(user)}`;
 }
 
 function isActionDisplay(value) {
@@ -31,6 +39,10 @@ function isActionDisplay(value) {
 
 function isDensity(value) {
   return Object.values(ADMIN_DENSITY).includes(value);
+}
+
+function isLocale(value) {
+  return Object.values(ADMIN_LOCALE).includes(value);
 }
 
 function normalizePreferences(value = {}) {
@@ -53,84 +65,218 @@ function normalizePreferences(value = {}) {
     density: isDensity(value.density)
       ? value.density
       : ADMIN_UI_DEFAULTS.density,
+
+    locale: isLocale(value.locale) ? value.locale : ADMIN_UI_DEFAULTS.locale,
+
+    sidebarCollapsed:
+      typeof value.sidebarCollapsed === "boolean"
+        ? value.sidebarCollapsed
+        : ADMIN_UI_DEFAULTS.sidebarCollapsed,
   };
 }
 
-function getInitialUserPreferences(user) {
+function getInitialPreferences(user) {
   return normalizePreferences(
-    user?.preferences?.adminUi || user?.adminUiPreferences || {},
+    user?.preferences?.admin || user?.preferences?.adminUi || {},
   );
 }
 
-export function AdminUiPreferencesProvider({
-  user,
+/*
+ * =========================================================
+ * PROVIDER
+ * =========================================================
+ */
 
-  children,
-}) {
-  const initialPreferences = useMemo(
-    () => getInitialUserPreferences(user),
-    [user],
-  );
+export function AdminUiPreferencesProvider({ user, children }) {
+  const initialPreferences = useMemo(() => getInitialPreferences(user), [user]);
 
   const [preferences, setPreferences] = useState(initialPreferences);
 
   const [ready, setReady] = useState(false);
 
+  const [saving, setSaving] = useState(false);
+
+  const initializedRef = useRef(false);
+
+  const saveTimerRef = useRef(null);
+
+  /*
+   * =======================================================
+   * INITIAL LOAD
+   * =======================================================
+   */
+
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      let storedPreferences = null;
+    if (initializedRef.current) {
+      return;
+    }
+
+    initializedRef.current = true;
+
+    let active = true;
+
+    const timeoutId = window.setTimeout(async () => {
+      /*
+       * Start from server-rendered
+       * session preference.
+       */
+
+      let resolved = initialPreferences;
+
+      /*
+       * Local cache gives immediate
+       * fallback if network is slow.
+       */
 
       try {
         const raw = window.localStorage.getItem(getStorageKey(user));
 
-        storedPreferences = raw ? JSON.parse(raw) : null;
+        if (raw) {
+          resolved = normalizePreferences({
+            ...resolved,
+            ...JSON.parse(raw),
+          });
+        }
       } catch {
-        storedPreferences = null;
+        // Ignore cache failure.
       }
 
-      if (storedPreferences) {
-        setPreferences(
-          normalizePreferences({
-            ...initialPreferences,
-            ...storedPreferences,
-          }),
+      /*
+       * Server profile remains
+       * source of truth.
+       */
+
+      try {
+        const response = await fetch("/api/v1/users/me/preferences", {
+          method: "GET",
+
+          cache: "no-store",
+
+          credentials: "same-origin",
+        });
+
+        if (response.ok) {
+          const payload = await response.json();
+
+          if (payload?.success && payload?.data?.admin) {
+            resolved = normalizePreferences(payload.data.admin);
+          }
+        }
+      } catch {
+        // Use local cache/server session.
+      }
+
+      if (!active) {
+        return;
+      }
+
+      setPreferences(resolved);
+
+      try {
+        window.localStorage.setItem(
+          getStorageKey(user),
+
+          JSON.stringify(resolved),
         );
-      } else {
-        setPreferences(initialPreferences);
+      } catch {
+        // Ignore cache failure.
       }
 
       setReady(true);
     }, 0);
 
     return () => {
+      active = false;
+
       window.clearTimeout(timeoutId);
     };
   }, [user, initialPreferences]);
 
-  useEffect(() => {
-    if (!ready) {
-      return;
-    }
+  /*
+   * =======================================================
+   * PERSIST
+   * =======================================================
+   */
 
-    try {
-      window.localStorage.setItem(
-        getStorageKey(user),
+  const persistPreferences = useCallback(
+    (nextPreferences) => {
+      /*
+       * Cache immediately.
+       */
 
-        JSON.stringify(preferences),
-      );
-    } catch {
-      // localStorage can be unavailable.
-    }
-  }, [user, preferences, ready]);
+      try {
+        window.localStorage.setItem(
+          getStorageKey(user),
 
-  const updatePreferences = useCallback((patch) => {
-    setPreferences((current) =>
-      normalizePreferences({
-        ...current,
-        ...patch,
-      }),
-    );
-  }, []);
+          JSON.stringify(nextPreferences),
+        );
+      } catch {
+        // Ignore cache failure.
+      }
+
+      /*
+       * Debounce Firestore writes.
+       *
+       * Multiple quick UI changes
+       * become one PATCH.
+       */
+
+      if (saveTimerRef.current) {
+        window.clearTimeout(saveTimerRef.current);
+      }
+
+      saveTimerRef.current = window.setTimeout(async () => {
+        setSaving(true);
+
+        try {
+          const response = await fetch("/api/v1/users/me/preferences", {
+            method: "PATCH",
+
+            headers: {
+              "Content-Type": "application/json",
+            },
+
+            credentials: "same-origin",
+
+            body: JSON.stringify({
+              admin: nextPreferences,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("PREFERENCE_SAVE_FAILED");
+          }
+        } catch (error) {
+          console.error("Save admin preferences error:", error);
+        } finally {
+          setSaving(false);
+        }
+      }, 400);
+    },
+    [user],
+  );
+
+  /*
+   * =======================================================
+   * UPDATE
+   * =======================================================
+   */
+
+  const updatePreferences = useCallback(
+    (patch) => {
+      setPreferences((current) => {
+        const next = normalizePreferences({
+          ...current,
+          ...patch,
+        });
+
+        persistPreferences(next);
+
+        return next;
+      });
+    },
+    [persistPreferences],
+  );
 
   const setActionDisplay = useCallback(
     (actionDisplay) => {
@@ -168,17 +314,75 @@ export function AdminUiPreferencesProvider({
     [updatePreferences],
   );
 
-  const resetPreferences = useCallback(() => {
-    setPreferences({
-      ...ADMIN_UI_DEFAULTS,
+  const setLocale = useCallback(
+    (locale) => {
+      updatePreferences({
+        locale,
+      });
+    },
+    [updatePreferences],
+  );
+
+  const setSidebarCollapsed = useCallback(
+    (sidebarCollapsed) => {
+      updatePreferences({
+        sidebarCollapsed: Boolean(sidebarCollapsed),
+      });
+    },
+    [updatePreferences],
+  );
+
+  const toggleSidebar = useCallback(() => {
+    setPreferences((current) => {
+      const next = normalizePreferences({
+        ...current,
+
+        sidebarCollapsed: !current.sidebarCollapsed,
+      });
+
+      persistPreferences(next);
+
+      return next;
     });
+  }, [persistPreferences]);
+
+  const resetPreferences = useCallback(() => {
+    const next = {
+      ...ADMIN_UI_DEFAULTS,
+    };
+
+    setPreferences(next);
+
+    persistPreferences(next);
+  }, [persistPreferences]);
+
+  /*
+   * =======================================================
+   * CLEANUP
+   * =======================================================
+   */
+
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) {
+        window.clearTimeout(saveTimerRef.current);
+      }
+    };
   }, []);
+
+  /*
+   * =======================================================
+   * CONTEXT
+   * =======================================================
+   */
 
   const value = useMemo(
     () => ({
       preferences,
 
       ready,
+
+      saving,
 
       actionDisplay: preferences.actionDisplay,
 
@@ -188,6 +392,10 @@ export function AdminUiPreferencesProvider({
 
       density: preferences.density,
 
+      locale: preferences.locale,
+
+      sidebarCollapsed: preferences.sidebarCollapsed,
+
       updatePreferences,
 
       setActionDisplay,
@@ -197,17 +405,27 @@ export function AdminUiPreferencesProvider({
       setTooltipDelay,
 
       setDensity,
+
+      setLocale,
+
+      setSidebarCollapsed,
+
+      toggleSidebar,
 
       resetPreferences,
     }),
     [
       preferences,
       ready,
+      saving,
       updatePreferences,
       setActionDisplay,
       setTooltipEnabled,
       setTooltipDelay,
       setDensity,
+      setLocale,
+      setSidebarCollapsed,
+      toggleSidebar,
       resetPreferences,
     ],
   );
@@ -218,6 +436,12 @@ export function AdminUiPreferencesProvider({
     </AdminUiPreferencesContext.Provider>
   );
 }
+
+/*
+ * =========================================================
+ * HOOK
+ * =========================================================
+ */
 
 export function useAdminUiPreferences() {
   const context = useContext(AdminUiPreferencesContext);

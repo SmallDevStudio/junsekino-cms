@@ -2,13 +2,26 @@ import { z } from "zod";
 
 import { PAGE_STATUSES, PAGE_TYPES } from "@/constants/page";
 
+import {
+  localizedRichTextSchema,
+  localizedStringSchema,
+  pageBlocksSchema,
+  pageBuilderImageSchema,
+} from "./page-block.schema";
+
+/*
+ * =========================================================
+ * COMMON
+ * =========================================================
+ */
+
 const nullableString = z.union([z.string(), z.null()]).optional();
 
-const localizedString = z.object({
-  th: z.string().default(""),
-
-  en: z.string().default(""),
-});
+/*
+ * =========================================================
+ * SEO
+ * =========================================================
+ */
 
 const localizedSeo = z.object({
   title: z.string().max(70).default(""),
@@ -25,52 +38,56 @@ const localizedSeo = z.object({
 });
 
 const seoSchema = z.object({
-  th: localizedSeo,
-
   en: localizedSeo,
+
+  th: localizedSeo,
 
   index: z.boolean().default(true),
 
   follow: z.boolean().default(true),
 });
 
-const pageImageSchema = z.object({
-  mediaId: z.string().min(1),
-
-  alt: localizedString.optional(),
-
-  caption: localizedString.optional(),
-});
+/*
+ * =========================================================
+ * HERO
+ * =========================================================
+ */
 
 const heroSchema = z.object({
-  title: localizedString.optional(),
+  title: localizedStringSchema.optional(),
 
-  subtitle: localizedString.optional(),
+  subtitle: localizedStringSchema.optional(),
 
-  media: z.union([pageImageSchema, z.null()]).optional(),
+  media: z.union([pageBuilderImageSchema, z.null()]).optional(),
 
   enabled: z.boolean().default(true),
 });
+
+/*
+ * =========================================================
+ * NAVIGATION
+ * =========================================================
+ *
+ * We retain this structure for compatibility.
+ *
+ * Later Navigation Manager will become the
+ * source of truth for menu placement.
+ * =========================================================
+ */
 
 const navigationSchema = z.object({
   showInNavigation: z.boolean().default(false),
 
-  label: localizedString.optional(),
+  label: localizedStringSchema.optional(),
 
   sortOrder: z.number().int().min(0).max(9999).default(0),
 });
 
-const pageSectionSchema = z.object({
-  id: z.string().trim().min(1).max(100).optional(),
-
-  type: z.string().trim().min(1).max(100),
-
-  enabled: z.boolean().default(true),
-
-  sortOrder: z.number().int().min(0).max(9999).default(0),
-
-  data: z.record(z.string(), z.unknown()).default({}),
-});
+/*
+ * =========================================================
+ * PAGE
+ * =========================================================
+ */
 
 const basePageSchema = z.object({
   slug: z
@@ -85,23 +102,40 @@ const basePageSchema = z.object({
 
   pageType: z.enum(PAGE_TYPES).default("standard"),
 
+  /*
+   * English remains primary.
+   *
+   * Thai may remain empty when disabled
+   * at Company Localization level.
+   */
   title: z.object({
-    th: z.string().trim().max(250).default(""),
-
     en: z.string().trim().max(250).default(""),
+
+    th: z.string().trim().max(250).default(""),
   }),
 
-  excerpt: localizedString.optional(),
+  excerpt: localizedStringSchema.optional(),
 
-  content: localizedString.optional(),
+  /*
+   * Legacy single page body.
+   *
+   * Keep this for migration compatibility.
+   *
+   * New About / Custom Pages should prefer
+   * sections.
+   */
+  content: localizedRichTextSchema.optional(),
 
   hero: heroSchema.optional(),
 
-  sections: z.array(pageSectionSchema).default([]),
+  /*
+   * Shared Page Builder blocks.
+   */
+  sections: pageBlocksSchema,
 
   navigation: navigationSchema.optional(),
 
-  featuredImage: z.union([pageImageSchema, z.null()]).optional(),
+  featuredImage: z.union([pageBuilderImageSchema, z.null()]).optional(),
 
   status: z.enum(PAGE_STATUSES).default("draft"),
 

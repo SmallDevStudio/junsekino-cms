@@ -1,9 +1,14 @@
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import PublicRichText from "@/components/public/content/PublicRichText";
 
 import PublicProjectBreadcrumbs from "./PublicProjectBreadcrumbs";
 import PublicProjectShare from "./PublicProjectShare";
 import PublicProjectSlideshow from "./PublicProjectSlideshow";
+
+/*
+ * =========================================================
+ * LOCALIZED STRING
+ * =========================================================
+ */
 
 function getLocalizedValue(value, locale = "en") {
   if (!value) {
@@ -14,10 +19,83 @@ function getLocalizedValue(value, locale = "en") {
     return value;
   }
 
-  return (
-    value?.[locale]?.trim() || value?.en?.trim() || value?.th?.trim() || ""
-  );
+  const preferred = value?.[locale];
+
+  if (typeof preferred === "string" && preferred.trim()) {
+    return preferred;
+  }
+
+  const english = value?.en;
+
+  if (typeof english === "string" && english.trim()) {
+    return english;
+  }
+
+  const thai = value?.th;
+
+  if (typeof thai === "string" && thai.trim()) {
+    return thai;
+  }
+
+  return "";
 }
+
+/*
+ * =========================================================
+ * LOCALIZED RICH CONTENT
+ * =========================================================
+ *
+ * Unlike normal localized text, Rich Text
+ * can be either:
+ *
+ * - String
+ * - TipTap JSON
+ * =========================================================
+ */
+
+function hasRichTextValue(value) {
+  if (typeof value === "string") {
+    return Boolean(value.trim());
+  }
+
+  return value && typeof value === "object" && value.type === "doc";
+}
+
+function getLocalizedRichText(value, locale = "en") {
+  if (!value) {
+    return null;
+  }
+
+  /*
+   * Compatibility if Public service ever
+   * returns a direct string/document.
+   */
+  if (typeof value === "string" || value?.type === "doc") {
+    return value;
+  }
+
+  const preferred = value?.[locale];
+
+  if (hasRichTextValue(preferred)) {
+    return preferred;
+  }
+
+  if (hasRichTextValue(value?.en)) {
+    return value.en;
+  }
+
+  if (hasRichTextValue(value?.th)) {
+    return value.th;
+  }
+
+  return null;
+}
+
+/*
+ * =========================================================
+ * CREDITS
+ * =========================================================
+ */
 
 function formatCredit(items, locale) {
   if (!Array.isArray(items)) {
@@ -30,6 +108,12 @@ function formatCredit(items, locale) {
     .join(", ");
 }
 
+/*
+ * =========================================================
+ * AREA
+ * =========================================================
+ */
+
 function formatArea(area) {
   if (area?.value === null || area?.value === undefined) {
     return "";
@@ -39,6 +123,12 @@ function formatArea(area) {
 
   return `${area.value.toLocaleString()} ${unit}`;
 }
+
+/*
+ * =========================================================
+ * INFORMATION ROW
+ * =========================================================
+ */
 
 function InfoRow({ label, value }) {
   if (value === null || value === undefined || value === "") {
@@ -66,61 +156,11 @@ function InfoRow({ label, value }) {
   );
 }
 
-function ProjectContent({ content }) {
-  if (!content) {
-    return null;
-  }
-
-  return (
-    <div
-      className="
-        text-[12px]
-        leading-[1.55]
-        text-black/80
-
-        sm:text-[13px]
-
-        [&_a]:underline
-        [&_a]:decoration-black/20
-        [&_a]:underline-offset-2
-        [&_a]:transition-colors
-        [&_a:hover]:text-[var(--public-primary)]
-
-        [&_blockquote]:my-5
-        [&_blockquote]:border-l
-        [&_blockquote]:border-black/15
-        [&_blockquote]:pl-4
-        [&_blockquote]:text-black/50
-
-        [&_h2]:mb-3
-        [&_h2]:mt-7
-        [&_h2]:text-[14px]
-        [&_h2]:font-semibold
-
-        [&_h3]:mb-3
-        [&_h3]:mt-6
-        [&_h3]:text-[13px]
-        [&_h3]:font-semibold
-
-        [&_li]:mb-1
-
-        [&_ol]:my-4
-        [&_ol]:list-decimal
-        [&_ol]:pl-5
-
-        [&_p]:mb-4
-
-        [&_strong]:font-semibold
-
-        [&_ul]:my-4
-        [&_ul]:list-disc
-        [&_ul]:pl-5
-      "
-    >
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
-    </div>
-  );
-}
+/*
+ * =========================================================
+ * PROJECT DETAIL
+ * =========================================================
+ */
 
 export default function PublicProjectDetail({
   companySlug,
@@ -131,7 +171,15 @@ export default function PublicProjectDetail({
 
   const location = getLocalizedValue(project.projectInfo?.location, locale);
 
-  const content = getLocalizedValue(project.content, locale);
+  /*
+   * Important:
+   *
+   * Do NOT use getLocalizedValue() here.
+   *
+   * Project content may now contain
+   * TipTap JSON.
+   */
+  const content = getLocalizedRichText(project.content, locale);
 
   const client = getLocalizedValue(project.projectInfo?.client, locale);
 
@@ -179,6 +227,10 @@ export default function PublicProjectDetail({
           max-w-[1680px]
         "
       >
+        {/* =================================
+            BREADCRUMBS
+        ================================= */}
+
         <div className="pt-2 lg:pt-4">
           <PublicProjectBreadcrumbs
             companySlug={companySlug}
@@ -187,6 +239,10 @@ export default function PublicProjectDetail({
             locale={locale}
           />
         </div>
+
+        {/* =================================
+            CONTENT
+        ================================= */}
 
         <div
           className="
@@ -203,7 +259,9 @@ export default function PublicProjectDetail({
             xl:grid-cols-[minmax(0,1.75fr)_minmax(360px,0.75fr)]
           "
         >
-          {/* LEFT — SLIDESHOW */}
+          {/* ===============================
+              LEFT — SLIDESHOW
+          =============================== */}
 
           <div className="min-w-0">
             <PublicProjectSlideshow
@@ -213,7 +271,9 @@ export default function PublicProjectDetail({
             />
           </div>
 
-          {/* RIGHT — INFORMATION */}
+          {/* ===============================
+              RIGHT — INFORMATION
+          =============================== */}
 
           <aside
             className="
@@ -227,6 +287,10 @@ export default function PublicProjectDetail({
               [&::-webkit-scrollbar]:hidden
             "
           >
+            {/* =============================
+                TITLE + SHARE
+            ============================= */}
+
             <div
               className="
                 flex
@@ -276,11 +340,19 @@ export default function PublicProjectDetail({
               <PublicProjectShare title={title} />
             </div>
 
+            {/* =============================
+                RICH CONTENT
+            ============================= */}
+
             {content && (
               <div className="mt-7 lg:mt-8">
-                <ProjectContent content={content} />
+                <PublicRichText value={content} />
               </div>
             )}
+
+            {/* =============================
+                PROJECT INFORMATION
+            ============================= */}
 
             <dl
               className="

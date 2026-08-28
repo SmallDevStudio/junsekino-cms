@@ -5,11 +5,45 @@ export const COMPANY_STATUS = {
 };
 
 export const COMPANY_LOCALES = {
-  TH: "th",
   EN: "en",
+  TH: "th",
 };
 
-export const DEFAULT_COMPANY_LOCALES = [COMPANY_LOCALES.TH, COMPANY_LOCALES.EN];
+/*
+ * =========================================================
+ * LOCALIZATION
+ * =========================================================
+ *
+ * Junsekino CMS rule:
+ *
+ * - English is always available.
+ * - New companies use English only.
+ * - Thai is optional and must be enabled
+ *   from Company Settings.
+ * - Admin UI language is a separate
+ *   user preference and does not affect
+ *   public content languages.
+ * =========================================================
+ */
+
+export const COMPANY_LOCALE_OPTIONS = [
+  {
+    value: COMPANY_LOCALES.EN,
+    label: "English",
+    shortLabel: "EN",
+    required: true,
+  },
+  {
+    value: COMPANY_LOCALES.TH,
+    label: "ไทย",
+    shortLabel: "TH",
+    required: false,
+  },
+];
+
+export const DEFAULT_COMPANY_LOCALE = COMPANY_LOCALES.EN;
+
+export const DEFAULT_COMPANY_LOCALES = [COMPANY_LOCALES.EN];
 
 export const DEFAULT_COMPANY_BRANDING = {
   logoLight: null,

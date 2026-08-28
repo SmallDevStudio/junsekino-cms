@@ -19,32 +19,112 @@ import {
 
 import { serializeFirestoreDocument } from "@/utils/firestore";
 
+/*
+ * =========================================================
+ * LOCALIZED
+ * =========================================================
+ */
+
 function mergeLocalized(defaults = {}, value = {}) {
   return {
-    th: value.th ?? defaults.th ?? "",
-
     en: value.en ?? defaults.en ?? "",
+
+    th: value.th ?? defaults.th ?? "",
   };
 }
+
+/*
+ * =========================================================
+ * RICH TEXT
+ * =========================================================
+ */
+
+function isTiptapDocument(value) {
+  return value && typeof value === "object" && value.type === "doc";
+}
+
+function hasTiptapContent(document) {
+  if (!isTiptapDocument(document)) {
+    return false;
+  }
+
+  if (!Array.isArray(document.content)) {
+    return false;
+  }
+
+  function nodeHasContent(node) {
+    if (!node) {
+      return false;
+    }
+
+    if (
+      node.type === "text" &&
+      typeof node.text === "string" &&
+      node.text.trim()
+    ) {
+      return true;
+    }
+
+    /*
+     * Non-text visual/structural node that
+     * itself represents meaningful content.
+     */
+    if (["horizontalRule", "image"].includes(node.type)) {
+      return true;
+    }
+
+    return Array.isArray(node.content) && node.content.some(nodeHasContent);
+  }
+
+  return document.content.some(nodeHasContent);
+}
+
+function hasRichTextContent(value) {
+  if (typeof value === "string") {
+    return Boolean(value.trim());
+  }
+
+  return hasTiptapContent(value);
+}
+
+function hasLocalizedRichText(value) {
+  return hasRichTextContent(value?.en) || hasRichTextContent(value?.th);
+}
+
+/*
+ * =========================================================
+ * SEO
+ * =========================================================
+ */
 
 function mergeSeo(seo = {}) {
   return {
     ...DEFAULT_PAGE_SEO,
     ...seo,
 
-    th: {
-      ...DEFAULT_PAGE_SEO.th,
-      ...(seo.th || {}),
-    },
-
     en: {
       ...DEFAULT_PAGE_SEO.en,
       ...(seo.en || {}),
     },
+
+    th: {
+      ...DEFAULT_PAGE_SEO.th,
+      ...(seo.th || {}),
+    },
   };
 }
 
+/*
+ * =========================================================
+ * BLOCKS
+ * =========================================================
+ */
+
 function normalizeSections(sections = []) {
+  if (!Array.isArray(sections)) {
+    return [];
+  }
+
   return sections.map((section, index) => ({
     ...section,
 
@@ -58,6 +138,12 @@ function normalizeSections(sections = []) {
   }));
 }
 
+/*
+ * =========================================================
+ * NORMALIZE INPUT
+ * =========================================================
+ */
+
 function normalizePageInput(input) {
   return {
     ...input,
@@ -70,6 +156,10 @@ function normalizePageInput(input) {
 
     excerpt: mergeLocalized({}, input.excerpt),
 
+    /*
+     * Preserve either legacy string or
+     * TipTap JSON for each language.
+     */
     content: mergeLocalized({}, input.content),
 
     hero: input.hero || {
@@ -88,6 +178,9 @@ function normalizePageInput(input) {
 
     featuredImage: input.featuredImage ?? null,
 
+    /*
+     * New page always starts draft.
+     */
     status: PAGE_STATUS.DRAFT,
 
     scheduledAt: null,
@@ -96,12 +189,24 @@ function normalizePageInput(input) {
   };
 }
 
-function validatePageTitle(page) {
-  const hasThai = Boolean(page.title?.th?.trim());
+/*
+ * =========================================================
+ * VALIDATION
+ * =========================================================
+ */
 
+function validatePageTitle(page) {
+  /*
+   * New platform rule:
+   * English is canonical.
+   *
+   * Existing Thai-only legacy page can still
+   * be loaded/edited, but new publishing flow
+   * should have an English title.
+   */
   const hasEnglish = Boolean(page.title?.en?.trim());
 
-  if (!hasThai && !hasEnglish) {
+  if (!hasEnglish) {
     throw new Error("PAGE_TITLE_REQUIRED");
   }
 }
@@ -109,8 +214,7 @@ function validatePageTitle(page) {
 function validatePublishablePage(page) {
   validatePageTitle(page);
 
-  const hasContent =
-    Boolean(page.content?.th?.trim()) || Boolean(page.content?.en?.trim());
+  const hasContent = hasLocalizedRichText(page.content);
 
   const hasSections =
     Array.isArray(page.sections) &&
@@ -120,6 +224,12 @@ function validatePublishablePage(page) {
     throw new Error("PAGE_CONTENT_REQUIRED");
   }
 }
+
+/*
+ * =========================================================
+ * LIST
+ * =========================================================
+ */
 
 export async function listPages({
   companyId,
@@ -143,7 +253,7 @@ export async function listPages({
     const keyword = search.trim().toLowerCase();
 
     items = items.filter((item) => {
-      const values = [item.title?.th, item.title?.en, item.slug, item.pageType]
+      const values = [item.title?.en, item.title?.th, item.slug, item.pageType]
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
@@ -163,6 +273,12 @@ export async function listPages({
   return items.map(serializeFirestoreDocument);
 }
 
+/*
+ * =========================================================
+ * GET
+ * =========================================================
+ */
+
 export async function getPage({ companyId, pageId }) {
   const page = await getPageById({
     companyId,
@@ -175,6 +291,12 @@ export async function getPage({ companyId, pageId }) {
 
   return serializeFirestoreDocument(page);
 }
+
+/*
+ * =========================================================
+ * CREATE
+ * =========================================================
+ */
 
 export async function createPage({ companyId, input, currentUser }) {
   const data = normalizePageInput(input);
@@ -209,6 +331,12 @@ export async function createPage({ companyId, input, currentUser }) {
 
   return serializedPage;
 }
+
+/*
+ * =========================================================
+ * UPDATE
+ * =========================================================
+ */
 
 export async function updatePage({ companyId, pageId, input, currentUser }) {
   const existing = await getPageById({
@@ -251,6 +379,7 @@ export async function updatePage({ companyId, pageId, input, currentUser }) {
 
       label: mergeLocalized(
         existing.navigation?.label,
+
         input.navigation?.label,
       ),
     };
@@ -268,23 +397,34 @@ export async function updatePage({ companyId, pageId, input, currentUser }) {
       ...existing.seo,
       ...input.seo,
 
-      th: {
-        ...existing.seo?.th,
-        ...input.seo?.th,
-      },
-
       en: {
         ...existing.seo?.en,
+
         ...input.seo?.en,
+      },
+
+      th: {
+        ...existing.seo?.th,
+
+        ...input.seo?.th,
       },
     });
   }
 
+  /*
+   * Lifecycle fields cannot be modified
+   * through normal content PATCH.
+   */
   delete updateData.status;
+
   delete updateData.scheduledAt;
+
   delete updateData.publishedAt;
+
   delete updateData.publishedBy;
+
   delete updateData.deletedAt;
+
   delete updateData.deletedBy;
 
   const preview = {
@@ -325,6 +465,12 @@ export async function updatePage({ companyId, pageId, input, currentUser }) {
 
   return serializedAfter;
 }
+
+/*
+ * =========================================================
+ * PUBLISH
+ * =========================================================
+ */
 
 export async function publishPage({
   companyId,
@@ -377,6 +523,12 @@ export async function publishPage({
   return serializedAfter;
 }
 
+/*
+ * =========================================================
+ * UNPUBLISH
+ * =========================================================
+ */
+
 export async function unpublishPage({ companyId, pageId, currentUser }) {
   const result = await unpublishPageRecord({
     companyId,
@@ -407,6 +559,12 @@ export async function unpublishPage({ companyId, pageId, currentUser }) {
 
   return serializedAfter;
 }
+
+/*
+ * =========================================================
+ * DELETE
+ * =========================================================
+ */
 
 export async function deletePage({ companyId, pageId, currentUser }) {
   const before = await softDeletePageRecord({

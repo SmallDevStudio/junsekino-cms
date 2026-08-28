@@ -18,11 +18,75 @@ function getCompanyName(company) {
   );
 }
 
-function getCompanyInitial(company) {
-  return getCompanyName(company).trim().charAt(0).toUpperCase();
+function getCompanyCode(company) {
+  const values = [
+    company?.shortName,
+    company?.code,
+    company?.name,
+    company?.displayName,
+  ]
+    .filter(Boolean)
+    .map((value) => String(value).trim().toUpperCase());
+
+  for (const value of values) {
+    const match = value.match(/\b([AI]\+D)\b/);
+
+    if (match?.[1]) {
+      return match[1];
+    }
+
+    if (value.includes("I+D")) {
+      return "I+D";
+    }
+
+    if (value.includes("A+D")) {
+      return "A+D";
+    }
+  }
+
+  const name = getCompanyName(company);
+
+  return name.trim().charAt(0).toUpperCase();
 }
 
-export default function CompanySwitcher() {
+function getCompanyPrimary(company) {
+  return (
+    company?.colors?.primary ||
+    company?.branding?.colors?.primary ||
+    company?.primaryColor ||
+    "#18181b"
+  );
+}
+
+function CompanyBadge({ company, compact = false }) {
+  const code = getCompanyCode(company);
+
+  const primary = getCompanyPrimary(company);
+
+  return (
+    <span
+      className={cn(
+        "flex shrink-0",
+        "items-center justify-center",
+        "rounded-xl",
+        "font-semibold",
+        compact ? "h-9 w-9 text-[9px]" : "h-10 w-10 text-[10px]",
+      )}
+      style={{
+        backgroundColor: primary,
+
+        color: "#ffffff",
+      }}
+    >
+      {code}
+    </span>
+  );
+}
+
+export default function CompanySwitcher({
+  compact = false,
+  placement = "bottom",
+}) {
   const { companies, activeCompany, loading, error, selectCompany } =
     useCompanyWorkspace();
 
@@ -40,32 +104,59 @@ export default function CompanySwitcher() {
       }
     }
 
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    }
+
     document.addEventListener("pointerdown", handlePointerDown);
+
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
       document.removeEventListener("pointerdown", handlePointerDown);
+
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
 
   if (loading) {
     return (
-      <div className="flex h-10 items-center gap-2 px-2 text-xs text-[var(--admin-muted)]">
+      <div
+        className={cn(
+          "flex h-11 items-center",
+          "text-xs text-[var(--admin-muted)]",
+          compact ? "justify-center" : "gap-2 px-2",
+        )}
+      >
         <LoaderCircle size={15} className="animate-spin" />
 
-        <span className="hidden sm:inline">Loading workspace</span>
+        {!compact && <span>Loading workspace</span>}
       </div>
     );
   }
 
   if (error) {
-    return <div className="text-xs text-red-600">Company unavailable</div>;
+    return (
+      <div className={cn("text-xs text-red-600", compact && "text-center")}>
+        {compact ? "!" : "Company unavailable"}
+      </div>
+    );
   }
 
   if (!activeCompany) {
-    return <div className="text-xs text-[var(--admin-muted)]">No company</div>;
+    return (
+      <div className="text-xs text-[var(--admin-muted)]">
+        {compact ? "—" : "No company"}
+      </div>
+    );
   }
 
   const activeName = getCompanyName(activeCompany);
+
+  const popoverPosition =
+    placement === "top" ? "bottom-[calc(100%+8px)]" : "top-[calc(100%+8px)]";
 
   return (
     <div ref={containerRef} className="relative">
@@ -73,54 +164,57 @@ export default function CompanySwitcher() {
         type="button"
         onClick={() => setOpen((current) => !current)}
         aria-expanded={open}
+        aria-label={`Current company: ${activeName}`}
+        title={compact ? activeName : undefined}
         className={cn(
-          "flex min-w-0 items-center gap-3",
-          "rounded-xl px-2 py-1.5",
+          "flex w-full min-w-0 items-center",
+          "rounded-xl",
           "text-left transition",
           "hover:bg-[var(--admin-hover)]",
+
+          compact ? "justify-center p-1.5" : "gap-3 p-2",
         )}
       >
-        <span
-          className={cn(
-            "flex h-8 w-8 shrink-0",
-            "items-center justify-center",
-            "rounded-lg",
-            "bg-[var(--company-primary)]",
-            "text-[11px] font-semibold",
-            "text-[var(--company-primary-foreground)]",
-          )}
-        >
-          {getCompanyInitial(activeCompany)}
-        </span>
+        <CompanyBadge company={activeCompany} compact={compact} />
 
-        <span className="min-w-0">
-          <span className="block max-w-[160px] truncate text-[13px] font-medium text-[var(--admin-foreground)] sm:max-w-[220px]">
-            {activeName}
-          </span>
+        {!compact && (
+          <>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[13px] font-medium text-[var(--admin-foreground)]">
+                {activeName}
+              </span>
 
-          <span className="hidden text-[10px] uppercase tracking-[0.12em] text-[var(--admin-muted)] sm:block">
-            Workspace
-          </span>
-        </span>
+              <span className="mt-0.5 block text-[9px] uppercase tracking-[0.13em] text-[var(--admin-muted)]">
+                Current workspace
+              </span>
+            </span>
 
-        <ChevronDown
-          size={15}
-          className={cn(
-            "shrink-0 text-[var(--admin-muted)]",
-            "transition-transform",
-            open && "rotate-180",
-          )}
-        />
+            <ChevronDown
+              size={14}
+              className={cn(
+                "shrink-0 text-[var(--admin-muted)]",
+                "transition-transform",
+                open && "rotate-180",
+              )}
+            />
+          </>
+        )}
       </button>
 
       {open && (
         <div
           className={cn(
-            "absolute left-0 top-[calc(100%+8px)]",
-            "z-50 w-[280px]",
+            "absolute z-[80]",
+            popoverPosition,
+
+            compact ? "left-[calc(100%+10px)] w-[280px]" : "left-0 w-[280px]",
+
             "overflow-hidden rounded-2xl",
+
             "border border-[var(--admin-border)]",
+
             "bg-[var(--admin-surface)]",
+
             "shadow-[0_18px_50px_rgba(0,0,0,0.12)]",
           )}
         >
@@ -138,6 +232,8 @@ export default function CompanySwitcher() {
             {companies.map((company) => {
               const selected = company.id === activeCompany.id;
 
+              const companyPrimary = getCompanyPrimary(company);
+
               return (
                 <button
                   key={company.id}
@@ -149,25 +245,37 @@ export default function CompanySwitcher() {
                   }}
                   className={cn(
                     "flex w-full items-center gap-3",
+
                     "rounded-xl p-2.5",
+
                     "text-left transition",
+
                     selected
                       ? "bg-[var(--company-primary-soft)]"
                       : "hover:bg-[var(--admin-hover)]",
                   )}
                 >
                   <span
-                    className={cn(
-                      "flex h-9 w-9 shrink-0",
-                      "items-center justify-center",
-                      "rounded-lg border",
-                      "border-[var(--admin-border)]",
-                      "bg-[var(--admin-surface)]",
-                      "text-xs font-semibold",
-                      "text-[var(--admin-foreground)]",
-                    )}
+                    className="
+                        flex
+                        h-9
+                        w-9
+                        shrink-0
+
+                        items-center
+                        justify-center
+
+                        rounded-lg
+
+                        text-[9px]
+                        font-semibold
+                        text-white
+                      "
+                    style={{
+                      backgroundColor: companyPrimary,
+                    }}
                   >
-                    {getCompanyInitial(company)}
+                    {getCompanyCode(company)}
                   </span>
 
                   <span className="min-w-0 flex-1">

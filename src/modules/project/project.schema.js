@@ -10,6 +10,42 @@ const localizedStringSchema = z.object({
   en: z.string().default(""),
 });
 
+/*
+ * =========================================================
+ * RICH TEXT
+ * =========================================================
+ *
+ * Project legacy records use plain
+ * strings.
+ *
+ * New editor records use TipTap JSON.
+ *
+ * Both remain valid during transition.
+ * =========================================================
+ */
+
+const tiptapDocumentSchema = z
+  .object({
+    type: z.literal("doc"),
+
+    content: z.array(z.unknown()).optional(),
+  })
+  .passthrough();
+
+const richTextValueSchema = z.union([z.string(), tiptapDocumentSchema]);
+
+const localizedRichTextSchema = z.object({
+  th: richTextValueSchema.default(""),
+
+  en: richTextValueSchema.default(""),
+});
+
+/*
+ * =========================================================
+ * CREDIT
+ * =========================================================
+ */
+
 const localizedCreditSchema = z.object({
   th: z.string().trim().max(250).default(""),
 
@@ -25,6 +61,12 @@ const projectCreditsSchema = z.object({
 
   consultant: z.array(localizedCreditSchema).default([]),
 });
+
+/*
+ * =========================================================
+ * PROJECT INFORMATION
+ * =========================================================
+ */
 
 const areaSchema = z.object({
   value: z.union([z.number().nonnegative(), z.null()]).default(null),
@@ -50,6 +92,12 @@ const projectInfoSchema = z.object({
   credits: projectCreditsSchema.optional(),
 });
 
+/*
+ * =========================================================
+ * SEO
+ * =========================================================
+ */
+
 const localizedSeoSchema = z.object({
   title: z.string().max(70).default(""),
 
@@ -74,6 +122,12 @@ const seoSchema = z.object({
   follow: z.boolean().default(true),
 });
 
+/*
+ * =========================================================
+ * IMAGE
+ * =========================================================
+ */
+
 const projectImageSchema = z.object({
   mediaId: z.string().min(1),
 
@@ -81,6 +135,12 @@ const projectImageSchema = z.object({
 
   caption: localizedStringSchema.optional(),
 });
+
+/*
+ * =========================================================
+ * PROJECT
+ * =========================================================
+ */
 
 const baseProjectSchema = z.object({
   slug: z
@@ -94,7 +154,10 @@ const baseProjectSchema = z.object({
 
   excerpt: localizedStringSchema.optional(),
 
-  content: localizedStringSchema.optional(),
+  /*
+   * Legacy String + TipTap JSON
+   */
+  content: localizedRichTextSchema.optional(),
 
   categoryId: z.union([z.string().min(1), z.null()]).default(null),
 

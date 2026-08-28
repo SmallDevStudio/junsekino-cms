@@ -12,6 +12,12 @@ import { pageIdSchema, updatePageSchema } from "@/modules/page/page.schema";
 
 import { deletePage, getPage, updatePage } from "@/modules/page/page.service";
 
+/*
+ * =========================================================
+ * PARAMS
+ * =========================================================
+ */
+
 async function resolveParams(context) {
   const params = await context.params;
 
@@ -30,6 +36,44 @@ async function resolveParams(context) {
   };
 }
 
+/*
+ * =========================================================
+ * ZOD ERROR FORMATTER
+ * =========================================================
+ *
+ * flatten().fieldErrors is not enough
+ * for nested CMS structures such as:
+ *
+ * content.en
+ * featuredImage.presentation.aspectRatio
+ * navigation.label.en
+ * sections[0].data.content.en
+ *
+ * Return the complete path so Admin UI
+ * can show the actual validation problem.
+ * =========================================================
+ */
+
+function formatValidationIssues(error) {
+  if (!Array.isArray(error?.issues)) {
+    return [];
+  }
+
+  return error.issues.map((issue) => ({
+    path: issue.path.map(String).join("."),
+
+    message: issue.message,
+
+    code: issue.code,
+  }));
+}
+
+/*
+ * =========================================================
+ * GET
+ * =========================================================
+ */
+
 export async function GET(request, context) {
   try {
     const params = await resolveParams(context);
@@ -38,6 +82,7 @@ export async function GET(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Invalid request parameters.",
         },
         {
@@ -56,6 +101,7 @@ export async function GET(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: access.reason,
         },
         {
@@ -72,6 +118,7 @@ export async function GET(request, context) {
 
     return NextResponse.json({
       success: true,
+
       data: page,
     });
   } catch (error) {
@@ -81,6 +128,7 @@ export async function GET(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Page not found.",
         },
         {
@@ -92,6 +140,7 @@ export async function GET(request, context) {
     return NextResponse.json(
       {
         success: false,
+
         message: "Unable to retrieve page.",
       },
       {
@@ -101,12 +150,19 @@ export async function GET(request, context) {
   }
 }
 
+/*
+ * =========================================================
+ * PATCH
+ * =========================================================
+ */
+
 export async function PATCH(request, context) {
   try {
     if (!isTrustedOrigin(request)) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Invalid request origin.",
         },
         {
@@ -121,6 +177,7 @@ export async function PATCH(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Invalid request parameters.",
         },
         {
@@ -139,6 +196,7 @@ export async function PATCH(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: access.reason,
         },
         {
@@ -147,17 +205,71 @@ export async function PATCH(request, context) {
       );
     }
 
-    const body = await request.json();
+    let body;
 
-    const validation = updatePageSchema.safeParse(body);
-
-    if (!validation.success) {
+    try {
+      body = await request.json();
+    } catch {
       return NextResponse.json(
         {
           success: false,
 
-          message: "Invalid page data.",
+          message: "Invalid JSON request body.",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
 
+    const validation = updatePageSchema.safeParse(body);
+
+    /*
+     * =====================================================
+     * VALIDATION FAILED
+     * =====================================================
+     */
+
+    if (!validation.success) {
+      const issues = formatValidationIssues(validation.error);
+
+      /*
+       * Server log is intentionally detailed.
+       *
+       * This dramatically improves debugging
+       * without exposing stack traces.
+       */
+      console.error("Update page validation failed:", {
+        companyId: params.companyId,
+
+        pageId: params.pageId,
+
+        issues,
+      });
+
+      return NextResponse.json(
+        {
+          success: false,
+
+          code: "PAGE_VALIDATION_FAILED",
+
+          message: issues.length
+            ? issues
+                .map((issue) =>
+                  issue.path
+                    ? `${issue.path}: ${issue.message}`
+                    : issue.message,
+                )
+                .join(" | ")
+            : "Invalid page data.",
+
+          issues,
+
+          /*
+           * Keep legacy shape for other
+           * Admin modules already consuming
+           * fieldErrors.
+           */
           errors: validation.error.flatten().fieldErrors,
         },
         {
@@ -170,6 +282,7 @@ export async function PATCH(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "No page data supplied.",
         },
         {
@@ -190,6 +303,7 @@ export async function PATCH(request, context) {
 
     return NextResponse.json({
       success: true,
+
       data: page,
     });
   } catch (error) {
@@ -199,6 +313,7 @@ export async function PATCH(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Page not found.",
         },
         {
@@ -211,6 +326,9 @@ export async function PATCH(request, context) {
       return NextResponse.json(
         {
           success: false,
+
+          code: "PAGE_SLUG_EXISTS",
+
           message: "This page slug is already in use.",
         },
         {
@@ -219,9 +337,25 @@ export async function PATCH(request, context) {
       );
     }
 
+    if (error.message === "PAGE_TITLE_REQUIRED") {
+      return NextResponse.json(
+        {
+          success: false,
+
+          code: "PAGE_TITLE_REQUIRED",
+
+          message: "English page title is required.",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
     return NextResponse.json(
       {
         success: false,
+
         message: "Unable to update page.",
       },
       {
@@ -231,12 +365,19 @@ export async function PATCH(request, context) {
   }
 }
 
+/*
+ * =========================================================
+ * DELETE
+ * =========================================================
+ */
+
 export async function DELETE(request, context) {
   try {
     if (!isTrustedOrigin(request)) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Invalid request origin.",
         },
         {
@@ -251,6 +392,7 @@ export async function DELETE(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Invalid request parameters.",
         },
         {
@@ -269,6 +411,7 @@ export async function DELETE(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: access.reason,
         },
         {
@@ -287,6 +430,7 @@ export async function DELETE(request, context) {
 
     return NextResponse.json({
       success: true,
+
       data: result,
     });
   } catch (error) {
@@ -296,6 +440,7 @@ export async function DELETE(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Page not found.",
         },
         {
@@ -308,6 +453,7 @@ export async function DELETE(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Page has already been deleted.",
         },
         {
@@ -319,6 +465,7 @@ export async function DELETE(request, context) {
     return NextResponse.json(
       {
         success: false,
+
         message: "Unable to delete page.",
       },
       {
