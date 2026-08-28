@@ -25,7 +25,13 @@ function createMediaUrl({ companySlug, mediaId }) {
   )}/media/${encodeURIComponent(mediaId)}?variant=medium`;
 }
 
-function InfoRow({ label, value }) {
+/*
+ * =========================================================
+ * INFO ROW
+ * =========================================================
+ */
+
+function InfoRow({ label, value, highlight = false }) {
   if (!value) {
     return null;
   }
@@ -34,38 +40,49 @@ function InfoRow({ label, value }) {
     <div
       className="
         grid
-        grid-cols-[86px_minmax(0,1fr)]
-        gap-3
+        grid-cols-[78px_minmax(0,1fr)]
+
+        gap-x-5
 
         text-[11px]
-        leading-[1.35]
+        leading-[1.45]
 
-        sm:grid-cols-[100px_minmax(0,1fr)]
+        sm:grid-cols-[88px_minmax(0,1fr)]
         sm:text-[12px]
 
-        lg:grid-cols-[108px_minmax(0,1fr)]
-        lg:text-[13px]
+        lg:grid-cols-[92px_minmax(0,1fr)]
       "
     >
       <dt
         className="
-          text-black/40
+          text-black/35
         "
       >
         {label}
       </dt>
 
       <dd
-        className="
+        className={`
           min-w-0
-          text-black/75
-        "
+
+          ${
+            highlight
+              ? "font-semibold text-[var(--public-primary)]"
+              : "font-normal text-black/70"
+          }
+        `}
       >
         {value}
       </dd>
     </div>
   );
 }
+
+/*
+ * =========================================================
+ * AWARD CARD
+ * =========================================================
+ */
 
 export default function PublicAwardCard({ companySlug, award, locale = "en" }) {
   const awardName = getLocalizedValue(award.awardName, locale) || "Award";
@@ -94,16 +111,18 @@ export default function PublicAwardCard({ companySlug, award, locale = "en" }) {
         href={href}
         className="
           group
+
           grid
           grid-cols-1
 
           gap-5
 
-          sm:gap-7
+          md:grid-cols-[minmax(280px,420px)_minmax(0,1fr)]
+          md:items-start
+          md:gap-10
 
-          lg:grid-cols-[minmax(0,0.9fr)_minmax(280px,1.1fr)]
-          lg:items-start
-          lg:gap-[clamp(3rem,6vw,7rem)]
+          lg:grid-cols-[minmax(320px,440px)_minmax(0,1fr)]
+          lg:gap-[clamp(3rem,5vw,5.5rem)]
         "
       >
         {/* =====================================
@@ -114,7 +133,7 @@ export default function PublicAwardCard({ companySlug, award, locale = "en" }) {
           className="
             relative
 
-            aspect-[4/3]
+            aspect-video
             w-full
 
             overflow-hidden
@@ -130,21 +149,19 @@ export default function PublicAwardCard({ companySlug, award, locale = "en" }) {
               unoptimized
               draggable={false}
               sizes="
-                (max-width: 1023px) 100vw,
-                42vw
+                (max-width: 767px) 100vw,
+                (max-width: 1199px) 420px,
+                440px
               "
               className="
                 select-none
                 object-cover
 
-                opacity-[0.55]
-
-                transition-all
+                transition-transform
                 duration-500
                 ease-out
 
-                group-hover:scale-[1.02]
-                group-hover:opacity-100
+                group-hover:scale-[1.015]
               "
             />
           ) : (
@@ -160,6 +177,7 @@ export default function PublicAwardCard({ companySlug, award, locale = "en" }) {
                 text-[9px]
                 uppercase
                 tracking-[0.08em]
+
                 text-black/20
               "
             >
@@ -175,64 +193,26 @@ export default function PublicAwardCard({ companySlug, award, locale = "en" }) {
         <div
           className="
             flex
-            h-full
             min-w-0
-
             flex-col
+
+            items-start
             justify-start
 
-            pt-1
-
-            lg:pt-2
+            pt-0
           "
         >
           <dl
             className="
-              space-y-1
+              space-y-1.5
             "
           >
-            <InfoRow label="Award" value={awardName} />
+            <InfoRow label="Award" value={awardName} highlight />
 
             <InfoRow label="Project" value={projectName} />
 
             <InfoRow label="Category" value={categoryName} />
           </dl>
-
-          <div
-            className="
-              mt-6
-              h-px
-              w-0
-
-              bg-[var(--public-primary)]
-
-              transition-all
-              duration-500
-
-              group-hover:w-12
-
-              lg:mt-8
-            "
-          />
-
-          <span
-            className="
-              mt-3
-
-              text-[9px]
-              uppercase
-              tracking-[0.08em]
-
-              text-black/0
-
-              transition-colors
-              duration-300
-
-              group-hover:text-black/30
-            "
-          >
-            View Project
-          </span>
         </div>
       </Link>
     </article>

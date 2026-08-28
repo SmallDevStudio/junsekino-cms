@@ -25,81 +25,97 @@ function getBrandFallback(company) {
   return "#000000";
 }
 
+/*
+ * =========================================================
+ * BRANDING
+ * =========================================================
+ *
+ * Source priority:
+ *
+ * 1. company.colors
+ * 2. company.branding.colors
+ * 3. company.branding legacy fields
+ * 4. settings.branding.colors
+ * 5. settings legacy fields
+ * 6. company suffix fallback
+ *
+ * Firestore current structure:
+ *
+ * company.colors.primary
+ *
+ * therefore company.colors MUST be
+ * treated as the primary source.
+ * =========================================================
+ */
+
 function resolveBranding(company, settings) {
-  const settingsBranding = settings?.branding || {};
+  const companyColors = company?.colors || {};
 
   const companyBranding = company?.branding || {};
 
+  const companyBrandingColors = companyBranding?.colors || {};
+
+  const settingsBranding = settings?.branding || {};
+
+  const settingsColors = settingsBranding?.colors || {};
+
   const fallbackPrimary = getBrandFallback(company);
 
-  /*
-   * IMPORTANT
-   *
-   * Company document is now the primary
-   * source of truth for public brand colors.
-   *
-   * This keeps:
-   *
-   * - company selector
-   * - company switcher
-   * - public header
-   * - active navigation
-   * - slideshow dots
-   * - breadcrumbs
-   * - project accents
-   *
-   * using the exact same company color.
-   *
-   * settings/branding remains as a
-   * compatibility fallback for older data.
-   */
   const primaryColor =
-    companyBranding?.colors?.primary ||
-    companyBranding?.primaryColor ||
-    settingsBranding?.colors?.primary ||
-    settingsBranding?.primaryColor ||
+    companyColors.primary ||
+    companyBrandingColors.primary ||
+    companyBranding.primaryColor ||
+    settingsColors.primary ||
+    settingsBranding.primaryColor ||
     fallbackPrimary;
 
   const secondaryColor =
-    companyBranding?.colors?.secondary ||
-    settingsBranding?.colors?.secondary ||
+    companyColors.secondary ||
+    companyBrandingColors.secondary ||
+    settingsColors.secondary ||
     "#ffffff";
 
   const accentColor =
-    companyBranding?.colors?.accent ||
-    settingsBranding?.colors?.accent ||
-    "#d4d4d4";
+    companyColors.accent ||
+    companyBrandingColors.accent ||
+    settingsColors.accent ||
+    primaryColor;
 
   const backgroundColor =
-    companyBranding?.colors?.background ||
-    companyBranding?.backgroundColor ||
-    settingsBranding?.colors?.background ||
-    settingsBranding?.backgroundColor ||
+    companyColors.background ||
+    companyBrandingColors.background ||
+    companyBranding.backgroundColor ||
+    settingsColors.background ||
+    settingsBranding.backgroundColor ||
     "#ffffff";
 
   const surfaceColor =
-    companyBranding?.colors?.surface ||
-    settingsBranding?.colors?.surface ||
+    companyColors.surface ||
+    companyBrandingColors.surface ||
+    settingsColors.surface ||
     "#f7f7f7";
+
+  /*
+   * Normal copy stays neutral.
+   *
+   * Brand color is reserved for:
+   *
+   * active navigation
+   * breadcrumb
+   * title
+   * like
+   * filter
+   * interaction accents
+   */
+  const textColor = "#111111";
 
   return {
     primaryColor,
-
     secondaryColor,
-
     accentColor,
-
     backgroundColor,
-
     surfaceColor,
-
-    /*
-     * Normal website copy stays neutral.
-     *
-     * Brand primary is used for active /
-     * highlighted visual states.
-     */
-    textColor: "#111111",
+    textColor,
   };
 }
 
@@ -151,6 +167,12 @@ export default function PublicSiteShell({
         flex-col
       "
       style={{
+        /*
+         * =================================================
+         * PUBLIC DESIGN TOKENS
+         * =================================================
+         */
+
         "--public-primary": branding.primaryColor,
 
         "--public-secondary": branding.secondaryColor,

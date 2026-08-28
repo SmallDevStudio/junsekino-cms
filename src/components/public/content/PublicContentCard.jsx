@@ -17,6 +17,79 @@ function mediaUrl({ companySlug, mediaId }) {
   )}/media/${encodeURIComponent(mediaId)}?variant=medium`;
 }
 
+function formatDate(value) {
+  if (!value) {
+    return "";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
+
+function getProvider(item) {
+  if (item.source?.provider) {
+    return String(item.source.provider).toLowerCase();
+  }
+
+  if (item.contentType === "article") {
+    return "article";
+  }
+
+  return item.section === "video" ? "video" : "publication";
+}
+
+function getProviderLabel(provider) {
+  const labels = {
+    youtube: "YouTube",
+    facebook: "Facebook",
+    instagram: "Instagram",
+    tiktok: "TikTok",
+    vimeo: "Vimeo",
+    article: "Article",
+    publication: "Publication",
+    video: "Video",
+    embed: "Embed",
+    other: "External",
+  };
+
+  return labels[provider] || provider;
+}
+
+function getProviderBadgeClass(provider) {
+  const styles = {
+    youtube: "border-[#ff0000]/20 bg-[#ff0000]/[0.07] text-[#d60000]",
+
+    facebook: "border-[#1877f2]/20 bg-[#1877f2]/[0.07] text-[#1877f2]",
+
+    instagram: "border-[#c13584]/20 bg-[#c13584]/[0.07] text-[#b52c79]",
+
+    tiktok: "border-black/15 bg-black/[0.05] text-black/70",
+
+    vimeo: "border-[#1ab7ea]/25 bg-[#1ab7ea]/[0.08] text-[#129ac8]",
+
+    article: "border-black/10 bg-black/[0.035] text-black/55",
+
+    publication: "border-black/10 bg-black/[0.035] text-black/55",
+
+    video: "border-black/10 bg-black/[0.035] text-black/55",
+
+    embed: "border-black/10 bg-black/[0.035] text-black/55",
+
+    other: "border-black/10 bg-black/[0.035] text-black/55",
+  };
+
+  return styles[provider] || styles.other;
+}
+
 export default function PublicContentCard({
   companySlug,
   item,
@@ -47,6 +120,12 @@ export default function PublicContentCard({
 
   const href = `/${companySlug}/public/${item.slug}`;
 
+  const provider = getProvider(item);
+
+  const providerLabel = getProviderLabel(provider);
+
+  const createdDate = formatDate(item.createdAt || item.publishedAt);
+
   return (
     <article
       className="
@@ -55,14 +134,15 @@ export default function PublicContentCard({
 
         gap-5
 
-        lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]
-        lg:items-start
-        lg:gap-[clamp(3rem,6vw,7rem)]
+        md:grid-cols-[minmax(280px,420px)_minmax(0,1fr)]
+        md:items-start
+        md:gap-10
+
+        lg:grid-cols-[minmax(320px,440px)_minmax(0,1fr)]
+        lg:gap-[clamp(3rem,5vw,5.5rem)]
       "
     >
-      {/* =====================================
-          THUMBNAIL
-      ===================================== */}
+      {/* THUMBNAIL */}
 
       <Link
         href={href}
@@ -91,8 +171,9 @@ export default function PublicContentCard({
               unoptimized
               draggable={false}
               sizes="
-                (max-width: 1023px) 100vw,
-                44vw
+                (max-width: 767px) 100vw,
+                (max-width: 1199px) 420px,
+                440px
               "
               className="
                 select-none
@@ -132,8 +213,8 @@ export default function PublicContentCard({
                 right-3
 
                 flex
-                h-9
-                w-9
+                h-8
+                w-8
 
                 items-center
                 justify-center
@@ -156,65 +237,98 @@ export default function PublicContentCard({
                 group-hover:bg-black/35
               "
             >
-              <Play size={14} strokeWidth={1.2} fill="currentColor" />
+              <Play size={13} strokeWidth={1.2} fill="currentColor" />
             </div>
           )}
         </div>
       </Link>
 
-      {/* =====================================
-          INFORMATION
-      ===================================== */}
+      {/* INFORMATION */}
 
       <div
         className="
           flex
           min-w-0
           flex-col
-
-          items-stretch
+          items-start
           justify-start
         "
       >
+        {/* TITLE */}
+
+        <Link
+          href={href}
+          className="
+            max-w-[720px]
+
+            text-[16px]
+            font-semibold
+            leading-[1.4]
+
+            transition-opacity
+            duration-200
+
+            hover:opacity-65
+
+            sm:text-[17px]
+
+            lg:text-[18px]
+          "
+          style={{
+            color: "var(--public-primary)",
+          }}
+        >
+          {title}
+        </Link>
+
+        {/* PROVIDER + DATE */}
+
         <div
           className="
-            min-w-0
+            mt-3
+
+            flex
+            flex-wrap
+            items-center
+
+            gap-2
           "
         >
-          <Link
-            href={href}
-            className="
-              text-[14px]
+          <span
+            className={`
+              inline-flex
+              items-center
+
+              rounded-full
+
+              border
+
+              px-2.5
+              py-1
+
+              text-[8px]
               font-medium
-              leading-[1.45]
-
-              text-[var(--public-primary)]
-
-              transition-opacity
-
-              hover:opacity-65
-
-              sm:text-[15px]
-            "
-          >
-            {title}
-          </Link>
-
-          <p
-            className="
-              mt-2
-
-              text-[9px]
               uppercase
-              tracking-[0.06em]
+              tracking-[0.07em]
 
-              text-black/35
-
-              sm:text-[10px]
-            "
+              ${getProviderBadgeClass(provider)}
+            `}
           >
-            {item.source?.provider || (isVideo ? "Video" : "Publication")}
-          </p>
+            {providerLabel}
+          </span>
+
+          {createdDate && (
+            <span
+              className="
+                text-[9px]
+                tracking-[0.025em]
+
+                text-black/30
+              "
+            >
+              {createdDate}
+            </span>
+          )}
         </div>
 
         {/* WEBSITE METRICS */}
@@ -232,19 +346,20 @@ export default function PublicContentCard({
           />
         </div>
 
+        {/* DESCRIPTION */}
+
         {excerpt && (
           <p
             className="
               mt-4
 
-              line-clamp-6
-
               max-w-[680px]
 
+              line-clamp-5
               whitespace-pre-line
 
               text-[11px]
-              leading-[1.6]
+              leading-[1.65]
 
               text-black/55
 
@@ -255,10 +370,12 @@ export default function PublicContentCard({
           </p>
         )}
 
+        {/* TAG */}
+
         {Array.isArray(item.tags) && item.tags.length > 0 && (
           <div
             className="
-                mt-5
+                mt-4
 
                 flex
                 flex-wrap

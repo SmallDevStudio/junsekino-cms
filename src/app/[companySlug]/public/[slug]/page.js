@@ -51,13 +51,9 @@ function youtubeEmbedUrl(item) {
 
   const params = new URLSearchParams({
     autoplay: "1",
-
     mute: "1",
-
     playsinline: "1",
-
     rel: "0",
-
     modestbranding: "1",
   });
 
@@ -79,9 +75,7 @@ function formatDate(value) {
 
   return new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
-
     month: "long",
-
     year: "numeric",
   }).format(date);
 }
@@ -235,7 +229,9 @@ export default async function PublicContentDetailPage({ params }) {
           max-w-[1200px]
         "
       >
-        {/* BREADCRUMB */}
+        {/* =====================================
+            BREADCRUMB
+        ===================================== */}
 
         <nav
           aria-label="Breadcrumb"
@@ -300,18 +296,37 @@ export default async function PublicContentDetailPage({ params }) {
           </Link>
         </nav>
 
-        {/* MEDIA */}
+        {/* =====================================
+            MEDIA
+        ===================================== */}
 
-        <div
-          className="
-            mt-8
+        {embedUrl ? (
+          /*
+           * Video intentionally smaller
+           * than full page content.
+           *
+           * overflow-hidden + scrolling=no
+           * prevents visual scrollbars
+           * around the iframe.
+           */
+          <div
+            className="
+              mx-auto
 
-            sm:mt-10
-          "
-        >
-          {embedUrl ? (
+              mt-8
+
+              w-full
+              max-w-[900px]
+
+              overflow-hidden
+
+              sm:mt-10
+            "
+          >
             <div
               className="
+                relative
+
                 aspect-video
                 w-full
 
@@ -323,9 +338,16 @@ export default async function PublicContentDetailPage({ params }) {
               <iframe
                 src={embedUrl}
                 title={title}
+                scrolling="no"
                 className="
+                  absolute
+                  inset-0
+
+                  block
                   h-full
                   w-full
+
+                  overflow-hidden
 
                   border-0
                 "
@@ -341,7 +363,20 @@ export default async function PublicContentDetailPage({ params }) {
                 allowFullScreen
               />
             </div>
-          ) : imageUrl ? (
+          </div>
+        ) : imageUrl ? (
+          <div
+            className="
+              mx-auto
+
+              mt-8
+
+              w-full
+              max-w-[1000px]
+
+              sm:mt-10
+            "
+          >
             <div
               className="
                 relative
@@ -362,8 +397,8 @@ export default async function PublicContentDetailPage({ params }) {
                 unoptimized
                 draggable={false}
                 sizes="
-                  (max-width: 1279px) 100vw,
-                  1200px
+                  (max-width: 1023px) 100vw,
+                  1000px
                 "
                 className="
                   select-none
@@ -371,10 +406,12 @@ export default async function PublicContentDetailPage({ params }) {
                 "
               />
             </div>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
 
-        {/* DETAIL */}
+        {/* =====================================
+            DETAIL
+        ===================================== */}
 
         <div
           className="
@@ -383,28 +420,30 @@ export default async function PublicContentDetailPage({ params }) {
             mt-7
 
             w-full
-            max-w-[920px]
+            max-w-[900px]
 
             sm:mt-8
           "
         >
           <h1
             className="
-              text-[17px]
-              font-medium
+              text-[18px]
+              font-semibold
               leading-[1.45]
 
               text-[var(--public-primary)]
 
-              sm:text-[19px]
+              sm:text-[20px]
 
-              lg:text-[20px]
+              lg:text-[22px]
             "
           >
             {title}
           </h1>
 
-          {/* PROVIDER / SOURCE */}
+          {/* ===================================
+              PROVIDER / SOURCE
+          =================================== */}
 
           <div
             className="
@@ -469,7 +508,7 @@ export default async function PublicContentDetailPage({ params }) {
           </div>
 
           {/* ===================================
-              REAL WEBSITE METRICS
+              METRICS
           =================================== */}
 
           <div className="mt-3">
@@ -485,7 +524,9 @@ export default async function PublicContentDetailPage({ params }) {
             />
           </div>
 
-          {/* DESCRIPTION */}
+          {/* ===================================
+              DESCRIPTION
+          =================================== */}
 
           {description && (
             <p
@@ -495,7 +536,7 @@ export default async function PublicContentDetailPage({ params }) {
                 whitespace-pre-line
 
                 text-[12px]
-                leading-[1.65]
+                leading-[1.7]
 
                 text-black/60
 
@@ -506,7 +547,9 @@ export default async function PublicContentDetailPage({ params }) {
             </p>
           )}
 
-          {/* CONTENT */}
+          {/* ===================================
+              CONTENT
+          =================================== */}
 
           {content && (
             <div
@@ -514,7 +557,7 @@ export default async function PublicContentDetailPage({ params }) {
                 mt-8
 
                 text-[12px]
-                leading-[1.7]
+                leading-[1.75]
 
                 text-black/70
 

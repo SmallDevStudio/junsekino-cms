@@ -47,103 +47,19 @@ function matchesSearch(item, keyword) {
 
 /*
  * =========================================================
- * CONTENT SECTION
- * =========================================================
- *
- * Important:
- * Keep this component outside
- * PublicContentIndex.
- *
- * React Compiler / ESLint does not allow
- * components to be created inside render.
- * =========================================================
- */
-
-function PublicContentSection({ title, contents, companySlug, locale }) {
-  if (!contents.length) {
-    return null;
-  }
-
-  return (
-    <section>
-      {/* =====================================
-          SECTION TITLE
-      ===================================== */}
-
-      <div
-        className="
-          flex
-          items-center
-          gap-6
-        "
-      >
-        <h2
-          className="
-            shrink-0
-
-            text-[12px]
-            font-medium
-            uppercase
-            tracking-[0.07em]
-
-            text-[var(--public-primary)]
-
-            sm:text-[13px]
-          "
-        >
-          {title}
-        </h2>
-
-        <div
-          className="
-            h-px
-            flex-1
-
-            bg-black/10
-          "
-        />
-      </div>
-
-      {/* =====================================
-          CONTENT LIST
-      ===================================== */}
-
-      <div
-        className="
-          mt-8
-
-          space-y-14
-
-          sm:space-y-16
-
-          lg:mt-10
-          lg:space-y-20
-        "
-      >
-        {contents.map((item) => (
-          <PublicContentCard
-            key={item.id}
-            companySlug={companySlug}
-            item={item}
-            locale={locale}
-          />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/*
- * =========================================================
- * PUBLIC CONTENT INDEX
+ * INDEX
  * =========================================================
  */
 
 export default function PublicContentIndex({
   companySlug,
+
   items = [],
+
   providers = [],
+
   tags = [],
+
   locale = "en",
 }) {
   const [filterOpen, setFilterOpen] = useState(false);
@@ -159,58 +75,31 @@ export default function PublicContentIndex({
   const hasFilters = Boolean(keyword || section || provider || tag);
 
   /*
-   * =======================================================
-   * FILTER DATA
-   * =======================================================
+   * Items already arrive from the
+   * server sorted by createdAt DESC.
+   *
+   * Client filtering therefore
+   * preserves the same order.
    */
-
   const filteredItems = useMemo(
     () =>
       items.filter((item) => {
-        /*
-         * Section
-         */
         if (section && item.section !== section) {
           return false;
         }
 
-        /*
-         * Provider
-         */
         if (provider && item.source?.provider !== provider) {
           return false;
         }
 
-        /*
-         * Tag
-         */
         if (tag && !(Array.isArray(item.tags) && item.tags.includes(tag))) {
           return false;
         }
 
-        /*
-         * Search
-         */
         return matchesSearch(item, keyword);
       }),
     [items, keyword, section, provider, tag],
   );
-
-  const videos = useMemo(
-    () => filteredItems.filter((item) => item.section === "video"),
-    [filteredItems],
-  );
-
-  const publications = useMemo(
-    () => filteredItems.filter((item) => item.section === "publication"),
-    [filteredItems],
-  );
-
-  /*
-   * =======================================================
-   * ACTIONS
-   * =======================================================
-   */
 
   function clearFilters() {
     setKeyword("");
@@ -218,16 +107,6 @@ export default function PublicContentIndex({
     setProvider("");
     setTag("");
   }
-
-  function toggleFilter() {
-    setFilterOpen((current) => !current);
-  }
-
-  /*
-   * =======================================================
-   * RENDER
-   * =======================================================
-   */
 
   return (
     <div
@@ -249,7 +128,7 @@ export default function PublicContentIndex({
         className="
           mx-auto
           w-full
-          max-w-[1440px]
+          max-w-[1280px]
         "
       >
         {/* =====================================
@@ -268,8 +147,6 @@ export default function PublicContentIndex({
             lg:pt-4
           "
         >
-          {/* Breadcrumb */}
-
           <nav
             aria-label="Breadcrumb"
             className="
@@ -291,7 +168,6 @@ export default function PublicContentIndex({
                 text-black/25
 
                 transition-colors
-                duration-200
 
                 hover:text-black/55
               "
@@ -318,13 +194,11 @@ export default function PublicContentIndex({
             </span>
           </nav>
 
-          {/* Filter Button */}
-
           <button
             type="button"
             aria-label={filterOpen ? "Close filters" : "Filter public content"}
             aria-expanded={filterOpen}
-            onClick={toggleFilter}
+            onClick={() => setFilterOpen((current) => !current)}
             className="
               group
 
@@ -340,7 +214,6 @@ export default function PublicContentIndex({
               text-black/25
 
               transition-colors
-              duration-200
 
               hover:text-[var(--public-primary)]
             "
@@ -363,7 +236,7 @@ export default function PublicContentIndex({
         </div>
 
         {/* =====================================
-            FILTER PANEL
+            FILTER
         ===================================== */}
 
         {filterOpen && (
@@ -386,9 +259,7 @@ export default function PublicContentIndex({
               md:gap-6
             "
           >
-            {/* =====================
-                SEARCH
-            ====================== */}
+            {/* SEARCH */}
 
             <label
               className="
@@ -404,7 +275,6 @@ export default function PublicContentIndex({
                 pb-2
 
                 transition-colors
-                duration-200
 
                 focus-within:border-[var(--public-primary)]
               "
@@ -416,8 +286,6 @@ export default function PublicContentIndex({
                   shrink-0
 
                   text-black/25
-
-                  transition-colors
 
                   group-focus-within:text-[var(--public-primary)]
                 "
@@ -464,8 +332,6 @@ export default function PublicContentIndex({
 
                     text-black/20
 
-                    transition-colors
-
                     hover:text-[var(--public-primary)]
                   "
                 >
@@ -474,9 +340,7 @@ export default function PublicContentIndex({
               )}
             </label>
 
-            {/* =====================
-                CONTENT TYPE
-            ====================== */}
+            {/* TYPE */}
 
             <label
               className="
@@ -490,6 +354,7 @@ export default function PublicContentIndex({
                   text-[8px]
                   uppercase
                   tracking-[0.09em]
+
                   text-black/25
                 "
               >
@@ -513,11 +378,10 @@ export default function PublicContentIndex({
                   text-[10px]
                   uppercase
                   tracking-[0.05em]
+
                   text-black/50
 
                   outline-none
-
-                  transition-colors
 
                   focus:border-[var(--public-primary)]
                 "
@@ -530,9 +394,7 @@ export default function PublicContentIndex({
               </select>
             </label>
 
-            {/* =====================
-                PROVIDER
-            ====================== */}
+            {/* PROVIDER */}
 
             <label
               className="
@@ -546,6 +408,7 @@ export default function PublicContentIndex({
                   text-[8px]
                   uppercase
                   tracking-[0.09em]
+
                   text-black/25
                 "
               >
@@ -569,11 +432,10 @@ export default function PublicContentIndex({
                   text-[10px]
                   uppercase
                   tracking-[0.05em]
+
                   text-black/50
 
                   outline-none
-
-                  transition-colors
 
                   focus:border-[var(--public-primary)]
                 "
@@ -588,9 +450,7 @@ export default function PublicContentIndex({
               </select>
             </label>
 
-            {/* =====================
-                TAG
-            ====================== */}
+            {/* TAG */}
 
             <label
               className="
@@ -604,6 +464,7 @@ export default function PublicContentIndex({
                   text-[8px]
                   uppercase
                   tracking-[0.09em]
+
                   text-black/25
                 "
               >
@@ -627,11 +488,10 @@ export default function PublicContentIndex({
                   text-[10px]
                   uppercase
                   tracking-[0.05em]
+
                   text-black/50
 
                   outline-none
-
-                  transition-colors
 
                   focus:border-[var(--public-primary)]
                 "
@@ -646,9 +506,7 @@ export default function PublicContentIndex({
               </select>
             </label>
 
-            {/* =====================
-                CLEAR
-            ====================== */}
+            {/* CLEAR */}
 
             <button
               type="button"
@@ -664,8 +522,6 @@ export default function PublicContentIndex({
 
                 text-black/25
 
-                transition-colors
-
                 enabled:hover:text-[var(--public-primary)]
 
                 disabled:cursor-default
@@ -680,7 +536,7 @@ export default function PublicContentIndex({
         )}
 
         {/* =====================================
-            ACTIVE FILTER SUMMARY
+            FILTER SUMMARY
         ===================================== */}
 
         {hasFilters && (
@@ -691,8 +547,6 @@ export default function PublicContentIndex({
               flex
               items-center
               gap-4
-
-              sm:mt-8
             "
           >
             <span
@@ -704,8 +558,6 @@ export default function PublicContentIndex({
                 tracking-[0.07em]
 
                 text-[var(--public-primary)]
-
-                sm:text-[10px]
               "
             >
               Filtered
@@ -750,8 +602,6 @@ export default function PublicContentIndex({
 
                 text-black/20
 
-                transition-colors
-
                 hover:text-[var(--public-primary)]
               "
             >
@@ -761,7 +611,7 @@ export default function PublicContentIndex({
         )}
 
         {/* =====================================
-            EMPTY STATE
+            CONTENT
         ===================================== */}
 
         {!items.length ? (
@@ -782,91 +632,73 @@ export default function PublicContentIndex({
           >
             No public content available
           </div>
+        ) : !filteredItems.length ? (
+          <div
+            className="
+              flex
+              min-h-[360px]
+
+              flex-col
+
+              items-center
+              justify-center
+
+              text-center
+            "
+          >
+            <p
+              className="
+                text-[10px]
+                uppercase
+                tracking-[0.08em]
+
+                text-black/25
+              "
+            >
+              No content found
+            </p>
+
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="
+                mt-4
+
+                text-[9px]
+                uppercase
+                tracking-[0.08em]
+
+                text-[var(--public-primary)]
+
+                hover:opacity-60
+              "
+            >
+              Clear Filters
+            </button>
+          </div>
         ) : (
-          <>
-            {/* =================================
-                NO FILTER RESULTS
-            ================================= */}
+          <div
+            className="
+              mt-10
 
-            {!videos.length && !publications.length ? (
-              <div
-                className="
-                  flex
-                  min-h-[360px]
+              space-y-12
 
-                  flex-col
+              sm:mt-12
+              sm:space-y-14
 
-                  items-center
-                  justify-center
-
-                  text-center
-                "
-              >
-                <p
-                  className="
-                    text-[10px]
-                    uppercase
-                    tracking-[0.08em]
-
-                    text-black/25
-                  "
-                >
-                  No content found
-                </p>
-
-                <button
-                  type="button"
-                  onClick={clearFilters}
-                  className="
-                    mt-4
-
-                    text-[9px]
-                    uppercase
-                    tracking-[0.08em]
-
-                    text-[var(--public-primary)]
-
-                    transition-opacity
-
-                    hover:opacity-60
-                  "
-                >
-                  Clear Filters
-                </button>
-              </div>
-            ) : (
-              /* =================================
-                 VIDEO + PUBLICATION
-              ================================= */
-
-              <div
-                className="
-                  mt-10
-
-                  space-y-24
-
-                  sm:mt-12
-
-                  lg:mt-14
-                  lg:space-y-28
-                "
-              >
-                <PublicContentSection
-                  title="Video"
-                  contents={videos}
-                  companySlug={companySlug}
-                  locale={locale}
-                />
-
-                <PublicContentSection
-                  title="Publication"
-                  contents={publications}
-                  companySlug={companySlug}
-                  locale={locale}
-                />
-              </div>
-            )}
-          </>
+              lg:mt-14
+              lg:space-y-16
+            "
+          >
+            {filteredItems.map((item) => (
+              <PublicContentCard
+                key={item.id}
+                companySlug={companySlug}
+                item={item}
+                locale={locale}
+              />
+            ))}
+          </div>
         )}
       </div>
     </div>

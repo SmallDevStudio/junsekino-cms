@@ -7,7 +7,6 @@ import { serializeFirestoreDocument } from "@/utils/firestore";
 function localized(value) {
   return {
     th: value?.th || "",
-
     en: value?.en || "",
   };
 }
@@ -42,12 +41,30 @@ function getTimestampMillis(value) {
   return Number.isNaN(parsed) ? 0 : parsed;
 }
 
-function sortContents(a, b) {
-  if (a.featured !== b.featured) {
-    return a.featured ? -1 : 1;
-  }
+/*
+ * =========================================================
+ * SORT
+ * =========================================================
+ *
+ * Public feed requirement:
+ *
+ * newest added content first
+ *
+ * createdAt DESC
+ *
+ * Older records without createdAt fall
+ * back to publishedAt.
+ * =========================================================
+ */
 
-  return getTimestampMillis(b.publishedAt) - getTimestampMillis(a.publishedAt);
+function sortContents(a, b) {
+  const aDate =
+    getTimestampMillis(a.createdAt) || getTimestampMillis(a.publishedAt);
+
+  const bDate =
+    getTimestampMillis(b.createdAt) || getTimestampMillis(b.publishedAt);
+
+  return bDate - aDate;
 }
 
 function getPublicSection(item) {
@@ -138,13 +155,14 @@ function normalizeContent(item) {
 
     featured: serialized.featured === true,
 
+    /*
+     * Used by public feed sorting.
+     */
+    createdAt: serialized.createdAt || null,
+
     publishedAt: serialized.publishedAt || null,
 
-    /*
-     * =====================================================
-     * JUNSEKINO WEBSITE METRICS
-     * =====================================================
-     */
+    updatedAt: serialized.updatedAt || null,
 
     engagement: {
       views: normalizeMetric(serialized.engagement?.views),
