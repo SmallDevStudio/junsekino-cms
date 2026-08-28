@@ -22,9 +22,16 @@ import {
 
 import { serializeFirestoreDocument } from "@/utils/firestore";
 
+/*
+ * =========================================================
+ * HELPERS
+ * =========================================================
+ */
+
 function mergeLocalized(existing = {}, incoming = {}) {
   return {
     th: incoming?.th ?? existing?.th ?? "",
+
     en: incoming?.en ?? existing?.en ?? "",
   };
 }
@@ -45,6 +52,26 @@ function mergeSeo(seo = {}) {
     },
   };
 }
+
+function normalizeStatistic(value) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const number = Number(value);
+
+  if (!Number.isFinite(number) || number < 0) {
+    return null;
+  }
+
+  return Math.floor(number);
+}
+
+/*
+ * =========================================================
+ * EXTERNAL METADATA
+ * =========================================================
+ */
 
 function normalizeExternalMetadata(metadata = null) {
   if (!metadata) {
@@ -69,8 +96,30 @@ function normalizeExternalMetadata(metadata = null) {
     publishedAt: metadata.publishedAt || null,
 
     duration: metadata.duration || null,
+
+    /*
+     * Preserve external platform
+     * statistics when saving.
+     */
+    statistics: metadata.statistics
+      ? {
+          viewCount: normalizeStatistic(metadata.statistics.viewCount),
+
+          likeCount: normalizeStatistic(metadata.statistics.likeCount),
+
+          commentCount: normalizeStatistic(metadata.statistics.commentCount),
+
+          fetchedAt: metadata.statistics.fetchedAt || null,
+        }
+      : null,
   };
 }
+
+/*
+ * =========================================================
+ * VALIDATION
+ * =========================================================
+ */
 
 function validateContent(item) {
   const hasTitle =
@@ -98,6 +147,12 @@ function validateContent(item) {
     }
   }
 }
+
+/*
+ * =========================================================
+ * NORMALIZE CREATE INPUT
+ * =========================================================
+ */
 
 function normalizeInput(input) {
   return {
@@ -133,11 +188,21 @@ function normalizeInput(input) {
   };
 }
 
+/*
+ * =========================================================
+ * LIST
+ * =========================================================
+ */
+
 export async function listPublicContents({
   companyId,
+
   status = null,
+
   contentType = null,
+
   provider = null,
+
   search = null,
 }) {
   let items = await listPublicContentRecords(companyId);
@@ -182,9 +247,16 @@ export async function listPublicContents({
   return items.map(serializeFirestoreDocument);
 }
 
+/*
+ * =========================================================
+ * GET
+ * =========================================================
+ */
+
 export async function getPublicContent({ companyId, contentId }) {
   const item = await getPublicContentById({
     companyId,
+
     contentId,
   });
 
@@ -195,6 +267,12 @@ export async function getPublicContent({ companyId, contentId }) {
   return serializeFirestoreDocument(item);
 }
 
+/*
+ * =========================================================
+ * CREATE
+ * =========================================================
+ */
+
 export async function createPublicContent({ companyId, input, currentUser }) {
   const data = normalizeInput(input);
 
@@ -202,6 +280,7 @@ export async function createPublicContent({ companyId, input, currentUser }) {
 
   const item = await createPublicContentRecord({
     companyId,
+
     data,
 
     userId: currentUser.uid,
@@ -228,6 +307,12 @@ export async function createPublicContent({ companyId, input, currentUser }) {
   return serialized;
 }
 
+/*
+ * =========================================================
+ * UPDATE
+ * =========================================================
+ */
+
 export async function updatePublicContent({
   companyId,
   contentId,
@@ -236,6 +321,7 @@ export async function updatePublicContent({
 }) {
   const existing = await getPublicContentById({
     companyId,
+
     contentId,
   });
 
@@ -292,22 +378,35 @@ export async function updatePublicContent({
 
       th: {
         ...existing.seo?.th,
+
         ...input.seo?.th,
       },
 
       en: {
         ...existing.seo?.en,
+
         ...input.seo?.en,
       },
     });
   }
 
+  /*
+   * Fields managed by workflow
+   * must not be edited through
+   * normal update.
+   */
   delete data.status;
   delete data.scheduledAt;
   delete data.publishedAt;
   delete data.publishedBy;
   delete data.deletedAt;
   delete data.deletedBy;
+
+  /*
+   * Public metrics are managed by
+   * engagement APIs, not Admin form.
+   */
+  delete data.engagement;
 
   const preview = {
     ...existing,
@@ -318,7 +417,9 @@ export async function updatePublicContent({
 
   const result = await updatePublicContentRecord({
     companyId,
+
     contentId,
+
     data,
 
     userId: currentUser.uid,
@@ -347,6 +448,12 @@ export async function updatePublicContent({
   return after;
 }
 
+/*
+ * =========================================================
+ * PUBLISH
+ * =========================================================
+ */
+
 export async function publishPublicContent({
   companyId,
   contentId,
@@ -355,6 +462,7 @@ export async function publishPublicContent({
 }) {
   const existing = await getPublicContentById({
     companyId,
+
     contentId,
   });
 
@@ -366,7 +474,9 @@ export async function publishPublicContent({
 
   const result = await publishPublicContentRecord({
     companyId,
+
     contentId,
+
     scheduledAt,
 
     userId: currentUser.uid,
@@ -397,6 +507,12 @@ export async function publishPublicContent({
   return after;
 }
 
+/*
+ * =========================================================
+ * UNPUBLISH
+ * =========================================================
+ */
+
 export async function unpublishPublicContent({
   companyId,
   contentId,
@@ -404,6 +520,7 @@ export async function unpublishPublicContent({
 }) {
   const result = await unpublishPublicContentRecord({
     companyId,
+
     contentId,
 
     userId: currentUser.uid,
@@ -432,6 +549,12 @@ export async function unpublishPublicContent({
   return after;
 }
 
+/*
+ * =========================================================
+ * DELETE
+ * =========================================================
+ */
+
 export async function deletePublicContent({
   companyId,
   contentId,
@@ -439,6 +562,7 @@ export async function deletePublicContent({
 }) {
   const before = await softDeletePublicContentRecord({
     companyId,
+
     contentId,
 
     userId: currentUser.uid,

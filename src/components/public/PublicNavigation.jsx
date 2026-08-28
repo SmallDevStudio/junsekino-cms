@@ -4,6 +4,12 @@ import Link from "next/link";
 
 import { usePathname } from "next/navigation";
 
+/*
+ * =========================================================
+ * HELPERS
+ * =========================================================
+ */
+
 function getLocalizedValue(value, locale = "en") {
   if (!value) {
     return "";
@@ -43,17 +49,32 @@ function isProjectItem(item) {
   );
 }
 
+function isPublicItem(item) {
+  return (
+    item?.key === "public" ||
+    item?.key === "public-content" ||
+    item?.key === "publicContent" ||
+    normalizePath(item?.path) === "public"
+  );
+}
+
 function resolveHref(companySlug, item) {
   /*
-   * Project public URL intentionally uses:
+   * Project always uses:
    *
    * /project
-   *
-   * even if legacy navigation settings
-   * still contain "projects".
    */
   if (isProjectItem(item)) {
     return `/${companySlug}/project`;
+  }
+
+  /*
+   * Public always uses:
+   *
+   * /public
+   */
+  if (isPublicItem(item)) {
+    return `/${companySlug}/public`;
   }
 
   const path = normalizePath(item?.path);
@@ -63,8 +84,8 @@ function resolveHref(companySlug, item) {
 
 function isMainItemActive({ pathname, href, companySlug }) {
   /*
-   * HOME must not stay active on every
-   * company child route.
+   * HOME must only be active
+   * on the company homepage.
    */
   if (href === `/${companySlug}`) {
     return pathname === href || pathname === `${href}/`;
@@ -80,9 +101,30 @@ function isCategoryActive({ pathname, companySlug, categorySlug }) {
   );
 }
 
+function isPublicCategoryActive({ pathname, companySlug, category }) {
+  return (
+    pathname === `/${companySlug}/public/${category}` ||
+    pathname.startsWith(`/${companySlug}/public/${category}/`)
+  );
+}
+
 /*
  * =========================================================
  * DESKTOP PROJECT CATEGORY DROPDOWN
+ * =========================================================
+ *
+ * IMPORTANT UI RULE
+ *
+ * The FIRST dropdown item starts from
+ * the same left edge as the parent menu.
+ *
+ * Example:
+ *
+ * PROJECT
+ * RESIDENTIAL   COMMERCIAL   ...
+ *
+ * instead of centering the whole dropdown
+ * below PROJECT.
  * =========================================================
  */
 
@@ -102,12 +144,12 @@ function ProjectCategoryDropdown({
     <div
       className="
         invisible
+
         absolute
-        left-1/2
+        left-0
         top-full
         z-[110]
 
-        -translate-x-1/2
         translate-y-1
 
         opacity-0
@@ -125,20 +167,21 @@ function ProjectCategoryDropdown({
         group-focus-within/navitem:opacity-100
       "
     >
-      {/*
-       * Hover bridge.
-       *
-       * Prevents the category row from
-       * closing while the cursor travels
-       * down from PROJECT.
-       */}
+      {/* =====================================
+          HOVER BRIDGE
+      ===================================== */}
+
       <div className="h-[12px]" />
+
+      {/* =====================================
+          CATEGORY ROW
+      ===================================== */}
 
       <div
         className="
           flex
           items-center
-          justify-center
+          justify-start
 
           gap-[clamp(1.7rem,2.15vw,2.8rem)]
 
@@ -192,6 +235,126 @@ function ProjectCategoryDropdown({
 
 /*
  * =========================================================
+ * DESKTOP PUBLIC CATEGORY DROPDOWN
+ * =========================================================
+ *
+ * Uses the same left-alignment rule:
+ *
+ * PUBLIC
+ * VIDEO   PUBLICATION
+ * =========================================================
+ */
+
+function PublicCategoryDropdown({ companySlug, primaryColor }) {
+  const pathname = usePathname();
+
+  const categories = [
+    {
+      key: "video",
+      label: "Video",
+    },
+
+    {
+      key: "publication",
+      label: "Publication",
+    },
+  ];
+
+  return (
+    <div
+      className="
+        invisible
+
+        absolute
+        left-0
+        top-full
+        z-[110]
+
+        translate-y-1
+
+        opacity-0
+
+        transition-all
+        duration-150
+        ease-out
+
+        group-hover/navitem:visible
+        group-hover/navitem:translate-y-0
+        group-hover/navitem:opacity-100
+
+        group-focus-within/navitem:visible
+        group-focus-within/navitem:translate-y-0
+        group-focus-within/navitem:opacity-100
+      "
+    >
+      {/* =====================================
+          HOVER BRIDGE
+      ===================================== */}
+
+      <div className="h-[12px]" />
+
+      {/* =====================================
+          PUBLIC CATEGORY ROW
+      ===================================== */}
+
+      <div
+        className="
+          flex
+          items-center
+          justify-start
+
+          gap-[clamp(1.7rem,2.15vw,2.8rem)]
+
+          whitespace-nowrap
+        "
+      >
+        {categories.map((category) => {
+          const active = isPublicCategoryActive({
+            pathname,
+
+            companySlug,
+
+            category: category.key,
+          });
+
+          return (
+            <Link
+              key={category.key}
+              href={`/${companySlug}/public/${category.key}`}
+              className={`
+                  text-[11px]
+                  uppercase
+                  tracking-[0.02em]
+
+                  transition-all
+                  duration-150
+                  ease-out
+
+                  hover:opacity-55
+
+                  xl:text-[12px]
+
+                  ${active ? "font-semibold" : "font-normal text-[#242424]"}
+                `}
+              style={
+                active
+                  ? {
+                      color: primaryColor,
+                    }
+                  : undefined
+              }
+            >
+              {category.label}
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/*
+ * =========================================================
  * DESKTOP MAIN ITEM
  * =========================================================
  */
@@ -217,6 +380,8 @@ function DesktopNavigationItem({
 
   const project = isProjectItem(item);
 
+  const publicItem = isPublicItem(item);
+
   return (
     <div
       className="
@@ -225,9 +390,13 @@ function DesktopNavigationItem({
 
         flex
         items-center
-        justify-center
+        justify-start
       "
     >
+      {/* =====================================
+          MAIN LINK
+      ===================================== */}
+
       <Link
         href={href}
         className={`
@@ -262,11 +431,26 @@ function DesktopNavigationItem({
         {label}
       </Link>
 
+      {/* =====================================
+          PROJECT DROPDOWN
+      ===================================== */}
+
       {project && projectCategories.length > 0 && (
         <ProjectCategoryDropdown
           companySlug={companySlug}
           categories={projectCategories}
           locale={locale}
+          primaryColor={primaryColor}
+        />
+      )}
+
+      {/* =====================================
+          PUBLIC DROPDOWN
+      ===================================== */}
+
+      {publicItem && (
+        <PublicCategoryDropdown
+          companySlug={companySlug}
           primaryColor={primaryColor}
         />
       )}
@@ -353,6 +537,82 @@ function MobileProjectCategories({
 
 /*
  * =========================================================
+ * MOBILE PUBLIC CATEGORIES
+ * =========================================================
+ */
+
+function MobilePublicCategories({ companySlug, primaryColor, onNavigate }) {
+  const pathname = usePathname();
+
+  const categories = [
+    {
+      key: "video",
+      label: "Video",
+    },
+
+    {
+      key: "publication",
+      label: "Publication",
+    },
+  ];
+
+  return (
+    <div
+      className="
+        mt-4
+
+        flex
+        items-center
+        justify-center
+
+        gap-x-5
+        gap-y-3
+      "
+    >
+      {categories.map((category) => {
+        const active = isPublicCategoryActive({
+          pathname,
+
+          companySlug,
+
+          category: category.key,
+        });
+
+        return (
+          <Link
+            key={category.key}
+            href={`/${companySlug}/public/${category.key}`}
+            onClick={onNavigate}
+            className={`
+                text-[11px]
+                uppercase
+                tracking-[0.025em]
+
+                transition-all
+                duration-150
+
+                hover:opacity-55
+
+                ${active ? "font-semibold" : "font-normal text-black/40"}
+              `}
+            style={
+              active
+                ? {
+                    color: primaryColor,
+                  }
+                : undefined
+            }
+          >
+            {category.label}
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
+/*
+ * =========================================================
  * PUBLIC NAVIGATION
  * =========================================================
  */
@@ -377,9 +637,9 @@ export default function PublicNavigation({
   const items = normalizeNavigation(navigation);
 
   /*
-   * =====================================================
+   * =======================================================
    * MOBILE
-   * =====================================================
+   * =======================================================
    */
 
   if (mobile) {
@@ -411,31 +671,33 @@ export default function PublicNavigation({
 
           const project = isProjectItem(item);
 
+          const publicItem = isPublicItem(item);
+
           return (
             <div
               key={item?.key || href}
               className="
-                flex
-                flex-col
+                  flex
+                  flex-col
 
-                items-center
-              "
+                  items-center
+                "
             >
               <Link
                 href={href}
                 onClick={onNavigate}
                 className={`
-                  text-[16px]
-                  uppercase
-                  tracking-[0.055em]
+                    text-[16px]
+                    uppercase
+                    tracking-[0.055em]
 
-                  transition-opacity
-                  duration-200
+                    transition-opacity
+                    duration-200
 
-                  hover:opacity-50
+                    hover:opacity-50
 
-                  ${active ? "font-semibold" : "font-normal text-[#151515]"}
-                `}
+                    ${active ? "font-semibold" : "font-normal text-[#151515]"}
+                  `}
                 style={
                   active
                     ? {
@@ -447,11 +709,23 @@ export default function PublicNavigation({
                 {label}
               </Link>
 
+              {/* PROJECT */}
+
               {project && (
                 <MobileProjectCategories
                   companySlug={companySlug}
                   categories={projectCategories}
                   locale={locale}
+                  primaryColor={primaryColor}
+                  onNavigate={onNavigate}
+                />
+              )}
+
+              {/* PUBLIC */}
+
+              {publicItem && (
+                <MobilePublicCategories
+                  companySlug={companySlug}
                   primaryColor={primaryColor}
                   onNavigate={onNavigate}
                 />
@@ -464,9 +738,9 @@ export default function PublicNavigation({
   }
 
   /*
-   * =====================================================
+   * =======================================================
    * DESKTOP
-   * =====================================================
+   * =======================================================
    */
 
   return (

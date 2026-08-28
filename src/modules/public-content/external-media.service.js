@@ -25,6 +25,26 @@ function createUrl(value) {
   }
 }
 
+function normalizeStatistic(value) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const number = Number(value);
+
+  if (!Number.isFinite(number) || number < 0) {
+    return null;
+  }
+
+  return Math.floor(number);
+}
+
+/*
+ * =========================================================
+ * PROVIDER
+ * =========================================================
+ */
+
 export function detectExternalMediaProvider(sourceUrl) {
   const url = createUrl(sourceUrl);
 
@@ -60,6 +80,12 @@ export function detectExternalMediaProvider(sourceUrl) {
 
   return "other";
 }
+
+/*
+ * =========================================================
+ * YOUTUBE ID
+ * =========================================================
+ */
 
 export function parseYouTubeVideoId(sourceUrl) {
   const url = createUrl(sourceUrl);
@@ -103,6 +129,12 @@ export function parseYouTubeVideoId(sourceUrl) {
   return normalizedId;
 }
 
+/*
+ * =========================================================
+ * THUMBNAIL
+ * =========================================================
+ */
+
 function getYouTubeThumbnail(snippet) {
   const thumbnails = snippet?.thumbnails || {};
 
@@ -115,6 +147,12 @@ function getYouTubeThumbnail(snippet) {
     null
   );
 }
+
+/*
+ * =========================================================
+ * OEMBED
+ * =========================================================
+ */
 
 async function fetchYouTubeOEmbed({ canonicalUrl }) {
   const endpoint = new URL("https://www.youtube.com/oembed");
@@ -142,6 +180,12 @@ async function fetchYouTubeOEmbed({ canonicalUrl }) {
   return response.json();
 }
 
+/*
+ * =========================================================
+ * YOUTUBE DATA API
+ * =========================================================
+ */
+
 async function fetchYouTubeDataApi({ videoId }) {
   const apiKey = process.env.YOUTUBE_API_KEY;
 
@@ -151,7 +195,10 @@ async function fetchYouTubeDataApi({ videoId }) {
 
   const endpoint = new URL("https://www.googleapis.com/youtube/v3/videos");
 
-  endpoint.searchParams.set("part", "snippet,contentDetails");
+  /*
+   * statistics added here.
+   */
+  endpoint.searchParams.set("part", "snippet,contentDetails,statistics");
 
   endpoint.searchParams.set("id", videoId);
 
@@ -168,7 +215,9 @@ async function fetchYouTubeDataApi({ videoId }) {
   if (!response.ok) {
     console.error(
       "YouTube Data API error:",
+
       response.status,
+
       await response.text().catch(() => ""),
     );
 
@@ -179,6 +228,12 @@ async function fetchYouTubeDataApi({ videoId }) {
 
   return payload?.items?.[0] || null;
 }
+
+/*
+ * =========================================================
+ * YOUTUBE RESOLVER
+ * =========================================================
+ */
 
 async function resolveYouTube(sourceUrl) {
   const videoId = parseYouTubeVideoId(sourceUrl);
@@ -202,6 +257,8 @@ async function resolveYouTube(sourceUrl) {
   const snippet = apiData?.snippet || null;
 
   const contentDetails = apiData?.contentDetails || null;
+
+  const statistics = apiData?.statistics || null;
 
   const apiThumbnail = getYouTubeThumbnail(snippet);
 
@@ -235,9 +292,33 @@ async function resolveYouTube(sourceUrl) {
       publishedAt: snippet?.publishedAt || null,
 
       duration: contentDetails?.duration || null,
+
+      /*
+       * =====================================
+       * EXTERNAL PLATFORM METRICS
+       * =====================================
+       */
+
+      statistics: statistics
+        ? {
+            viewCount: normalizeStatistic(statistics.viewCount),
+
+            likeCount: normalizeStatistic(statistics.likeCount),
+
+            commentCount: normalizeStatistic(statistics.commentCount),
+
+            fetchedAt: new Date().toISOString(),
+          }
+        : null,
     },
   };
 }
+
+/*
+ * =========================================================
+ * MAIN RESOLVER
+ * =========================================================
+ */
 
 export async function resolveExternalMedia({ sourceUrl }) {
   const url = createUrl(sourceUrl);
