@@ -1,7 +1,5 @@
 "use client";
 
-import { useRef, useState } from "react";
-
 import {
   CheckCircle2,
   FileImage,
@@ -10,6 +8,10 @@ import {
   XCircle,
 } from "lucide-react";
 
+import { useRef, useState } from "react";
+
+import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
+
 import {
   ALLOWED_IMAGE_MIME_TYPES,
   MAX_MEDIA_FILE_SIZE,
@@ -17,26 +19,41 @@ import {
 
 import { cn } from "@/utils/cn";
 
+/*
+ * =========================================================
+ * HELPERS
+ * =========================================================
+ */
+
 function formatBytes(bytes) {
-  if (!Number.isFinite(bytes)) {
+  if (!Number.isFinite(Number(bytes))) {
     return "—";
   }
 
-  if (bytes === 0) {
+  const value = Number(bytes);
+
+  if (value === 0) {
     return "0 B";
   }
 
   const units = ["B", "KB", "MB", "GB"];
 
   const index = Math.min(
-    Math.floor(Math.log(bytes) / Math.log(1024)),
+    Math.floor(Math.log(value) / Math.log(1024)),
+
     units.length - 1,
   );
 
-  const value = bytes / 1024 ** index;
+  const normalized = value / 1024 ** index;
 
-  return `${value.toFixed(index === 0 ? 0 : 1)} ${units[index]}`;
+  return `${normalized.toFixed(index === 0 ? 0 : 1)} ${units[index]}`;
 }
+
+/*
+ * =========================================================
+ * STORAGE UPLOAD
+ * =========================================================
+ */
 
 function uploadWithProgress({ url, method, headers, file, onProgress }) {
   return new Promise((resolve, reject) => {
@@ -55,7 +72,7 @@ function uploadWithProgress({ url, method, headers, file, onProgress }) {
 
       const percent = Math.round((event.loaded / event.total) * 100);
 
-      onProgress(percent);
+      onProgress?.(percent);
     });
 
     xhr.addEventListener("load", () => {
@@ -65,23 +82,37 @@ function uploadWithProgress({ url, method, headers, file, onProgress }) {
         return;
       }
 
-      reject(new Error(`Storage upload failed (${xhr.status}).`));
+      reject(new Error(`STORAGE_UPLOAD_FAILED_${xhr.status}`));
     });
 
     xhr.addEventListener("error", () => {
-      reject(new Error("Storage upload failed."));
+      reject(new Error("STORAGE_UPLOAD_FAILED"));
     });
 
     xhr.send(file);
   });
 }
 
+/*
+ * =========================================================
+ * UPLOAD DROPZONE
+ * =========================================================
+ */
+
 export default function MediaUploadDropzone({ companyId, onUploaded }) {
+  const { t } = useAdminTranslation();
+
   const inputRef = useRef(null);
 
   const [dragging, setDragging] = useState(false);
 
   const [uploads, setUploads] = useState([]);
+
+  /*
+   * =======================================================
+   * UPDATE UPLOAD
+   * =======================================================
+   */
 
   function updateUpload(localId, patch) {
     setUploads((current) =>
@@ -96,8 +127,18 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
     );
   }
 
+  /*
+   * =======================================================
+   * UPLOAD FILE
+   * =======================================================
+   */
+
   async function uploadFile(file) {
     const localId = `${Date.now()}-${Math.random()}`;
+
+    /*
+     * TYPE
+     */
 
     if (!ALLOWED_IMAGE_MIME_TYPES.includes(file.type)) {
       setUploads((current) => [
@@ -112,7 +153,7 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
 
           progress: 0,
 
-          error: "Unsupported file type.",
+          error: t("media.upload.errors.unsupportedType"),
         },
 
         ...current,
@@ -120,6 +161,10 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
 
       return;
     }
+
+    /*
+     * SIZE
+     */
 
     if (file.size > MAX_MEDIA_FILE_SIZE) {
       setUploads((current) => [
@@ -134,7 +179,9 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
 
           progress: 0,
 
-          error: `File exceeds ${formatBytes(MAX_MEDIA_FILE_SIZE)}.`,
+          error: t("media.upload.errors.fileTooLarge", {
+            size: formatBytes(MAX_MEDIA_FILE_SIZE),
+          }),
         },
 
         ...current,
@@ -142,6 +189,10 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
 
       return;
     }
+
+    /*
+     * CREATE LOCAL ITEM
+     */
 
     setUploads((current) => [
       {
@@ -162,6 +213,10 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
     ]);
 
     try {
+      /*
+       * CREATE MEDIA RECORD
+       */
+
       const createResponse = await fetch(
         `/api/v1/companies/${companyId}/media`,
         {
@@ -186,7 +241,7 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
       const created = await createResponse.json();
 
       if (!createResponse.ok || !created?.success) {
-        throw new Error(created?.message || "Unable to create media upload.");
+        throw new Error(created?.message || "MEDIA_CREATE_FAILED");
       }
 
       const media = created.data.media;
@@ -198,6 +253,10 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
 
         mediaId: media.id,
       });
+
+      /*
+       * STORAGE
+       */
 
       await uploadWithProgress({
         url: upload.url,
@@ -214,6 +273,10 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
           });
         },
       });
+
+      /*
+       * FINALIZE
+       */
 
       updateUpload(localId, {
         status: "finalizing",
@@ -233,7 +296,7 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
       const finalized = await finalizeResponse.json();
 
       if (!finalizeResponse.ok || !finalized?.success) {
-        throw new Error(finalized?.message || "Unable to finalize media.");
+        throw new Error(finalized?.message || "MEDIA_FINALIZE_FAILED");
       }
 
       updateUpload(localId, {
@@ -249,14 +312,28 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
       updateUpload(localId, {
         status: "error",
 
-        error: error?.message || "Upload failed.",
+        error:
+          error?.message && !error.message.startsWith("STORAGE_UPLOAD_FAILED")
+            ? error.message
+            : t("media.upload.errors.failed"),
       });
     }
   }
 
+  /*
+   * =======================================================
+   * FILE QUEUE
+   * =======================================================
+   */
+
   async function processFiles(fileList) {
     const files = Array.from(fileList || []);
 
+    /*
+     * Sequential uploads reduce spikes
+     * in browser memory and signed-upload
+     * requests when users drop many files.
+     */
     for (const file of files) {
       await uploadFile(file);
     }
@@ -270,8 +347,18 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
     processFiles(event.dataTransfer.files);
   }
 
+  /*
+   * =======================================================
+   * RENDER
+   * =======================================================
+   */
+
   return (
     <div>
+      {/* =====================================
+          DROP AREA
+      ===================================== */}
+
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
@@ -294,37 +381,66 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
         className={cn(
           "flex w-full flex-col items-center justify-center",
 
-          "rounded-2xl border border-dashed",
+          "rounded-2xl",
+
+          "border border-dashed",
 
           "px-6 py-10",
 
-          "text-center transition",
+          "text-center",
+
+          "transition",
 
           dragging
             ? "border-[var(--company-primary)] bg-[var(--company-primary-soft)]"
-            : "border-[var(--admin-border)] bg-[var(--admin-surface)] hover:border-[var(--company-primary)]",
+            : "border-[var(--admin-border)] bg-[var(--admin-surface)] hover:border-[var(--company-primary)] hover:bg-[var(--company-primary-soft)]",
         )}
       >
         <div
-          className={cn(
-            "flex h-12 w-12 items-center justify-center",
+          className="
+            flex
+            h-12
+            w-12
 
-            "rounded-2xl",
+            items-center
+            justify-center
 
-            "bg-[var(--company-primary-soft)]",
+            rounded-2xl
 
-            "text-[var(--company-primary)]",
-          )}
+            bg-[var(--company-primary-soft)]
+
+            text-[var(--company-primary)]
+          "
         >
           <UploadCloud size={21} strokeWidth={1.7} />
         </div>
 
-        <div className="mt-4 text-sm font-medium text-[var(--admin-foreground)]">
-          Drop images here or click to upload
+        <div
+          className="
+            mt-4
+
+            admin-text-14
+            font-medium
+
+            text-[var(--admin-foreground)]
+          "
+        >
+          {t("media.upload.dropTitle")}
         </div>
 
-        <div className="mt-1 text-xs text-[var(--admin-muted)]">
-          JPG, PNG, WebP or AVIF • up to {formatBytes(MAX_MEDIA_FILE_SIZE)}
+        <div
+          className="
+            mt-1
+
+            admin-text-12
+            leading-[1.55]
+
+            text-[var(--admin-muted)]
+          "
+        >
+          {t("media.upload.formats", {
+            size: formatBytes(MAX_MEDIA_FILE_SIZE),
+          })}
         </div>
       </button>
 
@@ -341,35 +457,112 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
         }}
       />
 
+      {/* =====================================
+          UPLOAD QUEUE
+      ===================================== */}
+
       {uploads.length > 0 && (
-        <div className="mt-4 overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
+        <div
+          className="
+            mt-4
+
+            overflow-hidden
+
+            rounded-2xl
+
+            border
+            border-[var(--admin-border)]
+
+            bg-[var(--admin-surface)]
+          "
+        >
           {uploads.map((upload, index) => (
             <div
               key={upload.localId}
               className={cn(
-                "flex items-center gap-4 px-4 py-3",
+                "flex items-center gap-4",
+
+                "px-4 py-3",
 
                 index !== uploads.length - 1 &&
                   "border-b border-[var(--admin-border)]",
               )}
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-background)] text-[var(--admin-muted)]">
+              <div
+                className="
+                    flex
+                    h-10
+                    w-10
+                    shrink-0
+
+                    items-center
+                    justify-center
+
+                    rounded-xl
+
+                    bg-[var(--admin-background)]
+
+                    text-[var(--admin-muted)]
+                  "
+              >
                 <FileImage size={18} />
               </div>
 
-              <div className="min-w-0 flex-1">
-                <div className="truncate text-xs font-medium text-[var(--admin-foreground)]">
+              <div
+                className="
+                    min-w-0
+                    flex-1
+                  "
+              >
+                <div
+                  className="
+                      truncate
+
+                      admin-text-12
+                      font-medium
+
+                      text-[var(--admin-foreground)]
+                    "
+                >
                   {upload.fileName}
                 </div>
 
-                <div className="mt-1 text-[11px] text-[var(--admin-muted)]">
+                <div
+                  className="
+                      mt-1
+
+                      admin-text-11
+
+                      text-[var(--admin-muted)]
+                    "
+                >
                   {formatBytes(upload.size)}
                 </div>
 
                 {["uploading", "finalizing"].includes(upload.status) && (
-                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--admin-hover)]">
+                  <div
+                    className="
+                        mt-2
+
+                        h-1.5
+
+                        overflow-hidden
+
+                        rounded-full
+
+                        bg-[var(--admin-hover)]
+                      "
+                  >
                     <div
-                      className="h-full rounded-full bg-[var(--company-primary)] transition-[width]"
+                      className="
+                          h-full
+
+                          rounded-full
+
+                          bg-[var(--company-primary)]
+
+                          transition-[width]
+                        "
                       style={{
                         width: `${upload.progress}%`,
                       }}
@@ -378,7 +571,15 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
                 )}
 
                 {upload.error && (
-                  <div className="mt-1.5 text-[11px] text-red-600">
+                  <div
+                    className="
+                        mt-1.5
+
+                        admin-text-11
+
+                        text-red-600
+                      "
+                  >
                     {upload.error}
                   </div>
                 )}
@@ -390,7 +591,10 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
                 ) && (
                   <LoaderCircle
                     size={17}
-                    className="animate-spin text-[var(--company-primary)]"
+                    className="
+                        animate-spin
+                        text-[var(--company-primary)]
+                      "
                   />
                 )}
 

@@ -1,10 +1,22 @@
+"use client";
+
 import { Bell, Search } from "lucide-react";
+
+import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
 
 import AdminDisplaySettings from "./AdminDisplaySettings";
 import AdminMobileNav from "./AdminMobileNav";
 import AdminUserMenu from "./AdminUserMenu";
 
+/*
+ * =========================================================
+ * HEADER
+ * =========================================================
+ */
+
 export default function AdminHeader({ user }) {
+  const { t } = useAdminTranslation();
+
   return (
     <header
       className="
@@ -55,17 +67,21 @@ export default function AdminHeader({ user }) {
         >
           <AdminMobileNav />
 
-          {/* GLOBAL SEARCH PLACEHOLDER */}
+          {/* =================================
+              GLOBAL SEARCH
+          ================================= */}
 
           <button
             type="button"
+            aria-label={t("common.search")}
+            title={t("common.search")}
             className="
               hidden
 
               h-10
 
               w-full
-              max-w-[360px]
+              max-w-[390px]
 
               items-center
               gap-2.5
@@ -81,7 +97,7 @@ export default function AdminHeader({ user }) {
 
               text-left
 
-              text-xs
+              admin-text-12
               text-[var(--admin-muted)]
 
               transition
@@ -93,12 +109,22 @@ export default function AdminHeader({ user }) {
               md:flex
             "
           >
-            <Search size={15} strokeWidth={1.7} />
-
-            <span className="flex-1">Search settings, pages, content...</span>
+            <Search size={15} strokeWidth={1.7} className="shrink-0" />
 
             <span
               className="
+                min-w-0
+                flex-1
+                truncate
+              "
+            >
+              {t("header.searchPlaceholder")}
+            </span>
+
+            <span
+              className="
+                shrink-0
+
                 rounded-md
 
                 border
@@ -109,7 +135,7 @@ export default function AdminHeader({ user }) {
                 px-1.5
                 py-0.5
 
-                text-[9px]
+                admin-text-9
 
                 text-[var(--admin-muted-light)]
               "
@@ -132,11 +158,14 @@ export default function AdminHeader({ user }) {
             gap-1
           "
         >
-          {/* NOTIFICATIONS */}
+          {/* =================================
+              NOTIFICATIONS
+          ================================= */}
 
           <button
             type="button"
-            aria-label="Notifications"
+            aria-label={t("header.notifications")}
+            title={t("header.notifications")}
             className="
               relative
 
@@ -179,11 +208,15 @@ export default function AdminHeader({ user }) {
             />
           </button>
 
-          {/* USER */}
+          {/* =================================
+              USER
+          ================================= */}
 
           <AdminUserMenu user={user} />
 
-          {/* DISPLAY SETTINGS */}
+          {/* =================================
+              DISPLAY SETTINGS
+          ================================= */}
 
           <AdminDisplaySettings />
         </div>

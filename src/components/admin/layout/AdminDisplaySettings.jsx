@@ -7,14 +7,21 @@ import {
   Settings,
   SlidersHorizontal,
   TextCursorInput,
+  Type,
   X,
 } from "lucide-react";
 
 import { useEffect, useRef, useState } from "react";
 
-import { ADMIN_DENSITY, ADMIN_LOCALE } from "@/constants/admin-ui";
+import {
+  ADMIN_DENSITY,
+  ADMIN_FONT_SIZE,
+  ADMIN_LOCALE,
+} from "@/constants/admin-ui";
 
 import { useAdminUiPreferences } from "@/components/admin/ui/AdminUiPreferencesProvider";
+
+import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
 
 import { cn } from "@/utils/cn";
 
@@ -30,15 +37,15 @@ function OptionButton({ selected, children, onClick }) {
       type="button"
       onClick={onClick}
       className={cn(
-        "flex h-8 items-center justify-center",
+        "flex min-h-8 items-center justify-center",
 
         "rounded-lg",
 
         "border",
 
-        "px-3",
+        "px-3 py-1.5",
 
-        "text-[10px] font-medium",
+        "admin-text-10 font-medium",
 
         "transition",
 
@@ -47,9 +54,11 @@ function OptionButton({ selected, children, onClick }) {
           : "border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-muted)] hover:bg-[var(--admin-hover)] hover:text-[var(--admin-foreground)]",
       )}
     >
-      {selected && <Check size={11} strokeWidth={2} className="mr-1.5" />}
+      {selected && (
+        <Check size={11} strokeWidth={2} className="mr-1.5 shrink-0" />
+      )}
 
-      {children}
+      <span className="whitespace-nowrap">{children}</span>
     </button>
   );
 }
@@ -110,7 +119,7 @@ function SettingRow({ icon: Icon, title, description, children }) {
         >
           <div
             className="
-              text-[11px]
+              admin-text-11
               font-semibold
 
               text-[var(--admin-foreground)]
@@ -124,8 +133,8 @@ function SettingRow({ icon: Icon, title, description, children }) {
               className="
                 mt-0.5
 
-                text-[9px]
-                leading-[1.45]
+                admin-text-9
+                leading-[1.55]
 
                 text-[var(--admin-muted)]
               "
@@ -159,12 +168,23 @@ export default function AdminDisplaySettings() {
     density,
     setDensity,
 
+    fontSize,
+    setFontSize,
+
     tooltipEnabled,
     setTooltipEnabled,
 
     sidebarCollapsed,
     setSidebarCollapsed,
   } = useAdminUiPreferences();
+
+  const { t } = useAdminTranslation();
+
+  /*
+   * =======================================================
+   * CLOSE POPOVER
+   * =======================================================
+   */
 
   useEffect(() => {
     function handlePointerDown(event) {
@@ -193,14 +213,23 @@ export default function AdminDisplaySettings() {
     };
   }, []);
 
+  /*
+   * =======================================================
+   * RENDER
+   * =======================================================
+   */
+
   return (
     <div ref={containerRef} className="relative">
-      {/* BUTTON */}
+      {/* =====================================
+          SETTINGS BUTTON
+      ===================================== */}
 
       <button
         type="button"
-        aria-label="Display settings"
+        aria-label={t("displaySettings.title")}
         aria-expanded={open}
+        title={t("displaySettings.title")}
         onClick={() => setOpen((current) => !current)}
         className="
           flex
@@ -224,7 +253,9 @@ export default function AdminDisplaySettings() {
         <Settings size={18} strokeWidth={1.7} />
       </button>
 
-      {/* POPOVER */}
+      {/* =====================================
+          POPOVER
+      ===================================== */}
 
       {open && (
         <div
@@ -234,7 +265,8 @@ export default function AdminDisplaySettings() {
             top-[calc(100%+10px)]
             z-[100]
 
-            w-[330px]
+            w-[350px]
+            max-w-[calc(100vw-24px)]
 
             overflow-hidden
 
@@ -248,13 +280,17 @@ export default function AdminDisplaySettings() {
             shadow-[0_18px_55px_rgba(0,0,0,0.12)]
           "
         >
-          {/* HEADER */}
+          {/* =================================
+              HEADER
+          ================================= */}
 
           <div
             className="
               flex
               items-center
               justify-between
+
+              gap-3
 
               border-b
               border-[var(--admin-border)]
@@ -263,39 +299,41 @@ export default function AdminDisplaySettings() {
               py-3
             "
           >
-            <div>
+            <div className="min-w-0">
               <div
                 className="
-                  text-[11px]
+                  admin-text-11
                   font-semibold
 
                   text-[var(--admin-foreground)]
                 "
               >
-                Display Settings
+                {t("displaySettings.title")}
               </div>
 
               <div
                 className="
                   mt-0.5
 
-                  text-[9px]
+                  admin-text-9
+                  leading-[1.5]
 
                   text-[var(--admin-muted)]
                 "
               >
-                Personalize your admin workspace
+                {t("displaySettings.description")}
               </div>
             </div>
 
             <button
               type="button"
-              aria-label="Close settings"
+              aria-label={t("common.close")}
               onClick={() => setOpen(false)}
               className="
                 flex
                 h-7
                 w-7
+                shrink-0
 
                 items-center
                 justify-center
@@ -303,6 +341,8 @@ export default function AdminDisplaySettings() {
                 rounded-lg
 
                 text-[var(--admin-muted-light)]
+
+                transition
 
                 hover:bg-[var(--admin-hover)]
 
@@ -313,16 +353,19 @@ export default function AdminDisplaySettings() {
             </button>
           </div>
 
-          {/* LANGUAGE */}
+          {/* =================================
+              LANGUAGE
+          ================================= */}
 
           <SettingRow
             icon={Languages}
-            title="Admin Language"
-            description="Changes only the administration interface."
+            title={t("preferences.language.title")}
+            description={t("displaySettings.language.description")}
           >
             <div
               className="
                 flex
+                flex-wrap
                 gap-2
               "
             >
@@ -330,24 +373,65 @@ export default function AdminDisplaySettings() {
                 selected={locale === ADMIN_LOCALE.EN}
                 onClick={() => setLocale(ADMIN_LOCALE.EN)}
               >
-                English
+                {t("preferences.language.english")}
               </OptionButton>
 
               <OptionButton
                 selected={locale === ADMIN_LOCALE.TH}
                 onClick={() => setLocale(ADMIN_LOCALE.TH)}
               >
-                ไทย
+                {t("preferences.language.thai")}
               </OptionButton>
             </div>
           </SettingRow>
 
-          {/* DENSITY */}
+          {/* =================================
+              FONT SIZE
+          ================================= */}
+
+          <SettingRow
+            icon={Type}
+            title={t("displaySettings.fontSize.title")}
+            description={t("displaySettings.fontSize.description")}
+          >
+            <div
+              className="
+                flex
+                flex-wrap
+                gap-2
+              "
+            >
+              <OptionButton
+                selected={fontSize === ADMIN_FONT_SIZE.SMALL}
+                onClick={() => setFontSize(ADMIN_FONT_SIZE.SMALL)}
+              >
+                {t("displaySettings.fontSize.small")}
+              </OptionButton>
+
+              <OptionButton
+                selected={fontSize === ADMIN_FONT_SIZE.MEDIUM}
+                onClick={() => setFontSize(ADMIN_FONT_SIZE.MEDIUM)}
+              >
+                {t("displaySettings.fontSize.medium")}
+              </OptionButton>
+
+              <OptionButton
+                selected={fontSize === ADMIN_FONT_SIZE.LARGE}
+                onClick={() => setFontSize(ADMIN_FONT_SIZE.LARGE)}
+              >
+                {t("displaySettings.fontSize.large")}
+              </OptionButton>
+            </div>
+          </SettingRow>
+
+          {/* =================================
+              DENSITY
+          ================================= */}
 
           <SettingRow
             icon={SlidersHorizontal}
-            title="Interface Density"
-            description="Controls spacing in lists, forms and panels."
+            title={t("preferences.density.title")}
+            description={t("displaySettings.density.description")}
           >
             <div
               className="
@@ -360,35 +444,38 @@ export default function AdminDisplaySettings() {
                 selected={density === ADMIN_DENSITY.COMPACT}
                 onClick={() => setDensity(ADMIN_DENSITY.COMPACT)}
               >
-                Compact
+                {t("preferences.density.compact")}
               </OptionButton>
 
               <OptionButton
                 selected={density === ADMIN_DENSITY.COMFORTABLE}
                 onClick={() => setDensity(ADMIN_DENSITY.COMFORTABLE)}
               >
-                Comfortable
+                {t("preferences.density.comfortable")}
               </OptionButton>
 
               <OptionButton
                 selected={density === ADMIN_DENSITY.SPACIOUS}
                 onClick={() => setDensity(ADMIN_DENSITY.SPACIOUS)}
               >
-                Spacious
+                {t("preferences.density.spacious")}
               </OptionButton>
             </div>
           </SettingRow>
 
-          {/* TOOLTIP */}
+          {/* =================================
+              TOOLTIP
+          ================================= */}
 
           <SettingRow
             icon={TextCursorInput}
-            title="Tooltips"
-            description="Show contextual help when hovering icons."
+            title={t("preferences.tooltip.title")}
+            description={t("preferences.tooltip.description")}
           >
             <div
               className="
                 flex
+                flex-wrap
                 gap-2
               "
             >
@@ -396,28 +483,31 @@ export default function AdminDisplaySettings() {
                 selected={tooltipEnabled}
                 onClick={() => setTooltipEnabled(true)}
               >
-                On
+                {t("displaySettings.on")}
               </OptionButton>
 
               <OptionButton
                 selected={!tooltipEnabled}
                 onClick={() => setTooltipEnabled(false)}
               >
-                Off
+                {t("displaySettings.off")}
               </OptionButton>
             </div>
           </SettingRow>
 
-          {/* SIDEBAR */}
+          {/* =================================
+              SIDEBAR
+          ================================= */}
 
           <SettingRow
             icon={LayoutPanelLeft}
-            title="Sidebar"
-            description="Choose the default desktop sidebar state."
+            title={t("displaySettings.sidebar.title")}
+            description={t("displaySettings.sidebar.description")}
           >
             <div
               className="
                 flex
+                flex-wrap
                 gap-2
               "
             >
@@ -425,14 +515,14 @@ export default function AdminDisplaySettings() {
                 selected={!sidebarCollapsed}
                 onClick={() => setSidebarCollapsed(false)}
               >
-                Expanded
+                {t("displaySettings.sidebar.expanded")}
               </OptionButton>
 
               <OptionButton
                 selected={sidebarCollapsed}
                 onClick={() => setSidebarCollapsed(true)}
               >
-                Collapsed
+                {t("displaySettings.sidebar.collapsed")}
               </OptionButton>
             </div>
           </SettingRow>

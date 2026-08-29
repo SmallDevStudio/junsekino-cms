@@ -21,11 +21,12 @@ import {
 export const ADMIN_NAVIGATION = [
   {
     id: "main",
-    label: "Overview",
+    labelKey: "navigation.overview",
+
     items: [
       {
         id: "dashboard",
-        label: "Dashboard",
+        labelKey: "navigation.dashboard",
         href: "/admin/dashboard",
         icon: LayoutDashboard,
       },
@@ -34,53 +35,61 @@ export const ADMIN_NAVIGATION = [
 
   {
     id: "content",
-    label: "Content",
+    labelKey: "navigation.content",
+
     items: [
       {
         id: "home",
-        label: "Home",
+        labelKey: "navigation.home",
         href: "/admin/home",
         icon: Home,
       },
+
       {
         id: "about",
-        label: "About",
+        labelKey: "navigation.about",
         href: "/admin/about",
         icon: Building2,
       },
+
       {
         id: "projects",
-        label: "Projects",
+        labelKey: "navigation.projects",
         href: "/admin/projects",
         icon: FolderKanban,
       },
+
       {
         id: "awards",
-        label: "Awards",
+        labelKey: "navigation.awards",
         href: "/admin/awards",
         icon: Award,
       },
+
       {
         id: "public",
-        label: "Public",
+        labelKey: "navigation.publicContent",
         href: "/admin/public-contents",
         icon: Newspaper,
       },
+
       {
         id: "news",
-        label: "News",
+        labelKey: "navigation.news",
         href: "/admin/news",
         icon: FileText,
       },
+
       {
         id: "people",
-        label: "People",
+        labelKey: "navigation.people",
         href: "/admin/people",
         icon: Users,
       },
+
       {
         id: "contact",
-        label: "Contact",
+        labelKey: "navigation.contact",
         href: "/admin/contact",
         icon: Contact,
       },
@@ -89,41 +98,47 @@ export const ADMIN_NAVIGATION = [
 
   {
     id: "management",
-    label: "Management",
+    labelKey: "navigation.management",
+
     items: [
       {
         id: "media",
-        label: "Media",
+        labelKey: "navigation.media",
         href: "/admin/media",
         icon: Image,
       },
+
       {
         id: "forms",
-        label: "Forms",
+        labelKey: "navigation.forms",
         href: "/admin/forms",
         icon: FormInput,
       },
+
       {
         id: "popups",
-        label: "Popups",
+        labelKey: "navigation.popups",
         href: "/admin/popups",
         icon: Megaphone,
       },
+
       {
         id: "tags",
-        label: "Tags",
+        labelKey: "navigation.tags",
         href: "/admin/tags",
         icon: Tags,
       },
+
       {
         id: "search",
-        label: "Search",
+        labelKey: "navigation.search",
         href: "/admin/search",
         icon: Search,
       },
+
       {
         id: "notifications",
-        label: "Notifications",
+        labelKey: "navigation.notifications",
         href: "/admin/notifications",
         icon: Bell,
       },
@@ -132,24 +147,27 @@ export const ADMIN_NAVIGATION = [
 
   {
     id: "administration",
-    label: "Administration",
+    labelKey: "navigation.administration",
+
     items: [
       {
         id: "company",
-        label: "Company",
+        labelKey: "navigation.company",
         href: "/admin/company",
         icon: BriefcaseBusiness,
       },
+
       {
         id: "members",
-        label: "Members",
+        labelKey: "navigation.members",
         href: "/admin/members",
         icon: Users,
         adminOnly: true,
       },
+
       {
         id: "settings",
-        label: "Settings",
+        labelKey: "navigation.settings",
         href: "/admin/settings",
         icon: Settings,
         adminOnly: true,

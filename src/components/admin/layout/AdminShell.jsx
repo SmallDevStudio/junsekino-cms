@@ -11,10 +11,13 @@ import {
   useAdminUiPreferences,
 } from "@/components/admin/ui/AdminUiPreferencesProvider";
 
+import { AdminI18nProvider } from "@/components/admin/i18n/AdminI18nProvider";
+
 import { cn } from "@/utils/cn";
 
 import AdminHeader from "./AdminHeader";
 import AdminSidebar from "./AdminSidebar";
+import AdminTypography from "@/components/admin/ui/AdminTypography";
 
 /*
  * =========================================================
@@ -28,6 +31,7 @@ function AdminShellContent({ user, children }) {
   return (
     <>
       <CompanyTheme />
+      <AdminTypography />
 
       <div
         className="
@@ -81,23 +85,20 @@ function AdminShellContent({ user, children }) {
  * ROOT
  * =========================================================
  *
- * Provider responsibilities:
+ * Provider dependency order:
  *
- * CompanyWorkspaceProvider
- *   - active company
- *   - company switcher
+ * CompanyWorkspace
+ *       ↓
+ * CompanyLocalization
  *
- * CompanyLocalizationProvider
- *   - public content languages
- *   - EN / TH availability
+ * AdminUiPreferences
+ *       ↓
+ * AdminI18n
  *
- * AdminUiPreferencesProvider
- *   - admin interface language
- *   - sidebar
- *   - density
- *   - tooltips
- *
- * These are intentionally separate.
+ * AdminI18n MUST be inside
+ * AdminUiPreferences because locale
+ * comes from the current user's
+ * preferences.
  * =========================================================
  */
 
@@ -106,7 +107,9 @@ export default function AdminShell({ user, children }) {
     <CompanyWorkspaceProvider>
       <CompanyLocalizationProvider>
         <AdminUiPreferencesProvider user={user}>
-          <AdminShellContent user={user}>{children}</AdminShellContent>
+          <AdminI18nProvider>
+            <AdminShellContent user={user}>{children}</AdminShellContent>
+          </AdminI18nProvider>
         </AdminUiPreferencesProvider>
       </CompanyLocalizationProvider>
     </CompanyWorkspaceProvider>

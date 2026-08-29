@@ -8,6 +8,13 @@ import { adminDb } from "@/lib/firebase/admin";
  * =========================================================
  * DEFAULTS
  * =========================================================
+ *
+ * These defaults are intentionally
+ * mirrored with ADMIN_UI_DEFAULTS.
+ *
+ * Server code must not import client-side
+ * Admin UI constants.
+ * =========================================================
  */
 
 const DEFAULT_ADMIN_PREFERENCES = {
@@ -16,6 +23,11 @@ const DEFAULT_ADMIN_PREFERENCES = {
   sidebarCollapsed: false,
 
   density: "comfortable",
+
+  /*
+   * Medium is now the standard default.
+   */
+  fontSize: "medium",
 
   tooltipEnabled: true,
 
@@ -37,22 +49,28 @@ function normalizeAdminPreferences(value = {}) {
     sidebarCollapsed:
       typeof value.sidebarCollapsed === "boolean"
         ? value.sidebarCollapsed
-        : false,
+        : DEFAULT_ADMIN_PREFERENCES.sidebarCollapsed,
 
     density: ["compact", "comfortable", "spacious"].includes(value.density)
       ? value.density
-      : "comfortable",
+      : DEFAULT_ADMIN_PREFERENCES.density,
+
+    fontSize: ["small", "medium", "large"].includes(value.fontSize)
+      ? value.fontSize
+      : DEFAULT_ADMIN_PREFERENCES.fontSize,
 
     tooltipEnabled:
-      typeof value.tooltipEnabled === "boolean" ? value.tooltipEnabled : true,
+      typeof value.tooltipEnabled === "boolean"
+        ? value.tooltipEnabled
+        : DEFAULT_ADMIN_PREFERENCES.tooltipEnabled,
 
     tooltipDelay: Number.isFinite(Number(value.tooltipDelay))
       ? Math.max(0, Math.min(3000, Number(value.tooltipDelay)))
-      : 300,
+      : DEFAULT_ADMIN_PREFERENCES.tooltipDelay,
 
     actionDisplay: ["icon-label", "icon", "label"].includes(value.actionDisplay)
       ? value.actionDisplay
-      : "icon-label",
+      : DEFAULT_ADMIN_PREFERENCES.actionDisplay,
   };
 }
 
@@ -77,9 +95,38 @@ export async function getUserPreferences({ userId }) {
 
   const data = snapshot.data();
 
-  const admin = normalizeAdminPreferences(
-    data?.preferences?.admin || data?.preferences?.adminUi || {},
-  );
+  const storedAdmin =
+    data?.preferences?.admin || data?.preferences?.adminUi || {};
+
+  const admin = normalizeAdminPreferences(storedAdmin);
+
+  /*
+   * =======================================================
+   * LAZY MIGRATION
+   * =======================================================
+   *
+   * Existing users created before fontSize
+   * was introduced do not contain the field.
+   *
+   * Normalize them to Medium and persist the
+   * missing value automatically.
+   *
+   * We do NOT overwrite existing valid user
+   * preferences.
+   * =======================================================
+   */
+
+  const needsMigration =
+    !data?.preferences?.admin ||
+    !["small", "medium", "large"].includes(storedAdmin.fontSize);
+
+  if (needsMigration) {
+    await ref.update({
+      "preferences.admin": admin,
+
+      preferencesUpdatedAt: FieldValue.serverTimestamp(),
+    });
+  }
 
   return {
     admin,
@@ -107,13 +154,33 @@ export async function updateUserPreferences({ userId, input }) {
 
   const existing = snapshot.data();
 
+  /*
+   * Existing stored values.
+   */
   const currentAdmin = normalizeAdminPreferences(
     existing?.preferences?.admin || existing?.preferences?.adminUi || {},
   );
 
+  /*
+   * IMPORTANT:
+   *
+   * Patch only the fields requested by
+   * the client while keeping every other
+   * preference intact.
+   *
+   * Example:
+   *
+   * locale = th
+   * fontSize = large
+   *
+   * User changes only locale to en.
+   *
+   * fontSize MUST remain large.
+   */
   const nextAdmin = normalizeAdminPreferences({
     ...currentAdmin,
-    ...input.admin,
+
+    ...(input?.admin || {}),
   });
 
   await ref.update({

@@ -2,6 +2,8 @@
 
 import FormField from "@/components/admin/form/FormField";
 
+import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
+
 import { useCompanyLocalization } from "@/components/admin/localization/CompanyLocalizationProvider";
 
 import { COMPANY_LOCALES } from "@/constants/company";
@@ -10,39 +12,16 @@ import { cn } from "@/utils/cn";
 
 /*
  * =========================================================
- * LANGUAGE META
- * =========================================================
- */
-
-const LANGUAGE_META = {
-  [COMPANY_LOCALES.EN]: {
-    label: "English",
-    shortLabel: "EN",
-  },
-
-  [COMPANY_LOCALES.TH]: {
-    label: "Thai",
-    shortLabel: "TH",
-  },
-};
-
-/*
- * =========================================================
  * LOCALIZED FORM FIELD
  * =========================================================
  *
- * Shared multilingual field used by all
- * CMS content editors.
+ * Admin UI language:
+ * User preference EN / TH
  *
- * Rules:
+ * Content languages:
+ * Company localization setting
  *
- * - English is always shown.
- * - Thai is shown only when enabled in
- *   Company → Localization.
- * - Hiding Thai NEVER mutates or clears
- *   its stored value.
- * - English is the primary / required
- *   content language.
+ * These systems remain independent.
  * =========================================================
  */
 
@@ -78,19 +57,112 @@ export default function LocalizedFormField({
   autoComplete,
 
   onLanguageChange,
+
+  infoTitle = "",
+
+  infoContent = "",
 }) {
   const { contentLocales, multilingual } = useCompanyLocalization();
+
+  const { t } = useAdminTranslation();
 
   const locales =
     Array.isArray(contentLocales) && contentLocales.length > 0
       ? contentLocales
       : [COMPANY_LOCALES.EN];
 
+  function getLanguageLabel(locale) {
+    if (locale === COMPANY_LOCALES.EN) {
+      return t("contentLanguage.english");
+    }
+
+    if (locale === COMPANY_LOCALES.TH) {
+      return t("contentLanguage.thai");
+    }
+
+    return locale.toUpperCase();
+  }
+
   function handleChange(locale, nextValue) {
     onChange?.(locale, nextValue);
 
     onLanguageChange?.(locale, nextValue);
   }
+
+  /*
+   * Default styles are deliberately
+   * provided here so Admin font scaling
+   * works even when consumers do not
+   * pass custom classes.
+   */
+
+  const defaultInputClass = `
+      h-11
+      w-full
+
+      rounded-xl
+
+      border
+      border-[var(--admin-border)]
+
+      bg-[var(--admin-surface)]
+
+      px-3
+
+      admin-text-14
+
+      text-[var(--admin-foreground)]
+
+      outline-none
+
+      transition
+
+      placeholder:text-[var(--admin-muted-light)]
+
+      focus:border-[var(--company-primary)]
+
+      focus:ring-2
+      focus:ring-[var(--company-primary-soft)]
+
+      disabled:cursor-not-allowed
+      disabled:opacity-60
+    `;
+
+  const defaultTextareaClass = `
+      min-h-[120px]
+      w-full
+
+      resize-y
+
+      rounded-xl
+
+      border
+      border-[var(--admin-border)]
+
+      bg-[var(--admin-surface)]
+
+      px-3
+      py-2.5
+
+      admin-text-14
+      leading-[1.65]
+
+      text-[var(--admin-foreground)]
+
+      outline-none
+
+      transition
+
+      placeholder:text-[var(--admin-muted-light)]
+
+      focus:border-[var(--company-primary)]
+
+      focus:ring-2
+      focus:ring-[var(--company-primary-soft)]
+
+      disabled:cursor-not-allowed
+      disabled:opacity-60
+    `;
 
   return (
     <div data-form-field={fieldName || undefined}>
@@ -102,27 +174,29 @@ export default function LocalizedFormField({
         )}
       >
         {locales.map((locale) => {
-          const meta = LANGUAGE_META[locale] || {
-            label: locale.toUpperCase(),
-
-            shortLabel: locale.toUpperCase(),
-          };
+          const languageLabel = getLanguageLabel(locale);
 
           /*
-           * English is the canonical
-           * required language.
+           * English is canonical.
            *
            * Thai remains optional even
-           * when the company enables it.
+           * when Company enables TH.
            */
           const languageRequired = required && locale === COMPANY_LOCALES.EN;
 
-          const fieldLabel = multilingual ? `${label} — ${meta.label}` : label;
+          const fieldLabel = multilingual
+            ? `${label} — ${languageLabel}`
+            : label;
 
           const fieldHint =
             multilingual && locale === COMPANY_LOCALES.TH
-              ? "Optional Thai translation."
+              ? t("contentLanguage.thaiOptional")
               : hint;
+
+          const localizedPlaceholder =
+            typeof placeholder === "object"
+              ? placeholder?.[locale] || ""
+              : placeholder;
 
           const commonProps = {
             value: value?.[locale] || "",
@@ -133,12 +207,14 @@ export default function LocalizedFormField({
 
             autoComplete,
 
-            placeholder:
-              typeof placeholder === "object"
-                ? placeholder?.[locale] || ""
-                : placeholder,
+            placeholder: localizedPlaceholder,
 
-            onChange: (event) => handleChange(locale, event.target.value),
+            onChange: (event) =>
+              handleChange(
+                locale,
+
+                event.target.value,
+              ),
           };
 
           return (
@@ -148,20 +224,30 @@ export default function LocalizedFormField({
               required={languageRequired}
               hint={fieldHint}
               error={locale === COMPANY_LOCALES.EN ? error : ""}
+              infoTitle={infoTitle}
+              infoContent={infoContent}
             >
               {type === "textarea" ? (
                 <textarea
                   {...commonProps}
                   rows={rows}
                   aria-invalid={locale === COMPANY_LOCALES.EN && Boolean(error)}
-                  className={textareaClassName}
+                  className={cn(
+                    defaultTextareaClass,
+
+                    textareaClassName,
+                  )}
                 />
               ) : (
                 <input
                   {...commonProps}
                   type={type}
                   aria-invalid={locale === COMPANY_LOCALES.EN && Boolean(error)}
-                  className={inputClassName}
+                  className={cn(
+                    defaultInputClass,
+
+                    inputClassName,
+                  )}
                 />
               )}
             </FormField>

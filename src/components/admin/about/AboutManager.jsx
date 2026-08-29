@@ -18,6 +18,8 @@ import { toast } from "sonner";
 
 import { useCompanyWorkspace } from "@/components/admin/company/CompanyWorkspaceProvider";
 
+import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
+
 import { PAGE_STATUS } from "@/constants/page";
 
 import { cn } from "@/utils/cn";
@@ -27,30 +29,27 @@ import AboutPreviewDialog from "./AboutPreviewDialog";
 
 /*
  * =========================================================
- * STATUS
+ * STATUS BADGE
  * =========================================================
  */
 
-function StatusBadge({ status }) {
+function StatusBadge({ status, label }) {
   const published = status === PAGE_STATUS.PUBLISHED;
 
   return (
     <span
       className={cn(
         "inline-flex",
-
         "rounded-full",
-
         "px-2.5 py-1",
-
-        "text-[8px] font-semibold uppercase tracking-[0.08em]",
+        "admin-text-8 font-semibold uppercase tracking-[0.08em]",
 
         published
           ? "bg-[var(--company-primary-soft)] text-[var(--company-primary)]"
           : "bg-[var(--admin-hover)] text-[var(--admin-muted)]",
       )}
     >
-      {published ? "Published" : "Draft"}
+      {label}
     </span>
   );
 }
@@ -67,6 +66,8 @@ export default function AboutManager() {
     activeCompanyId,
     loading: companyLoading,
   } = useCompanyWorkspace();
+
+  const { t, statusLabel, errorMessage } = useAdminTranslation();
 
   const [items, setItems] = useState([]);
 
@@ -105,9 +106,7 @@ export default function AboutManager() {
           `/api/v1/companies/${activeCompanyId}/pages?pageType=about`,
           {
             method: "GET",
-
             cache: "no-store",
-
             credentials: "include",
           },
         );
@@ -115,24 +114,26 @@ export default function AboutManager() {
         const payload = await response.json();
 
         if (!response.ok || payload?.success === false) {
-          throw new Error(
-            payload?.message || "Unable to retrieve About versions.",
-          );
+          throw new Error(payload?.message || t("about.messages.loadFailed"));
         }
 
         setItems(Array.isArray(payload.data) ? payload.data : []);
       } catch (error) {
         console.error("Load About error:", error);
 
-        toast.error(error?.message || "Unable to retrieve About versions.");
+        toast.error(error?.message || t("about.messages.loadFailed"));
       } finally {
         setLoading(false);
-
         setRefreshing(false);
       }
     },
-    [activeCompanyId],
+    [activeCompanyId, t],
   );
+
+  /*
+   * React Compiler-safe:
+   * do not synchronously set state in effect.
+   */
 
   useEffect(() => {
     if (!activeCompanyId) {
@@ -150,25 +151,22 @@ export default function AboutManager() {
 
   /*
    * =======================================================
-   * EDITOR
+   * EDIT
    * =======================================================
    */
 
   function createItem() {
     setEditingItem(null);
-
     setEditorOpen(true);
   }
 
   function editItem(item) {
     setEditingItem(item);
-
     setEditorOpen(true);
   }
 
   async function savedItem() {
     setEditorOpen(false);
-
     setEditingItem(null);
 
     await loadItems({
@@ -183,9 +181,12 @@ export default function AboutManager() {
    */
 
   async function publishItem(item) {
+    const title = item.title?.en || t("about.title");
+
     const confirmed = window.confirm(
-      `Publish "${item.title?.en || "About"}"?\n\n` +
-        "The currently published About version will automatically return to Draft.",
+      t("about.confirm.publish", {
+        title,
+      }),
     );
 
     if (!confirmed) {
@@ -199,7 +200,6 @@ export default function AboutManager() {
         `/api/v1/companies/${activeCompanyId}/about-pages/${item.id}/publish`,
         {
           method: "POST",
-
           credentials: "include",
         },
       );
@@ -207,16 +207,21 @@ export default function AboutManager() {
       const payload = await response.json();
 
       if (!response.ok || payload?.success === false) {
-        throw new Error(payload?.message || "Unable to publish About.");
+        throw new Error(
+          errorMessage(
+            payload?.code,
+            payload?.message || t("about.messages.publishFailed"),
+          ),
+        );
       }
 
-      toast.success("About page published.");
+      toast.success(t("about.messages.published"));
 
       await loadItems({
         silent: true,
       });
     } catch (error) {
-      toast.error(error?.message || "Unable to publish About.");
+      toast.error(error?.message || t("about.messages.publishFailed"));
     } finally {
       setActionId(null);
     }
@@ -229,7 +234,7 @@ export default function AboutManager() {
    */
 
   async function unpublishItem(item) {
-    if (!window.confirm("Return this About version to Draft?")) {
+    if (!window.confirm(t("about.confirm.unpublish"))) {
       return;
     }
 
@@ -240,7 +245,6 @@ export default function AboutManager() {
         `/api/v1/companies/${activeCompanyId}/pages/${item.id}/unpublish`,
         {
           method: "POST",
-
           credentials: "include",
         },
       );
@@ -248,16 +252,21 @@ export default function AboutManager() {
       const payload = await response.json();
 
       if (!response.ok || payload?.success === false) {
-        throw new Error(payload?.message || "Unable to unpublish About.");
+        throw new Error(
+          errorMessage(
+            payload?.code,
+            payload?.message || t("about.messages.unpublishFailed"),
+          ),
+        );
       }
 
-      toast.success("About returned to Draft.");
+      toast.success(t("about.messages.unpublished"));
 
       await loadItems({
         silent: true,
       });
     } catch (error) {
-      toast.error(error?.message || "Unable to unpublish About.");
+      toast.error(error?.message || t("about.messages.unpublishFailed"));
     } finally {
       setActionId(null);
     }
@@ -271,12 +280,12 @@ export default function AboutManager() {
 
   async function deleteItem(item) {
     if (item.status === PAGE_STATUS.PUBLISHED) {
-      toast.error("Unpublish this About version before deleting it.");
+      toast.error(t("about.messages.deletePublished"));
 
       return;
     }
 
-    if (!window.confirm("Delete this About version?")) {
+    if (!window.confirm(t("about.confirm.delete"))) {
       return;
     }
 
@@ -287,7 +296,6 @@ export default function AboutManager() {
         `/api/v1/companies/${activeCompanyId}/pages/${item.id}`,
         {
           method: "DELETE",
-
           credentials: "include",
         },
       );
@@ -295,16 +303,21 @@ export default function AboutManager() {
       const payload = await response.json();
 
       if (!response.ok || payload?.success === false) {
-        throw new Error(payload?.message || "Unable to delete About.");
+        throw new Error(
+          errorMessage(
+            payload?.code,
+            payload?.message || t("about.messages.deleteFailed"),
+          ),
+        );
       }
 
-      toast.success("About version deleted.");
+      toast.success(t("about.messages.deleted"));
 
       await loadItems({
         silent: true,
       });
     } catch (error) {
-      toast.error(error?.message || "Unable to delete About.");
+      toast.error(error?.message || t("about.messages.deleteFailed"));
     } finally {
       setActionId(null);
     }
@@ -322,7 +335,6 @@ export default function AboutManager() {
         className="
           flex
           min-h-[320px]
-
           items-center
           justify-center
         "
@@ -331,7 +343,6 @@ export default function AboutManager() {
           size={20}
           className="
             animate-spin
-
             text-[var(--company-primary)]
           "
         />
@@ -364,7 +375,7 @@ export default function AboutManager() {
           <div>
             <div
               className="
-                text-[10px]
+                admin-text-10
                 font-semibold
                 uppercase
                 tracking-[0.14em]
@@ -372,21 +383,20 @@ export default function AboutManager() {
                 text-[var(--company-primary)]
               "
             >
-              Content
+              {t("about.sectionLabel")}
             </div>
 
             <h1
               className="
                 mt-2
-
-                text-[28px]
+                admin-text-28
                 font-semibold
                 tracking-[-0.03em]
 
                 text-[var(--admin-foreground)]
               "
             >
-              About
+              {t("about.title")}
             </h1>
 
             <p
@@ -394,26 +404,21 @@ export default function AboutManager() {
                 mt-2
                 max-w-[620px]
 
-                text-xs
-                leading-5
+                admin-text-12
+                leading-[1.65]
 
                 text-[var(--admin-muted)]
               "
             >
-              Create and preview multiple About versions. Only one version can
-              be published at a time.
+              {t("about.description")}
             </p>
           </div>
 
-          <div
-            className="
-              flex
-              items-center
-              gap-2
-            "
-          >
+          <div className="flex items-center gap-2">
             <button
               type="button"
+              aria-label={t("common.refresh")}
+              title={t("common.refresh")}
               onClick={() =>
                 loadItems({
                   silent: true,
@@ -437,7 +442,11 @@ export default function AboutManager() {
 
                 transition
 
+                hover:border-[var(--company-primary-border)]
                 hover:bg-[var(--admin-hover)]
+                hover:text-[var(--company-primary)]
+
+                disabled:opacity-50
               "
             >
               <RefreshCw
@@ -462,7 +471,7 @@ export default function AboutManager() {
 
                 px-4
 
-                text-xs
+                admin-text-12
                 font-semibold
 
                 text-[var(--company-primary-foreground)]
@@ -473,7 +482,8 @@ export default function AboutManager() {
               "
             >
               <Plus size={15} />
-              New Version
+
+              {t("about.newVersion")}
             </button>
           </div>
         </div>
@@ -493,7 +503,10 @@ export default function AboutManager() {
             >
               <LoaderCircle
                 size={20}
-                className="animate-spin text-[var(--company-primary)]"
+                className="
+                  animate-spin
+                  text-[var(--company-primary)]
+                "
               />
             </div>
           ) : items.length === 0 ? (
@@ -525,25 +538,25 @@ export default function AboutManager() {
                 className="
                   mt-4
 
-                  text-sm
+                  admin-text-14
                   font-semibold
 
                   text-[var(--admin-foreground)]
                 "
               >
-                No About versions
+                {t("about.versions.emptyTitle")}
               </div>
 
               <div
                 className="
                   mt-1
 
-                  text-xs
+                  admin-text-12
 
                   text-[var(--admin-muted)]
                 "
               >
-                Create the first About page version.
+                {t("about.versions.emptyDescription")}
               </div>
             </div>
           ) : (
@@ -572,15 +585,13 @@ export default function AboutManager() {
                         bg-[var(--admin-surface)]
 
                         p-5
+
+                        transition
+
+                        hover:border-[var(--company-primary-border)]
                       "
                   >
-                    <div
-                      className="
-                          flex
-                          items-start
-                          gap-4
-                        "
-                    >
+                    <div className="flex items-start gap-4">
                       <div
                         className="
                             flex
@@ -602,47 +613,39 @@ export default function AboutManager() {
                         <FileText size={20} />
                       </div>
 
-                      <div
-                        className="
-                            min-w-0
-                            flex-1
-                          "
-                      >
-                        <div
-                          className="
-                              flex
-                              items-center
-                              gap-2
-                            "
-                        >
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
                           <h2
                             className="
                                 truncate
 
-                                text-sm
+                                admin-text-14
                                 font-semibold
 
                                 text-[var(--admin-foreground)]
                               "
                           >
-                            {item.title?.en || "About"}
+                            {item.title?.en || t("about.title")}
                           </h2>
 
-                          <StatusBadge status={item.status} />
+                          <StatusBadge
+                            status={item.status}
+                            label={statusLabel(item.status)}
+                          />
                         </div>
 
                         <div
                           className="
                               mt-2
 
-                              text-[10px]
+                              admin-text-10
 
                               text-[var(--admin-muted)]
                             "
                         >
                           {item.featuredImage?.mediaId
-                            ? "Cover image selected"
-                            : "No cover image"}
+                            ? t("about.versions.coverSelected")
+                            : t("about.versions.noCover")}
                         </div>
                       </div>
                     </div>
@@ -676,7 +679,7 @@ export default function AboutManager() {
 
                             px-3
 
-                            text-[10px]
+                            admin-text-10
                             font-medium
 
                             text-[var(--admin-muted)]
@@ -688,7 +691,8 @@ export default function AboutManager() {
                           "
                       >
                         <Eye size={14} />
-                        Preview
+
+                        {t("common.preview")}
                       </button>
 
                       <button
@@ -705,7 +709,7 @@ export default function AboutManager() {
 
                             px-3
 
-                            text-[10px]
+                            admin-text-10
                             font-medium
 
                             text-[var(--admin-muted)]
@@ -717,7 +721,8 @@ export default function AboutManager() {
                           "
                       >
                         <Pencil size={14} />
-                        Edit
+
+                        {t("common.edit")}
                       </button>
 
                       {!published ? (
@@ -736,7 +741,7 @@ export default function AboutManager() {
 
                               px-3
 
-                              text-[10px]
+                              admin-text-10
                               font-medium
 
                               text-[var(--company-primary)]
@@ -753,7 +758,8 @@ export default function AboutManager() {
                           ) : (
                             <Send size={14} />
                           )}
-                          Publish
+
+                          {t("common.publish")}
                         </button>
                       ) : (
                         <button
@@ -771,7 +777,7 @@ export default function AboutManager() {
 
                               px-3
 
-                              text-[10px]
+                              admin-text-10
                               font-medium
 
                               text-[var(--admin-muted)]
@@ -784,7 +790,8 @@ export default function AboutManager() {
                             "
                         >
                           <Undo2 size={14} />
-                          Unpublish
+
+                          {t("common.unpublish")}
                         </button>
                       )}
 
@@ -792,6 +799,8 @@ export default function AboutManager() {
                         <button
                           type="button"
                           disabled={busy}
+                          aria-label={t("common.delete")}
+                          title={t("common.delete")}
                           onClick={() => deleteItem(item)}
                           className="
                               ml-auto
@@ -811,6 +820,8 @@ export default function AboutManager() {
 
                               hover:bg-red-50
                               hover:text-red-600
+
+                              disabled:opacity-40
                             "
                         >
                           <Trash2 size={14} />
@@ -831,7 +842,6 @@ export default function AboutManager() {
         page={editingItem}
         onClose={() => {
           setEditorOpen(false);
-
           setEditingItem(null);
         }}
         onSaved={savedItem}

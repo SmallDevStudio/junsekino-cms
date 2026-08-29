@@ -1,14 +1,28 @@
 "use client";
 
+import {
+  Image as ImageIcon,
+  LoaderCircle,
+  RefreshCw,
+  Search,
+} from "lucide-react";
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Image as ImageIcon, RefreshCw, Search, Upload } from "lucide-react";
-
 import { useCompanyWorkspace } from "@/components/admin/company/CompanyWorkspaceProvider";
+
+import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
+
 import { cn } from "@/utils/cn";
 
-import MediaUploadDropzone from "./MediaUploadDropzone";
 import MediaCard from "./MediaCard";
+import MediaUploadDropzone from "./MediaUploadDropzone";
+
+/*
+ * =========================================================
+ * HELPERS
+ * =========================================================
+ */
 
 function normalizeMediaResponse(payload) {
   if (!payload) {
@@ -34,15 +48,21 @@ function normalizeMediaResponse(payload) {
   return [];
 }
 
-function getMediaName(media) {
+function getMediaName(media, fallback) {
   return (
     media?.originalFileName ||
     media?.fileName ||
     media?.name ||
     media?.id ||
-    "Untitled media"
+    fallback
   );
 }
+
+/*
+ * =========================================================
+ * MEDIA MANAGER
+ * =========================================================
+ */
 
 export default function MediaManager() {
   const {
@@ -51,17 +71,29 @@ export default function MediaManager() {
     loading: companyLoading,
   } = useCompanyWorkspace();
 
+  const { t } = useAdminTranslation();
+
   const [items, setItems] = useState([]);
+
   const [loading, setLoading] = useState(false);
+
   const [refreshing, setRefreshing] = useState(false);
+
   const [error, setError] = useState(null);
 
   const [search, setSearch] = useState("");
+
+  /*
+   * =======================================================
+   * LOAD MEDIA
+   * =======================================================
+   */
 
   const loadMedia = useCallback(
     async ({ silent = false } = {}) => {
       if (!activeCompanyId) {
         setItems([]);
+
         return;
       }
 
@@ -78,7 +110,9 @@ export default function MediaManager() {
           `/api/v1/companies/${activeCompanyId}/media`,
           {
             method: "GET",
+
             cache: "no-store",
+
             credentials: "include",
           },
         );
@@ -86,21 +120,28 @@ export default function MediaManager() {
         const payload = await response.json();
 
         if (!response.ok || payload?.success === false) {
-          throw new Error(payload?.message || "Unable to retrieve media.");
+          throw new Error(
+            payload?.message || t("media.manager.errors.loadFailed"),
+          );
         }
 
         setItems(normalizeMediaResponse(payload));
       } catch (loadError) {
         console.error("Load media error:", loadError);
 
-        setError(loadError?.message || "Unable to retrieve media.");
+        setError(loadError?.message || t("media.manager.errors.loadFailed"));
       } finally {
         setLoading(false);
+
         setRefreshing(false);
       }
     },
-    [activeCompanyId],
+    [activeCompanyId, t],
   );
+
+  /*
+   * React Compiler-safe.
+   */
 
   useEffect(() => {
     if (!activeCompanyId) {
@@ -116,6 +157,12 @@ export default function MediaManager() {
     };
   }, [activeCompanyId, loadMedia]);
 
+  /*
+   * =======================================================
+   * FILTER
+   * =======================================================
+   */
+
   const filteredItems = useMemo(() => {
     const keyword = search.trim().toLowerCase();
 
@@ -126,12 +173,26 @@ export default function MediaManager() {
     return items.filter((media) => {
       const text = [
         media.id,
+
         media.originalFileName,
+
         media.fileName,
+
         media.mimeType,
+
         media.type,
+
         media.usage,
+
         media.status,
+
+        media.alt?.en,
+
+        media.alt?.th,
+
+        media.caption?.en,
+
+        media.caption?.th,
       ]
         .filter(Boolean)
         .join(" ")
@@ -141,49 +202,156 @@ export default function MediaManager() {
     });
   }, [items, search]);
 
+  /*
+   * =======================================================
+   * COMPANY LOADING
+   * =======================================================
+   */
+
   if (companyLoading) {
     return (
-      <div className="flex min-h-[420px] items-center justify-center">
-        <div className="text-sm text-[var(--admin-muted)]">
-          Loading workspace...
+      <div
+        className="
+          flex
+          min-h-[420px]
+
+          items-center
+          justify-center
+        "
+      >
+        <div
+          className="
+            flex
+            items-center
+            gap-2
+
+            admin-text-14
+
+            text-[var(--admin-muted)]
+          "
+        >
+          <LoaderCircle
+            size={17}
+            className="
+              animate-spin
+
+              text-[var(--company-primary)]
+            "
+          />
+
+          {t("media.manager.loadingWorkspace")}
         </div>
       </div>
     );
   }
 
+  /*
+   * =======================================================
+   * NO COMPANY
+   * =======================================================
+   */
+
   if (!activeCompany) {
     return (
-      <div className="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-8">
-        <div className="text-sm font-medium text-[var(--admin-foreground)]">
-          No company selected
+      <div
+        className="
+          rounded-2xl
+
+          border
+          border-[var(--admin-border)]
+
+          bg-[var(--admin-surface)]
+
+          p-8
+        "
+      >
+        <div
+          className="
+            admin-text-14
+            font-medium
+
+            text-[var(--admin-foreground)]
+          "
+        >
+          {t("media.manager.noCompany.title")}
         </div>
 
-        <p className="mt-1 text-sm text-[var(--admin-muted)]">
-          Select a workspace before managing media.
+        <p
+          className="
+            mt-1
+
+            admin-text-14
+            leading-[1.6]
+
+            text-[var(--admin-muted)]
+          "
+        >
+          {t("media.manager.noCompany.description")}
         </p>
       </div>
     );
   }
 
+  /*
+   * =======================================================
+   * RENDER
+   * =======================================================
+   */
+
   return (
     <div>
+      {/* =====================================
+          HEADER
+      ===================================== */}
+
       <div
         className={cn(
           "flex flex-col gap-5",
+
           "lg:flex-row lg:items-end lg:justify-between",
         )}
       >
         <div>
-          <div className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--admin-muted)]">
-            Content Management
+          <div
+            className="
+              admin-text-12
+
+              font-medium
+              uppercase
+              tracking-[0.14em]
+
+              text-[var(--company-primary)]
+            "
+          >
+            {t("media.manager.sectionLabel")}
           </div>
 
-          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.035em] text-[var(--admin-foreground)] sm:text-4xl">
-            Media
+          <h1
+            className="
+              mt-2
+
+              admin-text-32
+              font-semibold
+              tracking-[-0.035em]
+
+              text-[var(--admin-foreground)]
+            "
+          >
+            {t("media.manager.title")}
           </h1>
 
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--admin-muted)]">
-            Upload and manage images used across the website.
+          <p
+            className="
+              mt-2
+              max-w-2xl
+
+              admin-text-14
+              leading-[1.7]
+
+              text-[var(--admin-muted)]
+            "
+          >
+            {t("media.manager.description")}
           </p>
         </div>
 
@@ -197,19 +365,39 @@ export default function MediaManager() {
           disabled={refreshing}
           className={cn(
             "inline-flex h-10 items-center justify-center gap-2",
+
             "self-start rounded-xl",
+
             "border border-[var(--admin-border)]",
+
             "bg-[var(--admin-surface)] px-4",
-            "text-sm font-medium text-[var(--admin-foreground)]",
-            "transition hover:bg-[var(--admin-hover)]",
+
+            "admin-text-14 font-medium",
+
+            "text-[var(--admin-foreground)]",
+
+            "transition",
+
+            "hover:border-[var(--company-primary-border)]",
+
+            "hover:bg-[var(--company-primary-soft)]",
+
+            "hover:text-[var(--company-primary)]",
+
             "disabled:cursor-not-allowed disabled:opacity-60",
+
             "lg:self-auto",
           )}
         >
           <RefreshCw size={15} className={cn(refreshing && "animate-spin")} />
-          Refresh
+
+          {refreshing ? t("media.manager.refreshing") : t("common.refresh")}
         </button>
       </div>
+
+      {/* =====================================
+          UPLOAD
+      ===================================== */}
 
       <div className="mt-8">
         <MediaUploadDropzone
@@ -222,56 +410,133 @@ export default function MediaManager() {
         />
       </div>
 
+      {/* =====================================
+          SEARCH + COUNT
+      ===================================== */}
+
       <div
         className={cn(
           "mt-6 flex flex-col gap-4",
+
           "sm:flex-row sm:items-center sm:justify-between",
         )}
       >
-        <div className="relative w-full sm:max-w-sm">
+        <div
+          className="
+            relative
+
+            w-full
+
+            sm:max-w-sm
+          "
+        >
           <Search
             size={16}
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-muted)]"
+            className="
+              pointer-events-none
+
+              absolute
+              left-3
+              top-1/2
+
+              -translate-y-1/2
+
+              text-[var(--admin-muted)]
+            "
           />
 
           <input
             type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search media..."
-            className={cn(
-              "h-11 w-full rounded-xl",
-              "border border-[var(--admin-border)]",
-              "bg-[var(--admin-surface)]",
-              "pl-10 pr-4",
-              "text-sm text-[var(--admin-foreground)]",
-              "outline-none transition",
-              "placeholder:text-[var(--admin-muted-light)]",
-              "focus:border-[var(--company-primary)]",
-              "focus:ring-2 focus:ring-[var(--company-primary-soft)]",
-            )}
+            placeholder={t("media.manager.searchPlaceholder")}
+            className="
+              h-11
+              w-full
+
+              rounded-xl
+
+              border
+              border-[var(--admin-border)]
+
+              bg-[var(--admin-surface)]
+
+              pl-10
+              pr-4
+
+              admin-text-14
+
+              text-[var(--admin-foreground)]
+
+              outline-none
+
+              transition
+
+              placeholder:text-[var(--admin-muted-light)]
+
+              focus:border-[var(--company-primary)]
+
+              focus:ring-2
+              focus:ring-[var(--company-primary-soft)]
+            "
           />
         </div>
 
-        <div className="text-xs text-[var(--admin-muted)]">
-          {filteredItems.length}{" "}
-          {filteredItems.length === 1 ? "asset" : "assets"}
+        <div
+          className="
+            admin-text-12
+
+            text-[var(--admin-muted)]
+          "
+        >
+          {t("media.manager.assetCount", {
+            count: filteredItems.length,
+          })}
         </div>
       </div>
 
+      {/* =====================================
+          ERROR
+      ===================================== */}
+
       {error && (
-        <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div
+          className="
+            mt-6
+
+            rounded-2xl
+
+            border
+            border-red-200
+
+            bg-red-50
+
+            p-4
+
+            admin-text-14
+
+            text-red-700
+          "
+        >
           {error}
         </div>
       )}
+
+      {/* =====================================
+          LOADING
+      ===================================== */}
 
       {loading ? (
         <div
           className={cn(
             "mt-6 grid gap-4",
+
             "grid-cols-2",
+
             "sm:grid-cols-3",
+
             "lg:grid-cols-4",
+
             "2xl:grid-cols-5",
           )}
         >
@@ -280,40 +545,155 @@ export default function MediaManager() {
           }).map((_, index) => (
             <div
               key={index}
-              className="overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"
+              className="
+                  overflow-hidden
+
+                  rounded-2xl
+
+                  border
+                  border-[var(--admin-border)]
+
+                  bg-[var(--admin-surface)]
+                "
             >
-              <div className="aspect-[4/3] animate-pulse bg-[var(--admin-hover)]" />
+              <div
+                className="
+                    aspect-[4/3]
+
+                    animate-pulse
+
+                    bg-[var(--admin-hover)]
+                  "
+              />
 
               <div className="space-y-2 p-4">
-                <div className="h-3 w-3/4 animate-pulse rounded bg-[var(--admin-hover)]" />
-                <div className="h-2.5 w-1/2 animate-pulse rounded bg-[var(--admin-hover)]" />
+                <div
+                  className="
+                      h-3
+                      w-3/4
+
+                      animate-pulse
+
+                      rounded
+
+                      bg-[var(--admin-hover)]
+                    "
+                />
+
+                <div
+                  className="
+                      h-2.5
+                      w-1/2
+
+                      animate-pulse
+
+                      rounded
+
+                      bg-[var(--admin-hover)]
+                    "
+                />
               </div>
             </div>
           ))}
         </div>
       ) : filteredItems.length === 0 ? (
-        <div className="mt-6 flex min-h-[320px] flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface)] p-8 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--company-primary-soft)] text-[var(--company-primary)]">
+        /*
+         * ===================================
+         * EMPTY
+         * ===================================
+         */
+
+        <div
+          className="
+            mt-6
+
+            flex
+            min-h-[320px]
+
+            flex-col
+            items-center
+            justify-center
+
+            rounded-2xl
+
+            border
+            border-dashed
+            border-[var(--admin-border)]
+
+            bg-[var(--admin-surface)]
+
+            p-8
+
+            text-center
+          "
+        >
+          <div
+            className="
+              flex
+              h-12
+              w-12
+
+              items-center
+              justify-center
+
+              rounded-2xl
+
+              bg-[var(--company-primary-soft)]
+
+              text-[var(--company-primary)]
+            "
+          >
             <ImageIcon size={21} strokeWidth={1.7} />
           </div>
 
-          <div className="mt-4 text-sm font-medium text-[var(--admin-foreground)]">
-            {search ? "No matching media" : "No media yet"}
+          <div
+            className="
+              mt-4
+
+              admin-text-14
+              font-medium
+
+              text-[var(--admin-foreground)]
+            "
+          >
+            {search
+              ? t("media.manager.empty.searchTitle")
+              : t("media.manager.empty.title")}
           </div>
 
-          <p className="mt-1 max-w-sm text-xs leading-5 text-[var(--admin-muted)]">
+          <p
+            className="
+              mt-1
+              max-w-sm
+
+              admin-text-12
+              leading-[1.65]
+
+              text-[var(--admin-muted)]
+            "
+          >
             {search
-              ? "Try another filename or keyword."
-              : "Upload the first image to start building your media library."}
+              ? t("media.manager.empty.searchDescription")
+              : t("media.manager.empty.description")}
           </p>
         </div>
       ) : (
+        /*
+         * ===================================
+         * GRID
+         * ===================================
+         */
+
         <div
           className={cn(
             "mt-6 grid gap-4",
+
             "grid-cols-2",
+
             "sm:grid-cols-3",
+
             "lg:grid-cols-4",
+
             "2xl:grid-cols-5",
           )}
         >
@@ -322,7 +702,11 @@ export default function MediaManager() {
               key={media.id}
               companyId={activeCompanyId}
               media={media}
-              title={getMediaName(media)}
+              title={getMediaName(
+                media,
+
+                t("media.manager.untitled"),
+              )}
             />
           ))}
         </div>

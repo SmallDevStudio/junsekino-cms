@@ -6,22 +6,28 @@ import { useMemo, useState } from "react";
 
 import { toast } from "sonner";
 
+import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
+
+import { useCompanyLocalization } from "@/components/admin/localization/CompanyLocalizationProvider";
+
+import { COMPANY_LOCALES } from "@/constants/company";
+
 import { cn } from "@/utils/cn";
 
-function slugify(value) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
+import { slugify } from "@/utils/slug";
 
-function getCategoryName(category) {
+/*
+ * =========================================================
+ * HELPERS
+ * =========================================================
+ */
+
+function getCategoryName(category, fallback) {
   return (
     category?.name?.en?.trim() ||
     category?.name?.th?.trim() ||
     category?.slug ||
-    "Untitled category"
+    fallback
   );
 }
 
@@ -36,6 +42,12 @@ function emptyCategoryForm() {
   };
 }
 
+/*
+ * =========================================================
+ * INLINE CATEGORY FORM
+ * =========================================================
+ */
+
 function InlineCategoryForm({
   type,
   companyId,
@@ -43,27 +55,48 @@ function InlineCategoryForm({
   onCreated,
   onCancel,
 }) {
+  const { t } = useAdminTranslation();
+
+  const { contentLocales } = useCompanyLocalization();
+
   const [form, setForm] = useState(emptyCategoryForm);
 
   const [saving, setSaving] = useState(false);
 
-  const title = type === "subcategory" ? "New Sub-category" : "New Category";
+  const thaiEnabled =
+    Array.isArray(contentLocales) &&
+    contentLocales.includes(COMPANY_LOCALES.TH);
+
+  const isSubCategory = type === "subcategory";
+
+  const title = isSubCategory
+    ? t("project.category.newSubCategory")
+    : t("project.category.newCategory");
+
+  /*
+   * =======================================================
+   * CREATE
+   * =======================================================
+   */
 
   async function handleCreate() {
-    if (!companyId) {
+    if (!companyId || saving) {
       return;
     }
 
-    if (!form.name.th.trim() && !form.name.en.trim()) {
-      toast.error("Category name is required.");
+    /*
+     * English remains canonical.
+     */
+    if (!form.name.en.trim()) {
+      toast.error(t("project.category.errors.nameRequired"));
 
       return;
     }
 
-    const generatedSlug = slugify(form.slug || form.name.en || form.name.th);
+    const generatedSlug = slugify(form.slug || form.name.en);
 
     if (generatedSlug.length < 2) {
-      toast.error("Please enter an English slug with at least 2 characters.");
+      toast.error(t("project.category.errors.slugInvalid"));
 
       return;
     }
@@ -83,9 +116,15 @@ function InlineCategoryForm({
           credentials: "include",
 
           body: JSON.stringify({
+            /*
+             * Keep complete localized
+             * shape even when Thai UI
+             * is hidden.
+             */
             name: {
-              th: form.name.th.trim(),
               en: form.name.en.trim(),
+
+              th: form.name.th.trim(),
             },
 
             slug: generatedSlug,
@@ -93,8 +132,8 @@ function InlineCategoryForm({
             parentId: parentId || null,
 
             description: {
-              th: "",
               en: "",
+              th: "",
             },
 
             sortOrder: 0,
@@ -107,27 +146,91 @@ function InlineCategoryForm({
       const result = await response.json();
 
       if (!response.ok || result?.success === false) {
-        throw new Error(result?.message || "Unable to create category.");
+        throw new Error(
+          result?.message || t("project.category.errors.createFailed"),
+        );
       }
 
       toast.success(
-        type === "subcategory" ? "Sub-category created." : "Category created.",
+        isSubCategory
+          ? t("project.category.messages.subCategoryCreated")
+          : t("project.category.messages.categoryCreated"),
       );
 
       onCreated?.(result.data);
     } catch (error) {
       console.error("Create project category error:", error);
 
-      toast.error(error?.message || "Unable to create category.");
+      toast.error(error?.message || t("project.category.errors.createFailed"));
     } finally {
       setSaving(false);
     }
   }
 
+  /*
+   * =======================================================
+   * INPUT
+   * =======================================================
+   */
+
+  function updateName(locale, value) {
+    setForm((current) => ({
+      ...current,
+
+      name: {
+        ...current.name,
+
+        [locale]: value,
+      },
+
+      /*
+       * Generate slug only from EN.
+       */
+      slug:
+        locale === COMPANY_LOCALES.EN && !current.slug
+          ? slugify(value)
+          : current.slug,
+    }));
+  }
+
+  /*
+   * =======================================================
+   * RENDER
+   * =======================================================
+   */
+
   return (
-    <div className="mt-3 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-background)] p-4">
-      <div className="flex items-center justify-between gap-4">
-        <div className="text-xs font-semibold text-[var(--admin-foreground)]">
+    <div
+      className="
+        mt-3
+
+        rounded-2xl
+
+        border
+        border-[var(--admin-border)]
+
+        bg-[var(--admin-background)]
+
+        p-4
+      "
+    >
+      <div
+        className="
+          flex
+          items-center
+          justify-between
+
+          gap-4
+        "
+      >
+        <div
+          className="
+            admin-text-12
+            font-semibold
+
+            text-[var(--admin-foreground)]
+          "
+        >
           {title}
         </div>
 
@@ -135,64 +238,188 @@ function InlineCategoryForm({
           type="button"
           onClick={onCancel}
           disabled={saving}
-          aria-label="Cancel"
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--admin-muted)] transition hover:bg-[var(--admin-hover)]"
+          aria-label={t("common.cancel")}
+          title={t("common.cancel")}
+          className="
+            flex
+            h-8
+            w-8
+
+            items-center
+            justify-center
+
+            rounded-lg
+
+            text-[var(--admin-muted)]
+
+            transition
+
+            hover:bg-[var(--admin-hover)]
+
+            hover:text-[var(--admin-foreground)]
+
+            disabled:opacity-50
+          "
         >
           <X size={14} />
         </button>
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <label>
-          <span className="text-[11px] text-[var(--admin-muted)]">
-            Name — Thai
-          </span>
+      {/* =====================================
+          NAMES
+      ===================================== */}
 
-          <input
-            value={form.name.th}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
+      <div
+        className={cn(
+          "mt-4 grid gap-3",
 
-                name: {
-                  ...current.name,
-
-                  th: event.target.value,
-                },
-              }))
-            }
-            className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none focus:border-[var(--company-primary)]"
-          />
-        </label>
+          thaiEnabled && "sm:grid-cols-2",
+        )}
+      >
+        {/* EN */}
 
         <label>
-          <span className="text-[11px] text-[var(--admin-muted)]">
-            Name — English
+          <span
+            className="
+              admin-text-11
+
+              text-[var(--admin-muted)]
+            "
+          >
+            {t("project.category.fields.name")} — {t("contentLanguage.english")}
+            <span className="ml-1 text-red-500">*</span>
           </span>
 
           <input
             value={form.name.en}
-            onChange={(event) => {
-              const value = event.target.value;
+            onChange={(event) =>
+              updateName(
+                COMPANY_LOCALES.EN,
 
-              setForm((current) => ({
-                ...current,
+                event.target.value,
+              )
+            }
+            placeholder={t("project.category.placeholders.englishName")}
+            className="
+              mt-2
 
-                name: {
-                  ...current.name,
-                  en: value,
-                },
+              h-10
+              w-full
 
-                slug: current.slug || slugify(value),
-              }));
-            }}
-            className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none focus:border-[var(--company-primary)]"
+              rounded-xl
+
+              border
+              border-[var(--admin-border)]
+
+              bg-[var(--admin-surface)]
+
+              px-3
+
+              admin-text-14
+
+              text-[var(--admin-foreground)]
+
+              outline-none
+
+              transition
+
+              placeholder:text-[var(--admin-muted-light)]
+
+              focus:border-[var(--company-primary)]
+
+              focus:ring-2
+              focus:ring-[var(--company-primary-soft)]
+            "
           />
         </label>
+
+        {/* TH */}
+
+        {thaiEnabled && (
+          <label>
+            <span
+              className="
+                admin-text-11
+
+                text-[var(--admin-muted)]
+              "
+            >
+              {t("project.category.fields.name")} — {t("contentLanguage.thai")}
+            </span>
+
+            <input
+              value={form.name.th}
+              onChange={(event) =>
+                updateName(
+                  COMPANY_LOCALES.TH,
+
+                  event.target.value,
+                )
+              }
+              placeholder={t("project.category.placeholders.thaiName")}
+              className="
+                mt-2
+
+                h-10
+                w-full
+
+                rounded-xl
+
+                border
+                border-[var(--admin-border)]
+
+                bg-[var(--admin-surface)]
+
+                px-3
+
+                admin-text-14
+
+                text-[var(--admin-foreground)]
+
+                outline-none
+
+                transition
+
+                placeholder:text-[var(--admin-muted-light)]
+
+                focus:border-[var(--company-primary)]
+
+                focus:ring-2
+                focus:ring-[var(--company-primary-soft)]
+              "
+            />
+
+            <div
+              className="
+                mt-1.5
+
+                admin-text-10
+
+                text-[var(--admin-muted-light)]
+              "
+            >
+              {t("contentLanguage.thaiOptional")}
+            </div>
+          </label>
+        )}
       </div>
 
-      <label className="mt-3 block">
-        <span className="text-[11px] text-[var(--admin-muted)]">Slug</span>
+      {/* =====================================
+          SLUG
+      ===================================== */}
+
+      <label className="mt-4 block">
+        <span
+          className="
+            admin-text-11
+
+            text-[var(--admin-muted)]
+          "
+        >
+          {t("project.category.fields.slug")}
+
+          <span className="ml-1 text-red-500">*</span>
+        </span>
 
         <input
           value={form.slug}
@@ -204,33 +431,122 @@ function InlineCategoryForm({
             }))
           }
           placeholder="residential"
-          className="mt-2 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm outline-none focus:border-[var(--company-primary)]"
+          className="
+            mt-2
+
+            h-10
+            w-full
+
+            rounded-xl
+
+            border
+            border-[var(--admin-border)]
+
+            bg-[var(--admin-surface)]
+
+            px-3
+
+            admin-text-14
+
+            text-[var(--admin-foreground)]
+
+            outline-none
+
+            transition
+
+            placeholder:text-[var(--admin-muted-light)]
+
+            focus:border-[var(--company-primary)]
+
+            focus:ring-2
+            focus:ring-[var(--company-primary-soft)]
+          "
         />
+
+        <p
+          className="
+            mt-1.5
+
+            admin-text-10
+            leading-[1.5]
+
+            text-[var(--admin-muted-light)]
+          "
+        >
+          {t("project.category.slugHint")}
+        </p>
       </label>
 
-      <div className="mt-4 flex justify-end gap-2">
+      {/* =====================================
+          ACTION
+      ===================================== */}
+
+      <div
+        className="
+          mt-4
+
+          flex
+          justify-end
+
+          gap-2
+        "
+      >
         <button
           type="button"
           onClick={onCancel}
           disabled={saving}
-          className="h-9 rounded-xl px-3 text-xs font-medium text-[var(--admin-muted)] transition hover:bg-[var(--admin-hover)]"
+          className="
+            h-9
+
+            rounded-xl
+
+            px-3
+
+            admin-text-12
+            font-medium
+
+            text-[var(--admin-muted)]
+
+            transition
+
+            hover:bg-[var(--admin-hover)]
+
+            disabled:opacity-50
+          "
         >
-          Cancel
+          {t("common.cancel")}
         </button>
 
         <button
           type="button"
           onClick={handleCreate}
           disabled={saving}
-          className={cn(
-            "inline-flex h-9 items-center justify-center gap-2",
-            "rounded-xl",
-            "bg-[var(--company-primary)] px-4",
-            "text-xs font-medium",
-            "text-[var(--company-primary-foreground)]",
-            "transition hover:opacity-90",
-            "disabled:cursor-not-allowed disabled:opacity-50",
-          )}
+          className="
+            inline-flex
+            h-9
+
+            items-center
+            justify-center
+            gap-2
+
+            rounded-xl
+
+            bg-[var(--company-primary)]
+
+            px-4
+
+            admin-text-12
+            font-medium
+
+            text-[var(--company-primary-foreground)]
+
+            transition
+
+            hover:bg-[var(--company-primary-hover)]
+
+            disabled:cursor-not-allowed
+            disabled:opacity-50
+          "
         >
           {saving ? (
             <LoaderCircle size={14} className="animate-spin" />
@@ -238,12 +554,18 @@ function InlineCategoryForm({
             <Plus size={14} />
           )}
 
-          {saving ? "Creating..." : "Create"}
+          {saving ? t("common.creating") : t("common.create")}
         </button>
       </div>
     </div>
   );
 }
+
+/*
+ * =========================================================
+ * PROJECT CATEGORY SECTION
+ * =========================================================
+ */
 
 export default function ProjectCategorySection({
   companyId,
@@ -253,6 +575,8 @@ export default function ProjectCategorySection({
   onCategoryChange,
   onSubCategoryChange,
 }) {
+  const { t } = useAdminTranslation();
+
   const [localCategories, setLocalCategories] = useState(categories);
 
   const [createCategoryOpen, setCreateCategoryOpen] = useState(false);
@@ -260,11 +584,11 @@ export default function ProjectCategorySection({
   const [createSubCategoryOpen, setCreateSubCategoryOpen] = useState(false);
 
   /*
-   * categories prop comes from ProjectManager.
-   *
-   * Newly-created inline categories remain inside this
-   * component until ProjectManager reloads after Save.
+   * =======================================================
+   * MERGE
+   * =======================================================
    */
+
   const combinedCategories = useMemo(() => {
     const map = new Map();
 
@@ -301,6 +625,12 @@ export default function ProjectCategorySection({
     [combinedCategories, categoryId],
   );
 
+  /*
+   * =======================================================
+   * CREATED
+   * =======================================================
+   */
+
   function handleRootCreated(category) {
     if (!category?.id) {
       return;
@@ -335,25 +665,65 @@ export default function ProjectCategorySection({
     setCreateSubCategoryOpen(false);
   }
 
+  /*
+   * =======================================================
+   * RENDER
+   * =======================================================
+   */
+
   return (
     <section className="mt-10">
       <div>
-        <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
-          Category
+        <h3
+          className="
+            admin-text-14
+            font-semibold
+
+            text-[var(--admin-foreground)]
+          "
+        >
+          {t("project.category.title")}
         </h3>
 
-        <p className="mt-1 text-xs leading-5 text-[var(--admin-muted)]">
-          Assign the project to a category and optional sub-category.
+        <p
+          className="
+            mt-1
+
+            admin-text-12
+            leading-[1.65]
+
+            text-[var(--admin-muted)]
+          "
+        >
+          {t("project.category.description")}
         </p>
       </div>
 
-      <div className="mt-4 grid gap-5 sm:grid-cols-2">
-        {/* Category */}
+      <div
+        className="
+          mt-4
+
+          grid
+          gap-5
+
+          sm:grid-cols-2
+        "
+      >
+        {/* =================================
+            CATEGORY
+        ================================= */}
 
         <div>
           <label>
-            <span className="text-xs font-medium text-[var(--admin-muted)]">
-              Category
+            <span
+              className="
+                admin-text-12
+                font-medium
+
+                text-[var(--admin-muted)]
+              "
+            >
+              {t("project.category.category")}
             </span>
 
             <select
@@ -365,13 +735,44 @@ export default function ProjectCategorySection({
 
                 setCreateSubCategoryOpen(false);
               }}
-              className="mt-2 h-11 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm text-[var(--admin-foreground)] outline-none focus:border-[var(--company-primary)]"
+              className="
+                mt-2
+
+                h-11
+                w-full
+
+                rounded-xl
+
+                border
+                border-[var(--admin-border)]
+
+                bg-[var(--admin-surface)]
+
+                px-3
+
+                admin-text-14
+
+                text-[var(--admin-foreground)]
+
+                outline-none
+
+                transition
+
+                focus:border-[var(--company-primary)]
+
+                focus:ring-2
+                focus:ring-[var(--company-primary-soft)]
+              "
             >
-              <option value="">No category</option>
+              <option value="">{t("project.category.noCategory")}</option>
 
               {rootCategories.map((category) => (
                 <option key={category.id} value={category.id}>
-                  {getCategoryName(category)}
+                  {getCategoryName(
+                    category,
+
+                    t("project.manager.untitledCategory"),
+                  )}
                 </option>
               ))}
             </select>
@@ -381,10 +782,26 @@ export default function ProjectCategorySection({
             <button
               type="button"
               onClick={() => setCreateCategoryOpen(true)}
-              className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-medium text-[var(--company-primary)] transition hover:opacity-70"
+              className="
+                mt-2
+
+                inline-flex
+                items-center
+                gap-1.5
+
+                admin-text-11
+                font-medium
+
+                text-[var(--company-primary)]
+
+                transition
+
+                hover:opacity-70
+              "
             >
               <Plus size={12} />
-              Create new category
+
+              {t("project.category.createCategory")}
             </button>
           ) : (
             <InlineCategoryForm
@@ -396,12 +813,21 @@ export default function ProjectCategorySection({
           )}
         </div>
 
-        {/* Sub-category */}
+        {/* =================================
+            SUB CATEGORY
+        ================================= */}
 
         <div>
           <label>
-            <span className="text-xs font-medium text-[var(--admin-muted)]">
-              Sub-category
+            <span
+              className="
+                admin-text-12
+                font-medium
+
+                text-[var(--admin-muted)]
+              "
+            >
+              {t("project.category.subCategory")}
             </span>
 
             <select
@@ -410,13 +836,47 @@ export default function ProjectCategorySection({
               onChange={(event) =>
                 onSubCategoryChange?.(event.target.value || null)
               }
-              className="mt-2 h-11 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm text-[var(--admin-foreground)] outline-none focus:border-[var(--company-primary)] disabled:cursor-not-allowed disabled:opacity-50"
+              className="
+                mt-2
+
+                h-11
+                w-full
+
+                rounded-xl
+
+                border
+                border-[var(--admin-border)]
+
+                bg-[var(--admin-surface)]
+
+                px-3
+
+                admin-text-14
+
+                text-[var(--admin-foreground)]
+
+                outline-none
+
+                transition
+
+                focus:border-[var(--company-primary)]
+
+                focus:ring-2
+                focus:ring-[var(--company-primary-soft)]
+
+                disabled:cursor-not-allowed
+                disabled:opacity-50
+              "
             >
-              <option value="">No sub-category</option>
+              <option value="">{t("project.category.noSubCategory")}</option>
 
               {subCategories.map((category) => (
                 <option key={category.id} value={category.id}>
-                  {getCategoryName(category)}
+                  {getCategoryName(
+                    category,
+
+                    t("project.manager.untitledCategory"),
+                  )}
                 </option>
               ))}
             </select>
@@ -426,10 +886,26 @@ export default function ProjectCategorySection({
             <button
               type="button"
               onClick={() => setCreateSubCategoryOpen(true)}
-              className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-medium text-[var(--company-primary)] transition hover:opacity-70"
+              className="
+                  mt-2
+
+                  inline-flex
+                  items-center
+                  gap-1.5
+
+                  admin-text-11
+                  font-medium
+
+                  text-[var(--company-primary)]
+
+                  transition
+
+                  hover:opacity-70
+                "
             >
               <Plus size={12} />
-              Create new sub-category
+
+              {t("project.category.createSubCategory")}
             </button>
           )}
 
@@ -444,8 +920,16 @@ export default function ProjectCategorySection({
           )}
 
           {!categoryId && (
-            <p className="mt-2 text-[11px] text-[var(--admin-muted-light)]">
-              Select a category first before creating a sub-category.
+            <p
+              className="
+                mt-2
+
+                admin-text-11
+
+                text-[var(--admin-muted-light)]
+              "
+            >
+              {t("project.category.selectCategoryFirst")}
             </p>
           )}
         </div>

@@ -19,13 +19,20 @@ import {
 import { EditorContent, useEditor } from "@tiptap/react";
 
 import { StarterKit } from "@tiptap/starter-kit";
+
 import { Underline } from "@tiptap/extension-underline";
+
 import { Link } from "@tiptap/extension-link";
+
 import { TextAlign } from "@tiptap/extension-text-align";
+
 import { TextStyle } from "@tiptap/extension-text-style";
+
 import { Color } from "@tiptap/extension-color";
 
 import { useEffect } from "react";
+
+import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
 
 import { cn } from "@/utils/cn";
 
@@ -51,6 +58,7 @@ function normalizeEditorContent(value) {
         content: [
           {
             type: "text",
+
             text: paragraph,
           },
         ],
@@ -89,9 +97,13 @@ function normalizeEditorContent(value) {
 
 function ToolbarButton({
   active = false,
+
   disabled = false,
+
   label,
+
   onClick,
+
   children,
 }) {
   return (
@@ -123,7 +135,7 @@ function ToolbarButton({
 
 /*
  * =========================================================
- * TOOLBAR DIVIDER
+ * DIVIDER
  * =========================================================
  */
 
@@ -132,8 +144,10 @@ function ToolbarDivider() {
     <span
       className="
         mx-1
+
         h-5
         w-px
+
         bg-[var(--admin-border)]
       "
     />
@@ -142,7 +156,7 @@ function ToolbarDivider() {
 
 /*
  * =========================================================
- * COMPANY PRIMARY COLOR
+ * COMPANY COLOR
  * =========================================================
  */
 
@@ -167,15 +181,22 @@ function getCompanyPrimaryColor() {
 
 export default function RichTextEditor({
   value,
+
   onChange,
-  placeholder = "Write content...",
+
+  placeholder,
+
   minHeight = 260,
+
   disabled = false,
 }) {
+  const { t } = useAdminTranslation();
+
+  const resolvedPlaceholder = placeholder || t("editor.placeholderEnglish");
+
   const editor = useEditor({
     /*
-     * Prevent SSR hydration mismatch
-     * with Next.js App Router.
+     * Prevent App Router hydration mismatch.
      */
     immediatelyRender: false,
 
@@ -183,24 +204,13 @@ export default function RichTextEditor({
 
     extensions: [
       /*
-       * =====================================================
-       * STARTER KIT
-       * =====================================================
+       * Tiptap v3 StarterKit already
+       * includes Link and Underline.
        *
-       * Tiptap v3 StarterKit already includes
-       * Link and Underline.
-       *
-       * We disable them here because this editor
-       * registers separately configured versions
+       * Disable them here because we
+       * register configured versions
        * below.
-       *
-       * Without this, Tiptap warns:
-       *
-       * Duplicate extension names found:
-       * ['link', 'underline']
-       * =====================================================
        */
-
       StarterKit.configure({
         heading: {
           levels: [2, 3],
@@ -211,14 +221,8 @@ export default function RichTextEditor({
         underline: false,
       }),
 
-      /*
-       * Custom Underline
-       */
       Underline,
 
-      /*
-       * Custom Link configuration
-       */
       Link.configure({
         openOnClick: false,
 
@@ -233,21 +237,12 @@ export default function RichTextEditor({
         },
       }),
 
-      /*
-       * Text alignment
-       */
       TextAlign.configure({
         types: ["heading", "paragraph"],
       }),
 
-      /*
-       * Required by Color extension
-       */
       TextStyle,
 
-      /*
-       * Text color
-       */
       Color,
     ],
 
@@ -255,7 +250,12 @@ export default function RichTextEditor({
 
     editorProps: {
       attributes: {
-        class: "rich-text-editor-content outline-none",
+        /*
+         * admin-text-14 allows the base
+         * editor font size to follow the
+         * user's Admin typography setting.
+         */
+        class: "rich-text-editor-content admin-text-14 outline-none",
       },
     },
 
@@ -267,6 +267,11 @@ export default function RichTextEditor({
   /*
    * =======================================================
    * EXTERNAL CONTENT SYNC
+   * =======================================================
+   *
+   * State is not modified directly in
+   * this effect. Editor is an external
+   * system, which is a valid effect use.
    * =======================================================
    */
 
@@ -294,7 +299,7 @@ export default function RichTextEditor({
 
   /*
    * =======================================================
-   * EDITABLE STATE
+   * EDITABLE
    * =======================================================
    */
 
@@ -317,9 +322,12 @@ export default function RichTextEditor({
       <div
         className="
           animate-pulse
+
           rounded-2xl
+
           border
           border-[var(--admin-border)]
+
           bg-[var(--admin-background)]
         "
         style={{
@@ -338,7 +346,11 @@ export default function RichTextEditor({
   function setLink() {
     const previousUrl = editor.getAttributes("link").href;
 
-    const url = window.prompt("Enter URL", previousUrl || "");
+    const url = window.prompt(
+      t("editor.enterUrl"),
+
+      previousUrl || "",
+    );
 
     if (url === null) {
       return;
@@ -346,18 +358,12 @@ export default function RichTextEditor({
 
     const normalized = url.trim();
 
-    /*
-     * Empty input removes link.
-     */
     if (!normalized) {
       editor.chain().focus().extendMarkRange("link").unsetLink().run();
 
       return;
     }
 
-    /*
-     * Normalize common URLs.
-     */
     const safeUrl = /^(https?:\/\/|mailto:|tel:|\/|#)/i.test(normalized)
       ? normalized
       : `https://${normalized}`;
@@ -434,11 +440,11 @@ export default function RichTextEditor({
         "
       >
         {/* =================================
-            TEXT STYLE
+            STYLE
         ================================= */}
 
         <ToolbarButton
-          label="Bold"
+          label={t("editor.bold")}
           active={editor.isActive("bold")}
           onClick={() => editor.chain().focus().toggleBold().run()}
         >
@@ -446,7 +452,7 @@ export default function RichTextEditor({
         </ToolbarButton>
 
         <ToolbarButton
-          label="Italic"
+          label={t("editor.italic")}
           active={editor.isActive("italic")}
           onClick={() => editor.chain().focus().toggleItalic().run()}
         >
@@ -454,7 +460,7 @@ export default function RichTextEditor({
         </ToolbarButton>
 
         <ToolbarButton
-          label="Underline"
+          label={t("editor.underline")}
           active={editor.isActive("underline")}
           onClick={() => editor.chain().focus().toggleUnderline().run()}
         >
@@ -468,7 +474,7 @@ export default function RichTextEditor({
         ================================= */}
 
         <ToolbarButton
-          label="Heading 2"
+          label={t("editor.heading2")}
           active={editor.isActive("heading", {
             level: 2,
           })}
@@ -482,11 +488,18 @@ export default function RichTextEditor({
               .run()
           }
         >
-          <span className="text-[11px] font-semibold">H2</span>
+          <span
+            className="
+              admin-text-11
+              font-semibold
+            "
+          >
+            H2
+          </span>
         </ToolbarButton>
 
         <ToolbarButton
-          label="Heading 3"
+          label={t("editor.heading3")}
           active={editor.isActive("heading", {
             level: 3,
           })}
@@ -500,17 +513,24 @@ export default function RichTextEditor({
               .run()
           }
         >
-          <span className="text-[11px] font-semibold">H3</span>
+          <span
+            className="
+              admin-text-11
+              font-semibold
+            "
+          >
+            H3
+          </span>
         </ToolbarButton>
 
         <ToolbarDivider />
 
         {/* =================================
-            LISTS
+            LIST
         ================================= */}
 
         <ToolbarButton
-          label="Bullet List"
+          label={t("editor.bulletList")}
           active={editor.isActive("bulletList")}
           onClick={() => editor.chain().focus().toggleBulletList().run()}
         >
@@ -518,7 +538,7 @@ export default function RichTextEditor({
         </ToolbarButton>
 
         <ToolbarButton
-          label="Numbered List"
+          label={t("editor.orderedList")}
           active={editor.isActive("orderedList")}
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
         >
@@ -526,7 +546,7 @@ export default function RichTextEditor({
         </ToolbarButton>
 
         <ToolbarButton
-          label="Quote"
+          label={t("editor.quote")}
           active={editor.isActive("blockquote")}
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
         >
@@ -536,11 +556,11 @@ export default function RichTextEditor({
         <ToolbarDivider />
 
         {/* =================================
-            ALIGNMENT
+            ALIGN
         ================================= */}
 
         <ToolbarButton
-          label="Align Left"
+          label={t("editor.alignLeft")}
           active={editor.isActive({
             textAlign: "left",
           })}
@@ -550,7 +570,7 @@ export default function RichTextEditor({
         </ToolbarButton>
 
         <ToolbarButton
-          label="Align Center"
+          label={t("editor.alignCenter")}
           active={editor.isActive({
             textAlign: "center",
           })}
@@ -560,7 +580,7 @@ export default function RichTextEditor({
         </ToolbarButton>
 
         <ToolbarButton
-          label="Align Right"
+          label={t("editor.alignRight")}
           active={editor.isActive({
             textAlign: "right",
           })}
@@ -576,7 +596,7 @@ export default function RichTextEditor({
         ================================= */}
 
         <ToolbarButton
-          label="Link"
+          label={t("editor.link")}
           active={editor.isActive("link")}
           onClick={setLink}
         >
@@ -584,7 +604,7 @@ export default function RichTextEditor({
         </ToolbarButton>
 
         {/* =================================
-            TEXT COLOR
+            COLORS
         ================================= */}
 
         <div
@@ -594,27 +614,27 @@ export default function RichTextEditor({
             items-center
             gap-1
           "
-          title="Text color"
+          title={t("editor.textColor")}
         >
           {["#111111", "#666666", "#800000", "#FE9800"].map((color) => (
             <button
               key={color}
               type="button"
-              aria-label={`Text color ${color}`}
+              aria-label={`${t("editor.textColor")} ${color}`}
               onClick={() => applyColor(color)}
               className="
-                h-5
-                w-5
+                  h-5
+                  w-5
 
-                rounded-full
+                  rounded-full
 
-                border
-                border-black/10
+                  border
+                  border-black/10
 
-                transition
+                  transition
 
-                hover:scale-110
-              "
+                  hover:scale-110
+                "
               style={{
                 backgroundColor: color,
               }}
@@ -623,8 +643,8 @@ export default function RichTextEditor({
 
           <button
             type="button"
-            title="Company color"
-            aria-label="Company color"
+            title={t("editor.companyColor")}
+            aria-label={t("editor.companyColor")}
             onClick={applyCompanyColor}
             className="
               h-5
@@ -647,11 +667,11 @@ export default function RichTextEditor({
         <ToolbarDivider />
 
         {/* =================================
-            CLEAR FORMAT
+            CLEAR
         ================================= */}
 
         <ToolbarButton
-          label="Clear Formatting"
+          label={t("editor.clearFormatting")}
           onClick={() =>
             editor.chain().focus().unsetAllMarks().clearNodes().run()
           }
@@ -664,7 +684,7 @@ export default function RichTextEditor({
         ================================= */}
 
         <ToolbarButton
-          label="Undo"
+          label={t("editor.undo")}
           disabled={!editor.can().chain().focus().undo().run()}
           onClick={() => editor.chain().focus().undo().run()}
         >
@@ -672,7 +692,7 @@ export default function RichTextEditor({
         </ToolbarButton>
 
         <ToolbarButton
-          label="Redo"
+          label={t("editor.redo")}
           disabled={!editor.can().chain().focus().redo().run()}
           onClick={() => editor.chain().focus().redo().run()}
         >
@@ -681,12 +701,13 @@ export default function RichTextEditor({
       </div>
 
       {/* =================================
-          EDITOR CONTENT
+          CONTENT
       ================================= */}
 
       <div
         className="
           relative
+
           px-4
           py-3
         "
@@ -703,12 +724,12 @@ export default function RichTextEditor({
               left-4
               top-3
 
-              text-sm
+              admin-text-14
 
               text-[var(--admin-muted-light)]
             "
           >
-            {placeholder}
+            {resolvedPlaceholder}
           </div>
         )}
 

@@ -13,6 +13,8 @@ import { useEffect, useState } from "react";
 
 import { toast } from "sonner";
 
+import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
+
 import MediaPicker from "@/components/admin/media/MediaPicker";
 
 import LocalizedFormField from "@/components/admin/localization/LocalizedFormField";
@@ -20,8 +22,6 @@ import LocalizedFormField from "@/components/admin/localization/LocalizedFormFie
 import LocalizedRichTextEditor from "@/components/admin/localization/LocalizedRichTextEditor";
 
 import { PAGE_TYPE } from "@/constants/page";
-
-import { cn } from "@/utils/cn";
 
 import AboutPreviewDialog from "./AboutPreviewDialog";
 
@@ -125,6 +125,8 @@ export default function AboutEditor({
   onClose,
   onSaved,
 }) {
+  const { t, errorMessage } = useAdminTranslation();
+
   const [form, setForm] = useState(() => normalizePage(page));
 
   const [saving, setSaving] = useState(false);
@@ -220,7 +222,7 @@ export default function AboutEditor({
     }
 
     if (!form.title?.en?.trim()) {
-      toast.error("English title is required.");
+      toast.error(t("about.messages.titleRequired"));
 
       return;
     }
@@ -266,18 +268,23 @@ export default function AboutEditor({
       const payload = await response.json();
 
       if (!response.ok || payload?.success === false) {
-        throw new Error(payload?.message || "Unable to save About page.");
+        throw new Error(
+          errorMessage(
+            payload?.code,
+            payload?.message || t("about.messages.saveFailed"),
+          ),
+        );
       }
 
       toast.success(
-        editing ? "About version updated." : "About version created.",
+        editing ? t("about.messages.updated") : t("about.messages.created"),
       );
 
       await onSaved?.(payload.data);
     } catch (error) {
       console.error("Save About error:", error);
 
-      toast.error(error?.message || "Unable to save About page.");
+      toast.error(error?.message || t("about.messages.saveFailed"));
     } finally {
       setSaving(false);
     }
@@ -297,7 +304,7 @@ export default function AboutEditor({
       >
         <button
           type="button"
-          aria-label="Close About editor"
+          aria-label={t("common.close")}
           onClick={saving ? undefined : onClose}
           className="
             absolute
@@ -330,51 +337,50 @@ export default function AboutEditor({
           <header
             className="
               flex
-              h-20
+              min-h-20
               shrink-0
 
               items-center
               justify-between
 
+              gap-4
+
               border-b
               border-[var(--admin-border)]
 
               px-5
+              py-4
 
               sm:px-8
             "
           >
-            <div>
+            <div className="min-w-0">
               <h2
                 className="
-                  text-lg
+                  admin-text-18
                   font-semibold
                   tracking-[-0.02em]
 
                   text-[var(--admin-foreground)]
                 "
               >
-                {page ? "Edit About" : "New About Version"}
+                {page ? t("about.editTitle") : t("about.newVersionTitle")}
               </h2>
 
               <p
                 className="
                   mt-1
-                  text-xs
+
+                  admin-text-12
+
                   text-[var(--admin-muted)]
                 "
               >
-                Cover image and rich text content
+                {t("about.editorDescription")}
               </p>
             </div>
 
-            <div
-              className="
-                flex
-                items-center
-                gap-1
-              "
-            >
+            <div className="flex shrink-0 items-center gap-1">
               <button
                 type="button"
                 onClick={() => setPreviewOpen(true)}
@@ -389,7 +395,7 @@ export default function AboutEditor({
 
                   px-3
 
-                  text-xs
+                  admin-text-12
                   font-medium
 
                   text-[var(--admin-muted)]
@@ -401,14 +407,15 @@ export default function AboutEditor({
                 "
               >
                 <Eye size={15} />
-                Preview
+
+                {t("common.preview")}
               </button>
 
               <button
                 type="button"
                 onClick={onClose}
                 disabled={saving}
-                aria-label="Close"
+                aria-label={t("common.close")}
                 className="
                   flex
                   h-9
@@ -424,6 +431,7 @@ export default function AboutEditor({
                   transition
 
                   hover:bg-[var(--admin-hover)]
+                  hover:text-[var(--admin-foreground)]
                 "
               >
                 <X size={18} />
@@ -447,23 +455,23 @@ export default function AboutEditor({
               sm:py-8
             "
           >
-            {/* TITLE */}
+            {/* PAGE INFORMATION */}
 
             <section>
               <h3
                 className="
-                  text-sm
+                  admin-text-14
                   font-semibold
 
                   text-[var(--admin-foreground)]
                 "
               >
-                Page Information
+                {t("about.pageInformation")}
               </h3>
 
               <div className="mt-4">
                 <LocalizedFormField
-                  label="Title"
+                  label={t("project.fields.title")}
                   value={form.title}
                   required
                   onChange={(locale, value) =>
@@ -482,7 +490,7 @@ export default function AboutEditor({
 
                     px-3
 
-                    text-sm
+                    admin-text-14
 
                     outline-none
 
@@ -502,26 +510,26 @@ export default function AboutEditor({
             <section className="mt-10">
               <h3
                 className="
-                  text-sm
+                  admin-text-14
                   font-semibold
 
                   text-[var(--admin-foreground)]
                 "
               >
-                Cover Image
+                {t("about.cover.title")}
               </h3>
 
               <p
                 className="
                   mt-1
-                  text-xs
-                  leading-5
+
+                  admin-text-12
+                  leading-[1.65]
 
                   text-[var(--admin-muted)]
                 "
               >
-                Recommended landscape image. Crop and focal-point controls will
-                use this presentation data.
+                {t("about.cover.description")}
               </p>
 
               <div
@@ -537,13 +545,7 @@ export default function AboutEditor({
                 "
               >
                 {form.featuredImage?.mediaId ? (
-                  <div
-                    className="
-                      flex
-                      items-center
-                      gap-3
-                    "
-                  >
+                  <div className="flex items-center gap-3">
                     <div
                       className="
                         flex
@@ -565,21 +567,16 @@ export default function AboutEditor({
                       <ImageIcon size={18} />
                     </div>
 
-                    <div
-                      className="
-                        min-w-0
-                        flex-1
-                      "
-                    >
+                    <div className="min-w-0 flex-1">
                       <div
                         className="
-                          text-xs
+                          admin-text-12
                           font-medium
 
                           text-[var(--admin-foreground)]
                         "
                       >
-                        Cover selected
+                        {t("about.cover.selected")}
                       </div>
 
                       <div
@@ -587,7 +584,7 @@ export default function AboutEditor({
                           mt-1
                           truncate
 
-                          text-[10px]
+                          admin-text-10
 
                           text-[var(--admin-muted)]
                         "
@@ -598,10 +595,11 @@ export default function AboutEditor({
 
                     <button
                       type="button"
+                      aria-label={t("common.remove")}
+                      title={t("common.remove")}
                       onClick={() =>
                         setForm((current) => ({
                           ...current,
-
                           featuredImage: null,
                         }))
                       }
@@ -626,13 +624,7 @@ export default function AboutEditor({
                     </button>
                   </div>
                 ) : (
-                  <div
-                    className="
-                      flex
-                      items-center
-                      gap-3
-                    "
-                  >
+                  <div className="flex items-center gap-3">
                     <ImageIcon
                       size={18}
                       className="text-[var(--admin-muted)]"
@@ -640,12 +632,11 @@ export default function AboutEditor({
 
                     <span
                       className="
-                        text-xs
-
+                        admin-text-12
                         text-[var(--admin-muted)]
                       "
                     >
-                      No cover image selected.
+                      {t("about.cover.none")}
                     </span>
                   </div>
                 )}
@@ -669,7 +660,7 @@ export default function AboutEditor({
 
                     px-4
 
-                    text-xs
+                    admin-text-12
                     font-medium
 
                     text-[var(--admin-foreground)]
@@ -686,8 +677,8 @@ export default function AboutEditor({
                   <ImageIcon size={15} />
 
                   {form.featuredImage?.mediaId
-                    ? "Change Cover"
-                    : "Select Cover"}
+                    ? t("about.cover.change")
+                    : t("about.cover.select")}
                 </button>
               </div>
             </section>
@@ -697,31 +688,31 @@ export default function AboutEditor({
             <section className="mt-10">
               <h3
                 className="
-                  text-sm
+                  admin-text-14
                   font-semibold
 
                   text-[var(--admin-foreground)]
                 "
               >
-                Content
+                {t("about.content.title")}
               </h3>
 
               <p
                 className="
                   mt-1
-                  text-xs
-                  leading-5
+
+                  admin-text-12
+                  leading-[1.65]
 
                   text-[var(--admin-muted)]
                 "
               >
-                Rich text supports headings, bold, italic, links, lists,
-                alignment and text color.
+                {t("about.content.description")}
               </p>
 
               <div className="mt-4">
                 <LocalizedRichTextEditor
-                  label="About Content"
+                  label={t("about.content.label")}
                   value={form.content}
                   minHeight={380}
                   onChange={(locale, value) =>
@@ -739,9 +730,7 @@ export default function AboutEditor({
               flex
               shrink-0
 
-              items-center
-              justify-between
-
+              flex-col
               gap-3
 
               border-t
@@ -750,26 +739,24 @@ export default function AboutEditor({
               px-5
               py-4
 
+              sm:flex-row
+              sm:items-center
+              sm:justify-between
               sm:px-8
             "
           >
             <span
               className="
-                text-[10px]
+                admin-text-10
+                leading-[1.5]
 
                 text-[var(--admin-muted)]
               "
             >
-              Save creates a Draft. Publish is managed from the About list.
+              {t("about.actions.saveHint")}
             </span>
 
-            <div
-              className="
-                flex
-                items-center
-                gap-2
-              "
-            >
+            <div className="flex shrink-0 items-center gap-2">
               <button
                 type="button"
                 onClick={onClose}
@@ -781,7 +768,7 @@ export default function AboutEditor({
 
                   px-4
 
-                  text-sm
+                  admin-text-14
                   font-medium
 
                   text-[var(--admin-muted)]
@@ -791,7 +778,7 @@ export default function AboutEditor({
                   hover:bg-[var(--admin-hover)]
                 "
               >
-                Cancel
+                {t("common.cancel")}
               </button>
 
               <button
@@ -811,7 +798,7 @@ export default function AboutEditor({
 
                   px-5
 
-                  text-sm
+                  admin-text-14
                   font-medium
 
                   text-[var(--company-primary-foreground)]
@@ -820,6 +807,7 @@ export default function AboutEditor({
 
                   hover:bg-[var(--company-primary-hover)]
 
+                  disabled:cursor-not-allowed
                   disabled:opacity-50
                 "
               >
@@ -829,7 +817,7 @@ export default function AboutEditor({
                   <Save size={15} />
                 )}
 
-                {saving ? "Saving..." : "Save Draft"}
+                {saving ? t("common.saving") : t("common.saveDraft")}
               </button>
             </div>
           </footer>
@@ -843,7 +831,7 @@ export default function AboutEditor({
         selectedIds={
           form.featuredImage?.mediaId ? [form.featuredImage.mediaId] : []
         }
-        title="Select About cover"
+        title={t("about.cover.dialogTitle")}
         onClose={() => setMediaPickerOpen(false)}
         onConfirm={selectCover}
       />

@@ -13,6 +13,7 @@ import {
 import {
   ADMIN_ACTION_DISPLAY,
   ADMIN_DENSITY,
+  ADMIN_FONT_SIZE,
   ADMIN_LOCALE,
   ADMIN_UI_DEFAULTS,
 } from "@/constants/admin-ui";
@@ -41,6 +42,10 @@ function isDensity(value) {
   return Object.values(ADMIN_DENSITY).includes(value);
 }
 
+function isFontSize(value) {
+  return Object.values(ADMIN_FONT_SIZE).includes(value);
+}
+
 function isLocale(value) {
   return Object.values(ADMIN_LOCALE).includes(value);
 }
@@ -66,6 +71,10 @@ function normalizePreferences(value = {}) {
       ? value.density
       : ADMIN_UI_DEFAULTS.density,
 
+    fontSize: isFontSize(value.fontSize)
+      ? value.fontSize
+      : ADMIN_UI_DEFAULTS.fontSize,
+
     locale: isLocale(value.locale) ? value.locale : ADMIN_UI_DEFAULTS.locale,
 
     sidebarCollapsed:
@@ -79,6 +88,40 @@ function getInitialPreferences(user) {
   return normalizePreferences(
     user?.preferences?.admin || user?.preferences?.adminUi || {},
   );
+}
+
+function readLocalPreferences(user) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(getStorageKey(user));
+
+    if (!raw) {
+      return null;
+    }
+
+    return normalizePreferences(JSON.parse(raw));
+  } catch {
+    return null;
+  }
+}
+
+function writeLocalPreferences(user, preferences) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(
+      getStorageKey(user),
+
+      JSON.stringify(preferences),
+    );
+  } catch {
+    // Ignore local cache failure.
+  }
 }
 
 /*
@@ -96,7 +139,7 @@ export function AdminUiPreferencesProvider({ user, children }) {
 
   const [saving, setSaving] = useState(false);
 
-  const initializedRef = useRef(false);
+  const initializedUserRef = useRef(null);
 
   const saveTimerRef = useRef(null);
 
@@ -107,45 +150,47 @@ export function AdminUiPreferencesProvider({ user, children }) {
    */
 
   useEffect(() => {
-    if (initializedRef.current) {
+    const userId = getUserId(user);
+
+    /*
+     * Each authenticated user gets an
+     * independent preference initialization.
+     */
+    if (initializedUserRef.current === userId) {
       return;
     }
 
-    initializedRef.current = true;
+    initializedUserRef.current = userId;
 
     let active = true;
 
     const timeoutId = window.setTimeout(async () => {
       /*
-       * Start from server-rendered
-       * session preference.
+       * Start from session values.
        */
-
       let resolved = initialPreferences;
 
       /*
-       * Local cache gives immediate
-       * fallback if network is slow.
+       * Apply cached user preference
+       * immediately.
        */
+      const cached = readLocalPreferences(user);
 
-      try {
-        const raw = window.localStorage.getItem(getStorageKey(user));
+      if (cached) {
+        resolved = normalizePreferences({
+          ...resolved,
+          ...cached,
+        });
+      }
 
-        if (raw) {
-          resolved = normalizePreferences({
-            ...resolved,
-            ...JSON.parse(raw),
-          });
-        }
-      } catch {
-        // Ignore cache failure.
+      if (active) {
+        setPreferences(resolved);
       }
 
       /*
-       * Server profile remains
-       * source of truth.
+       * Firestore-backed preference is
+       * the final persistent source.
        */
-
       try {
         const response = await fetch("/api/v1/users/me/preferences", {
           method: "GET",
@@ -162,8 +207,8 @@ export function AdminUiPreferencesProvider({ user, children }) {
             resolved = normalizePreferences(payload.data.admin);
           }
         }
-      } catch {
-        // Use local cache/server session.
+      } catch (error) {
+        console.error("Load admin preferences error:", error);
       }
 
       if (!active) {
@@ -172,15 +217,7 @@ export function AdminUiPreferencesProvider({ user, children }) {
 
       setPreferences(resolved);
 
-      try {
-        window.localStorage.setItem(
-          getStorageKey(user),
-
-          JSON.stringify(resolved),
-        );
-      } catch {
-        // Ignore cache failure.
-      }
+      writeLocalPreferences(user, resolved);
 
       setReady(true);
     }, 0);
@@ -201,26 +238,13 @@ export function AdminUiPreferencesProvider({ user, children }) {
   const persistPreferences = useCallback(
     (nextPreferences) => {
       /*
-       * Cache immediately.
+       * Immediate local persistence.
        */
-
-      try {
-        window.localStorage.setItem(
-          getStorageKey(user),
-
-          JSON.stringify(nextPreferences),
-        );
-      } catch {
-        // Ignore cache failure.
-      }
+      writeLocalPreferences(user, nextPreferences);
 
       /*
-       * Debounce Firestore writes.
-       *
-       * Multiple quick UI changes
-       * become one PATCH.
+       * Debounce server writes.
        */
-
       if (saveTimerRef.current) {
         window.clearTimeout(saveTimerRef.current);
       }
@@ -243,8 +267,22 @@ export function AdminUiPreferencesProvider({ user, children }) {
             }),
           });
 
-          if (!response.ok) {
-            throw new Error("PREFERENCE_SAVE_FAILED");
+          const payload = await response.json();
+
+          if (!response.ok || payload?.success === false) {
+            throw new Error(payload?.message || "PREFERENCE_SAVE_FAILED");
+          }
+
+          /*
+           * Server-normalized preference
+           * becomes the final value.
+           */
+          if (payload?.data?.admin) {
+            const saved = normalizePreferences(payload.data.admin);
+
+            setPreferences(saved);
+
+            writeLocalPreferences(user, saved);
           }
         } catch (error) {
           console.error("Save admin preferences error:", error);
@@ -265,8 +303,16 @@ export function AdminUiPreferencesProvider({ user, children }) {
   const updatePreferences = useCallback(
     (patch) => {
       setPreferences((current) => {
+        /*
+         * Merge with CURRENT state.
+         *
+         * Changing locale therefore
+         * never resets fontSize, density,
+         * sidebar or other preferences.
+         */
         const next = normalizePreferences({
           ...current,
+
           ...patch,
         });
 
@@ -314,6 +360,15 @@ export function AdminUiPreferencesProvider({ user, children }) {
     [updatePreferences],
   );
 
+  const setFontSize = useCallback(
+    (fontSize) => {
+      updatePreferences({
+        fontSize,
+      });
+    },
+    [updatePreferences],
+  );
+
   const setLocale = useCallback(
     (locale) => {
       updatePreferences({
@@ -347,9 +402,9 @@ export function AdminUiPreferencesProvider({ user, children }) {
   }, [persistPreferences]);
 
   const resetPreferences = useCallback(() => {
-    const next = {
+    const next = normalizePreferences({
       ...ADMIN_UI_DEFAULTS,
-    };
+    });
 
     setPreferences(next);
 
@@ -392,6 +447,8 @@ export function AdminUiPreferencesProvider({ user, children }) {
 
       density: preferences.density,
 
+      fontSize: preferences.fontSize,
+
       locale: preferences.locale,
 
       sidebarCollapsed: preferences.sidebarCollapsed,
@@ -405,6 +462,8 @@ export function AdminUiPreferencesProvider({ user, children }) {
       setTooltipDelay,
 
       setDensity,
+
+      setFontSize,
 
       setLocale,
 
@@ -423,6 +482,7 @@ export function AdminUiPreferencesProvider({ user, children }) {
       setTooltipEnabled,
       setTooltipDelay,
       setDensity,
+      setFontSize,
       setLocale,
       setSidebarCollapsed,
       toggleSidebar,

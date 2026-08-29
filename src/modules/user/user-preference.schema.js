@@ -7,6 +7,8 @@ export const adminPreferenceSchema = z.object({
 
   density: z.enum(["compact", "comfortable", "spacious"]).optional(),
 
+  fontSize: z.enum(["small", "medium", "large"]).optional(),
+
   tooltipEnabled: z.boolean().optional(),
 
   tooltipDelay: z.number().int().min(0).max(3000).optional(),

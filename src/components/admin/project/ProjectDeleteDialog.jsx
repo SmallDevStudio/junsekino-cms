@@ -2,19 +2,19 @@
 
 import { AlertTriangle, LoaderCircle, Trash2, X } from "lucide-react";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+
 import { toast } from "sonner";
+
+import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
 
 import { cn } from "@/utils/cn";
 
-function getProjectTitle(project) {
-  return (
-    project?.title?.en?.trim() ||
-    project?.title?.th?.trim() ||
-    project?.slug ||
-    "Untitled project"
-  );
-}
+/*
+ * =========================================================
+ * DELETE DIALOG
+ * =========================================================
+ */
 
 export default function ProjectDeleteDialog({
   open,
@@ -23,19 +23,35 @@ export default function ProjectDeleteDialog({
   onClose,
   onCompleted,
 }) {
+  const { t } = useAdminTranslation();
+
   const [submitting, setSubmitting] = useState(false);
+
   const [confirmation, setConfirmation] = useState("");
+
+  const projectTitle = useMemo(
+    () =>
+      project?.title?.en?.trim() ||
+      project?.title?.th?.trim() ||
+      project?.slug ||
+      t("project.manager.untitledProject"),
+    [project, t],
+  );
 
   if (!open || !project) {
     return null;
   }
 
-  const projectTitle = getProjectTitle(project);
-
   const canDelete = confirmation.trim().toLowerCase() === "delete";
 
+  /*
+   * =======================================================
+   * DELETE
+   * =======================================================
+   */
+
   async function handleDelete() {
-    if (!companyId || !project?.id || !canDelete) {
+    if (!companyId || !project?.id || !canDelete || submitting) {
       return;
     }
 
@@ -55,19 +71,19 @@ export default function ProjectDeleteDialog({
 
       if (!response.ok || payload?.success === false) {
         const messages = {
-          PROJECT_NOT_FOUND: "Project not found.",
+          PROJECT_NOT_FOUND: t("project.delete.errors.notFound"),
 
-          PROJECT_ALREADY_DELETED: "Project has already been deleted.",
+          PROJECT_ALREADY_DELETED: t("project.delete.errors.alreadyDeleted"),
         };
 
         throw new Error(
-          messages[payload?.message] ||
+          messages[payload?.code || payload?.message] ||
             payload?.message ||
-            "Unable to delete project.",
+            t("project.delete.errors.failed"),
         );
       }
 
-      toast.success("Project deleted.");
+      toast.success(t("project.delete.messages.deleted"));
 
       setConfirmation("");
 
@@ -75,7 +91,7 @@ export default function ProjectDeleteDialog({
     } catch (error) {
       console.error("Delete project error:", error);
 
-      toast.error(error?.message || "Unable to delete project.");
+      toast.error(error?.message || t("project.delete.errors.failed"));
     } finally {
       setSubmitting(false);
     }
@@ -92,33 +108,94 @@ export default function ProjectDeleteDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-[230] flex items-center justify-center p-4">
+    <div
+      className="
+        fixed
+        inset-0
+        z-[230]
+
+        flex
+        items-center
+        justify-center
+
+        p-4
+      "
+    >
       <button
         type="button"
-        aria-label="Close delete dialog"
+        aria-label={t("common.close")}
         onClick={handleClose}
-        className="absolute inset-0 bg-black/45 backdrop-blur-[2px]"
+        disabled={submitting}
+        className="
+          absolute
+          inset-0
+
+          bg-black/45
+
+          backdrop-blur-[2px]
+        "
       />
 
       <div
         className={cn(
-          "relative z-10 w-full max-w-md",
-          "overflow-hidden rounded-3xl",
+          "relative z-10",
+
+          "w-full max-w-md",
+
+          "overflow-hidden",
+
+          "rounded-3xl",
+
           "border border-red-200",
+
           "bg-[var(--admin-surface)]",
+
           "shadow-2xl",
         )}
       >
-        {/* Header */}
+        {/* HEADER */}
 
-        <header className="flex items-start justify-between border-b border-[var(--admin-border)] px-6 py-5">
+        <header
+          className="
+            flex
+            items-start
+            justify-between
+
+            gap-4
+
+            border-b
+            border-[var(--admin-border)]
+
+            px-6
+            py-5
+          "
+        >
           <div>
-            <div className="text-xs font-medium uppercase tracking-[0.12em] text-red-500">
-              Destructive Action
+            <div
+              className="
+                admin-text-11
+                font-medium
+                uppercase
+                tracking-[0.12em]
+
+                text-red-500
+              "
+            >
+              {t("project.delete.sectionLabel")}
             </div>
 
-            <h2 className="mt-1 text-lg font-semibold tracking-[-0.02em] text-[var(--admin-foreground)]">
-              Delete Project
+            <h2
+              className="
+                mt-1
+
+                admin-text-18
+                font-semibold
+                tracking-[-0.02em]
+
+                text-[var(--admin-foreground)]
+              "
+            >
+              {t("project.delete.title")}
             </h2>
           </div>
 
@@ -126,68 +203,201 @@ export default function ProjectDeleteDialog({
             type="button"
             onClick={handleClose}
             disabled={submitting}
-            aria-label="Close"
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-[var(--admin-muted)] transition hover:bg-[var(--admin-hover)] disabled:opacity-50"
+            aria-label={t("common.close")}
+            className="
+              flex
+              h-9
+              w-9
+              shrink-0
+
+              items-center
+              justify-center
+
+              rounded-xl
+
+              text-[var(--admin-muted)]
+
+              transition
+
+              hover:bg-[var(--admin-hover)]
+
+              disabled:opacity-50
+            "
           >
             <X size={17} />
           </button>
         </header>
 
-        {/* Content */}
+        {/* BODY */}
 
         <div className="p-6">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-red-600">
+          <div
+            className="
+              flex
+              h-12
+              w-12
+
+              items-center
+              justify-center
+
+              rounded-2xl
+
+              bg-red-50
+
+              text-red-600
+            "
+          >
             <AlertTriangle size={21} strokeWidth={1.8} />
           </div>
 
-          <h3 className="mt-4 text-sm font-semibold text-[var(--admin-foreground)]">
+          <h3
+            className="
+              mt-4
+
+              admin-text-14
+              font-semibold
+
+              text-[var(--admin-foreground)]
+            "
+          >
             {projectTitle}
           </h3>
 
           {project.slug && (
-            <div className="mt-1 text-xs text-[var(--admin-muted)]">
+            <div
+              className="
+                mt-1
+
+                admin-text-12
+
+                text-[var(--admin-muted)]
+              "
+            >
               /{project.slug}
             </div>
           )}
 
-          <p className="mt-4 text-sm leading-6 text-[var(--admin-muted)]">
-            This project will be removed from the active CMS project list and
-            archived internally.
+          <p
+            className="
+              mt-4
+
+              admin-text-14
+              leading-[1.7]
+
+              text-[var(--admin-muted)]
+            "
+          >
+            {t("project.delete.description")}
           </p>
+
+          {/* STATUS WARNING */}
 
           {(project.status === "published" ||
             project.status === "scheduled") && (
-            <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4">
-              <div className="text-xs font-semibold text-amber-800">
+            <div
+              className="
+                mt-4
+
+                rounded-2xl
+
+                border
+                border-amber-200
+
+                bg-amber-50
+
+                p-4
+              "
+            >
+              <div
+                className="
+                  admin-text-12
+                  font-semibold
+
+                  text-amber-800
+                "
+              >
                 {project.status === "published"
-                  ? "This project is currently published."
-                  : "This project is currently scheduled."}
+                  ? t("project.delete.warning.published")
+                  : t("project.delete.warning.scheduled")}
               </div>
 
-              <p className="mt-1 text-xs leading-5 text-amber-700">
-                Deleting it will remove it from the active content collection.
-                Continue only if this is intentional.
+              <p
+                className="
+                  mt-1
+
+                  admin-text-12
+                  leading-[1.6]
+
+                  text-amber-700
+                "
+              >
+                {t("project.delete.warning.description")}
               </p>
             </div>
           )}
 
-          <div className="mt-5 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-hover)] p-4">
-            <div className="text-xs font-medium text-[var(--admin-foreground)]">
-              This is a soft delete.
+          {/* SOFT DELETE */}
+
+          <div
+            className="
+              mt-5
+
+              rounded-2xl
+
+              border
+              border-[var(--admin-border)]
+
+              bg-[var(--admin-background)]
+
+              p-4
+            "
+          >
+            <div
+              className="
+                admin-text-12
+                font-medium
+
+                text-[var(--admin-foreground)]
+              "
+            >
+              {t("project.delete.softDelete.title")}
             </div>
 
-            <p className="mt-1 text-xs leading-5 text-[var(--admin-muted)]">
-              The database record and audit history are preserved. Restore
-              functionality can be added later.
+            <p
+              className="
+                mt-1
+
+                admin-text-12
+                leading-[1.6]
+
+                text-[var(--admin-muted)]
+              "
+            >
+              {t("project.delete.softDelete.description")}
             </p>
           </div>
 
-          {/* Confirmation */}
+          {/* CONFIRM */}
 
           <label className="mt-5 block">
-            <span className="text-xs font-medium text-[var(--admin-foreground)]">
-              Type <span className="font-semibold text-red-600">DELETE</span> to
-              confirm
+            <span
+              className="
+                admin-text-12
+                font-medium
+
+                text-[var(--admin-foreground)]
+              "
+            >
+              {t("project.delete.confirm.prefix")}{" "}
+              <span
+                className="
+                  font-semibold
+                  text-red-600
+                "
+              >
+                DELETE
+              </span>{" "}
+              {t("project.delete.confirm.suffix")}
             </span>
 
             <input
@@ -197,44 +407,116 @@ export default function ProjectDeleteDialog({
               disabled={submitting}
               autoComplete="off"
               placeholder="DELETE"
-              className={cn(
-                "mt-2 h-11 w-full rounded-xl",
-                "border border-[var(--admin-border)]",
-                "bg-[var(--admin-surface)] px-3",
-                "text-sm text-[var(--admin-foreground)]",
-                "outline-none transition",
-                "placeholder:text-[var(--admin-muted-light)]",
-                "focus:border-red-400",
-                "focus:ring-2 focus:ring-red-100",
-                "disabled:opacity-60",
-              )}
+              className="
+                mt-2
+
+                h-11
+                w-full
+
+                rounded-xl
+
+                border
+                border-[var(--admin-border)]
+
+                bg-[var(--admin-surface)]
+
+                px-3
+
+                admin-text-14
+
+                text-[var(--admin-foreground)]
+
+                outline-none
+
+                transition
+
+                placeholder:text-[var(--admin-muted-light)]
+
+                focus:border-red-400
+
+                focus:ring-2
+                focus:ring-red-100
+
+                disabled:opacity-60
+              "
             />
           </label>
         </div>
 
-        {/* Footer */}
+        {/* FOOTER */}
 
-        <footer className="flex items-center justify-end gap-2 border-t border-[var(--admin-border)] px-6 py-4">
+        <footer
+          className="
+            flex
+            items-center
+            justify-end
+
+            gap-2
+
+            border-t
+            border-[var(--admin-border)]
+
+            px-6
+            py-4
+          "
+        >
           <button
             type="button"
             onClick={handleClose}
             disabled={submitting}
-            className="h-10 rounded-xl px-4 text-sm font-medium text-[var(--admin-muted)] transition hover:bg-[var(--admin-hover)] disabled:opacity-50"
+            className="
+              h-10
+
+              rounded-xl
+
+              px-4
+
+              admin-text-14
+              font-medium
+
+              text-[var(--admin-muted)]
+
+              transition
+
+              hover:bg-[var(--admin-hover)]
+
+              disabled:opacity-50
+            "
           >
-            Cancel
+            {t("common.cancel")}
           </button>
 
           <button
             type="button"
             onClick={handleDelete}
             disabled={!canDelete || submitting}
-            className={cn(
-              "inline-flex h-10 min-w-32 items-center justify-center gap-2",
-              "rounded-xl bg-red-600 px-4",
-              "text-sm font-medium text-white",
-              "transition hover:bg-red-700",
-              "disabled:cursor-not-allowed disabled:opacity-40",
-            )}
+            className="
+              inline-flex
+              h-10
+              min-w-32
+
+              items-center
+              justify-center
+              gap-2
+
+              rounded-xl
+
+              bg-red-600
+
+              px-4
+
+              admin-text-14
+              font-medium
+
+              text-white
+
+              transition
+
+              hover:bg-red-700
+
+              disabled:cursor-not-allowed
+              disabled:opacity-40
+            "
           >
             {submitting ? (
               <LoaderCircle size={15} className="animate-spin" />
@@ -242,7 +524,9 @@ export default function ProjectDeleteDialog({
               <Trash2 size={15} />
             )}
 
-            {submitting ? "Deleting..." : "Delete Project"}
+            {submitting
+              ? t("project.delete.deleting")
+              : t("project.delete.action")}
           </button>
         </footer>
       </div>

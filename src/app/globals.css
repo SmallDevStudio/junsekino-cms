@@ -129,6 +129,16 @@
   --status-info-text: #1d4ed8;
 }
 
+@keyframes admin-image-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
@@ -301,4 +311,70 @@ img {
   margin: 1.5rem 0;
   border: 0;
   border-top: 1px solid var(--admin-border);
+}
+
+/* =========================================================
+   ADMIN TYPOGRAPHY SCALE
+   =========================================================
+   Small  = current UI
+   Medium = +8%
+   Large  = +16%
+
+   Do not use this for Public pages.
+   ========================================================= */
+
+:root {
+  --admin-font-scale: 1;
+}
+
+.admin-text-8 {
+  font-size: calc(8px * var(--admin-font-scale));
+}
+
+.admin-text-9 {
+  font-size: calc(9px * var(--admin-font-scale));
+}
+
+.admin-text-10 {
+  font-size: calc(10px * var(--admin-font-scale));
+}
+
+.admin-text-11 {
+  font-size: calc(11px * var(--admin-font-scale));
+}
+
+.admin-text-12 {
+  font-size: calc(12px * var(--admin-font-scale));
+}
+
+.admin-text-13 {
+  font-size: calc(13px * var(--admin-font-scale));
+}
+
+.admin-text-14 {
+  font-size: calc(14px * var(--admin-font-scale));
+}
+
+.admin-text-16 {
+  font-size: calc(16px * var(--admin-font-scale));
+}
+
+.admin-text-18 {
+  font-size: calc(18px * var(--admin-font-scale));
+}
+
+.admin-text-20 {
+  font-size: calc(20px * var(--admin-font-scale));
+}
+
+.admin-text-24 {
+  font-size: calc(24px * var(--admin-font-scale));
+}
+
+.admin-text-28 {
+  font-size: calc(28px * var(--admin-font-scale));
+}
+
+.admin-text-32 {
+  font-size: calc(32px * var(--admin-font-scale));
 }

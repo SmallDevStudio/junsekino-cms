@@ -2,11 +2,13 @@
 
 import { X } from "lucide-react";
 
-import PublicRichText from "@/components/public/content/PublicRichText";
+import { useState } from "react";
+
+import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
 
 import { useCompanyLocalization } from "@/components/admin/localization/CompanyLocalizationProvider";
 
-import { useState } from "react";
+import PublicRichText from "@/components/public/content/PublicRichText";
 
 import { cn } from "@/utils/cn";
 
@@ -23,6 +25,8 @@ export default function AboutPreviewDialog({
   onClose,
 }) {
   const { contentLocales } = useCompanyLocalization();
+
+  const { t } = useAdminTranslation();
 
   const [locale, setLocale] = useState("en");
 
@@ -61,12 +65,13 @@ export default function AboutPreviewDialog({
         justify-center
 
         p-4
+
         sm:p-6
       "
     >
       <button
         type="button"
-        aria-label="Close preview"
+        aria-label={t("common.close")}
         onClick={onClose}
         className="
           absolute
@@ -98,7 +103,9 @@ export default function AboutPreviewDialog({
           shadow-[0_30px_100px_rgba(0,0,0,0.3)]
         "
       >
-        {/* HEADER */}
+        {/* =================================
+            ADMIN PREVIEW HEADER
+        ================================= */}
 
         <div
           className="
@@ -120,7 +127,7 @@ export default function AboutPreviewDialog({
           <div>
             <div
               className="
-                text-[10px]
+                admin-text-10
                 font-semibold
                 uppercase
                 tracking-[0.16em]
@@ -128,29 +135,23 @@ export default function AboutPreviewDialog({
                 text-[var(--company-primary)]
               "
             >
-              Preview
+              {t("about.preview.title")}
             </div>
 
             <div
               className="
                 mt-0.5
 
-                text-[11px]
+                admin-text-11
 
                 text-black/45
               "
             >
-              About page preview
+              {t("about.preview.description")}
             </div>
           </div>
 
-          <div
-            className="
-              flex
-              items-center
-              gap-2
-            "
-          >
+          <div className="flex items-center gap-2">
             {locales.length > 1 && (
               <div
                 className="
@@ -172,7 +173,7 @@ export default function AboutPreviewDialog({
                     className={cn(
                       "rounded-lg px-3 py-1.5",
 
-                      "text-[9px] font-semibold uppercase",
+                      "admin-text-9 font-semibold uppercase",
 
                       "transition",
 
@@ -190,7 +191,7 @@ export default function AboutPreviewDialog({
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close"
+              aria-label={t("common.close")}
               className="
                 flex
                 h-9
@@ -214,7 +215,10 @@ export default function AboutPreviewDialog({
           </div>
         </div>
 
-        {/* WEBSITE */}
+        {/* =================================
+            PUBLIC WEBSITE PREVIEW
+            DO NOT APPLY ADMIN FONT SCALE
+        ================================= */}
 
         <div
           className="

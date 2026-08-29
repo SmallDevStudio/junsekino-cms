@@ -10,6 +10,12 @@ export const ADMIN_DENSITY = {
   SPACIOUS: "spacious",
 };
 
+export const ADMIN_FONT_SIZE = {
+  SMALL: "small",
+  MEDIUM: "medium",
+  LARGE: "large",
+};
+
 export const ADMIN_LOCALE = {
   EN: "en",
   TH: "th",
@@ -25,33 +31,29 @@ export const ADMIN_UI_DEFAULTS = {
   density: ADMIN_DENSITY.COMFORTABLE,
 
   /*
-   * Admin interface language.
+   * Default Admin typography.
    *
-   * This is different from
-   * public website languages.
+   * Existing users without fontSize
+   * automatically fall back to MEDIUM.
    */
+  fontSize: ADMIN_FONT_SIZE.MEDIUM,
+
   locale: ADMIN_LOCALE.EN,
 
-  /*
-   * Desktop sidebar state.
-   */
   sidebarCollapsed: false,
 };
 
 export const ADMIN_ACTION_DISPLAY_OPTIONS = [
   {
     value: ADMIN_ACTION_DISPLAY.ICON_LABEL,
-
     label: "Icon + Text",
   },
   {
     value: ADMIN_ACTION_DISPLAY.ICON,
-
     label: "Icon only",
   },
   {
     value: ADMIN_ACTION_DISPLAY.LABEL,
-
     label: "Text only",
   },
 ];
@@ -59,18 +61,33 @@ export const ADMIN_ACTION_DISPLAY_OPTIONS = [
 export const ADMIN_DENSITY_OPTIONS = [
   {
     value: ADMIN_DENSITY.COMPACT,
-
     label: "Compact",
   },
   {
     value: ADMIN_DENSITY.COMFORTABLE,
-
     label: "Comfortable",
   },
   {
     value: ADMIN_DENSITY.SPACIOUS,
-
     label: "Spacious",
+  },
+];
+
+export const ADMIN_FONT_SIZE_OPTIONS = [
+  {
+    value: ADMIN_FONT_SIZE.SMALL,
+    label: "Small",
+    scale: 1,
+  },
+  {
+    value: ADMIN_FONT_SIZE.MEDIUM,
+    label: "Medium",
+    scale: 1.08,
+  },
+  {
+    value: ADMIN_FONT_SIZE.LARGE,
+    label: "Large",
+    scale: 1.16,
   },
 ];
 
@@ -115,6 +132,11 @@ export const ADMIN_STATUS_META = {
 
   active: {
     label: "Active",
+    tone: "published",
+  },
+
+  ready: {
+    label: "Ready",
     tone: "published",
   },
 

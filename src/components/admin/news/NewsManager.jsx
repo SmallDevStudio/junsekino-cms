@@ -1,22 +1,21 @@
 "use client";
 
 import {
-  Archive,
   CalendarClock,
-  CalendarX2,
-  CircleDot,
-  FolderKanban,
-  LoaderCircle,
+  Newspaper,
   Pencil,
   Plus,
   RefreshCw,
   RotateCcw,
   Search,
   Send,
+  Star,
   Trash2,
 } from "lucide-react";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { toast } from "sonner";
 
 import { useCompanyWorkspace } from "@/components/admin/company/CompanyWorkspaceProvider";
 
@@ -24,18 +23,18 @@ import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
 
 import ActionButton from "@/components/admin/ui/ActionButton";
 import ActionButtonGroup from "@/components/admin/ui/ActionButtonGroup";
+import StatusBadge from "@/components/admin/ui/StatusBadge";
 
 import { useAdminUiPreferences } from "@/components/admin/ui/AdminUiPreferencesProvider";
 
-import StatusBadge from "@/components/admin/ui/StatusBadge";
+import { NEWS_STATUS } from "@/constants/news";
 
 import { cn } from "@/utils/cn";
 
-import ProjectCoverThumbnail from "./ProjectCoverThumbnail";
-import ProjectDeleteDialog from "./ProjectDeleteDialog";
-import ProjectEditor from "./ProjectEditor";
-import ProjectPublishDialog from "./ProjectPublishDialog";
-import ProjectUnpublishDialog from "./ProjectUnpublishDialog";
+import NewsConfirmDialog from "./NewsConfirmDialog";
+import NewsCoverThumbnail from "./NewsCoverThumbnail";
+import NewsEditor from "./NewsEditor";
+import NewsPublishDialog from "./NewsPublishDialog";
 
 /*
  * =========================================================
@@ -55,39 +54,17 @@ function normalizeArray(payload) {
   return [];
 }
 
-function getLocalizedName(value) {
+function getLocalized(value) {
   return value?.en?.trim() || value?.th?.trim() || "";
 }
 
-function getProjectTitle(project, fallback) {
-  return (
-    project?.title?.en?.trim() ||
-    project?.title?.th?.trim() ||
-    project?.slug ||
-    fallback
-  );
+function getNewsTitle(item, fallback) {
+  return getLocalized(item?.title) || item?.slug || fallback;
 }
 
-function getCategoryName(category, fallback) {
-  return (
-    category?.name?.en?.trim() ||
-    category?.name?.th?.trim() ||
-    category?.slug ||
-    fallback
-  );
+function getCoverMediaId(item) {
+  return item?.featuredImage?.mediaId || null;
 }
-
-/*
- * =========================================================
- * DATE FORMATTER
- * =========================================================
- *
- * Admin UI locale controls date formatting too.
- *
- * Content language and Admin UI language remain
- * independent systems.
- * =========================================================
- */
 
 function formatDate(value, locale) {
   if (!value) {
@@ -123,13 +100,53 @@ function formatDateTime(value, locale) {
   }).format(date);
 }
 
+async function readResponse(response) {
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+function extractTagSuggestions(items) {
+  const tags = new Map();
+
+  for (const item of items) {
+    if (!Array.isArray(item?.tags)) {
+      continue;
+    }
+
+    for (const rawTag of item.tags) {
+      const tag = String(rawTag || "")
+        .trim()
+        .replace(/\s+/g, " ");
+
+      if (!tag) {
+        continue;
+      }
+
+      const key = tag.toLowerCase();
+
+      if (!tags.has(key)) {
+        tags.set(key, tag);
+      }
+    }
+  }
+
+  return [...tags.values()].sort((first, second) =>
+    first.localeCompare(second, "en", {
+      sensitivity: "base",
+    }),
+  );
+}
+
 /*
  * =========================================================
- * PROJECT LIST SKELETON
+ * SKELETON
  * =========================================================
  */
 
-function ProjectListSkeleton({ density }) {
+function NewsListSkeleton({ density }) {
   const rowPadding =
     density === "compact" ? "p-4" : density === "spacious" ? "p-6" : "p-5";
 
@@ -161,8 +178,6 @@ function ProjectListSkeleton({ density }) {
             index !== 5 && "border-b border-[var(--admin-border)]",
           )}
         >
-          {/* IMAGE */}
-
           <div
             className="
                 h-[86px]
@@ -177,8 +192,6 @@ function ProjectListSkeleton({ density }) {
                 bg-[var(--admin-hover)]
               "
           />
-
-          {/* CONTENT */}
 
           <div
             className="
@@ -196,7 +209,7 @@ function ProjectListSkeleton({ density }) {
               <div
                 className="
                     h-4
-                    w-[34%]
+                    w-[40%]
 
                     animate-pulse
 
@@ -225,7 +238,7 @@ function ProjectListSkeleton({ density }) {
                   mt-2
 
                   h-3
-                  w-[22%]
+                  w-[24%]
 
                   animate-pulse
 
@@ -246,19 +259,6 @@ function ProjectListSkeleton({ density }) {
               <div
                 className="
                     h-3
-                    w-24
-
-                    animate-pulse
-
-                    rounded
-
-                    bg-[var(--admin-hover)]
-                  "
-              />
-
-              <div
-                className="
-                    h-3
                     w-20
 
                     animate-pulse
@@ -272,7 +272,7 @@ function ProjectListSkeleton({ density }) {
               <div
                 className="
                     h-3
-                    w-16
+                    w-24
 
                     animate-pulse
 
@@ -284,14 +284,10 @@ function ProjectListSkeleton({ density }) {
             </div>
           </div>
 
-          {/* ACTION */}
-
           <div
             className="
                 hidden
-
                 shrink-0
-
                 gap-2
 
                 lg:flex
@@ -335,15 +331,15 @@ function ProjectListSkeleton({ density }) {
  * =========================================================
  */
 
-function ProjectStatCard({ icon: Icon, value, label, tone = "neutral" }) {
+function NewsStatCard({ icon: Icon, value, label, tone = "neutral" }) {
   const iconClass = {
     neutral: "text-[var(--admin-muted)]",
+
+    company: "text-[var(--company-primary)]",
 
     success: "text-emerald-600",
 
     warning: "text-amber-600",
-
-    company: "text-[var(--company-primary)]",
   }[tone];
 
   return (
@@ -392,11 +388,11 @@ function ProjectStatCard({ icon: Icon, value, label, tone = "neutral" }) {
 
 /*
  * =========================================================
- * PROJECT MANAGER
+ * NEWS MANAGER
  * =========================================================
  */
 
-export default function ProjectManager() {
+export default function NewsManager() {
   const {
     activeCompany,
     activeCompanyId,
@@ -406,25 +402,28 @@ export default function ProjectManager() {
 
   const { t, locale } = useAdminTranslation();
 
-  const {
-    actionDisplay,
+  const { actionDisplay, tooltipEnabled, tooltipDelay, density } =
+    useAdminUiPreferences();
 
-    tooltipEnabled,
+  /*
+   * =======================================================
+   * DATA
+   * =======================================================
+   */
 
-    tooltipDelay,
-
-    density,
-  } = useAdminUiPreferences();
-
-  const [projects, setProjects] = useState([]);
-
-  const [categories, setCategories] = useState([]);
+  const [items, setItems] = useState([]);
 
   const [loading, setLoading] = useState(false);
 
   const [refreshing, setRefreshing] = useState(false);
 
   const [error, setError] = useState(null);
+
+  /*
+   * =======================================================
+   * FILTER
+   * =======================================================
+   */
 
   const [search, setSearch] = useState("");
 
@@ -440,7 +439,7 @@ export default function ProjectManager() {
 
   const [editorOpen, setEditorOpen] = useState(false);
 
-  const [editingProject, setEditingProject] = useState(null);
+  const [editingItem, setEditingItem] = useState(null);
 
   /*
    * =======================================================
@@ -448,33 +447,33 @@ export default function ProjectManager() {
    * =======================================================
    */
 
-  const [publishDialogOpen, setPublishDialogOpen] = useState(false);
-
-  const [publishingProject, setPublishingProject] = useState(null);
+  const [publishItem, setPublishItem] = useState(null);
 
   /*
    * =======================================================
-   * UNPUBLISH
+   * CONFIRM
    * =======================================================
    */
 
-  const [unpublishDialogOpen, setUnpublishDialogOpen] = useState(false);
+  const [confirmState, setConfirmState] = useState({
+    open: false,
 
-  const [unpublishingProject, setUnpublishingProject] = useState(null);
+    mode: "delete",
+
+    item: null,
+  });
 
   /*
    * =======================================================
-   * DELETE
+   * ACTION LOADING
    * =======================================================
    */
 
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
-  const [deletingProject, setDeletingProject] = useState(null);
+  const [processingId, setProcessingId] = useState(null);
 
   /*
    * =======================================================
-   * DENSITY
+   * DISPLAY
    * =======================================================
    */
 
@@ -492,8 +491,7 @@ export default function ProjectManager() {
   const loadData = useCallback(
     async ({ silent = false } = {}) => {
       if (!activeCompanyId) {
-        setProjects([]);
-        setCategories([]);
+        setItems([]);
 
         return;
       }
@@ -507,65 +505,37 @@ export default function ProjectManager() {
 
         setError(null);
 
-        const [projectsResponse, categoriesResponse] = await Promise.all([
-          fetch(`/api/v1/companies/${activeCompanyId}/projects`, {
+        const response = await fetch(
+          `/api/v1/companies/${activeCompanyId}/news`,
+          {
             method: "GET",
 
             cache: "no-store",
 
             credentials: "include",
-          }),
-
-          fetch(`/api/v1/companies/${activeCompanyId}/project-categories`, {
-            method: "GET",
-
-            cache: "no-store",
-
-            credentials: "include",
-          }),
-        ]);
-
-        const [projectsPayload, categoriesPayload] = await Promise.all([
-          projectsResponse.json(),
-
-          categoriesResponse.json(),
-        ]);
-
-        if (!projectsResponse.ok || projectsPayload?.success === false) {
-          throw new Error(
-            projectsPayload?.message ||
-              t("project.manager.errors.loadProjects"),
-          );
-        }
-
-        if (!categoriesResponse.ok || categoriesPayload?.success === false) {
-          throw new Error(
-            categoriesPayload?.message ||
-              t("project.manager.errors.loadCategories"),
-          );
-        }
-
-        setProjects(normalizeArray(projectsPayload));
-
-        setCategories(normalizeArray(categoriesPayload));
-      } catch (loadError) {
-        console.error("Load projects error:", loadError);
-
-        setError(
-          loadError?.message || t("project.manager.errors.loadProjects"),
+          },
         );
+
+        const payload = await readResponse(response);
+
+        if (!response.ok || payload?.success === false) {
+          throw new Error(
+            payload?.message || t("news.manager.errors.loadFailed"),
+          );
+        }
+
+        setItems(normalizeArray(payload));
+      } catch (loadError) {
+        console.error("Load news error:", loadError);
+
+        setError(loadError?.message || t("news.manager.errors.loadFailed"));
       } finally {
         setLoading(false);
-
         setRefreshing(false);
       }
     },
     [activeCompanyId, t],
   );
-
-  /*
-   * React Compiler-safe.
-   */
 
   useEffect(() => {
     if (!activeCompanyId) {
@@ -583,25 +553,27 @@ export default function ProjectManager() {
 
   /*
    * =======================================================
-   * CATEGORY MAP
+   * CATEGORY SUGGESTIONS
    * =======================================================
    */
 
-  const categoryMap = useMemo(
-    () => new Map(categories.map((category) => [category.id, category])),
-    [categories],
-  );
+  const categories = useMemo(() => {
+    return [
+      ...new Set(items.map((item) => item.category?.trim()).filter(Boolean)),
+    ].sort((first, second) =>
+      first.localeCompare(second, "en", {
+        sensitivity: "base",
+      }),
+    );
+  }, [items]);
 
-  const rootCategories = useMemo(
-    () =>
-      categories.filter(
-        (category) =>
-          !category.parentId &&
-          category.status === "active" &&
-          !category.deletedAt,
-      ),
-    [categories],
-  );
+  /*
+   * =======================================================
+   * TAG SUGGESTIONS
+   * =======================================================
+   */
+
+  const tagSuggestions = useMemo(() => extractTagSuggestions(items), [items]);
 
   /*
    * =======================================================
@@ -609,15 +581,15 @@ export default function ProjectManager() {
    * =======================================================
    */
 
-  const filteredProjects = useMemo(() => {
+  const filteredItems = useMemo(() => {
     const keyword = search.trim().toLowerCase();
 
-    return projects.filter((project) => {
-      if (statusFilter && project.status !== statusFilter) {
+    return items.filter((item) => {
+      if (statusFilter && item.status !== statusFilter) {
         return false;
       }
 
-      if (categoryFilter && project.categoryId !== categoryFilter) {
+      if (categoryFilter && item.category !== categoryFilter) {
         return false;
       }
 
@@ -626,25 +598,21 @@ export default function ProjectManager() {
       }
 
       const text = [
-        project.title?.th,
+        item.title?.en,
 
-        project.title?.en,
+        item.title?.th,
 
-        project.slug,
+        item.excerpt?.en,
 
-        project.excerpt?.th,
+        item.excerpt?.th,
 
-        project.excerpt?.en,
+        item.slug,
 
-        project.projectInfo?.location?.th,
+        item.category,
 
-        project.projectInfo?.location?.en,
+        item.author,
 
-        project.projectInfo?.client?.th,
-
-        project.projectInfo?.client?.en,
-
-        ...(project.tags || []),
+        ...(item.tags || []),
       ]
         .filter(Boolean)
         .join(" ")
@@ -652,7 +620,7 @@ export default function ProjectManager() {
 
       return text.includes(keyword);
     });
-  }, [projects, search, statusFilter, categoryFilter]);
+  }, [categoryFilter, items, search, statusFilter]);
 
   /*
    * =======================================================
@@ -661,19 +629,19 @@ export default function ProjectManager() {
    */
 
   const counts = useMemo(() => {
-    return projects.reduce(
-      (result, project) => {
+    return items.reduce(
+      (result, item) => {
         result.total += 1;
 
-        if (project.status === "published") {
+        if (item.status === NEWS_STATUS.PUBLISHED) {
           result.published += 1;
         }
 
-        if (project.status === "draft") {
+        if (item.status === NEWS_STATUS.DRAFT) {
           result.draft += 1;
         }
 
-        if (project.status === "scheduled") {
+        if (item.status === NEWS_STATUS.SCHEDULED) {
           result.scheduled += 1;
         }
 
@@ -681,12 +649,15 @@ export default function ProjectManager() {
       },
       {
         total: 0,
+
         published: 0,
+
         draft: 0,
+
         scheduled: 0,
       },
     );
-  }, [projects]);
+  }, [items]);
 
   /*
    * =======================================================
@@ -694,31 +665,87 @@ export default function ProjectManager() {
    * =======================================================
    */
 
-  function handleCreateProject() {
-    setEditingProject(null);
+  function handleCreate() {
+    setEditingItem(null);
 
     setEditorOpen(true);
   }
 
-  function handleEditProject(project) {
-    setEditingProject(project);
+  function handleEdit(item) {
+    setEditingItem(item);
 
     setEditorOpen(true);
   }
 
-  function handleCloseEditor() {
+  function closeEditor() {
     setEditorOpen(false);
 
-    setEditingProject(null);
+    setEditingItem(null);
   }
 
-  async function handleProjectSaved() {
+  async function handleSaved() {
     setEditorOpen(false);
 
-    setEditingProject(null);
+    setEditingItem(null);
 
     await loadData({
       silent: true,
+    });
+  }
+
+  /*
+   * =======================================================
+   * PUBLISH DIALOG
+   * =======================================================
+   */
+
+  function openPublish(item) {
+    if (processingId) {
+      return;
+    }
+
+    setPublishItem(item);
+  }
+
+  function closePublish() {
+    if (processingId) {
+      return;
+    }
+
+    setPublishItem(null);
+  }
+
+  /*
+   * =======================================================
+   * CONFIRM DIALOG
+   * =======================================================
+   */
+
+  function openConfirm(mode, item) {
+    if (processingId) {
+      return;
+    }
+
+    setConfirmState({
+      open: true,
+
+      mode,
+
+      item,
+    });
+  }
+
+  function closeConfirm() {
+    if (processingId) {
+      return;
+    }
+
+    setConfirmState({
+      open: false,
+
+      mode: "delete",
+
+      item: null,
     });
   }
 
@@ -728,48 +755,122 @@ export default function ProjectManager() {
    * =======================================================
    */
 
-  function handleOpenPublish(project) {
-    setPublishingProject(project);
+  async function publishNews(item, scheduledAt = null) {
+    if (!activeCompanyId || !item?.id || processingId) {
+      return;
+    }
 
-    setPublishDialogOpen(true);
-  }
+    try {
+      setProcessingId(item.id);
 
-  function handleClosePublish() {
-    setPublishDialogOpen(false);
+      setError(null);
 
-    setPublishingProject(null);
+      const response = await fetch(
+        `/api/v1/companies/${activeCompanyId}/news/${item.id}/publish`,
+        {
+          method: "POST",
+
+          credentials: "include",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+            scheduledAt: scheduledAt || null,
+          }),
+        },
+      );
+
+      const payload = await readResponse(response);
+
+      if (!response.ok || payload?.success === false) {
+        throw new Error(
+          payload?.message || t("news.manager.errors.publishFailed"),
+        );
+      }
+
+      setPublishItem(null);
+
+      toast.success(
+        scheduledAt
+          ? t("news.manager.messages.scheduled")
+          : t("news.manager.messages.published"),
+      );
+
+      await loadData({
+        silent: true,
+      });
+    } catch (publishError) {
+      console.error("Publish news error:", publishError);
+
+      toast.error(
+        publishError?.message || t("news.manager.errors.publishFailed"),
+      );
+    } finally {
+      setProcessingId(null);
+    }
   }
 
   /*
    * =======================================================
-   * UNPUBLISH
+   * UNPUBLISH / CANCEL SCHEDULE
    * =======================================================
    */
 
-  function handleOpenUnpublish(project) {
-    setUnpublishingProject(project);
+  async function unpublishNews(item) {
+    if (!activeCompanyId || !item?.id || processingId) {
+      return;
+    }
 
-    setUnpublishDialogOpen(true);
-  }
+    try {
+      setProcessingId(item.id);
 
-  function handleCloseUnpublish() {
-    setUnpublishDialogOpen(false);
+      setError(null);
 
-    setUnpublishingProject(null);
-  }
+      const response = await fetch(
+        `/api/v1/companies/${activeCompanyId}/news/${item.id}/unpublish`,
+        {
+          method: "POST",
 
-  async function handleLifecycleCompleted() {
-    setPublishDialogOpen(false);
+          credentials: "include",
+        },
+      );
 
-    setPublishingProject(null);
+      const payload = await readResponse(response);
 
-    setUnpublishDialogOpen(false);
+      if (!response.ok || payload?.success === false) {
+        throw new Error(
+          payload?.message || t("news.manager.errors.unpublishFailed"),
+        );
+      }
 
-    setUnpublishingProject(null);
+      setConfirmState({
+        open: false,
 
-    await loadData({
-      silent: true,
-    });
+        mode: "delete",
+
+        item: null,
+      });
+
+      toast.success(
+        item.status === NEWS_STATUS.SCHEDULED
+          ? t("news.manager.messages.scheduleCancelled")
+          : t("news.manager.messages.unpublished"),
+      );
+
+      await loadData({
+        silent: true,
+      });
+    } catch (unpublishError) {
+      console.error("Unpublish news error:", unpublishError);
+
+      toast.error(
+        unpublishError?.message || t("news.manager.errors.unpublishFailed"),
+      );
+    } finally {
+      setProcessingId(null);
+    }
   }
 
   /*
@@ -778,45 +879,66 @@ export default function ProjectManager() {
    * =======================================================
    */
 
-  function handleOpenDelete(project) {
-    if (project.status === "published" || project.status === "scheduled") {
+  async function deleteNews(item) {
+    if (!activeCompanyId || !item?.id || processingId) {
       return;
     }
 
-    setDeletingProject(project);
+    try {
+      setProcessingId(item.id);
 
-    setDeleteDialogOpen(true);
-  }
+      setError(null);
 
-  function handleCloseDelete() {
-    setDeleteDialogOpen(false);
+      const response = await fetch(
+        `/api/v1/companies/${activeCompanyId}/news/${item.id}`,
+        {
+          method: "DELETE",
 
-    setDeletingProject(null);
-  }
+          credentials: "include",
+        },
+      );
 
-  async function handleDeleteCompleted() {
-    setDeleteDialogOpen(false);
+      const payload = await readResponse(response);
 
-    setDeletingProject(null);
+      if (!response.ok || payload?.success === false) {
+        throw new Error(
+          payload?.message || t("news.manager.errors.deleteFailed"),
+        );
+      }
 
-    await loadData({
-      silent: true,
-    });
+      setConfirmState({
+        open: false,
+
+        mode: "delete",
+
+        item: null,
+      });
+
+      toast.success(t("news.manager.messages.deleted"));
+
+      await loadData({
+        silent: true,
+      });
+    } catch (deleteError) {
+      console.error("Delete news error:", deleteError);
+
+      toast.error(
+        deleteError?.message || t("news.manager.errors.deleteFailed"),
+      );
+    } finally {
+      setProcessingId(null);
+    }
   }
 
   /*
    * =======================================================
-   * WORKSPACE LOADING
+   * COMPANY LOADING
    * =======================================================
    */
 
   if (companyLoading) {
     return (
-      <div
-        className="
-          min-h-[420px]
-        "
-      >
+      <div>
         <div
           className="
             h-8
@@ -846,7 +968,7 @@ export default function ProjectManager() {
           "
         />
 
-        <ProjectListSkeleton density={density} />
+        <NewsListSkeleton density={density} />
       </div>
     );
   }
@@ -879,7 +1001,7 @@ export default function ProjectManager() {
             text-[var(--admin-foreground)]
           "
         >
-          {t("project.manager.noCompany.title")}
+          {t("news.manager.noCompany.title")}
         </div>
 
         <p
@@ -891,7 +1013,7 @@ export default function ProjectManager() {
             text-[var(--admin-muted)]
           "
         >
-          {t("project.manager.noCompany.description")}
+          {t("news.manager.noCompany.description")}
         </p>
       </div>
     );
@@ -901,50 +1023,7 @@ export default function ProjectManager() {
     activeCompany.name ||
     activeCompany.displayName ||
     activeCompany.slug ||
-    t("project.manager.thisCompany");
-
-  /*
-   * =======================================================
-   * STATUS OPTIONS
-   * =======================================================
-   */
-
-  const statusOptions = [
-    {
-      value: "",
-      label: t("project.manager.filters.allStatuses"),
-    },
-
-    {
-      value: "draft",
-
-      label: t("status.draft"),
-    },
-
-    {
-      value: "review",
-
-      label: t("status.review"),
-    },
-
-    {
-      value: "scheduled",
-
-      label: t("status.scheduled"),
-    },
-
-    {
-      value: "published",
-
-      label: t("status.published"),
-    },
-
-    {
-      value: "archived",
-
-      label: t("status.archived"),
-    },
-  ];
+    t("news.manager.thisCompany");
 
   /*
    * =======================================================
@@ -959,11 +1038,15 @@ export default function ProjectManager() {
       ===================================== */}
 
       <div
-        className={cn(
-          "flex flex-col gap-5",
+        className="
+          flex
+          flex-col
+          gap-5
 
-          "lg:flex-row lg:items-end lg:justify-between",
-        )}
+          lg:flex-row
+          lg:items-end
+          lg:justify-between
+        "
       >
         <div>
           <div
@@ -976,7 +1059,7 @@ export default function ProjectManager() {
               text-[var(--company-primary)]
             "
           >
-            {t("project.manager.sectionLabel")}
+            {t("news.manager.sectionLabel")}
           </div>
 
           <h1
@@ -990,7 +1073,7 @@ export default function ProjectManager() {
               text-[var(--admin-foreground)]
             "
           >
-            {t("project.title")}
+            {t("news.title")}
           </h1>
 
           <p
@@ -1004,7 +1087,7 @@ export default function ProjectManager() {
               text-[var(--admin-muted)]
             "
           >
-            {t("project.manager.description", {
+            {t("news.manager.description", {
               company: companyName,
             })}
           </p>
@@ -1020,6 +1103,7 @@ export default function ProjectManager() {
             tooltipDelay={tooltipDelay}
             size={actionSize}
             loading={refreshing}
+            disabled={Boolean(processingId)}
             onClick={() =>
               loadData({
                 silent: true,
@@ -1029,19 +1113,20 @@ export default function ProjectManager() {
 
           <ActionButton
             icon={Plus}
-            label={t("project.newProject")}
+            label={t("news.newNews")}
             tone="primary"
             display={actionDisplay}
             tooltip={tooltipEnabled}
             tooltipDelay={tooltipDelay}
             size={actionSize}
-            onClick={handleCreateProject}
+            disabled={Boolean(processingId)}
+            onClick={handleCreate}
           />
         </ActionButtonGroup>
       </div>
 
       {/* =====================================
-          STATISTICS
+          STATS
       ===================================== */}
 
       <div
@@ -1055,27 +1140,27 @@ export default function ProjectManager() {
           lg:grid-cols-4
         "
       >
-        <ProjectStatCard
-          icon={FolderKanban}
+        <NewsStatCard
+          icon={Newspaper}
           value={counts.total}
-          label={t("project.manager.stats.all")}
+          label={t("news.manager.stats.all")}
           tone="company"
         />
 
-        <ProjectStatCard
-          icon={CircleDot}
+        <NewsStatCard
+          icon={Send}
           value={counts.published}
           label={t("status.published")}
           tone="success"
         />
 
-        <ProjectStatCard
-          icon={Archive}
+        <NewsStatCard
+          icon={Newspaper}
           value={counts.draft}
           label={t("status.draft")}
         />
 
-        <ProjectStatCard
+        <NewsStatCard
           icon={CalendarClock}
           value={counts.scheduled}
           label={t("status.scheduled")}
@@ -1084,22 +1169,27 @@ export default function ProjectManager() {
       </div>
 
       {/* =====================================
-          FILTERS
+          FILTER
       ===================================== */}
 
       <div
-        className={cn(
-          "mt-6 flex flex-col gap-3",
+        className="
+          mt-6
 
-          "lg:flex-row lg:items-center",
-        )}
+          flex
+          flex-col
+          gap-3
+
+          xl:flex-row
+          xl:items-center
+        "
       >
         <div
           className="
             relative
             flex-1
 
-            lg:max-w-sm
+            xl:max-w-sm
           "
         >
           <Search
@@ -1121,7 +1211,7 @@ export default function ProjectManager() {
             type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder={t("project.manager.searchPlaceholder")}
+            placeholder={t("news.manager.searchPlaceholder")}
             className="
               h-11
               w-full
@@ -1181,11 +1271,17 @@ export default function ProjectManager() {
             focus:ring-[var(--company-primary-soft)]
           "
         >
-          {statusOptions.map((option) => (
-            <option key={option.value || "all"} value={option.value}>
-              {option.label}
-            </option>
-          ))}
+          <option value="">{t("news.manager.filters.allStatuses")}</option>
+
+          <option value="draft">{t("status.draft")}</option>
+
+          <option value="review">{t("status.review")}</option>
+
+          <option value="scheduled">{t("status.scheduled")}</option>
+
+          <option value="published">{t("status.published")}</option>
+
+          <option value="archived">{t("status.archived")}</option>
         </select>
 
         <select
@@ -1215,20 +1311,16 @@ export default function ProjectManager() {
             focus:ring-[var(--company-primary-soft)]
           "
         >
-          <option value="">{t("project.manager.filters.allCategories")}</option>
+          <option value="">{t("news.manager.filters.allCategories")}</option>
 
-          {rootCategories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {getCategoryName(
-                category,
-
-                t("project.manager.untitledCategory"),
-              )}
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category}
             </option>
           ))}
         </select>
 
-        <div className="lg:ml-auto">
+        <div className="xl:ml-auto">
           <span
             className="
               admin-text-12
@@ -1236,8 +1328,8 @@ export default function ProjectManager() {
               text-[var(--admin-muted)]
             "
           >
-            {t("project.manager.projectCount", {
-              count: filteredProjects.length,
+            {t("news.manager.itemCount", {
+              count: filteredItems.length,
             })}
           </span>
         </div>
@@ -1271,18 +1363,12 @@ export default function ProjectManager() {
       )}
 
       {/* =====================================
-          LOADING
+          LIST
       ===================================== */}
 
       {loading ? (
-        <ProjectListSkeleton density={density} />
-      ) : filteredProjects.length === 0 ? (
-        /*
-         * =================================
-         * EMPTY
-         * =================================
-         */
-
+        <NewsListSkeleton density={density} />
+      ) : filteredItems.length === 0 ? (
         <div
           className="
             mt-6
@@ -1323,7 +1409,7 @@ export default function ProjectManager() {
               text-[var(--company-primary)]
             "
           >
-            <FolderKanban size={21} strokeWidth={1.7} />
+            <Newspaper size={21} strokeWidth={1.7} />
           </div>
 
           <div
@@ -1336,9 +1422,9 @@ export default function ProjectManager() {
               text-[var(--admin-foreground)]
             "
           >
-            {projects.length === 0
-              ? t("project.manager.empty.title")
-              : t("project.manager.empty.searchTitle")}
+            {items.length === 0
+              ? t("news.manager.empty.title")
+              : t("news.manager.empty.searchTitle")}
           </div>
 
           <p
@@ -1352,18 +1438,48 @@ export default function ProjectManager() {
               text-[var(--admin-muted)]
             "
           >
-            {projects.length === 0
-              ? t("project.manager.empty.description")
-              : t("project.manager.empty.searchDescription")}
+            {items.length === 0
+              ? t("news.manager.empty.description")
+              : t("news.manager.empty.searchDescription")}
           </p>
+
+          {items.length === 0 && (
+            <button
+              type="button"
+              onClick={handleCreate}
+              className="
+                mt-5
+
+                inline-flex
+                h-10
+
+                items-center
+                justify-center
+                gap-2
+
+                rounded-xl
+
+                bg-[var(--company-primary)]
+
+                px-4
+
+                admin-text-12
+                font-medium
+
+                text-[var(--company-primary-foreground)]
+
+                transition
+
+                hover:bg-[var(--company-primary-hover)]
+              "
+            >
+              <Plus size={14} />
+
+              {t("news.newNews")}
+            </button>
+          )}
         </div>
       ) : (
-        /*
-         * =================================
-         * PROJECT LIST
-         * =================================
-         */
-
         <div
           className="
             mt-6
@@ -1378,30 +1494,30 @@ export default function ProjectManager() {
             bg-[var(--admin-surface)]
           "
         >
-          {filteredProjects.map((project, index) => {
-            const category = categoryMap.get(project.categoryId);
+          {filteredItems.map((item, index) => {
+            const title = getNewsTitle(
+              item,
 
-            const subCategory = categoryMap.get(project.subCategoryId);
-
-            const location = getLocalizedName(project.projectInfo?.location);
-
-            const canDelete =
-              project.status === "draft" || project.status === "review";
-
-            const title = getProjectTitle(
-              project,
-
-              t("project.manager.untitledProject"),
+              t("news.manager.untitled"),
             );
 
-            const coverMediaId =
-              project?.featuredImage?.mediaId ||
-              project?.cover?.mediaId ||
-              null;
+            const processing = processingId === item.id;
+
+            const canPublish =
+              item.status === NEWS_STATUS.DRAFT ||
+              item.status === NEWS_STATUS.REVIEW;
+
+            const canUnpublish =
+              item.status === NEWS_STATUS.PUBLISHED ||
+              item.status === NEWS_STATUS.SCHEDULED;
+
+            const canDelete =
+              item.status === NEWS_STATUS.DRAFT ||
+              item.status === NEWS_STATUS.REVIEW;
 
             return (
               <article
-                key={project.id}
+                key={item.id}
                 className={cn(
                   "flex flex-col gap-4",
 
@@ -1413,23 +1529,19 @@ export default function ProjectManager() {
 
                   "lg:flex-row lg:items-center",
 
-                  index !== filteredProjects.length - 1 &&
+                  index !== filteredItems.length - 1 &&
                     "border-b border-[var(--admin-border)]",
                 )}
               >
-                {/* =========================
-                      COVER
-                  ========================= */}
+                {/* COVER */}
 
-                <ProjectCoverThumbnail
+                <NewsCoverThumbnail
                   companyId={activeCompanyId}
-                  mediaId={coverMediaId}
+                  mediaId={getCoverMediaId(item)}
                   alt={title}
                 />
 
-                {/* =========================
-                      INFORMATION
-                  ========================= */}
+                {/* CONTENT */}
 
                 <div
                   className="
@@ -1459,13 +1571,17 @@ export default function ProjectManager() {
                     </h2>
 
                     <StatusBadge
-                      status={project.status}
+                      status={item.status}
                       size={density === "compact" ? "small" : "default"}
                     />
 
-                    {project.featured && (
+                    {item.featured && (
                       <span
                         className="
+                            inline-flex
+                            items-center
+                            gap-1
+
                             rounded-full
 
                             border
@@ -1484,7 +1600,9 @@ export default function ProjectManager() {
                             text-[var(--company-primary)]
                           "
                       >
-                        {t("project.manager.featured")}
+                        <Star size={9} />
+
+                        {t("news.manager.featured")}
                       </span>
                     )}
                   </div>
@@ -1499,7 +1617,7 @@ export default function ProjectManager() {
                         text-[var(--admin-muted)]
                       "
                   >
-                    /{project.slug}
+                    /{item.slug}
                   </div>
 
                   <div
@@ -1517,67 +1635,53 @@ export default function ProjectManager() {
                         text-[var(--admin-muted)]
                       "
                   >
-                    {category && (
+                    {item.category && (
                       <span>
-                        {getCategoryName(
-                          category,
-
-                          t("project.manager.untitledCategory"),
-                        )}
-
-                        {subCategory
-                          ? ` / ${getCategoryName(
-                              subCategory,
-
-                              t("project.manager.untitledCategory"),
-                            )}`
-                          : ""}
-                      </span>
-                    )}
-
-                    {location && <span>{location}</span>}
-
-                    {project.projectInfo?.completionYear && (
-                      <span>{project.projectInfo.completionYear}</span>
-                    )}
-
-                    {project.status === "scheduled" && project.scheduledAt && (
-                      <span
-                        className="
-                              text-amber-600
-                            "
-                      >
-                        {t("project.manager.dates.scheduled", {
-                          date: formatDateTime(
-                            project.scheduledAt,
-
-                            locale,
-                          ),
+                        {t("news.manager.category", {
+                          category: item.category,
                         })}
                       </span>
                     )}
 
-                    {project.status === "published" && project.publishedAt && (
-                      <span
-                        className="
-                              text-emerald-600
-                            "
-                      >
-                        {t("project.manager.dates.published", {
-                          date: formatDate(
-                            project.publishedAt,
-
-                            locale,
-                          ),
+                    {item.author && (
+                      <span>
+                        {t("news.manager.author", {
+                          author: item.author,
                         })}
                       </span>
                     )}
 
-                    {project.updatedAt && (
+                    {item.status === NEWS_STATUS.SCHEDULED &&
+                      item.scheduledAt && (
+                        <span className="text-amber-600">
+                          {t("news.manager.dates.scheduled", {
+                            date: formatDateTime(
+                              item.scheduledAt,
+
+                              locale,
+                            ),
+                          })}
+                        </span>
+                      )}
+
+                    {item.status === NEWS_STATUS.PUBLISHED &&
+                      item.publishedAt && (
+                        <span className="text-emerald-600">
+                          {t("news.manager.dates.published", {
+                            date: formatDate(
+                              item.publishedAt,
+
+                              locale,
+                            ),
+                          })}
+                        </span>
+                      )}
+
+                    {item.updatedAt && (
                       <span>
-                        {t("project.manager.dates.updated", {
+                        {t("news.manager.dates.updated", {
                           date: formatDate(
-                            project.updatedAt,
+                            item.updatedAt,
 
                             locale,
                           ),
@@ -1587,16 +1691,9 @@ export default function ProjectManager() {
                   </div>
                 </div>
 
-                {/* =========================
-                      ACTIONS
-                  ========================= */}
+                {/* ACTIONS */}
 
-                <ActionButtonGroup
-                  className="
-                      shrink-0
-                    "
-                  align="end"
-                >
+                <ActionButtonGroup className="shrink-0" align="end">
                   <ActionButton
                     icon={Pencil}
                     label={t("common.edit")}
@@ -1605,11 +1702,11 @@ export default function ProjectManager() {
                     tooltip={tooltipEnabled}
                     tooltipDelay={tooltipDelay}
                     size={actionSize}
-                    onClick={() => handleEditProject(project)}
+                    disabled={Boolean(processingId)}
+                    onClick={() => handleEdit(item)}
                   />
 
-                  {(project.status === "draft" ||
-                    project.status === "review") && (
+                  {canPublish && (
                     <ActionButton
                       icon={Send}
                       label={t("common.publish")}
@@ -1618,33 +1715,34 @@ export default function ProjectManager() {
                       tooltip={tooltipEnabled}
                       tooltipDelay={tooltipDelay}
                       size={actionSize}
-                      onClick={() => handleOpenPublish(project)}
+                      loading={processing}
+                      disabled={Boolean(processingId) && !processing}
+                      onClick={() => openPublish(item)}
                     />
                   )}
 
-                  {project.status === "scheduled" && (
-                    <ActionButton
-                      icon={CalendarX2}
-                      label={t("project.manager.actions.cancelSchedule")}
-                      tone="warning"
-                      display={actionDisplay}
-                      tooltip={tooltipEnabled}
-                      tooltipDelay={tooltipDelay}
-                      size={actionSize}
-                      onClick={() => handleOpenUnpublish(project)}
-                    />
-                  )}
-
-                  {project.status === "published" && (
+                  {canUnpublish && (
                     <ActionButton
                       icon={RotateCcw}
-                      label={t("common.unpublish")}
+                      label={
+                        item.status === NEWS_STATUS.SCHEDULED
+                          ? t("news.manager.actions.cancelSchedule")
+                          : t("common.unpublish")
+                      }
                       tone="warning"
                       display={actionDisplay}
                       tooltip={tooltipEnabled}
                       tooltipDelay={tooltipDelay}
                       size={actionSize}
-                      onClick={() => handleOpenUnpublish(project)}
+                      loading={processing}
+                      disabled={Boolean(processingId) && !processing}
+                      onClick={() =>
+                        openConfirm(
+                          "unpublish",
+
+                          item,
+                        )
+                      }
                     />
                   )}
 
@@ -1657,7 +1755,15 @@ export default function ProjectManager() {
                       tooltip={tooltipEnabled}
                       tooltipDelay={tooltipDelay}
                       size={actionSize}
-                      onClick={() => handleOpenDelete(project)}
+                      loading={processing}
+                      disabled={Boolean(processingId) && !processing}
+                      onClick={() =>
+                        openConfirm(
+                          "delete",
+
+                          item,
+                        )
+                      }
                     />
                   )}
                 </ActionButtonGroup>
@@ -1668,52 +1774,54 @@ export default function ProjectManager() {
       )}
 
       {/* =====================================
-          PROJECT EDITOR
+          EDITOR
       ===================================== */}
 
-      <ProjectEditor
+      <NewsEditor
         open={editorOpen}
         companyId={activeCompanyId}
-        project={editingProject}
-        categories={categories}
-        onClose={handleCloseEditor}
-        onSaved={handleProjectSaved}
+        item={editingItem}
+        categorySuggestions={categories}
+        tagSuggestions={tagSuggestions}
+        onClose={closeEditor}
+        onSaved={handleSaved}
       />
 
       {/* =====================================
           PUBLISH
       ===================================== */}
 
-      <ProjectPublishDialog
-        open={publishDialogOpen}
-        companyId={activeCompanyId}
-        project={publishingProject}
-        onClose={handleClosePublish}
-        onCompleted={handleLifecycleCompleted}
+      <NewsPublishDialog
+        open={Boolean(publishItem)}
+        item={publishItem}
+        loading={Boolean(publishItem?.id) && processingId === publishItem?.id}
+        onClose={closePublish}
+        onPublishNow={() => publishNews(publishItem, null)}
+        onSchedule={(scheduledAt) => publishNews(publishItem, scheduledAt)}
       />
 
       {/* =====================================
-          UNPUBLISH
+          CONFIRM
       ===================================== */}
 
-      <ProjectUnpublishDialog
-        open={unpublishDialogOpen}
-        companyId={activeCompanyId}
-        project={unpublishingProject}
-        onClose={handleCloseUnpublish}
-        onCompleted={handleLifecycleCompleted}
-      />
+      <NewsConfirmDialog
+        open={confirmState.open}
+        mode={confirmState.mode}
+        item={confirmState.item}
+        loading={
+          Boolean(confirmState.item?.id) &&
+          processingId === confirmState.item?.id
+        }
+        onClose={closeConfirm}
+        onConfirm={() => {
+          if (confirmState.mode === "delete") {
+            deleteNews(confirmState.item);
 
-      {/* =====================================
-          DELETE
-      ===================================== */}
+            return;
+          }
 
-      <ProjectDeleteDialog
-        open={deleteDialogOpen}
-        companyId={activeCompanyId}
-        project={deletingProject}
-        onClose={handleCloseDelete}
-        onCompleted={handleDeleteCompleted}
+          unpublishNews(confirmState.item);
+        }}
       />
     </div>
   );

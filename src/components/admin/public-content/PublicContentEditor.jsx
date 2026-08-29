@@ -7,6 +7,8 @@ import {
   LoaderCircle,
   PlaySquare,
   RefreshCw,
+  Save,
+  Star,
   X,
 } from "lucide-react";
 
@@ -16,7 +18,14 @@ import { toast } from "sonner";
 
 import ContentMediaSection from "@/components/admin/content/ContentMediaSection";
 import ContentSeoSection from "@/components/admin/content/ContentSeoSection";
+
 import FormField from "@/components/admin/form/FormField";
+
+import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
+
+import LocalizedFormField from "@/components/admin/localization/LocalizedFormField";
+import LocalizedRichTextEditor from "@/components/admin/localization/LocalizedRichTextEditor";
+
 import TagInput from "@/components/admin/tag/TagInput";
 
 import {
@@ -32,60 +41,38 @@ import {
   getInvalidFieldClass,
   hasErrors,
   normalizeServerFieldErrors,
-  validatePublicContentForm,
 } from "@/utils/admin-form-validation";
 
 import { cn } from "@/utils/cn";
+
 import { slugify } from "@/utils/slug";
 
-const CONTENT_TYPES = [
-  {
-    value: PUBLIC_CONTENT_TYPE.ARTICLE,
-    label: "Article",
-    description: "Long-form editorial or media article.",
-    icon: FileText,
-  },
-  {
-    value: PUBLIC_CONTENT_TYPE.VIDEO,
-    label: "Video",
-    description:
-      "Video hosted on YouTube, Vimeo, Facebook or another platform.",
-    icon: PlaySquare,
-  },
-  {
-    value: PUBLIC_CONTENT_TYPE.EMBED,
-    label: "Embed",
-    description: "Embedded social post or external media.",
-    icon: PlaySquare,
-  },
+/*
+ * =========================================================
+ * CONSTANTS
+ * =========================================================
+ */
+
+const CONTENT_TYPE_VALUES = [
+  PUBLIC_CONTENT_TYPE.ARTICLE,
+  PUBLIC_CONTENT_TYPE.VIDEO,
+  PUBLIC_CONTENT_TYPE.EMBED,
 ];
 
-const PROVIDERS = [
-  {
-    value: PUBLIC_PROVIDER.YOUTUBE,
-    label: "YouTube",
-  },
-  {
-    value: PUBLIC_PROVIDER.FACEBOOK,
-    label: "Facebook",
-  },
-  {
-    value: PUBLIC_PROVIDER.VIMEO,
-    label: "Vimeo",
-  },
-  {
-    value: PUBLIC_PROVIDER.INSTAGRAM,
-    label: "Instagram",
-  },
-  {
-    value: PUBLIC_PROVIDER.TIKTOK,
-    label: "TikTok",
-  },
-  {
-    value: PUBLIC_PROVIDER.OTHER,
-    label: "Other",
-  },
+const PROVIDER_VALUES = [
+  PUBLIC_PROVIDER.YOUTUBE,
+  PUBLIC_PROVIDER.FACEBOOK,
+  PUBLIC_PROVIDER.VIMEO,
+  PUBLIC_PROVIDER.INSTAGRAM,
+  PUBLIC_PROVIDER.TIKTOK,
+  PUBLIC_PROVIDER.OTHER,
 ];
+
+/*
+ * =========================================================
+ * EMPTY VALUES
+ * =========================================================
+ */
 
 function emptyLocalized() {
   return {
@@ -108,8 +95,11 @@ function emptySeoLanguage() {
 function emptySeo() {
   return {
     th: emptySeoLanguage(),
+
     en: emptySeoLanguage(),
+
     index: true,
+
     follow: true,
   };
 }
@@ -117,41 +107,34 @@ function emptySeo() {
 function emptyMetadata() {
   return {
     title: "",
+
     description: "",
+
     authorName: "",
+
     authorUrl: null,
+
     thumbnailUrl: null,
+
     thumbnailWidth: null,
+
     thumbnailHeight: null,
+
     publishedAt: null,
+
     duration: null,
   };
 }
 
-function normalizeSeoLanguage(value) {
+function emptySource() {
   return {
-    title: value?.title || "",
-    description: value?.description || "",
-    keywords: Array.isArray(value?.keywords) ? value.keywords : [],
-    ogTitle: value?.ogTitle || "",
-    ogDescription: value?.ogDescription || "",
-    ogImage: value?.ogImage || null,
-  };
-}
+    provider: null,
 
-function normalizeSeo(value) {
-  return {
-    th: normalizeSeoLanguage(value?.th),
-    en: normalizeSeoLanguage(value?.en),
-    index: value?.index !== false,
-    follow: value?.follow !== false,
-  };
-}
+    sourceUrl: "",
 
-function normalizeMetadata(metadata) {
-  return {
-    ...emptyMetadata(),
-    ...(metadata || {}),
+    externalId: null,
+
+    metadata: emptyMetadata(),
   };
 }
 
@@ -167,12 +150,7 @@ function emptyForm() {
 
     content: emptyLocalized(),
 
-    source: {
-      provider: null,
-      sourceUrl: "",
-      externalId: null,
-      metadata: emptyMetadata(),
-    },
+    source: emptySource(),
 
     featuredImage: null,
 
@@ -183,6 +161,48 @@ function emptyForm() {
     featured: false,
 
     seo: emptySeo(),
+  };
+}
+
+/*
+ * =========================================================
+ * NORMALIZATION
+ * =========================================================
+ */
+
+function normalizeSeoLanguage(value) {
+  return {
+    title: value?.title || "",
+
+    description: value?.description || "",
+
+    keywords: Array.isArray(value?.keywords) ? value.keywords : [],
+
+    ogTitle: value?.ogTitle || "",
+
+    ogDescription: value?.ogDescription || "",
+
+    ogImage: value?.ogImage || null,
+  };
+}
+
+function normalizeSeo(value) {
+  return {
+    th: normalizeSeoLanguage(value?.th),
+
+    en: normalizeSeoLanguage(value?.en),
+
+    index: value?.index !== false,
+
+    follow: value?.follow !== false,
+  };
+}
+
+function normalizeMetadata(metadata) {
+  return {
+    ...emptyMetadata(),
+
+    ...(metadata || {}),
   };
 }
 
@@ -198,23 +218,29 @@ function normalizeItem(item) {
 
     title: {
       th: item.title?.th || "",
+
       en: item.title?.en || "",
     },
 
     excerpt: {
       th: item.excerpt?.th || "",
+
       en: item.excerpt?.en || "",
     },
 
     content: {
       th: item.content?.th || "",
+
       en: item.content?.en || "",
     },
 
     source: {
       provider: item.source?.provider || null,
+
       sourceUrl: item.source?.sourceUrl || "",
+
       externalId: item.source?.externalId || null,
+
       metadata: normalizeMetadata(item.source?.metadata),
     },
 
@@ -242,6 +268,12 @@ function normalizeArray(payload) {
   return [];
 }
 
+/*
+ * =========================================================
+ * TAGS
+ * =========================================================
+ */
+
 function extractTagSuggestions(items) {
   const tags = new Map();
 
@@ -267,12 +299,18 @@ function extractTagSuggestions(items) {
     }
   }
 
-  return [...tags.values()].sort((a, b) =>
-    a.localeCompare(b, "en", {
+  return [...tags.values()].sort((first, second) =>
+    first.localeCompare(second, "en", {
       sensitivity: "base",
     }),
   );
 }
+
+/*
+ * =========================================================
+ * TEXT
+ * =========================================================
+ */
 
 function truncateText(value, maxLength = 300) {
   const text = String(value || "")
@@ -286,7 +324,13 @@ function truncateText(value, maxLength = 300) {
   return `${text.slice(0, maxLength - 1)}…`;
 }
 
-function formatPublishedDate(value) {
+/*
+ * =========================================================
+ * DATE / DURATION
+ * =========================================================
+ */
+
+function formatPublishedDate(value, locale) {
   if (!value) {
     return null;
   }
@@ -297,7 +341,7 @@ function formatPublishedDate(value) {
     return null;
   }
 
-  return new Intl.DateTimeFormat("en", {
+  return new Intl.DateTimeFormat(locale === "th" ? "th-TH" : "en-US", {
     dateStyle: "medium",
   }).format(date);
 }
@@ -314,13 +358,17 @@ function formatIsoDuration(value) {
   }
 
   const hours = Number(match[1] || 0);
+
   const minutes = Number(match[2] || 0);
+
   const seconds = Number(match[3] || 0);
 
   if (hours > 0) {
     return [
       hours,
+
       String(minutes).padStart(2, "0"),
+
       String(seconds).padStart(2, "0"),
     ].join(":");
   }
@@ -328,13 +376,80 @@ function formatIsoDuration(value) {
   return [minutes, String(seconds).padStart(2, "0")].join(":");
 }
 
+/*
+ * =========================================================
+ * RICH TEXT
+ * =========================================================
+ */
+
+function richTextHasContent(value) {
+  const text = String(value || "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return Boolean(text);
+}
+
+/*
+ * =========================================================
+ * SECTION HEADER
+ * =========================================================
+ */
+
+function SectionHeader({ title, description }) {
+  return (
+    <div>
+      <h3
+        className="
+          admin-text-14
+          font-semibold
+
+          text-[var(--admin-foreground)]
+        "
+      >
+        {title}
+      </h3>
+
+      {description && (
+        <p
+          className="
+            mt-1
+            max-w-2xl
+
+            admin-text-12
+            leading-[1.65]
+
+            text-[var(--admin-muted)]
+          "
+        >
+          {description}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/*
+ * =========================================================
+ * PUBLIC CONTENT EDITOR
+ * =========================================================
+ */
+
 export default function PublicContentEditor({
   open,
+
   companyId,
+
   item,
+
   onClose,
+
   onSaved,
 }) {
+  const { t, locale } = useAdminTranslation();
+
   const [form, setForm] = useState(() => normalizeItem(item));
 
   const [saving, setSaving] = useState(false);
@@ -345,9 +460,17 @@ export default function PublicContentEditor({
 
   const [tagSuggestions, setTagSuggestions] = useState([]);
 
+  const [tagSuggestionsLoading, setTagSuggestionsLoading] = useState(false);
+
   const slugManuallyEditedRef = useRef(false);
 
   const lastResolvedUrlRef = useRef("");
+
+  /*
+   * =======================================================
+   * OPEN SYNC
+   * =======================================================
+   */
 
   useEffect(() => {
     if (!open) {
@@ -371,6 +494,12 @@ export default function PublicContentEditor({
     };
   }, [item, open]);
 
+  /*
+   * =======================================================
+   * TAG SUGGESTIONS
+   * =======================================================
+   */
+
   useEffect(() => {
     if (!open || !companyId) {
       return;
@@ -380,11 +509,17 @@ export default function PublicContentEditor({
 
     const timeoutId = window.setTimeout(async () => {
       try {
+        if (!cancelled) {
+          setTagSuggestionsLoading(true);
+        }
+
         const response = await fetch(
           `/api/v1/companies/${companyId}/public-contents`,
           {
             method: "GET",
+
             cache: "no-store",
+
             credentials: "include",
           },
         );
@@ -393,7 +528,7 @@ export default function PublicContentEditor({
 
         if (!response.ok || payload?.success === false) {
           throw new Error(
-            payload?.message || "Unable to retrieve public content tags.",
+            payload?.message || t("publicContent.editor.errors.loadTags"),
           );
         }
 
@@ -408,18 +543,73 @@ export default function PublicContentEditor({
         if (!cancelled) {
           setTagSuggestions([]);
         }
+      } finally {
+        if (!cancelled) {
+          setTagSuggestionsLoading(false);
+        }
       }
     }, 0);
 
     return () => {
       cancelled = true;
+
       window.clearTimeout(timeoutId);
     };
-  }, [companyId, open]);
+  }, [companyId, open, t]);
 
   if (!open) {
     return null;
   }
+
+  /*
+   * =======================================================
+   * TRANSLATED OPTIONS
+   * =======================================================
+   */
+
+  function getContentTypeMeta(value) {
+    const meta = {
+      [PUBLIC_CONTENT_TYPE.ARTICLE]: {
+        icon: FileText,
+
+        label: t("publicContent.types.article"),
+
+        description: t("publicContent.editor.contentTypes.article"),
+      },
+
+      [PUBLIC_CONTENT_TYPE.VIDEO]: {
+        icon: PlaySquare,
+
+        label: t("publicContent.types.video"),
+
+        description: t("publicContent.editor.contentTypes.video"),
+      },
+
+      [PUBLIC_CONTENT_TYPE.EMBED]: {
+        icon: PlaySquare,
+
+        label: t("publicContent.types.embed"),
+
+        description: t("publicContent.editor.contentTypes.embed"),
+      },
+    };
+
+    return meta[value] || meta[PUBLIC_CONTENT_TYPE.ARTICLE];
+  }
+
+  function getProviderLabel(provider) {
+    if (!provider) {
+      return "";
+    }
+
+    return t(`publicContent.providers.${provider}`);
+  }
+
+  /*
+   * =======================================================
+   * LOCALIZED FIELD
+   * =======================================================
+   */
 
   function updateLocalized(field, language, value) {
     setForm((current) => ({
@@ -427,6 +617,7 @@ export default function PublicContentEditor({
 
       [field]: {
         ...current[field],
+
         [language]: value,
       },
     }));
@@ -440,6 +631,41 @@ export default function PublicContentEditor({
     }
   }
 
+  /*
+   * =======================================================
+   * TITLE
+   * =======================================================
+   */
+
+  function updateTitle(language, value) {
+    setForm((current) => ({
+      ...current,
+
+      title: {
+        ...current.title,
+
+        [language]: value,
+      },
+
+      slug:
+        language === "en" && !item && !slugManuallyEditedRef.current
+          ? slugify(value)
+          : current.slug,
+    }));
+
+    clearFieldError(setErrors, "title");
+
+    if (language === "en" && !item && !slugManuallyEditedRef.current) {
+      clearFieldError(setErrors, "slug");
+    }
+  }
+
+  /*
+   * =======================================================
+   * CONTENT TYPE
+   * =======================================================
+   */
+
   function changeContentType(contentType) {
     setForm((current) => ({
       ...current,
@@ -448,12 +674,7 @@ export default function PublicContentEditor({
 
       source:
         contentType === PUBLIC_CONTENT_TYPE.ARTICLE
-          ? {
-              provider: null,
-              sourceUrl: "",
-              externalId: null,
-              metadata: emptyMetadata(),
-            }
+          ? emptySource()
           : current.source,
     }));
 
@@ -467,13 +688,77 @@ export default function PublicContentEditor({
     ]);
   }
 
+  /*
+   * =======================================================
+   * VALIDATION
+   * =======================================================
+   */
+
+  function validateForm(value) {
+    const nextErrors = {};
+
+    if (!CONTENT_TYPE_VALUES.includes(value.contentType)) {
+      nextErrors.contentType = t(
+        "publicContent.editor.validation.contentTypeRequired",
+      );
+    }
+
+    /*
+     * English is canonical.
+     */
+    if (!value.title?.en?.trim()) {
+      nextErrors.title = t("publicContent.editor.validation.titleRequired");
+    }
+
+    if (!value.slug?.trim()) {
+      nextErrors.slug = t("publicContent.editor.validation.slugRequired");
+    }
+
+    /*
+     * Article requires English body content.
+     */
+    if (
+      value.contentType === PUBLIC_CONTENT_TYPE.ARTICLE &&
+      !richTextHasContent(value.content?.en)
+    ) {
+      nextErrors.content = t(
+        "publicContent.editor.validation.articleContentRequired",
+      );
+    }
+
+    /*
+     * Video / Embed requires a source URL.
+     */
+    if (value.contentType !== PUBLIC_CONTENT_TYPE.ARTICLE) {
+      if (!String(value.source?.sourceUrl || "").trim()) {
+        nextErrors.sourceUrl = t(
+          "publicContent.editor.validation.sourceUrlRequired",
+        );
+      }
+
+      if (!value.source?.provider) {
+        nextErrors.sourceProvider = t(
+          "publicContent.editor.validation.providerRequired",
+        );
+      }
+    }
+
+    return nextErrors;
+  }
+
   function applyValidationErrors(validationErrors) {
     setErrors(validationErrors);
 
     focusFirstInvalidField(validationErrors);
 
-    toast.error("Please complete the required fields.");
+    toast.error(t("publicContent.editor.validation.completeRequired"));
   }
+
+  /*
+   * =======================================================
+   * EXTERNAL METADATA
+   * =======================================================
+   */
 
   async function fetchExternalMetadata({ force = false } = {}) {
     if (!companyId || metadataLoading) {
@@ -522,19 +807,18 @@ export default function PublicContentEditor({
 
       if (!response.ok || result?.success === false) {
         throw new Error(
-          result?.message || "Unable to retrieve video information.",
+          result?.message ||
+            t("publicContent.editor.metadata.errors.loadFailed"),
         );
       }
 
       const data = result?.data;
 
       if (!data) {
-        throw new Error("Unable to retrieve video information.");
+        throw new Error(t("publicContent.editor.metadata.errors.loadFailed"));
       }
 
       lastResolvedUrlRef.current = data.canonicalUrl || sourceUrl;
-
-      setImportedThumbnailMedia(null);
 
       setForm((current) => {
         const metadata = normalizeMetadata(data.metadata);
@@ -568,6 +852,7 @@ export default function PublicContentEditor({
           title: shouldSetTitle
             ? {
                 ...current.title,
+
                 en: metadata.title,
               }
             : current.title,
@@ -575,6 +860,7 @@ export default function PublicContentEditor({
           excerpt: shouldSetExcerpt
             ? {
                 ...current.excerpt,
+
                 en: truncateText(metadata.description, 500),
               }
             : current.excerpt,
@@ -611,24 +897,30 @@ export default function PublicContentEditor({
         "slug",
       ]);
 
-      toast.success("Video information loaded.");
+      toast.success(t("publicContent.editor.metadata.messages.loaded"));
     } catch (error) {
       console.error("Load external media metadata error:", error);
 
-      const sourceErrors = {
-        sourceUrl: error?.message || "Unable to retrieve video information.",
-      };
+      const message =
+        error?.message || t("publicContent.editor.metadata.errors.loadFailed");
 
       setErrors((current) => ({
         ...current,
-        ...sourceErrors,
+
+        sourceUrl: message,
       }));
 
-      toast.error(sourceErrors.sourceUrl);
+      toast.error(message);
     } finally {
       setMetadataLoading(false);
     }
   }
+
+  /*
+   * =======================================================
+   * PAYLOAD
+   * =======================================================
+   */
 
   function createPayload(slug) {
     return {
@@ -646,14 +938,20 @@ export default function PublicContentEditor({
         form.contentType === PUBLIC_CONTENT_TYPE.ARTICLE
           ? {
               provider: null,
+
               sourceUrl: null,
+
               externalId: null,
+
               metadata: null,
             }
           : {
               provider: form.source.provider || null,
+
               sourceUrl: form.source.sourceUrl?.trim() || null,
+
               externalId: form.source.externalId || null,
+
               metadata: form.source.metadata || null,
             },
 
@@ -668,6 +966,12 @@ export default function PublicContentEditor({
       seo: form.seo,
     };
   }
+
+  /*
+   * =======================================================
+   * SAVE REQUEST
+   * =======================================================
+   */
 
   async function saveContent(payload) {
     const editing = Boolean(item?.id);
@@ -703,10 +1007,16 @@ export default function PublicContentEditor({
     };
   }
 
+  /*
+   * =======================================================
+   * SAVE
+   * =======================================================
+   */
+
   async function handleSubmit(event) {
     event.preventDefault();
 
-    if (!companyId || saving) {
+    if (!companyId || saving || metadataLoading) {
       return;
     }
 
@@ -714,18 +1024,21 @@ export default function PublicContentEditor({
 
     const normalizedForm = {
       ...form,
+
       slug: normalizedSlug,
     };
 
-    const validationErrors = validatePublicContentForm(normalizedForm);
+    const validationErrors = validateForm(normalizedForm);
 
     if (hasErrors(validationErrors)) {
       applyValidationErrors(validationErrors);
+
       return;
     }
 
     try {
       setSaving(true);
+
       setErrors({});
 
       let currentSlug = normalizedSlug;
@@ -739,9 +1052,14 @@ export default function PublicContentEditor({
 
         const { response, result } = await saveContent(payload);
 
+        /*
+         * SUCCESS
+         */
+
         if (response.ok && result?.success !== false) {
           setForm((current) => ({
             ...current,
+
             slug: currentSlug,
           }));
 
@@ -749,8 +1067,8 @@ export default function PublicContentEditor({
 
           toast.success(
             item
-              ? "Public content updated successfully."
-              : "Public content created successfully.",
+              ? t("publicContent.editor.messages.updated")
+              : t("publicContent.editor.messages.created"),
           );
 
           await onSaved?.(result?.data);
@@ -758,12 +1076,21 @@ export default function PublicContentEditor({
           return;
         }
 
+        /*
+         * SERVER FIELD ERRORS
+         */
+
         const serverErrors = normalizeServerFieldErrors(result?.errors);
 
         if (hasErrors(serverErrors)) {
           setErrors(serverErrors);
+
           focusFirstInvalidField(serverErrors);
         }
+
+        /*
+         * SLUG CONFLICT
+         */
 
         const slugConflict =
           response.status === 409 &&
@@ -773,35 +1100,38 @@ export default function PublicContentEditor({
               .includes("slug"));
 
         if (!slugConflict) {
-          throw new Error(result?.message || "Unable to save public content.");
+          throw new Error(
+            result?.message || t("publicContent.editor.errors.saveFailed"),
+          );
         }
 
         const suggestedSlug = slugify(result?.suggestedSlug);
 
         if (!suggestedSlug || suggestedSlug === currentSlug) {
           const slugErrors = {
-            slug: "This slug is already in use.",
+            slug: t("publicContent.editor.slug.exists"),
           };
 
           setErrors(slugErrors);
 
           focusFirstInvalidField(slugErrors);
 
-          toast.error(
-            "This slug is already in use and no alternative slug is currently available.",
-          );
+          toast.error(t("publicContent.editor.slug.noAlternative"));
 
           return;
         }
 
         const confirmed = window.confirm(
-          `The slug "${currentSlug}" is already in use.\n\n` +
-            `Would you like to use "${suggestedSlug}" instead?`,
+          t("publicContent.editor.slug.confirmSuggestion", {
+            current: currentSlug,
+
+            suggested: suggestedSlug,
+          }),
         );
 
         if (!confirmed) {
           const slugErrors = {
-            slug: "This slug is already in use.",
+            slug: t("publicContent.editor.slug.exists"),
           };
 
           setErrors(slugErrors);
@@ -817,6 +1147,7 @@ export default function PublicContentEditor({
 
         setForm((current) => ({
           ...current,
+
           slug: suggestedSlug,
         }));
 
@@ -825,41 +1156,41 @@ export default function PublicContentEditor({
         clearFieldError(setErrors, "slug");
 
         if (conflictAttempts > maxConflictAttempts) {
-          throw new Error(
-            "Unable to reserve an available slug. Please enter another slug.",
-          );
+          throw new Error(t("publicContent.editor.slug.reserveFailed"));
         }
       }
     } catch (error) {
       console.error("Save public content error:", error);
 
-      toast.error(error?.message || "Unable to save public content.");
+      toast.error(
+        error?.message || t("publicContent.editor.errors.saveFailed"),
+      );
     } finally {
       setSaving(false);
     }
   }
 
-  const inputClass = cn(
-    "h-11 w-full rounded-xl",
-    "border border-[var(--admin-border)]",
-    "bg-[var(--admin-surface)] px-3",
-    "text-sm text-[var(--admin-foreground)]",
-    "outline-none transition",
-    "placeholder:text-[var(--admin-muted-light)]",
-    "focus:border-[var(--company-primary)]",
-    "focus:ring-2 focus:ring-[var(--company-primary-soft)]",
-  );
+  /*
+   * =======================================================
+   * CLOSE
+   * =======================================================
+   */
 
-  const textareaClass = cn(
-    "w-full rounded-xl",
-    "border border-[var(--admin-border)]",
-    "bg-[var(--admin-surface)] p-3",
-    "text-sm text-[var(--admin-foreground)]",
-    "outline-none transition",
-    "placeholder:text-[var(--admin-muted-light)]",
-    "focus:border-[var(--company-primary)]",
-    "focus:ring-2 focus:ring-[var(--company-primary-soft)]",
-  );
+  const busy = saving || metadataLoading;
+
+  function handleClose() {
+    if (busy) {
+      return;
+    }
+
+    onClose?.();
+  }
+
+  /*
+   * =======================================================
+   * STATE
+   * =======================================================
+   */
 
   const requiresSource =
     form.contentType === PUBLIC_CONTENT_TYPE.VIDEO ||
@@ -867,283 +1198,567 @@ export default function PublicContentEditor({
 
   const metadata = form.source.metadata || emptyMetadata();
 
-  const busy = saving || metadataLoading;
+  const inputClass = cn(
+    "h-11 w-full",
+
+    "rounded-xl",
+
+    "border border-[var(--admin-border)]",
+
+    "bg-[var(--admin-surface)]",
+
+    "px-3",
+
+    "admin-text-14",
+
+    "text-[var(--admin-foreground)]",
+
+    "outline-none transition",
+
+    "placeholder:text-[var(--admin-muted-light)]",
+
+    "focus:border-[var(--company-primary)]",
+
+    "focus:ring-2 focus:ring-[var(--company-primary-soft)]",
+  );
+
+  /*
+   * =======================================================
+   * RENDER
+   * =======================================================
+   */
 
   return (
-    <div className="fixed inset-0 z-[200]">
+    <div
+      className="
+        fixed
+        inset-0
+        z-[200]
+      "
+    >
+      {/* =====================================
+          BACKDROP
+      ===================================== */}
+
       <button
         type="button"
-        aria-label="Close public content editor"
-        className="absolute inset-0 bg-black/40"
-        onClick={busy ? undefined : onClose}
+        aria-label={t("common.close")}
+        className="
+          absolute
+          inset-0
+
+          bg-black/40
+
+          backdrop-blur-[1px]
+        "
+        onClick={handleClose}
+        disabled={busy}
       />
 
-      <div className="absolute inset-y-0 right-0 flex w-full max-w-5xl flex-col bg-[var(--admin-background)] shadow-2xl">
-        <header className="flex items-center justify-between border-b border-[var(--admin-border)] bg-[var(--admin-surface)] px-5 py-4 sm:px-6">
+      {/* =====================================
+          PANEL
+      ===================================== */}
+
+      <div
+        className="
+          absolute
+          inset-y-0
+          right-0
+
+          flex
+          w-full
+          max-w-[1120px]
+          flex-col
+
+          bg-[var(--admin-background)]
+
+          shadow-2xl
+        "
+      >
+        {/* =================================
+            HEADER
+        ================================= */}
+
+        <header
+          className="
+            flex
+            min-h-[80px]
+            shrink-0
+
+            items-center
+            justify-between
+
+            gap-4
+
+            border-b
+            border-[var(--admin-border)]
+
+            bg-[var(--admin-surface)]
+
+            px-5
+            py-4
+
+            sm:px-8
+          "
+        >
           <div>
-            <div className="text-xs uppercase tracking-[0.14em] text-[var(--admin-muted)]">
-              Public Content
+            <div
+              className="
+                admin-text-10
+                font-semibold
+                uppercase
+                tracking-[0.14em]
+
+                text-[var(--company-primary)]
+              "
+            >
+              {t("publicContent.editor.sectionLabel")}
             </div>
 
-            <h2 className="mt-1 text-xl font-semibold text-[var(--admin-foreground)]">
-              {item ? "Edit Content" : "New Content"}
+            <h2
+              className="
+                mt-1
+
+                admin-text-18
+                font-semibold
+                tracking-[-0.02em]
+
+                text-[var(--admin-foreground)]
+              "
+            >
+              {item
+                ? t("publicContent.editor.editTitle")
+                : t("publicContent.editor.newTitle")}
             </h2>
+
+            <p
+              className="
+                mt-1
+
+                admin-text-12
+
+                text-[var(--admin-muted)]
+              "
+            >
+              {t("publicContent.editor.headerDescription")}
+            </p>
           </div>
 
           <button
             type="button"
             disabled={busy}
-            onClick={onClose}
-            aria-label="Close"
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--admin-border)] text-[var(--admin-muted)] transition hover:bg-[var(--admin-hover)] disabled:opacity-50"
+            onClick={handleClose}
+            aria-label={t("common.close")}
+            title={t("common.close")}
+            className="
+              flex
+              h-9
+              w-9
+              shrink-0
+
+              items-center
+              justify-center
+
+              rounded-xl
+
+              text-[var(--admin-muted)]
+
+              transition
+
+              hover:bg-[var(--admin-hover)]
+
+              hover:text-[var(--admin-foreground)]
+
+              disabled:opacity-50
+            "
           >
             <X size={18} />
           </button>
         </header>
 
+        {/* =================================
+            FORM
+        ================================= */}
+
         <form
           id="public-content-editor-form"
           onSubmit={handleSubmit}
           noValidate
-          className="flex-1 overflow-y-auto"
-        >
-          <div className="p-5 sm:p-6">
-            <section>
-              <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
-                Content Type
-              </h3>
+          className="
+            admin-sidebar-scrollbar-hide
 
-              <p className="mt-1 text-xs leading-5 text-[var(--admin-muted)]">
-                Choose how this content will be presented on the public website.
-              </p>
+            min-h-0
+            flex-1
+
+            overflow-y-auto
+          "
+        >
+          <div
+            className="
+              px-5
+              py-6
+
+              sm:px-8
+              sm:py-8
+            "
+          >
+            {/* ===============================
+                CONTENT TYPE
+            =============================== */}
+
+            <section>
+              <SectionHeader
+                title={t("publicContent.editor.typeSection.title")}
+                description={t("publicContent.editor.typeSection.description")}
+              />
 
               <div
                 data-form-field="contentType"
-                className="mt-4 grid gap-3 sm:grid-cols-3"
+                className="
+                  mt-4
+
+                  grid
+                  gap-3
+
+                  sm:grid-cols-3
+                "
               >
-                {CONTENT_TYPES.map(
-                  ({ value, label, description, icon: Icon }) => {
-                    const active = form.contentType === value;
+                {CONTENT_TYPE_VALUES.map((value) => {
+                  const {
+                    label,
+                    description,
+                    icon: Icon,
+                  } = getContentTypeMeta(value);
 
-                    return (
-                      <button
-                        key={value}
-                        type="button"
-                        onClick={() => changeContentType(value)}
-                        className={cn(
-                          "rounded-2xl border p-4 text-left transition",
+                  const active = form.contentType === value;
 
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => changeContentType(value)}
+                      className={cn(
+                        "rounded-2xl",
+
+                        "border",
+
+                        "p-4",
+
+                        "text-left",
+
+                        "transition",
+
+                        active
+                          ? [
+                              "border-[var(--company-primary)]",
+
+                              "bg-[var(--company-primary-soft)]",
+                            ]
+                          : [
+                              "border-[var(--admin-border)]",
+
+                              "bg-[var(--admin-surface)]",
+
+                              "hover:bg-[var(--admin-hover)]",
+                            ],
+
+                        getInvalidFieldClass(errors.contentType),
+                      )}
+                    >
+                      <Icon
+                        size={18}
+                        className={
                           active
-                            ? "border-[var(--company-primary)] bg-[var(--company-primary-soft)]"
-                            : "border-[var(--admin-border)] bg-[var(--admin-surface)] hover:bg-[var(--admin-hover)]",
+                            ? "text-[var(--company-primary)]"
+                            : "text-[var(--admin-muted)]"
+                        }
+                      />
 
-                          getInvalidFieldClass(errors.contentType),
-                        )}
+                      <div
+                        className="
+                            mt-3
+
+                            admin-text-14
+                            font-medium
+
+                            text-[var(--admin-foreground)]
+                          "
                       >
-                        <Icon
-                          size={18}
-                          className={
-                            active
-                              ? "text-[var(--company-primary)]"
-                              : "text-[var(--admin-muted)]"
-                          }
-                        />
+                        {label}
+                      </div>
 
-                        <div className="mt-3 text-sm font-medium text-[var(--admin-foreground)]">
-                          {label}
-                        </div>
+                      <p
+                        className="
+                            mt-1
 
-                        <p className="mt-1 text-[11px] leading-5 text-[var(--admin-muted)]">
-                          {description}
-                        </p>
-                      </button>
-                    );
-                  },
-                )}
+                            admin-text-11
+                            leading-[1.6]
+
+                            text-[var(--admin-muted)]
+                          "
+                      >
+                        {description}
+                      </p>
+                    </button>
+                  );
+                })}
               </div>
 
               {errors.contentType && (
-                <p className="mt-2 text-xs font-medium text-red-500">
+                <p
+                  className="
+                    mt-2
+
+                    admin-text-12
+                    font-medium
+
+                    text-red-500
+                  "
+                >
                   {errors.contentType}
                 </p>
               )}
             </section>
 
-            <section className="mt-10 border-t border-[var(--admin-border)] pt-8">
-              <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
-                Basic Information
-              </h3>
+            {/* ===============================
+                BASIC
+            =============================== */}
+
+            <section
+              className="
+                mt-10
+
+                border-t
+                border-[var(--admin-border)]
+
+                pt-8
+              "
+            >
+              <SectionHeader
+                title={t("publicContent.editor.basic.title")}
+                description={t("publicContent.editor.basic.description")}
+              />
 
               <div
-                data-form-field="title"
-                className="mt-5 grid gap-4 sm:grid-cols-2"
+                className="
+                  mt-5
+
+                  grid
+                  gap-5
+                "
               >
-                <FormField
-                  label="Title — English"
+                <LocalizedFormField
+                  fieldName="title"
+                  label={t("publicContent.editor.fields.title")}
                   required
+                  value={form.title}
                   error={getFieldError(errors, "title")}
-                >
-                  <input
-                    value={form.title.en}
-                    aria-invalid={Boolean(errors.title)}
-                    onChange={(event) => {
-                      const value = event.target.value;
+                  onChange={updateTitle}
+                  placeholder={{
+                    en: t("publicContent.editor.placeholders.titleEnglish"),
 
-                      setForm((current) => ({
-                        ...current,
+                    th: t("publicContent.editor.placeholders.titleThai"),
+                  }}
+                />
 
-                        title: {
-                          ...current.title,
-                          en: value,
-                        },
+                <div data-form-field="slug">
+                  <FormField
+                    label={t("publicContent.editor.fields.slug")}
+                    required
+                    error={getFieldError(errors, "slug")}
+                    hint={t("publicContent.editor.slug.hint")}
+                    infoTitle={t("publicContent.editor.slug.infoTitle")}
+                    infoContent={t("publicContent.editor.slug.infoDescription")}
+                  >
+                    <input
+                      value={form.slug}
+                      aria-invalid={Boolean(errors.slug)}
+                      onChange={(event) => {
+                        slugManuallyEditedRef.current = true;
 
-                        slug:
-                          !item && !slugManuallyEditedRef.current
-                            ? slugify(value)
-                            : current.slug,
-                      }));
+                        setForm((current) => ({
+                          ...current,
 
-                      clearFieldError(setErrors, "title");
+                          slug: event.target.value,
+                        }));
 
-                      if (!item && !slugManuallyEditedRef.current) {
                         clearFieldError(setErrors, "slug");
+                      }}
+                      onBlur={() =>
+                        setForm((current) => ({
+                          ...current,
+
+                          slug: slugify(current.slug),
+                        }))
                       }
-                    }}
-                    className={cn(
-                      inputClass,
-                      getInvalidFieldClass(errors.title),
-                    )}
-                  />
-                </FormField>
+                      placeholder="public-content-slug"
+                      className={cn(
+                        inputClass,
 
-                <FormField label="Title — ไทย" required>
-                  <input
-                    value={form.title.th}
-                    aria-invalid={Boolean(errors.title)}
-                    onChange={(event) =>
-                      updateLocalized("title", "th", event.target.value)
-                    }
-                    className={cn(
-                      inputClass,
-                      getInvalidFieldClass(errors.title),
-                    )}
-                  />
-                </FormField>
-              </div>
-
-              <div data-form-field="slug" className="mt-4">
-                <FormField
-                  label="Slug"
-                  required
-                  error={getFieldError(errors, "slug")}
-                  hint="Lowercase letters, numbers and hyphens only."
-                >
-                  <input
-                    value={form.slug}
-                    aria-invalid={Boolean(errors.slug)}
-                    onChange={(event) => {
-                      slugManuallyEditedRef.current = true;
-
-                      setForm((current) => ({
-                        ...current,
-                        slug: slugify(event.target.value),
-                      }));
-
-                      clearFieldError(setErrors, "slug");
-                    }}
-                    placeholder="public-content-slug"
-                    className={cn(
-                      inputClass,
-                      getInvalidFieldClass(errors.slug),
-                    )}
-                  />
-                </FormField>
+                        getInvalidFieldClass(errors.slug),
+                      )}
+                    />
+                  </FormField>
+                </div>
               </div>
             </section>
 
+            {/* ===============================
+                EXTERNAL SOURCE
+            =============================== */}
+
             {requiresSource && (
-              <section className="mt-10 border-t border-[var(--admin-border)] pt-8">
-                <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
-                  External Source
-                </h3>
+              <section
+                className="
+                  mt-10
 
-                <p className="mt-1 text-xs leading-5 text-[var(--admin-muted)]">
-                  Paste a YouTube URL. Provider, video ID and available metadata
-                  will be detected automatically.
-                </p>
+                  border-t
+                  border-[var(--admin-border)]
 
-                <div className="mt-5">
-                  <div data-form-field="sourceUrl">
-                    <FormField
-                      label="Source URL"
-                      required
-                      error={getFieldError(errors, "sourceUrl")}
-                      hint="Supports youtube.com/watch, youtu.be, Shorts, Live and Embed URLs."
+                  pt-8
+                "
+              >
+                <SectionHeader
+                  title={t("publicContent.editor.source.title")}
+                  description={t(
+                    form.contentType === PUBLIC_CONTENT_TYPE.VIDEO
+                      ? "publicContent.editor.source.videoDescription"
+                      : "publicContent.editor.source.embedDescription",
+                  )}
+                />
+
+                {/* SOURCE URL */}
+
+                <div data-form-field="sourceUrl" className="mt-5">
+                  <FormField
+                    label={t("publicContent.editor.fields.sourceUrl")}
+                    required
+                    error={getFieldError(errors, "sourceUrl")}
+                    hint={t("publicContent.editor.source.urlHint")}
+                    infoTitle={t("publicContent.editor.source.infoTitle")}
+                    infoContent={t(
+                      "publicContent.editor.source.infoDescription",
+                    )}
+                  >
+                    <div
+                      className="
+                        flex
+                        flex-col
+                        gap-2
+
+                        sm:flex-row
+                      "
                     >
-                      <div className="flex flex-col gap-2 sm:flex-row">
-                        <input
-                          type="url"
-                          value={form.source.sourceUrl || ""}
-                          aria-invalid={Boolean(errors.sourceUrl)}
-                          placeholder="https://www.youtube.com/watch?v=..."
-                          onChange={(event) => {
-                            const value = event.target.value;
+                      <input
+                        type="url"
+                        value={form.source.sourceUrl || ""}
+                        aria-invalid={Boolean(errors.sourceUrl)}
+                        placeholder="https://www.youtube.com/watch?v=..."
+                        onChange={(event) => {
+                          const value = event.target.value;
 
-                            lastResolvedUrlRef.current = "";
+                          lastResolvedUrlRef.current = "";
 
-                            setForm((current) => ({
-                              ...current,
+                          setForm((current) => ({
+                            ...current,
 
-                              source: {
-                                ...current.source,
+                            source: {
+                              ...current.source,
 
-                                sourceUrl: value,
+                              sourceUrl: value,
 
-                                externalId: null,
+                              externalId: null,
 
-                                metadata: emptyMetadata(),
-                              },
-                            }));
+                              metadata: emptyMetadata(),
+                            },
+                          }));
 
-                            clearFieldError(setErrors, "sourceUrl");
-                          }}
-                          onBlur={() => fetchExternalMetadata()}
-                          className={cn(
-                            inputClass,
-                            "flex-1",
-                            getInvalidFieldClass(errors.sourceUrl),
-                          )}
-                        />
+                          clearFieldError(setErrors, "sourceUrl");
+                        }}
+                        onBlur={() => fetchExternalMetadata()}
+                        className={cn(
+                          inputClass,
 
-                        <button
-                          type="button"
-                          disabled={
-                            metadataLoading || !form.source.sourceUrl?.trim()
-                          }
-                          onClick={() =>
-                            fetchExternalMetadata({
-                              force: true,
-                            })
-                          }
-                          className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 text-sm font-medium text-[var(--admin-foreground)] transition hover:bg-[var(--admin-hover)] disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          {metadataLoading ? (
-                            <LoaderCircle size={15} className="animate-spin" />
-                          ) : (
-                            <RefreshCw size={15} />
-                          )}
+                          "flex-1",
 
-                          {metadataLoading ? "Loading..." : "Fetch Video Info"}
-                        </button>
-                      </div>
-                    </FormField>
-                  </div>
+                          getInvalidFieldClass(errors.sourceUrl),
+                        )}
+                      />
+
+                      <button
+                        type="button"
+                        disabled={
+                          metadataLoading || !form.source.sourceUrl?.trim()
+                        }
+                        onClick={() =>
+                          fetchExternalMetadata({
+                            force: true,
+                          })
+                        }
+                        className="
+                          inline-flex
+                          h-11
+                          shrink-0
+
+                          items-center
+                          justify-center
+                          gap-2
+
+                          rounded-xl
+
+                          border
+                          border-[var(--admin-border)]
+
+                          bg-[var(--admin-surface)]
+
+                          px-4
+
+                          admin-text-12
+                          font-medium
+
+                          text-[var(--admin-foreground)]
+
+                          transition
+
+                          hover:border-[var(--company-primary-border)]
+
+                          hover:bg-[var(--company-primary-soft)]
+
+                          hover:text-[var(--company-primary)]
+
+                          disabled:cursor-not-allowed
+                          disabled:opacity-50
+                        "
+                      >
+                        {metadataLoading ? (
+                          <LoaderCircle size={15} className="animate-spin" />
+                        ) : (
+                          <RefreshCw size={15} />
+                        )}
+
+                        {metadataLoading
+                          ? t("publicContent.editor.metadata.loading")
+                          : t("publicContent.editor.metadata.fetch")}
+                      </button>
+                    </div>
+                  </FormField>
                 </div>
 
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                {/* PROVIDER */}
+
+                <div
+                  className="
+                    mt-4
+
+                    grid
+                    gap-4
+
+                    sm:grid-cols-2
+                  "
+                >
                   <div data-form-field="sourceProvider">
                     <FormField
-                      label="Provider"
+                      label={t("publicContent.editor.fields.provider")}
                       required
                       error={getFieldError(errors, "sourceProvider")}
                     >
@@ -1156,6 +1771,7 @@ export default function PublicContentEditor({
 
                             source: {
                               ...current.source,
+
                               provider: event.target.value || null,
                             },
                           }));
@@ -1164,14 +1780,17 @@ export default function PublicContentEditor({
                         }}
                         className={cn(
                           inputClass,
+
                           getInvalidFieldClass(errors.sourceProvider),
                         )}
                       >
-                        <option value="">Auto detect</option>
+                        <option value="">
+                          {t("publicContent.editor.source.autoDetect")}
+                        </option>
 
-                        {PROVIDERS.map((provider) => (
-                          <option key={provider.value} value={provider.value}>
-                            {provider.label}
+                        {PROVIDER_VALUES.map((provider) => (
+                          <option key={provider} value={provider}>
+                            {getProviderLabel(provider)}
                           </option>
                         ))}
                       </select>
@@ -1179,58 +1798,165 @@ export default function PublicContentEditor({
                   </div>
 
                   <FormField
-                    label="External ID"
-                    hint="Detected automatically when supported."
+                    label={t("publicContent.editor.fields.externalId")}
+                    hint={t("publicContent.editor.source.externalIdHint")}
                   >
                     <input
                       value={form.source.externalId || ""}
                       readOnly
-                      placeholder="Video ID"
+                      placeholder={t(
+                        "publicContent.editor.source.externalIdPlaceholder",
+                      )}
                       className={cn(
                         inputClass,
-                        "cursor-default bg-[var(--admin-background)]",
+
+                        "cursor-default",
+
+                        "bg-[var(--admin-background)]",
                       )}
                     />
                   </FormField>
                 </div>
 
-                {metadata.thumbnailUrl && (
-                  <div className="mt-5 overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
-                    <div
-                      className="aspect-video w-full bg-[var(--admin-background)] bg-cover bg-center"
-                      style={{
-                        backgroundImage: `url("${metadata.thumbnailUrl}")`,
-                      }}
-                    />
+                {/* METADATA PREVIEW */}
 
-                    <div className="p-4 sm:p-5">
-                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                {metadata.thumbnailUrl && (
+                  <div
+                    className="
+                      mt-5
+
+                      overflow-hidden
+
+                      rounded-2xl
+
+                      border
+                      border-[var(--admin-border)]
+
+                      bg-[var(--admin-surface)]
+                    "
+                  >
+                    <div
+                      className="
+                        relative
+
+                        aspect-video
+                        w-full
+
+                        overflow-hidden
+
+                        bg-[var(--admin-background)]
+                      "
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={metadata.thumbnailUrl}
+                        alt={metadata.title || ""}
+                        loading="lazy"
+                        decoding="async"
+                        className="
+                          h-full
+                          w-full
+
+                          object-cover
+                        "
+                      />
+                    </div>
+
+                    <div
+                      className="
+                        p-4
+
+                        sm:p-5
+                      "
+                    >
+                      <div
+                        className="
+                          flex
+                          flex-col
+                          gap-4
+
+                          sm:flex-row
+                          sm:items-start
+                          sm:justify-between
+                        "
+                      >
                         <div className="min-w-0">
-                          <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--admin-muted)]">
-                            YouTube Preview
+                          <div
+                            className="
+                              admin-text-10
+                              font-semibold
+                              uppercase
+                              tracking-[0.12em]
+
+                              text-[var(--company-primary)]
+                            "
+                          >
+                            {t("publicContent.editor.metadata.preview")}
                           </div>
 
-                          <div className="mt-2 text-sm font-semibold leading-6 text-[var(--admin-foreground)]">
-                            {metadata.title || "Untitled video"}
+                          <div
+                            className="
+                              mt-2
+
+                              admin-text-14
+                              font-semibold
+                              leading-[1.6]
+
+                              text-[var(--admin-foreground)]
+                            "
+                          >
+                            {metadata.title ||
+                              t("publicContent.editor.metadata.untitled")}
                           </div>
 
                           {metadata.authorName && (
-                            <div className="mt-1 text-xs text-[var(--admin-muted)]">
+                            <div
+                              className="
+                                mt-1
+
+                                admin-text-12
+
+                                text-[var(--admin-muted)]
+                              "
+                            >
                               {metadata.authorName}
                             </div>
                           )}
 
-                          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[var(--admin-muted)]">
+                          <div
+                            className="
+                              mt-3
+
+                              flex
+                              flex-wrap
+
+                              gap-x-4
+                              gap-y-1
+
+                              admin-text-11
+
+                              text-[var(--admin-muted)]
+                            "
+                          >
                             {metadata.publishedAt && (
                               <span>
-                                Published{" "}
-                                {formatPublishedDate(metadata.publishedAt)}
+                                {t("publicContent.editor.metadata.published", {
+                                  date: formatPublishedDate(
+                                    metadata.publishedAt,
+
+                                    locale,
+                                  ),
+                                })}
                               </span>
                             )}
 
                             {metadata.duration && (
                               <span>
-                                Duration {formatIsoDuration(metadata.duration)}
+                                {t("publicContent.editor.metadata.duration", {
+                                  duration: formatIsoDuration(
+                                    metadata.duration,
+                                  ),
+                                })}
                               </span>
                             )}
                           </div>
@@ -1241,41 +1967,148 @@ export default function PublicContentEditor({
                             href={form.source.sourceUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-xl border border-[var(--admin-border)] px-3 text-xs font-medium text-[var(--admin-foreground)] transition hover:bg-[var(--admin-hover)]"
+                            className="
+                              inline-flex
+                              h-9
+                              shrink-0
+
+                              items-center
+                              justify-center
+                              gap-2
+
+                              rounded-xl
+
+                              border
+                              border-[var(--admin-border)]
+
+                              px-3
+
+                              admin-text-12
+                              font-medium
+
+                              text-[var(--admin-foreground)]
+
+                              transition
+
+                              hover:border-[var(--company-primary-border)]
+
+                              hover:bg-[var(--company-primary-soft)]
+
+                              hover:text-[var(--company-primary)]
+                            "
                           >
                             <ExternalLink size={14} />
-                            Open YouTube
+
+                            {t("publicContent.editor.metadata.openSource")}
                           </a>
                         )}
                       </div>
 
                       {metadata.description && (
-                        <p className="mt-4 line-clamp-4 text-xs leading-5 text-[var(--admin-muted)]">
+                        <p
+                          className="
+                            mt-4
+
+                            line-clamp-4
+
+                            admin-text-12
+                            leading-[1.65]
+
+                            text-[var(--admin-muted)]
+                          "
+                        >
                           {metadata.description}
                         </p>
                       )}
 
-                      <div className="mt-5 border-t border-[var(--admin-border)] pt-4">
-                        <div className="flex items-start gap-3 rounded-xl bg-[var(--company-primary-soft)] p-3">
-                          <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--company-primary)] text-[var(--company-primary-foreground)]">
+                      <div
+                        className="
+                          mt-5
+
+                          border-t
+                          border-[var(--admin-border)]
+
+                          pt-4
+                        "
+                      >
+                        <div
+                          className="
+                            flex
+                            items-start
+                            gap-3
+
+                            rounded-xl
+
+                            bg-[var(--company-primary-soft)]
+
+                            p-3
+                          "
+                        >
+                          <span
+                            className="
+                              mt-0.5
+
+                              flex
+                              h-6
+                              w-6
+                              shrink-0
+
+                              items-center
+                              justify-center
+
+                              rounded-full
+
+                              bg-[var(--company-primary)]
+
+                              text-[var(--company-primary-foreground)]
+                            "
+                          >
                             <Check size={14} />
                           </span>
 
                           <div>
-                            <div className="text-xs font-medium text-[var(--admin-foreground)]">
-                              Automatic YouTube Cover
+                            <div
+                              className="
+                                admin-text-12
+                                font-medium
+
+                                text-[var(--admin-foreground)]
+                              "
+                            >
+                              {t(
+                                "publicContent.editor.metadata.autoCover.title",
+                              )}
                             </div>
 
-                            <p className="mt-1 text-[11px] leading-5 text-[var(--admin-muted)]">
-                              This YouTube thumbnail will automatically be used
-                              as the cover when no custom featured image is
-                              selected below.
+                            <p
+                              className="
+                                mt-1
+
+                                admin-text-11
+                                leading-[1.6]
+
+                                text-[var(--admin-muted)]
+                              "
+                            >
+                              {t(
+                                "publicContent.editor.metadata.autoCover.description",
+                              )}
                             </p>
 
                             {form.featuredImage?.mediaId && (
-                              <p className="mt-2 text-[11px] font-medium text-[var(--company-primary)]">
-                                A custom cover is currently selected and will
-                                override the YouTube thumbnail.
+                              <p
+                                className="
+                                  mt-2
+
+                                  admin-text-11
+                                  font-medium
+
+                                  text-[var(--company-primary)]
+                                "
+                              >
+                                {t(
+                                  "publicContent.editor.metadata.autoCover.override",
+                                )}
                               </p>
                             )}
                           </div>
@@ -1287,114 +2120,154 @@ export default function PublicContentEditor({
               </section>
             )}
 
-            <section className="mt-10 border-t border-[var(--admin-border)] pt-8">
-              <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
-                Content
-              </h3>
+            {/* ===============================
+                CONTENT
+            =============================== */}
 
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                <FormField label="Excerpt — English">
-                  <textarea
-                    rows={4}
-                    value={form.excerpt.en}
-                    onChange={(event) =>
-                      updateLocalized("excerpt", "en", event.target.value)
-                    }
-                    className={textareaClass}
-                  />
-                </FormField>
+            <section
+              className="
+                mt-10
 
-                <FormField label="Excerpt — ไทย">
-                  <textarea
-                    rows={4}
-                    value={form.excerpt.th}
-                    onChange={(event) =>
-                      updateLocalized("excerpt", "th", event.target.value)
-                    }
-                    className={textareaClass}
-                  />
-                </FormField>
+                border-t
+                border-[var(--admin-border)]
+
+                pt-8
+              "
+            >
+              <SectionHeader
+                title={t("publicContent.editor.content.title")}
+                description={t(
+                  form.contentType === PUBLIC_CONTENT_TYPE.ARTICLE
+                    ? "publicContent.editor.content.articleDescription"
+                    : "publicContent.editor.content.mediaDescription",
+                )}
+              />
+
+              {/* EXCERPT */}
+
+              <div className="mt-5">
+                <LocalizedFormField
+                  label={t("publicContent.editor.fields.excerpt")}
+                  type="textarea"
+                  rows={4}
+                  value={form.excerpt}
+                  onChange={(language, value) =>
+                    updateLocalized(
+                      "excerpt",
+
+                      language,
+
+                      value,
+                    )
+                  }
+                  placeholder={{
+                    en: t("publicContent.editor.placeholders.excerptEnglish"),
+
+                    th: t("publicContent.editor.placeholders.excerptThai"),
+                  }}
+                  infoTitle={t("publicContent.editor.excerpt.infoTitle")}
+                  infoContent={t(
+                    "publicContent.editor.excerpt.infoDescription",
+                  )}
+                />
               </div>
 
-              <div
-                data-form-field="content"
-                className="mt-4 grid gap-4 sm:grid-cols-2"
-              >
-                <FormField
-                  label="Content — English"
-                  required={form.contentType === PUBLIC_CONTENT_TYPE.ARTICLE}
-                  error={getFieldError(errors, "content")}
-                >
-                  <textarea
-                    rows={12}
-                    value={form.content.en}
-                    aria-invalid={Boolean(errors.content)}
-                    onChange={(event) =>
-                      updateLocalized("content", "en", event.target.value)
-                    }
-                    className={cn(
-                      textareaClass,
-                      getInvalidFieldClass(errors.content),
-                    )}
-                  />
-                </FormField>
+              {/* RICH TEXT */}
 
-                <FormField
-                  label="Content — ไทย"
+              <div data-form-field="content" className="mt-5">
+                <LocalizedRichTextEditor
+                  label={t("publicContent.editor.fields.content")}
                   required={form.contentType === PUBLIC_CONTENT_TYPE.ARTICLE}
-                >
-                  <textarea
-                    rows={12}
-                    value={form.content.th}
-                    aria-invalid={Boolean(errors.content)}
-                    onChange={(event) =>
-                      updateLocalized("content", "th", event.target.value)
-                    }
-                    className={cn(
-                      textareaClass,
-                      getInvalidFieldClass(errors.content),
-                    )}
-                  />
-                </FormField>
+                  value={form.content}
+                  error={getFieldError(errors, "content")}
+                  minHeight={
+                    form.contentType === PUBLIC_CONTENT_TYPE.ARTICLE ? 360 : 220
+                  }
+                  onChange={(language, value) =>
+                    updateLocalized(
+                      "content",
+
+                      language,
+
+                      value,
+                    )
+                  }
+                  placeholder={{
+                    en:
+                      form.contentType === PUBLIC_CONTENT_TYPE.ARTICLE
+                        ? t(
+                            "publicContent.editor.placeholders.articleContentEnglish",
+                          )
+                        : t(
+                            "publicContent.editor.placeholders.mediaContentEnglish",
+                          ),
+
+                    th:
+                      form.contentType === PUBLIC_CONTENT_TYPE.ARTICLE
+                        ? t(
+                            "publicContent.editor.placeholders.articleContentThai",
+                          )
+                        : t(
+                            "publicContent.editor.placeholders.mediaContentThai",
+                          ),
+                  }}
+                />
               </div>
             </section>
 
+            {/* ===============================
+                MEDIA
+            =============================== */}
+
             <ContentMediaSection
               companyId={companyId}
-              contentLabel="Public Content"
               featuredImage={form.featuredImage}
               gallery={form.gallery}
               onFeaturedImageChange={(featuredImage) =>
                 setForm((current) => ({
                   ...current,
+
                   featuredImage,
                 }))
               }
               onGalleryChange={(gallery) =>
                 setForm((current) => ({
                   ...current,
+
                   gallery,
                 }))
               }
             />
 
-            <section className="mt-10 border-t border-[var(--admin-border)] pt-8">
-              <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
-                Tags
-              </h3>
+            {/* ===============================
+                TAGS
+            =============================== */}
 
-              <p className="mt-1 text-xs leading-5 text-[var(--admin-muted)]">
-                Add keywords for classification, search and related content.
-              </p>
+            <section
+              className="
+                mt-10
+
+                border-t
+                border-[var(--admin-border)]
+
+                pt-8
+              "
+            >
+              <SectionHeader
+                title={t("publicContent.editor.tags.title")}
+                description={t("publicContent.editor.tags.description")}
+              />
 
               <div className="mt-4">
                 <TagInput
                   value={form.tags}
                   suggestions={tagSuggestions}
-                  placeholder="architecture"
+                  loadingSuggestions={tagSuggestionsLoading}
+                  placeholder={t("publicContent.editor.tags.placeholder")}
                   onChange={(tags) =>
                     setForm((current) => ({
                       ...current,
+
                       tags,
                     }))
                   }
@@ -1402,39 +2275,137 @@ export default function PublicContentEditor({
               </div>
             </section>
 
-            <section className="mt-10 border-t border-[var(--admin-border)] pt-8">
-              <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-[var(--admin-border)] p-4 sm:p-5">
+            {/* ===============================
+                FEATURED
+            =============================== */}
+
+            <section
+              className="
+                mt-10
+
+                border-t
+                border-[var(--admin-border)]
+
+                pt-8
+              "
+            >
+              <label
+                className={cn(
+                  "flex cursor-pointer items-start gap-3",
+
+                  "rounded-2xl",
+
+                  "border",
+
+                  "p-4",
+
+                  "transition",
+
+                  form.featured
+                    ? [
+                        "border-[var(--company-primary-border)]",
+
+                        "bg-[var(--company-primary-soft)]",
+                      ]
+                    : [
+                        "border-[var(--admin-border)]",
+
+                        "bg-[var(--admin-surface)]",
+
+                        "hover:bg-[var(--admin-hover)]",
+                      ],
+                )}
+              >
                 <input
                   type="checkbox"
                   checked={form.featured}
                   onChange={(event) =>
                     setForm((current) => ({
                       ...current,
+
                       featured: event.target.checked,
                     }))
                   }
-                  className="mt-0.5 h-4 w-4 accent-[var(--company-primary)]"
+                  className="
+                    mt-1
+
+                    accent-[var(--company-primary)]
+                  "
                 />
 
-                <span>
-                  <span className="block text-sm font-medium text-[var(--admin-foreground)]">
-                    Featured Content
+                <span
+                  className="
+                    flex
+                    min-w-0
+                    flex-1
+
+                    items-start
+                    gap-3
+                  "
+                >
+                  <span
+                    className="
+                      flex
+                      h-9
+                      w-9
+                      shrink-0
+
+                      items-center
+                      justify-center
+
+                      rounded-xl
+
+                      bg-[var(--company-primary-soft)]
+
+                      text-[var(--company-primary)]
+                    "
+                  >
+                    <Star size={16} />
                   </span>
 
-                  <span className="mt-1 block text-xs leading-5 text-[var(--admin-muted)]">
-                    Highlight this content in supported public layouts.
+                  <span>
+                    <span
+                      className="
+                        block
+
+                        admin-text-14
+                        font-medium
+
+                        text-[var(--admin-foreground)]
+                      "
+                    >
+                      {t("publicContent.editor.featured.title")}
+                    </span>
+
+                    <span
+                      className="
+                        mt-1
+                        block
+
+                        admin-text-12
+                        leading-[1.6]
+
+                        text-[var(--admin-muted)]
+                      "
+                    >
+                      {t("publicContent.editor.featured.description")}
+                    </span>
                   </span>
                 </span>
               </label>
             </section>
 
+            {/* ===============================
+                SEO
+            =============================== */}
+
             <ContentSeoSection
               companyId={companyId}
-              contentLabel="Public Content"
               seo={form.seo}
               onChange={(seo) =>
                 setForm((current) => ({
                   ...current,
+
                   seo,
                 }))
               }
@@ -1442,26 +2413,125 @@ export default function PublicContentEditor({
           </div>
         </form>
 
-        <footer className="flex items-center justify-end gap-3 border-t border-[var(--admin-border)] bg-[var(--admin-surface)] px-5 py-4 sm:px-6">
-          <button
-            type="button"
-            disabled={busy}
-            onClick={onClose}
-            className="h-10 rounded-xl border border-[var(--admin-border)] px-4 text-sm font-medium text-[var(--admin-foreground)] transition hover:bg-[var(--admin-hover)] disabled:opacity-50"
-          >
-            Cancel
-          </button>
+        {/* =================================
+            FOOTER
+        ================================= */}
 
-          <button
-            type="submit"
-            form="public-content-editor-form"
-            disabled={busy}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[var(--company-primary)] px-5 text-sm font-medium text-[var(--company-primary-foreground)] transition hover:bg-[var(--company-primary-hover)] disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {saving && <LoaderCircle size={15} className="animate-spin" />}
+        <footer
+          className="
+            flex
+            shrink-0
 
-            {saving ? "Saving..." : item ? "Save Changes" : "Create Content"}
-          </button>
+            flex-col
+            gap-3
+
+            border-t
+            border-[var(--admin-border)]
+
+            bg-[var(--admin-surface)]
+
+            px-5
+            py-4
+
+            sm:flex-row
+            sm:items-center
+            sm:justify-between
+
+            sm:px-8
+          "
+        >
+          <div
+            className="
+              admin-text-11
+              leading-[1.55]
+
+              text-[var(--admin-muted)]
+            "
+          >
+            {t("publicContent.editor.saveHint")}
+          </div>
+
+          <div
+            className="
+              flex
+              shrink-0
+              items-center
+              justify-end
+
+              gap-2
+            "
+          >
+            <button
+              type="button"
+              disabled={busy}
+              onClick={handleClose}
+              className="
+                h-10
+
+                rounded-xl
+
+                px-4
+
+                admin-text-14
+                font-medium
+
+                text-[var(--admin-muted)]
+
+                transition
+
+                hover:bg-[var(--admin-hover)]
+
+                disabled:opacity-50
+              "
+            >
+              {t("common.cancel")}
+            </button>
+
+            <button
+              type="submit"
+              form="public-content-editor-form"
+              disabled={busy}
+              className="
+                inline-flex
+                h-10
+                min-w-36
+
+                items-center
+                justify-center
+                gap-2
+
+                rounded-xl
+
+                bg-[var(--company-primary)]
+
+                px-5
+
+                admin-text-14
+                font-medium
+
+                text-[var(--company-primary-foreground)]
+
+                transition
+
+                hover:bg-[var(--company-primary-hover)]
+
+                disabled:cursor-not-allowed
+                disabled:opacity-50
+              "
+            >
+              {saving ? (
+                <LoaderCircle size={15} className="animate-spin" />
+              ) : (
+                <Save size={15} />
+              )}
+
+              {saving
+                ? t("common.saving")
+                : item
+                  ? t("common.saveChanges")
+                  : t("publicContent.editor.createAction")}
+            </button>
+          </div>
         </footer>
       </div>
     </div>

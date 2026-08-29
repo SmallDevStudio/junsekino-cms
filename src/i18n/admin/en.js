@@ -1,0 +1,2023 @@
+export const adminEn = {
+  common: {
+    save: "Save",
+    saveChanges: "Save Changes",
+    saveDraft: "Save Draft",
+    saving: "Saving...",
+    cancel: "Cancel",
+    close: "Close",
+    create: "Create",
+    edit: "Edit",
+    delete: "Delete",
+    publish: "Publish",
+    unpublish: "Unpublish",
+    preview: "Preview",
+    refresh: "Refresh",
+    search: "Search",
+    loading: "Loading...",
+    retry: "Retry",
+    remove: "Remove",
+    select: "Select",
+    change: "Change",
+    add: "Add",
+    confirm: "Confirm",
+    back: "Back",
+    next: "Next",
+    previous: "Previous",
+    yes: "Yes",
+    no: "No",
+    enabled: "Enabled",
+    disabled: "Disabled",
+    required: "Required",
+    optional: "Optional",
+    noData: "No data",
+    currentWorkspace: "Current workspace",
+    processing: "Processing...",
+    creating: "Creating...",
+    changeImage: "Change Image",
+    selectImage: "Select Image",
+  },
+
+  navigation: {
+    overview: "Overview",
+    content: "Content",
+    management: "Management",
+    administration: "Administration",
+
+    dashboard: "Dashboard",
+    home: "Home",
+    about: "About",
+    projects: "Projects",
+    awards: "Awards",
+    publicContent: "Public",
+    news: "News",
+    people: "People",
+    contact: "Contact",
+
+    media: "Media",
+    forms: "Forms",
+    popups: "Popups",
+    tags: "Tags",
+    search: "Search",
+    notifications: "Notifications",
+
+    company: "Company",
+    members: "Members",
+    settings: "Settings",
+    docs: "Docs",
+
+    expandSidebar: "Expand sidebar",
+    collapseSidebar: "Collapse sidebar",
+
+    platformAdministration: "Platform Administration",
+  },
+
+  header: {
+    notifications: "Notifications",
+    preferences: "Preferences",
+    settings: "Settings",
+    logout: "Sign out",
+    profile: "Profile",
+
+    searchPlaceholder: "Search settings, pages, content...",
+  },
+
+  user: {
+    account: "User account",
+
+    profileDescription: "Account information and avatar",
+
+    preferencesDescription: "Personal administration settings",
+
+    loggingOut: "Signing out...",
+
+    loggingOutDescription: "Ending your session...",
+
+    logoutDescription: "Sign out from Junsekino CMS",
+
+    roles: {
+      superAdministrator: "Super Administrator",
+
+      administrator: "Administrator",
+
+      editor: "Editor",
+
+      staff: "Staff",
+    },
+  },
+
+  preferences: {
+    title: "Preferences",
+
+    language: {
+      title: "Admin Language",
+
+      description:
+        "Choose the language used for menus, buttons, messages and other Admin interface elements.",
+
+      english: "English",
+      thai: "Thai",
+    },
+
+    density: {
+      title: "Interface Density",
+      compact: "Compact",
+      comfortable: "Comfortable",
+      spacious: "Spacious",
+    },
+
+    tooltip: {
+      title: "Tooltips",
+
+      description: "Show helpful labels when hovering over icons.",
+    },
+  },
+
+  localization: {
+    title: "Localization",
+
+    publicWebsite: "Public Website",
+
+    publicLanguages: "Public Languages",
+
+    description:
+      "Choose which languages are available for public website content. English is always enabled. Thai fields only appear in CMS editors when Thai is enabled here.",
+
+    english: {
+      title: "English",
+
+      description: "Primary language for public content and CMS data entry.",
+    },
+
+    thai: {
+      title: "Thai",
+
+      description:
+        "Enable Thai fields in Project, Award, About, Public Content and future page editors.",
+    },
+
+    defaultLanguage: {
+      title: "Default Public Language",
+
+      description:
+        "This language is used when a visitor has not selected another language.",
+    },
+
+    messages: {
+      saved: "Localization settings saved.",
+
+      loadFailed: "Unable to load localization settings.",
+
+      saveFailed: "Unable to save localization settings.",
+    },
+  },
+
+  contentLanguage: {
+    english: "English",
+    thai: "Thai",
+
+    thaiOptional: "Optional Thai translation.",
+  },
+
+  about: {
+    title: "About",
+
+    sectionLabel: "Content",
+
+    description:
+      "Create and preview multiple About versions. Only one version can be published at a time.",
+
+    newVersion: "New Version",
+
+    newVersionTitle: "New About Version",
+
+    editTitle: "Edit About",
+
+    editorDescription: "Cover image and rich text content",
+
+    pageInformation: "Page Information",
+
+    cover: {
+      title: "Cover Image",
+
+      description:
+        "Recommended landscape image. Crop and focal-point controls use this presentation data.",
+
+      selected: "Cover selected",
+
+      none: "No cover image selected.",
+
+      select: "Select Cover",
+
+      change: "Change Cover",
+
+      dialogTitle: "Select About cover",
+    },
+
+    content: {
+      title: "Content",
+
+      description:
+        "Rich text supports headings, bold, italic, links, lists, alignment and text color.",
+
+      label: "About Content",
+
+      placeholder: "Write About content...",
+    },
+
+    preview: {
+      title: "Preview",
+
+      description: "About page preview",
+    },
+
+    versions: {
+      emptyTitle: "No About versions",
+
+      emptyDescription: "Create the first About page version.",
+
+      coverSelected: "Cover image selected",
+
+      noCover: "No cover image",
+    },
+
+    actions: {
+      saveHint: "Save creates a Draft. Publish is managed from the About list.",
+    },
+
+    confirm: {
+      publish:
+        'Publish "{title}"?\n\nThe currently published About version will automatically return to Draft.',
+
+      unpublish: "Return this About version to Draft?",
+
+      delete: "Delete this About version?",
+    },
+
+    messages: {
+      created: "About version created.",
+
+      updated: "About version updated.",
+
+      published: "About page published.",
+
+      unpublished: "About returned to Draft.",
+
+      deleted: "About version deleted.",
+
+      titleRequired: "English title is required.",
+
+      loadFailed: "Unable to retrieve About versions.",
+
+      saveFailed: "Unable to save About page.",
+
+      publishFailed: "Unable to publish About.",
+
+      unpublishFailed: "Unable to unpublish About.",
+
+      deleteFailed: "Unable to delete About.",
+
+      deletePublished: "Unpublish this About version before deleting it.",
+    },
+  },
+
+  project: {
+    title: "Projects",
+
+    newProject: "New Project",
+
+    editProject: "Edit Project",
+
+    projectContent: "Project content and information",
+
+    basicInformation: "Basic Information",
+
+    projectInformation: "Project Information",
+
+    content: "Content",
+
+    tags: "Tags",
+
+    fields: {
+      title: "Title",
+      slug: "Slug",
+      location: "Location",
+      client: "Client",
+      designYear: "Design Year",
+      completionYear: "Completion Year",
+      area: "Area",
+      unit: "Unit",
+      excerpt: "Excerpt",
+      content: "Content",
+    },
+
+    messages: {
+      created: "Project created.",
+
+      updated: "Project updated.",
+
+      saveFailed: "Unable to save project.",
+
+      requiredFields: "Please complete the required fields.",
+    },
+
+    manager: {
+      sectionLabel: "Content Management",
+
+      description: "Manage architecture and design projects for {company}.",
+
+      thisCompany: "this company",
+
+      searchPlaceholder: "Search projects...",
+
+      projectCount: "{count} projects",
+
+      featured: "Featured",
+
+      untitledProject: "Untitled project",
+
+      untitledCategory: "Untitled category",
+
+      stats: {
+        all: "All projects",
+      },
+
+      filters: {
+        allStatuses: "All statuses",
+
+        allCategories: "All categories",
+      },
+
+      noCompany: {
+        title: "No company selected",
+
+        description: "Select a workspace before managing projects.",
+      },
+
+      empty: {
+        title: "No projects yet",
+
+        description: "Create the first project for this company.",
+
+        searchTitle: "No matching projects",
+
+        searchDescription: "Try changing the search term or filters.",
+      },
+
+      dates: {
+        scheduled: "Scheduled {date}",
+
+        published: "Published {date}",
+
+        updated: "Updated {date}",
+      },
+
+      actions: {
+        cancelSchedule: "Cancel Schedule",
+      },
+
+      errors: {
+        loadProjects: "Unable to retrieve projects.",
+
+        loadCategories: "Unable to retrieve project categories.",
+      },
+    },
+
+    cover: {
+      noCover: "No cover image",
+    },
+
+    publish: {
+      sectionLabel: "Publishing",
+      title: "Publish Project",
+
+      description:
+        "Publish this project immediately or schedule it to become public at a future date and time.",
+
+      now: {
+        title: "Publish Now",
+        description: "Make this project publicly available immediately.",
+        action: "Publish Project",
+        publishing: "Publishing...",
+      },
+
+      schedule: {
+        title: "Schedule",
+        description: "Publish automatically at a selected future time.",
+        dateLabel: "Publishing Date & Time",
+        action: "Schedule Project",
+        scheduling: "Scheduling...",
+      },
+
+      visibility: {
+        title: "Public website visibility",
+        description:
+          "Once published, this project can appear on the public website and its Project category can become visible in public navigation.",
+      },
+
+      messages: {
+        published: "Project published successfully.",
+        scheduled: "Project scheduled successfully.",
+      },
+
+      errors: {
+        titleRequired: "Project title is required before publishing.",
+        contentRequired: "Project content is required before publishing.",
+        categoryRequired: "Project category is required before publishing.",
+        categoryNotFound: "Selected project category was not found.",
+        subCategoryNotFound: "Selected project sub-category was not found.",
+        invalidSubCategory:
+          "Selected sub-category does not belong to the selected category.",
+        selectSchedule: "Select a publishing date and time.",
+        invalidSchedule: "Invalid publishing date and time.",
+        scheduleFuture: "Scheduled publishing time must be in the future.",
+        scheduleFailed: "Unable to schedule project.",
+        publishFailed: "Unable to publish project.",
+      },
+    },
+
+    unpublish: {
+      title: "Unpublish Project",
+      cancelScheduleTitle: "Cancel Schedule",
+
+      description:
+        "This project will no longer be publicly published and will return to Draft.",
+
+      cancelScheduleDescription:
+        "This will cancel the scheduled publishing time and return the project to Draft.",
+
+      keepStatus: "Keep Current Status",
+
+      action: "Unpublish",
+
+      cancelScheduleAction: "Cancel Schedule",
+
+      contentSafe: {
+        title: "Project content will not be deleted.",
+        description:
+          "You can continue editing and publish the project again later.",
+      },
+
+      messages: {
+        unpublished: "Project unpublished.",
+        scheduleCancelled: "Scheduled publishing cancelled.",
+      },
+
+      errors: {
+        unpublishFailed: "Unable to unpublish project.",
+        cancelScheduleFailed: "Unable to cancel schedule.",
+      },
+    },
+
+    delete: {
+      sectionLabel: "Destructive Action",
+
+      title: "Delete Project",
+
+      description:
+        "This project will be removed from the active CMS project list and archived internally.",
+
+      action: "Delete Project",
+
+      deleting: "Deleting...",
+
+      warning: {
+        published: "This project is currently published.",
+        scheduled: "This project is currently scheduled.",
+        description:
+          "Deleting it will remove it from the active content collection. Continue only if this is intentional.",
+      },
+
+      softDelete: {
+        title: "This is a soft delete.",
+        description:
+          "The database record and audit history are preserved. Restore functionality can be added later.",
+      },
+
+      confirm: {
+        prefix: "Type",
+        suffix: "to confirm",
+      },
+
+      messages: {
+        deleted: "Project deleted.",
+      },
+
+      errors: {
+        notFound: "Project not found.",
+        alreadyDeleted: "Project has already been deleted.",
+        failed: "Unable to delete project.",
+      },
+    },
+    category: {
+      title: "Category",
+
+      description:
+        "Assign the project to a category and optional sub-category.",
+
+      category: "Category",
+      subCategory: "Sub-category",
+
+      noCategory: "No category",
+      noSubCategory: "No sub-category",
+
+      createCategory: "Create new category",
+
+      createSubCategory: "Create new sub-category",
+
+      newCategory: "New Category",
+
+      newSubCategory: "New Sub-category",
+
+      selectCategoryFirst:
+        "Select a category first before creating a sub-category.",
+
+      slugHint:
+        "Used in the public URL. Use lowercase English letters, numbers and hyphens.",
+
+      fields: {
+        name: "Name",
+        slug: "Slug",
+      },
+
+      placeholders: {
+        englishName: "Category name",
+
+        thaiName: "ชื่อหมวดหมู่",
+      },
+
+      messages: {
+        categoryCreated: "Category created.",
+
+        subCategoryCreated: "Sub-category created.",
+      },
+
+      errors: {
+        nameRequired: "English category name is required.",
+
+        slugInvalid: "Please enter an English slug with at least 2 characters.",
+
+        createFailed: "Unable to create category.",
+      },
+    },
+
+    credits: {
+      title: "Project Credits",
+
+      description:
+        "Add architecture, interior, landscape and consultant credits. Multiple people or companies can be added to each group.",
+
+      fields: {
+        name: "Name",
+      },
+
+      placeholders: {
+        english: "Person or company name",
+
+        thai: "ชื่อบุคคลหรือบริษัท",
+      },
+
+      empty: "No {type} credits added.",
+
+      addCredit: "Add {type}",
+
+      remove: "Remove {type} credit",
+
+      creditNumber: "Credit {number}",
+
+      groups: {
+        architecture: {
+          label: "Architecture",
+
+          description:
+            "Architects or architecture teams credited for this project.",
+        },
+
+        interior: {
+          label: "Interior",
+
+          description: "Interior designers or interior design teams.",
+        },
+
+        landscape: {
+          label: "Landscape",
+
+          description: "Landscape architects or landscape design teams.",
+        },
+
+        consultant: {
+          label: "Consultant",
+
+          description: "Consultants and other professional collaborators.",
+        },
+      },
+    },
+
+    editor: {
+      sectionLabel: "Project Editor",
+
+      basicDescription:
+        "Core project information used across the CMS and public website.",
+
+      contentDescription:
+        "Create the main project description using formatted rich text.",
+
+      projectInfoDescription:
+        "Project metadata displayed with the public project details.",
+
+      tagsDescription:
+        "Add keywords for filtering, search and content organization.",
+
+      tagsPlaceholder: "architecture",
+
+      yearHint: "Use a four-digit year, for example 2026.",
+
+      saveHint:
+        "Saving updates the project content. Publishing is managed separately from the project list.",
+
+      placeholders: {
+        titleEnglish: "Project title",
+
+        titleThai: "ชื่อโปรเจกต์",
+
+        excerptEnglish: "Short project introduction",
+
+        excerptThai: "ข้อความแนะนำโปรเจกต์แบบสั้น",
+
+        contentEnglish: "Write the project description...",
+
+        contentThai: "เขียนรายละเอียดโปรเจกต์ภาษาไทย...",
+      },
+
+      validation: {
+        titleRequired: "English project title is required.",
+
+        slugRequired: "Project slug is required.",
+      },
+
+      slug: {
+        hint: "Used in the public project URL.",
+
+        infoTitle: "Project Slug",
+
+        infoDescription:
+          "A unique URL-friendly identifier. Use lowercase English letters, numbers and hyphens.",
+
+        exists: "This slug is already in use.",
+
+        noAlternative:
+          "This slug is already in use and no alternative slug is currently available.",
+
+        confirmSuggestion:
+          'The slug "{current}" is already in use.\n\nWould you like to use "{suggested}" instead?',
+
+        reserveFailed:
+          "Unable to reserve an available slug. Please enter another slug.",
+      },
+
+      excerpt: {
+        infoTitle: "Project Excerpt",
+
+        infoDescription:
+          "A short introduction used in previews, search results or areas where the full description is not appropriate.",
+      },
+
+      area: {
+        infoTitle: "Project Area",
+
+        infoDescription:
+          "Enter the numeric project area and choose the corresponding measurement unit.",
+      },
+
+      featured: {
+        title: "Featured Project",
+
+        description:
+          "Mark this project as featured so it can be prioritized in supported public website sections.",
+      },
+
+      units: {
+        rai: "Rai",
+      },
+
+      errors: {
+        loadTags: "Unable to retrieve project tags.",
+      },
+    },
+  },
+
+  editor: {
+    bold: "Bold",
+    italic: "Italic",
+    underline: "Underline",
+    heading2: "Heading 2",
+    heading3: "Heading 3",
+    bulletList: "Bullet List",
+    orderedList: "Numbered List",
+    quote: "Quote",
+    alignLeft: "Align Left",
+    alignCenter: "Align Center",
+    alignRight: "Align Right",
+    link: "Link",
+    textColor: "Text color",
+    companyColor: "Company color",
+    clearFormatting: "Clear Formatting",
+    undo: "Undo",
+    redo: "Redo",
+    enterUrl: "Enter URL",
+    content: "Content",
+    placeholderEnglish: "Write content...",
+    placeholderThai: "Write Thai content...",
+  },
+
+  status: {
+    draft: "Draft",
+    review: "Review",
+    scheduled: "Scheduled",
+    published: "Published",
+    public: "Public",
+    active: "Active",
+    unpublished: "Unpublished",
+    inactive: "Inactive",
+    archived: "Archived",
+    deleted: "Deleted",
+    error: "Error",
+    ready: "Ready",
+  },
+
+  errors: {
+    authenticationRequired: "Authentication required.",
+
+    permissionDenied: "Permission denied.",
+
+    companyNotFound: "Company not found.",
+
+    pageNotFound: "Page not found.",
+
+    invalidData: "Invalid data.",
+
+    unknown: "Something went wrong.",
+  },
+
+  displaySettings: {
+    title: "Display Settings",
+
+    description: "Personalize your admin workspace",
+
+    language: {
+      description: "Changes only the administration interface.",
+    },
+
+    density: {
+      description: "Controls spacing in lists, forms and panels.",
+    },
+
+    sidebar: {
+      title: "Sidebar",
+
+      description: "Choose the default desktop sidebar state.",
+
+      expanded: "Expanded",
+      collapsed: "Collapsed",
+    },
+
+    on: "On",
+    off: "Off",
+    fontSize: {
+      title: "Text Size",
+
+      description:
+        "Adjust text size across the Admin interface without changing layout scale.",
+
+      small: "Small",
+      medium: "Medium",
+      large: "Large",
+    },
+  },
+
+  companySwitcher: {
+    loading: "Loading workspace",
+    unavailable: "Company unavailable",
+    noCompany: "No company",
+
+    currentCompany: "Current company: {company}",
+
+    workspace: "Workspace",
+
+    selectDescription: "Select company to manage",
+  },
+
+  media: {
+    upload: {
+      dropTitle: "Drop images here or click to upload",
+
+      formats: "JPG, PNG, WebP or AVIF • up to {size}",
+
+      errors: {
+        unsupportedType: "Unsupported file type.",
+
+        fileTooLarge: "File exceeds {size}.",
+
+        failed: "Upload failed.",
+      },
+    },
+
+    picker: {
+      title: "Select Media",
+
+      close: "Close media picker",
+
+      multipleDescription: "Select one or more images.",
+
+      singleDescription: "Select an image.",
+
+      tabs: {
+        library: "Library",
+
+        upload: "Upload",
+
+        importUrl: "Import URL",
+      },
+
+      searchPlaceholder: "Search media...",
+
+      resultCount: "{count} images",
+
+      loading: "Loading media...",
+
+      emptyTitle: "No images yet",
+
+      emptyDescription: "Upload an image or import one from a URL.",
+
+      noSearchResults: "No matching images",
+
+      noSearchDescription: "Try another file name, caption or keyword.",
+
+      selectedCount: "{count} selected",
+
+      noneSelected: "No image selected",
+
+      confirmSingle: "Select Image",
+
+      confirmMultiple: "Add Selected",
+
+      untitled: "Untitled image",
+
+      errors: {
+        loadFailed: "Unable to load media.",
+      },
+    },
+
+    importUrl: {
+      title: "Import image from URL",
+
+      description:
+        "Paste a direct image URL. The image will be copied into this company's Media Library and processed like a normal upload.",
+
+      fieldLabel: "Image URL",
+
+      directOnly: "Direct image URLs only",
+
+      supportedFormats:
+        "Supported formats are JPEG, PNG, WebP and AVIF. Web pages, local network addresses and unsupported files are rejected.",
+
+      action: "Import Image",
+
+      importing: "Importing...",
+
+      messages: {
+        imported: "Image imported.",
+      },
+
+      errors: {
+        required: "Enter an image URL.",
+
+        invalid: "Enter a valid HTTP or HTTPS image URL.",
+
+        failed: "Unable to import image.",
+      },
+    },
+    manager: {
+      sectionLabel: "Content Management",
+
+      title: "Media",
+
+      description: "Upload and manage images used across the website.",
+
+      loadingWorkspace: "Loading workspace...",
+
+      refreshing: "Refreshing...",
+
+      searchPlaceholder: "Search media...",
+
+      assetCount: "{count} assets",
+
+      untitled: "Untitled media",
+
+      noCompany: {
+        title: "No company selected",
+
+        description: "Select a workspace before managing media.",
+      },
+
+      empty: {
+        title: "No media yet",
+
+        description:
+          "Upload the first image to start building your media library.",
+
+        searchTitle: "No matching media",
+
+        searchDescription: "Try another filename or keyword.",
+      },
+
+      errors: {
+        loadFailed: "Unable to retrieve media.",
+      },
+    },
+
+    card: {
+      openPreview: "Open preview",
+
+      previewFailed: "Preview unavailable.",
+
+      retryPreview: "Retry preview",
+
+      loadingPreview: "Loading...",
+
+      statusUnknown: "Unknown",
+    },
+  },
+
+  tagInput: {
+    placeholder: "architecture",
+
+    suggestions: "Suggestions",
+
+    loadingSuggestions: "Loading suggestions...",
+
+    remove: "Remove {tag}",
+
+    hint: "Type to search existing tags. Press Enter or comma to add a new tag.",
+  },
+
+  contentMedia: {
+    title: "Media",
+
+    description:
+      "Select the cover image and gallery images from the company Media Library.",
+
+    mediaId: "Media ID: {id}",
+
+    errors: {
+      previewUnavailable: "Preview unavailable.",
+    },
+
+    cover: {
+      title: "Cover Image",
+
+      description:
+        "Primary image used for listings, previews and supported public layouts.",
+
+      selected: "Selected cover image",
+
+      select: "Select Cover Image",
+
+      remove: "Remove cover image",
+
+      emptyTitle: "No cover image",
+
+      emptyDescription:
+        "Select an image from the Media Library to represent this content.",
+
+      pickerTitle: "Select Cover Image",
+    },
+
+    gallery: {
+      title: "Gallery",
+
+      description: "Images are displayed in the order shown below.",
+
+      add: "Add Images",
+
+      emptyTitle: "No gallery images",
+
+      emptyDescription: "Add one or more images from the Media Library.",
+
+      movePrevious: "Move image backward",
+
+      moveNext: "Move image forward",
+
+      remove: "Remove image",
+
+      pickerTitle: "Select Gallery Images",
+    },
+  },
+
+  contentSeo: {
+    title: "Search Engine Optimization",
+
+    description:
+      "Configure search metadata and social sharing information for this content.",
+
+    fields: {
+      title: "SEO Title",
+
+      description: "Meta Description",
+
+      keywords: "SEO Keywords",
+
+      ogTitle: "Open Graph Title",
+
+      ogDescription: "Open Graph Description",
+    },
+
+    placeholders: {
+      title: "Search result title",
+
+      description: "Short description for search engines",
+
+      ogTitle: "Title used when shared on social media",
+
+      ogDescription: "Description used when shared on social media",
+    },
+
+    keywords: {
+      placeholder: "architecture",
+
+      remove: "Remove {keyword}",
+    },
+
+    ogImage: {
+      title: "Open Graph Image",
+
+      description:
+        "Optional image used when this content is shared on social media.",
+
+      mediaId: "Media ID: {id}",
+
+      pickerTitle: "Select Open Graph Image",
+    },
+
+    robots: {
+      index: {
+        title: "Allow Indexing",
+
+        description:
+          "Allow search engines to include this page in search results.",
+      },
+
+      follow: {
+        title: "Follow Links",
+
+        description:
+          "Allow search engines to follow links contained on this page.",
+      },
+    },
+  },
+
+  award: {
+    title: "Awards",
+    newAward: "New Award",
+    editAward: "Edit Award",
+
+    fields: {
+      title: "Title",
+      slug: "Slug",
+      linkedProject: "Linked Project",
+      awardName: "Award Name",
+      organization: "Organization",
+      category: "Award Category",
+      level: "Award Level",
+      year: "Award Year",
+      excerpt: "Excerpt",
+      content: "Content",
+    },
+
+    editor: {
+      sectionLabel: "Award Editor",
+
+      headerDescription: "Create and manage award information.",
+
+      basic: {
+        title: "Basic Information",
+
+        description: "Configure the award title, URL and related project.",
+      },
+
+      awardInfo: {
+        title: "Award Information",
+
+        description:
+          "Enter the official award name, organization, category, level and year.",
+      },
+
+      summary: {
+        title: "Summary",
+
+        description: "Add a short introduction used in listings and previews.",
+      },
+
+      content: {
+        title: "Award Content",
+
+        description:
+          "Add the full award story or supporting information using formatted rich text.",
+      },
+
+      placeholders: {
+        titleEnglish: "Award title",
+
+        titleThai: "ชื่อรางวัล",
+
+        excerptEnglish: "Short award introduction",
+
+        excerptThai: "ข้อความแนะนำรางวัลแบบสั้น",
+
+        contentEnglish: "Write award details...",
+
+        contentThai: "เขียนรายละเอียดรางวัลภาษาไทย...",
+      },
+
+      validation: {
+        titleRequired: "English award title is required.",
+
+        slugRequired: "Award slug is required.",
+
+        awardNameRequired: "English award name is required.",
+      },
+
+      slug: {
+        hint: "Used in the public Award URL.",
+
+        infoTitle: "Award Slug",
+
+        infoDescription:
+          "A unique URL-friendly identifier using lowercase English letters, numbers and hyphens.",
+
+        exists: "This slug is already in use.",
+
+        noAlternative:
+          "This slug is already in use and no alternative is available.",
+
+        confirmSuggestion:
+          'The slug "{current}" is already in use.\n\nWould you like to use "{suggested}" instead?',
+
+        reserveFailed:
+          "Unable to reserve an available slug. Please enter another slug.",
+      },
+
+      projectHint: "Optional. Link this award to an existing project.",
+
+      projectInfoTitle: "Linked Project",
+
+      projectInfoDescription:
+        "Linking an award to a project allows the public website to connect the Award and Project automatically.",
+
+      noLinkedProject: "No linked project",
+
+      year: {
+        infoTitle: "Award Year",
+
+        infoDescription:
+          "The year in which the award was officially received or announced.",
+      },
+
+      featured: {
+        title: "Featured Award",
+
+        description:
+          "Prioritize this award in supported public Award sections.",
+      },
+
+      saveHint:
+        "Save the award first. Publishing is managed separately from the Award list.",
+    },
+
+    messages: {
+      requiredFields: "Please complete the required fields.",
+
+      created: "Award created successfully.",
+
+      updated: "Award updated successfully.",
+
+      saveFailed: "Unable to save award.",
+    },
+
+    publish: {
+      sectionLabel: "Publishing",
+
+      title: "Publish Award",
+
+      now: {
+        title: "Publish Now",
+
+        description: "Make this award publicly available immediately.",
+
+        action: "Publish Award",
+      },
+
+      schedule: {
+        title: "Schedule",
+
+        description:
+          "Publish this award automatically at a future date and time.",
+
+        dateLabel: "Publishing Date & Time",
+
+        action: "Schedule Award",
+      },
+
+      messages: {
+        published: "Award published successfully.",
+
+        scheduled: "Award scheduled successfully.",
+      },
+
+      errors: {
+        selectSchedule: "Select a publishing date and time.",
+
+        invalidSchedule: "Invalid publishing date and time.",
+
+        futureSchedule: "Scheduled publishing time must be in the future.",
+
+        failed: "Unable to publish award.",
+      },
+    },
+
+    delete: {
+      sectionLabel: "Destructive Action",
+
+      title: "Delete Award",
+
+      description: "will be removed from the active Award library.",
+
+      action: "Delete Award",
+
+      deleting: "Deleting...",
+
+      softDelete: {
+        title: "This is a soft delete.",
+
+        description:
+          "The Award record and audit history remain stored internally and can support Restore functionality later.",
+      },
+
+      confirm: {
+        prefix: "Type",
+
+        suffix: "to confirm",
+      },
+
+      messages: {
+        deleted: "Award deleted successfully.",
+      },
+
+      errors: {
+        failed: "Unable to delete award.",
+      },
+    },
+
+    manager: {
+      sectionLabel: "Content Management",
+
+      description: "Manage awards and project recognition for {company}.",
+
+      thisCompany: "this company",
+
+      searchPlaceholder: "Search awards...",
+
+      awardCount: "{count} awards",
+
+      untitledAward: "Untitled award",
+
+      untitledProject: "Untitled project",
+
+      featured: "Featured",
+
+      project: "Project: {project}",
+
+      stats: {
+        all: "All awards",
+      },
+
+      filters: {
+        allStatuses: "All statuses",
+
+        allYears: "All years",
+
+        allProjects: "All projects",
+      },
+
+      actions: {
+        cancelSchedule: "Cancel Schedule",
+      },
+
+      dates: {
+        scheduled: "Scheduled {date}",
+
+        published: "Published {date}",
+      },
+
+      noCompany: {
+        title: "No company selected",
+
+        description: "Select a workspace before managing awards.",
+      },
+
+      empty: {
+        title: "No awards yet",
+
+        description: "Create the first award for this company.",
+
+        searchTitle: "No matching awards",
+
+        searchDescription: "Try changing the search term or filters.",
+      },
+
+      messages: {
+        unpublished: "Award unpublished.",
+
+        scheduleCancelled: "Scheduled publishing cancelled.",
+      },
+
+      errors: {
+        loadAwards: "Unable to retrieve awards.",
+
+        loadProjects: "Unable to retrieve projects.",
+
+        unpublishFailed: "Unable to unpublish award.",
+      },
+    },
+
+    cover: {
+      noCover: "No award cover image",
+    },
+  },
+
+  publicContent: {
+    title: "Public Content",
+    newContent: "New Content",
+
+    types: {
+      article: "Article",
+      video: "Video",
+      embed: "Embed",
+    },
+
+    providers: {
+      youtube: "YouTube",
+      facebook: "Facebook",
+      vimeo: "Vimeo",
+      instagram: "Instagram",
+      tiktok: "TikTok",
+      other: "Other",
+    },
+
+    manager: {
+      sectionLabel: "Content Management",
+
+      description: "Manage articles, videos and external media for {company}.",
+
+      thisCompany: "this company",
+
+      searchPlaceholder: "Search public content...",
+
+      itemCount: "{count} items",
+
+      untitled: "Untitled content",
+
+      featured: "Featured",
+
+      stats: {
+        all: "All content",
+      },
+
+      filters: {
+        allStatuses: "All statuses",
+
+        allTypes: "All types",
+
+        allProviders: "All providers",
+      },
+
+      actions: {
+        cancelSchedule: "Cancel Schedule",
+      },
+
+      dates: {
+        scheduled: "Scheduled {date}",
+
+        published: "Published {date}",
+
+        updated: "Updated {date}",
+      },
+
+      noCompany: {
+        title: "No company selected",
+
+        description: "Select a workspace before managing public content.",
+      },
+
+      empty: {
+        title: "No public content yet",
+
+        description: "Create the first public content item for this company.",
+
+        searchTitle: "No matching content",
+
+        searchDescription: "Try changing the search term or filters.",
+      },
+
+      messages: {
+        published: "Public content published successfully.",
+
+        scheduled: "Public content scheduled successfully.",
+
+        unpublished: "Public content unpublished.",
+
+        scheduleCancelled: "Scheduled publish cancelled.",
+
+        deleted: "Public content deleted.",
+      },
+
+      errors: {
+        loadFailed: "Unable to retrieve public content.",
+
+        publishFailed: "Unable to publish public content.",
+
+        unpublishFailed: "Unable to unpublish public content.",
+
+        deleteFailed: "Unable to delete public content.",
+      },
+    },
+
+    editor: {
+      sectionLabel: "Public Content Editor",
+
+      newTitle: "New Content",
+
+      editTitle: "Edit Content",
+
+      headerDescription:
+        "Create articles, videos and external media for the public website.",
+
+      createAction: "Create Content",
+
+      saveHint:
+        "Save changes first. Publishing is managed separately from the Public Content list.",
+
+      typeSection: {
+        title: "Content Type",
+
+        description:
+          "Choose how this content will be presented on the public website.",
+      },
+
+      contentTypes: {
+        article: "Long-form editorial, news feature or media article.",
+
+        video:
+          "Video content hosted on YouTube, Vimeo, Facebook or another supported platform.",
+
+        embed: "Embedded social post or external media content.",
+      },
+
+      basic: {
+        title: "Basic Information",
+
+        description: "Configure the public title and URL for this content.",
+      },
+
+      fields: {
+        title: "Title",
+
+        slug: "Slug",
+
+        sourceUrl: "Source URL",
+
+        provider: "Provider",
+
+        externalId: "External ID",
+
+        excerpt: "Excerpt",
+
+        content: "Content",
+      },
+
+      placeholders: {
+        titleEnglish: "Content title",
+
+        titleThai: "ชื่อเนื้อหา",
+
+        excerptEnglish: "Short introduction for this content",
+
+        excerptThai: "ข้อความแนะนำเนื้อหาแบบสั้น",
+
+        articleContentEnglish: "Write the article content...",
+
+        articleContentThai: "เขียนเนื้อหาบทความภาษาไทย...",
+
+        mediaContentEnglish: "Optional description or supporting content...",
+
+        mediaContentThai: "รายละเอียดเพิ่มเติมภาษาไทย...",
+      },
+
+      slug: {
+        hint: "Used in the public Content URL.",
+
+        infoTitle: "Content Slug",
+
+        infoDescription:
+          "A unique URL-friendly identifier. Use lowercase English letters, numbers and hyphens.",
+
+        exists: "This slug is already in use.",
+
+        noAlternative:
+          "This slug is already in use and no alternative slug is currently available.",
+
+        confirmSuggestion:
+          'The slug "{current}" is already in use.\n\nWould you like to use "{suggested}" instead?',
+
+        reserveFailed:
+          "Unable to reserve an available slug. Please enter another slug.",
+      },
+
+      source: {
+        title: "External Source",
+
+        videoDescription:
+          "Paste the video URL. The provider, external ID and available metadata will be detected automatically.",
+
+        embedDescription:
+          "Enter the external media URL and select the provider used for this embedded content.",
+
+        urlHint:
+          "YouTube URLs can be detected automatically. Other supported providers can be selected manually.",
+
+        infoTitle: "External Source",
+
+        infoDescription:
+          "The original public URL of the video or external media. Metadata can be fetched automatically when the provider is supported.",
+
+        autoDetect: "Auto detect",
+
+        externalIdHint: "Detected automatically when supported.",
+
+        externalIdPlaceholder: "External media ID",
+      },
+
+      metadata: {
+        fetch: "Fetch Media Info",
+
+        loading: "Loading...",
+
+        preview: "External Media Preview",
+
+        untitled: "Untitled media",
+
+        published: "Published {date}",
+
+        duration: "Duration {duration}",
+
+        openSource: "Open Source",
+
+        messages: {
+          loaded: "Media information loaded.",
+        },
+
+        errors: {
+          loadFailed: "Unable to retrieve media information.",
+        },
+
+        autoCover: {
+          title: "Automatic External Cover",
+
+          description:
+            "The external thumbnail will automatically be used as the cover when no custom featured image is selected.",
+
+          override:
+            "A custom cover is currently selected and will override the external thumbnail.",
+        },
+      },
+
+      content: {
+        title: "Content",
+
+        articleDescription:
+          "Write the main article using the Rich Text editor. English content is required for Article content.",
+
+        mediaDescription:
+          "Add an optional excerpt and supporting description for this media content.",
+      },
+
+      excerpt: {
+        infoTitle: "Content Excerpt",
+
+        infoDescription:
+          "A short introduction used in public listings, previews and search-related layouts.",
+      },
+
+      tags: {
+        title: "Tags",
+
+        description:
+          "Add keywords for classification, search and related content.",
+
+        placeholder: "architecture",
+      },
+
+      featured: {
+        title: "Featured Content",
+
+        description:
+          "Prioritize this content in public layouts that support featured items.",
+      },
+
+      validation: {
+        contentTypeRequired: "Select a content type.",
+
+        titleRequired: "English title is required.",
+
+        slugRequired: "Content slug is required.",
+
+        articleContentRequired: "English article content is required.",
+
+        sourceUrlRequired: "Source URL is required for this content type.",
+
+        providerRequired: "Select or detect a provider.",
+
+        completeRequired: "Please complete the required fields.",
+      },
+
+      messages: {
+        created: "Public content created successfully.",
+
+        updated: "Public content updated successfully.",
+      },
+
+      errors: {
+        loadTags: "Unable to retrieve public content tags.",
+
+        saveFailed: "Unable to save public content.",
+      },
+    },
+
+    publish: {
+      sectionLabel: "Publishing",
+
+      description:
+        "Choose whether to publish this content now or schedule it for later.",
+
+      now: {
+        title: "Publish Now",
+
+        description:
+          "Make this content available on the public website immediately.",
+
+        action: "Publish Now",
+      },
+
+      schedule: {
+        title: "Schedule",
+
+        description: "Publish automatically at a future date and time.",
+
+        dateLabel: "Publish Date & Time",
+
+        action: "Schedule",
+      },
+
+      visibility: {
+        title: "Public website visibility",
+
+        description:
+          "Once published, this content can appear on the public website according to its content type and website layout.",
+      },
+
+      errors: {
+        selectSchedule: "Select a publish date and time.",
+
+        invalidSchedule: "The selected date and time is invalid.",
+
+        futureSchedule: "Scheduled publishing time must be in the future.",
+      },
+    },
+
+    confirm: {
+      lifecycleSectionLabel: "Publishing Status",
+
+      contentSafe: {
+        title: "Content will not be deleted.",
+
+        description:
+          "The content remains available in Admin and can be edited or published again later.",
+      },
+
+      unpublish: {
+        title: "Unpublish Content?",
+
+        description:
+          "This content will be removed from the public website and returned to Draft.",
+
+        action: "Unpublish",
+      },
+
+      cancelSchedule: {
+        title: "Cancel Scheduled Publish?",
+
+        description:
+          "The scheduled publishing time will be removed and this content will return to Draft.",
+
+        action: "Cancel Schedule",
+      },
+
+      delete: {
+        sectionLabel: "Destructive Action",
+
+        title: "Delete Public Content?",
+
+        description:
+          "This content will be removed from the active content list.",
+
+        action: "Delete Content",
+
+        softDelete: {
+          title: "This is a soft delete.",
+
+          description:
+            "The database record and audit history are preserved internally and can support Restore functionality later.",
+        },
+      },
+    },
+  },
+
+  news: {
+    title: "News",
+    newNews: "New News",
+
+    manager: {
+      sectionLabel: "Content Management",
+
+      description:
+        "Manage news, announcements and editorial updates for {company}.",
+
+      thisCompany: "this company",
+
+      searchPlaceholder: "Search news...",
+
+      itemCount: "{count} items",
+
+      untitled: "Untitled news",
+
+      featured: "Featured",
+
+      category: "Category: {category}",
+
+      author: "Author: {author}",
+
+      editorNextStep:
+        "News Editor and publishing dialogs are added in the next step.",
+
+      stats: {
+        all: "All news",
+      },
+
+      filters: {
+        allStatuses: "All statuses",
+
+        allCategories: "All categories",
+      },
+
+      actions: {
+        cancelSchedule: "Cancel Schedule",
+      },
+
+      dates: {
+        scheduled: "Scheduled {date}",
+
+        published: "Published {date}",
+
+        updated: "Updated {date}",
+      },
+
+      noCompany: {
+        title: "No company selected",
+
+        description: "Select a workspace before managing News.",
+      },
+
+      empty: {
+        title: "No news yet",
+
+        description: "Create the first News item for this company.",
+
+        searchTitle: "No matching news",
+
+        searchDescription: "Try changing the search term or filters.",
+      },
+
+      errors: {
+        loadFailed: "Unable to retrieve News.",
+      },
+    },
+
+    // EN — ภายใน news
+
+    editor: {
+      sectionLabel: "News Editor",
+      newTitle: "New News",
+      editTitle: "Edit News",
+
+      headerDescription:
+        "Create and manage news content for the public website.",
+
+      createAction: "Create News",
+
+      saveHint:
+        "Save the News first. Publishing is managed separately from the News list.",
+
+      fields: {
+        title: "Title",
+        slug: "Slug",
+        category: "Category",
+        author: "Author",
+        excerpt: "Excerpt",
+        content: "Content",
+      },
+
+      basic: {
+        title: "Basic Information",
+        description: "Configure the title, URL, category and author.",
+      },
+
+      summary: {
+        title: "Summary",
+        description: "Add a short introduction for News listings and previews.",
+      },
+
+      content: {
+        title: "News Content",
+        description:
+          "Write the complete News article using the Rich Text editor.",
+      },
+
+      placeholders: {
+        titleEnglish: "News title",
+        titleThai: "ชื่อข่าว",
+        category: "Architecture",
+        author: "Junsekino",
+        contentEnglish: "Write the News article...",
+        contentThai: "เขียนเนื้อหาข่าวภาษาไทย...",
+      },
+
+      category: {
+        hint: "Use an existing category or enter a new category.",
+      },
+
+      author: {
+        hint: "Public author or editorial credit shown with this News item.",
+      },
+
+      slug: {
+        hint: "Used in the public News URL.",
+        infoTitle: "News Slug",
+
+        infoDescription:
+          "A unique URL-friendly identifier using lowercase English letters, numbers and hyphens.",
+
+        exists: "This News slug is already in use.",
+      },
+
+      cover: {
+        title: "Cover Image",
+
+        description:
+          "Primary image used for News listings, previews and supported public layouts.",
+
+        select: "Select Cover Image",
+
+        emptyDescription: "Choose an image from the company Media Library.",
+
+        pickerTitle: "Select News Cover",
+      },
+
+      tags: {
+        title: "Tags",
+
+        description:
+          "Add keywords for search, classification and related content.",
+      },
+
+      featured: {
+        title: "Featured News",
+
+        description:
+          "Prioritize this News item in public layouts that support featured content.",
+      },
+
+      validation: {
+        titleRequired: "English News title is required.",
+
+        slugRequired: "News slug is required.",
+
+        contentRequired: "English News content is required.",
+
+        completeRequired: "Please complete the required fields.",
+      },
+
+      messages: {
+        created: "News created successfully.",
+
+        updated: "News updated successfully.",
+      },
+
+      errors: {
+        saveFailed: "Unable to save News.",
+      },
+    },
+
+    publish: {
+      sectionLabel: "Publishing",
+
+      now: {
+        title: "Publish Now",
+
+        description:
+          "Make this News item available on the public website immediately.",
+
+        action: "Publish News",
+      },
+
+      schedule: {
+        title: "Schedule",
+
+        description:
+          "Publish this News item automatically at a future date and time.",
+
+        dateLabel: "Publishing Date & Time",
+
+        action: "Schedule News",
+      },
+
+      errors: {
+        selectSchedule: "Select a publishing date and time.",
+
+        invalidSchedule: "Invalid publishing date and time.",
+
+        futureSchedule: "Scheduled publishing time must be in the future.",
+      },
+    },
+
+    confirm: {
+      unpublish: {
+        title: "Unpublish News?",
+
+        description:
+          "This News item will be removed from the public website and returned to Draft.",
+
+        action: "Unpublish",
+      },
+
+      cancelSchedule: {
+        title: "Cancel Scheduled Publish?",
+
+        description:
+          "The scheduled publishing time will be removed and this News item will return to Draft.",
+
+        action: "Cancel Schedule",
+      },
+
+      delete: {
+        title: "Delete News?",
+
+        description:
+          "This News item will be removed from the active News library using soft delete.",
+
+        action: "Delete News",
+      },
+    },
+
+    messages: {
+      published: "News published successfully.",
+
+      scheduled: "News scheduled successfully.",
+
+      unpublished: "News unpublished successfully.",
+
+      scheduleCancelled: "Scheduled publishing cancelled.",
+
+      deleted: "News deleted successfully.",
+    },
+
+    errors: {
+      loadFailed: "Unable to retrieve News.",
+
+      publishFailed: "Unable to publish News.",
+
+      unpublishFailed: "Unable to unpublish News.",
+
+      deleteFailed: "Unable to delete News.",
+    },
+  },
+};

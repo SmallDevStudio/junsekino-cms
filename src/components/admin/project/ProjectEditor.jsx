@@ -1,6 +1,6 @@
 "use client";
 
-import { LoaderCircle, X } from "lucide-react";
+import { LoaderCircle, Save, Star, X } from "lucide-react";
 
 import { useEffect, useRef, useState } from "react";
 
@@ -8,7 +8,10 @@ import { toast } from "sonner";
 
 import FormField from "@/components/admin/form/FormField";
 
+import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
+
 import LocalizedFormField from "@/components/admin/localization/LocalizedFormField";
+import LocalizedRichTextEditor from "@/components/admin/localization/LocalizedRichTextEditor";
 
 import TagInput from "@/components/admin/tag/TagInput";
 
@@ -19,7 +22,6 @@ import {
   getInvalidFieldClass,
   hasErrors,
   normalizeServerFieldErrors,
-  validateProjectForm,
 } from "@/utils/admin-form-validation";
 
 import { cn } from "@/utils/cn";
@@ -30,7 +32,7 @@ import ProjectCategorySection from "./ProjectCategorySection";
 import ProjectCreditsSection from "./ProjectCreditsSection";
 import ProjectMediaSection from "./ProjectMediaSection";
 import ProjectSeoSection from "./ProjectSeoSection";
-import LocalizedRichTextEditor from "@/components/admin/localization/LocalizedRichTextEditor";
+
 /*
  * =========================================================
  * EMPTY VALUES
@@ -113,11 +115,8 @@ function emptyProjectInfo() {
 
     credits: {
       architecture: [],
-
       interior: [],
-
       landscape: [],
-
       consultant: [],
     },
   };
@@ -284,8 +283,8 @@ function extractTagSuggestions(projects) {
     }
   }
 
-  return [...tags.values()].sort((a, b) =>
-    a.localeCompare(b, "en", {
+  return [...tags.values()].sort((first, second) =>
+    first.localeCompare(second, "en", {
       sensitivity: "base",
     }),
   );
@@ -313,6 +312,46 @@ function normalizeArea(value) {
 
 /*
  * =========================================================
+ * SECTION HEADER
+ * =========================================================
+ */
+
+function SectionHeader({ title, description }) {
+  return (
+    <div>
+      <h3
+        className="
+          admin-text-14
+          font-semibold
+
+          text-[var(--admin-foreground)]
+        "
+      >
+        {title}
+      </h3>
+
+      {description && (
+        <p
+          className="
+            mt-1
+
+            max-w-2xl
+
+            admin-text-12
+            leading-[1.65]
+
+            text-[var(--admin-muted)]
+          "
+        >
+          {description}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/*
+ * =========================================================
  * PROJECT EDITOR
  * =========================================================
  */
@@ -325,11 +364,15 @@ export default function ProjectEditor({
   onClose,
   onSaved,
 }) {
+  const { t } = useAdminTranslation();
+
   const [form, setForm] = useState(() => normalizeProject(project));
 
   const [saving, setSaving] = useState(false);
 
   const [tagSuggestions, setTagSuggestions] = useState([]);
+
+  const [tagSuggestionsLoading, setTagSuggestionsLoading] = useState(false);
 
   const [errors, setErrors] = useState({});
 
@@ -374,6 +417,10 @@ export default function ProjectEditor({
 
     const timeoutId = window.setTimeout(async () => {
       try {
+        if (!cancelled) {
+          setTagSuggestionsLoading(true);
+        }
+
         const response = await fetch(
           `/api/v1/companies/${companyId}/projects`,
           {
@@ -389,7 +436,7 @@ export default function ProjectEditor({
 
         if (!response.ok || payload?.success === false) {
           throw new Error(
-            payload?.message || "Unable to retrieve project tags.",
+            payload?.message || t("project.editor.errors.loadTags"),
           );
         }
 
@@ -404,6 +451,10 @@ export default function ProjectEditor({
         if (!cancelled) {
           setTagSuggestions([]);
         }
+      } finally {
+        if (!cancelled) {
+          setTagSuggestionsLoading(false);
+        }
       }
     }, 0);
 
@@ -412,7 +463,7 @@ export default function ProjectEditor({
 
       window.clearTimeout(timeoutId);
     };
-  }, [open, companyId]);
+  }, [open, companyId, t]);
 
   if (!open) {
     return null;
@@ -458,7 +509,7 @@ export default function ProjectEditor({
 
   /*
    * =======================================================
-   * TITLE
+   * TITLE / AUTO SLUG
    * =======================================================
    */
 
@@ -489,14 +540,35 @@ export default function ProjectEditor({
    * =======================================================
    * VALIDATION
    * =======================================================
+   *
+   * EN is canonical.
+   *
+   * Thai can be enabled by Company,
+   * but cannot replace the required
+   * English project title.
+   * =======================================================
    */
+
+  function validateForm(value) {
+    const validationErrors = {};
+
+    if (!value.title?.en?.trim()) {
+      validationErrors.title = t("project.editor.validation.titleRequired");
+    }
+
+    if (!value.slug?.trim()) {
+      validationErrors.slug = t("project.editor.validation.slugRequired");
+    }
+
+    return validationErrors;
+  }
 
   function applyValidationErrors(validationErrors) {
     setErrors(validationErrors);
 
     focusFirstInvalidField(validationErrors);
 
-    toast.error("Please complete the required fields.");
+    toast.error(t("project.messages.requiredFields"));
   }
 
   /*
@@ -516,7 +588,7 @@ export default function ProjectEditor({
       slug: slugify(form.slug),
     };
 
-    const validationErrors = validateProjectForm(normalizedForm);
+    const validationErrors = validateForm(normalizedForm);
 
     if (hasErrors(validationErrors)) {
       applyValidationErrors(validationErrors);
@@ -530,19 +602,13 @@ export default function ProjectEditor({
       ? `/api/v1/companies/${companyId}/projects/${project.id}`
       : `/api/v1/companies/${companyId}/projects`;
 
+    /*
+     * Complete localized data is always
+     * submitted.
+     *
+     * Hidden Thai fields are preserved.
+     */
     function createPayload(slug) {
-      /*
-       * IMPORTANT:
-       *
-       * Send the complete localized
-       * object, including hidden
-       * languages.
-       *
-       * Therefore disabling Thai in
-       * Company Settings does NOT erase
-       * existing Thai content.
-       */
-
       return {
         slug,
 
@@ -614,6 +680,12 @@ export default function ProjectEditor({
           result = null;
         }
 
+        /*
+         * =================================
+         * SUCCESS
+         * =================================
+         */
+
         if (response.ok && result?.success !== false) {
           setForm((current) => ({
             ...current,
@@ -623,12 +695,22 @@ export default function ProjectEditor({
 
           slugManuallyEditedRef.current = true;
 
-          toast.success(editing ? "Project updated." : "Project created.");
+          toast.success(
+            editing
+              ? t("project.messages.updated")
+              : t("project.messages.created"),
+          );
 
           await onSaved?.(result?.data);
 
           return;
         }
+
+        /*
+         * =================================
+         * SERVER FIELD ERRORS
+         * =================================
+         */
 
         const serverErrors = normalizeServerFieldErrors(result?.errors);
 
@@ -638,6 +720,12 @@ export default function ProjectEditor({
           focusFirstInvalidField(serverErrors);
         }
 
+        /*
+         * =================================
+         * SLUG CONFLICT
+         * =================================
+         */
+
         const slugConflict =
           response.status === 409 &&
           (result?.code === "PROJECT_SLUG_EXISTS" ||
@@ -646,35 +734,36 @@ export default function ProjectEditor({
               .includes("slug"));
 
         if (!slugConflict) {
-          throw new Error(result?.message || "Unable to save project.");
+          throw new Error(result?.message || t("project.messages.saveFailed"));
         }
 
         const suggestedSlug = slugify(result?.suggestedSlug);
 
         if (!suggestedSlug || suggestedSlug === currentSlug) {
           const slugErrors = {
-            slug: "This slug is already in use.",
+            slug: t("project.editor.slug.exists"),
           };
 
           setErrors(slugErrors);
 
           focusFirstInvalidField(slugErrors);
 
-          toast.error(
-            "This slug is already in use and no alternative slug is currently available.",
-          );
+          toast.error(t("project.editor.slug.noAlternative"));
 
           return;
         }
 
         const confirmed = window.confirm(
-          `The slug "${currentSlug}" is already in use.\n\n` +
-            `Would you like to use "${suggestedSlug}" instead?`,
+          t("project.editor.slug.confirmSuggestion", {
+            current: currentSlug,
+
+            suggested: suggestedSlug,
+          }),
         );
 
         if (!confirmed) {
           const slugErrors = {
-            slug: "This slug is already in use.",
+            slug: t("project.editor.slug.exists"),
           };
 
           setErrors(slugErrors);
@@ -699,15 +788,13 @@ export default function ProjectEditor({
         clearFieldError(setErrors, "slug");
 
         if (conflictAttempts > maxConflictAttempts) {
-          throw new Error(
-            "Unable to reserve an available slug. Please enter another slug.",
-          );
+          throw new Error(t("project.editor.slug.reserveFailed"));
         }
       }
     } catch (error) {
       console.error("Save project error:", error);
 
-      toast.error(error?.message || "Unable to save project.");
+      toast.error(error?.message || t("project.messages.saveFailed"));
     } finally {
       setSaving(false);
     }
@@ -715,49 +802,17 @@ export default function ProjectEditor({
 
   /*
    * =======================================================
-   * STYLE
+   * CLOSE
    * =======================================================
    */
 
-  const inputClass = cn(
-    "h-11 w-full rounded-xl",
+  function handleClose() {
+    if (saving) {
+      return;
+    }
 
-    "border border-[var(--admin-border)]",
-
-    "bg-[var(--admin-surface)] px-3",
-
-    "text-sm text-[var(--admin-foreground)]",
-
-    "outline-none transition",
-
-    "placeholder:text-[var(--admin-muted-light)]",
-
-    "focus:border-[var(--company-primary)]",
-
-    "focus:ring-2 focus:ring-[var(--company-primary-soft)]",
-  );
-
-  const smallInputClass = cn(inputClass, "h-10");
-
-  const textareaClass = cn(
-    "w-full rounded-xl",
-
-    "border border-[var(--admin-border)]",
-
-    "bg-[var(--admin-surface)] p-3",
-
-    "text-sm text-[var(--admin-foreground)]",
-
-    "outline-none transition",
-
-    "placeholder:text-[var(--admin-muted-light)]",
-
-    "focus:border-[var(--company-primary)]",
-
-    "focus:ring-2 focus:ring-[var(--company-primary-soft)]",
-  );
-
-  const invalidTitleClass = getInvalidFieldClass(errors.title);
+    onClose?.();
+  }
 
   /*
    * =======================================================
@@ -766,24 +821,52 @@ export default function ProjectEditor({
    */
 
   return (
-    <div className="fixed inset-0 z-[160] flex justify-end">
+    <div
+      className="
+        fixed
+        inset-0
+        z-[180]
+
+        flex
+        justify-end
+      "
+    >
+      {/* =====================================
+          BACKDROP
+      ===================================== */}
+
       <button
         type="button"
-        aria-label="Close project editor"
-        onClick={saving ? undefined : onClose}
-        className="absolute inset-0 bg-black/30 backdrop-blur-[1px]"
+        aria-label={t("common.close")}
+        disabled={saving}
+        onClick={handleClose}
+        className="
+          absolute
+          inset-0
+
+          bg-black/30
+
+          backdrop-blur-[1px]
+        "
       />
+
+      {/* =====================================
+          PANEL
+      ===================================== */}
 
       <div
         className="
           relative
           z-10
+
           flex
           h-full
           w-full
-          max-w-5xl
+          max-w-[1120px]
           flex-col
+
           bg-[var(--admin-surface)]
+
           shadow-2xl
         "
       >
@@ -794,41 +877,89 @@ export default function ProjectEditor({
         <header
           className="
             flex
-            h-20
+            min-h-[80px]
             shrink-0
+
             items-center
             justify-between
+
+            gap-4
+
             border-b
             border-[var(--admin-border)]
+
             px-5
+            py-4
+
             sm:px-8
           "
         >
-          <div>
-            <h2 className="text-lg font-semibold tracking-[-0.02em] text-[var(--admin-foreground)]">
-              {project ? "Edit Project" : "New Project"}
+          <div className="min-w-0">
+            <div
+              className="
+                admin-text-10
+                font-semibold
+                uppercase
+                tracking-[0.14em]
+
+                text-[var(--company-primary)]
+              "
+            >
+              {t("project.editor.sectionLabel")}
+            </div>
+
+            <h2
+              className="
+                mt-1
+
+                admin-text-18
+                font-semibold
+                tracking-[-0.02em]
+
+                text-[var(--admin-foreground)]
+              "
+            >
+              {project ? t("project.editProject") : t("project.newProject")}
             </h2>
 
-            <p className="mt-1 text-xs text-[var(--admin-muted)]">
-              Project content and information
+            <p
+              className="
+                mt-1
+
+                admin-text-12
+
+                text-[var(--admin-muted)]
+              "
+            >
+              {t("project.projectContent")}
             </p>
           </div>
 
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             disabled={saving}
-            aria-label="Close"
+            aria-label={t("common.close")}
+            title={t("common.close")}
             className="
               flex
               h-9
               w-9
+              shrink-0
+
               items-center
               justify-center
+
               rounded-xl
+
               text-[var(--admin-muted)]
+
               transition
+
               hover:bg-[var(--admin-hover)]
+
+              hover:text-[var(--admin-foreground)]
+
               disabled:opacity-50
             "
           >
@@ -837,75 +968,176 @@ export default function ProjectEditor({
         </header>
 
         {/* =================================
-            BODY
+            CONTENT
         ================================= */}
 
         <div
           className="
+            admin-sidebar-scrollbar-hide
+
             min-h-0
             flex-1
+
             overflow-y-auto
+
             px-5
             py-6
+
             sm:px-8
             sm:py-8
           "
         >
           {/* ===============================
-              BASIC
+              BASIC INFORMATION
           =============================== */}
 
           <section>
-            <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
-              Basic Information
-            </h3>
+            <SectionHeader
+              title={t("project.basicInformation")}
+              description={t("project.editor.basicDescription")}
+            />
 
-            <p className="mt-1 text-xs leading-5 text-[var(--admin-muted)]">
-              Enter the project title and URL. English is the primary content
-              language.
-            </p>
+            <div
+              className="
+                mt-5
 
-            <div className="mt-4">
+                grid
+                gap-5
+              "
+            >
+              {/* TITLE */}
+
               <LocalizedFormField
                 fieldName="title"
-                label="Title"
+                label={t("project.fields.title")}
                 value={form.title}
                 required
                 error={getFieldError(errors, "title")}
                 onChange={updateTitle}
-                inputClassName={cn(inputClass, invalidTitleClass)}
+                placeholder={{
+                  en: t("project.editor.placeholders.titleEnglish"),
+
+                  th: t("project.editor.placeholders.titleThai"),
+                }}
+              />
+
+              {/* SLUG */}
+
+              <div data-form-field="slug">
+                <FormField
+                  label={t("project.fields.slug")}
+                  required
+                  error={getFieldError(errors, "slug")}
+                  hint={t("project.editor.slug.hint")}
+                  infoTitle={t("project.editor.slug.infoTitle")}
+                  infoContent={t("project.editor.slug.infoDescription")}
+                >
+                  <input
+                    value={form.slug}
+                    onChange={(event) => {
+                      const value = event.target.value;
+
+                      slugManuallyEditedRef.current = true;
+
+                      setForm((current) => ({
+                        ...current,
+
+                        slug: value,
+                      }));
+
+                      clearFieldError(setErrors, "slug");
+                    }}
+                    onBlur={() => {
+                      setForm((current) => ({
+                        ...current,
+
+                        slug: slugify(current.slug),
+                      }));
+                    }}
+                    placeholder="house-001"
+                    className={cn(
+                      "h-11 w-full",
+
+                      "rounded-xl",
+
+                      "border border-[var(--admin-border)]",
+
+                      "bg-[var(--admin-surface)]",
+
+                      "px-3",
+
+                      "admin-text-14",
+
+                      "text-[var(--admin-foreground)]",
+
+                      "outline-none transition",
+
+                      "placeholder:text-[var(--admin-muted-light)]",
+
+                      "focus:border-[var(--company-primary)]",
+
+                      "focus:ring-2 focus:ring-[var(--company-primary-soft)]",
+
+                      getInvalidFieldClass(getFieldError(errors, "slug")),
+                    )}
+                  />
+                </FormField>
+              </div>
+
+              {/* EXCERPT */}
+
+              <LocalizedFormField
+                label={t("project.fields.excerpt")}
+                type="textarea"
+                rows={4}
+                value={form.excerpt}
+                onChange={(language, value) =>
+                  updateLocalized("excerpt", language, value)
+                }
+                placeholder={{
+                  en: t("project.editor.placeholders.excerptEnglish"),
+
+                  th: t("project.editor.placeholders.excerptThai"),
+                }}
+                infoTitle={t("project.editor.excerpt.infoTitle")}
+                infoContent={t("project.editor.excerpt.infoDescription")}
               />
             </div>
+          </section>
 
-            <div data-form-field="slug" className="mt-4">
-              <FormField
-                label="Slug"
-                required
-                error={getFieldError(errors, "slug")}
-                hint="Lowercase letters, numbers and hyphens only."
-              >
-                <input
-                  value={form.slug}
-                  aria-invalid={Boolean(errors.slug)}
-                  onChange={(event) => {
-                    slugManuallyEditedRef.current = true;
+          {/* ===============================
+              CONTENT
+          =============================== */}
 
-                    setForm((current) => ({
-                      ...current,
+          <section
+            className="
+              mt-10
 
-                      slug: slugify(event.target.value),
-                    }));
+              border-t
+              border-[var(--admin-border)]
 
-                    clearFieldError(setErrors, "slug");
-                  }}
-                  placeholder="house-project-2026"
-                  className={cn(
-                    inputClass,
+              pt-8
+            "
+          >
+            <SectionHeader
+              title={t("project.content")}
+              description={t("project.editor.contentDescription")}
+            />
 
-                    getInvalidFieldClass(errors.slug),
-                  )}
-                />
-              </FormField>
+            <div className="mt-5">
+              <LocalizedRichTextEditor
+                label={t("project.fields.content")}
+                value={form.content}
+                minHeight={340}
+                onChange={(language, value) =>
+                  updateLocalized("content", language, value)
+                }
+                placeholder={{
+                  en: t("project.editor.placeholders.contentEnglish"),
+
+                  th: t("project.editor.placeholders.contentThai"),
+                }}
+              />
             </div>
           </section>
 
@@ -924,7 +1156,15 @@ export default function ProjectEditor({
 
                 categoryId,
 
-                subCategoryId: null,
+                /*
+                 * Sub-category becomes
+                 * invalid when parent
+                 * category changes.
+                 */
+                subCategoryId:
+                  current.categoryId === categoryId
+                    ? current.subCategoryId
+                    : null,
               }))
             }
             onSubCategoryChange={(subCategoryId) =>
@@ -935,6 +1175,459 @@ export default function ProjectEditor({
               }))
             }
           />
+
+          {/* ===============================
+              PROJECT INFORMATION
+          =============================== */}
+
+          <section
+            className="
+              mt-10
+
+              border-t
+              border-[var(--admin-border)]
+
+              pt-8
+            "
+          >
+            <SectionHeader
+              title={t("project.projectInformation")}
+              description={t("project.editor.projectInfoDescription")}
+            />
+
+            <div
+              className="
+                mt-5
+
+                grid
+                gap-5
+              "
+            >
+              {/* LOCATION */}
+
+              <LocalizedFormField
+                label={t("project.fields.location")}
+                value={form.projectInfo.location}
+                onChange={(language, value) =>
+                  updateProjectInfoLocalized("location", language, value)
+                }
+              />
+
+              {/* CLIENT */}
+
+              <LocalizedFormField
+                label={t("project.fields.client")}
+                value={form.projectInfo.client}
+                onChange={(language, value) =>
+                  updateProjectInfoLocalized("client", language, value)
+                }
+              />
+
+              {/* YEARS */}
+
+              <div
+                className="
+                  grid
+                  gap-5
+
+                  sm:grid-cols-2
+                "
+              >
+                <FormField
+                  label={t("project.fields.designYear")}
+                  hint={t("project.editor.yearHint")}
+                >
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min="1900"
+                    max="2200"
+                    value={form.projectInfo.designYear ?? ""}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+
+                        projectInfo: {
+                          ...current.projectInfo,
+
+                          designYear: event.target.value,
+                        },
+                      }))
+                    }
+                    placeholder="2024"
+                    className="
+                      h-11
+                      w-full
+
+                      rounded-xl
+
+                      border
+                      border-[var(--admin-border)]
+
+                      bg-[var(--admin-surface)]
+
+                      px-3
+
+                      admin-text-14
+
+                      text-[var(--admin-foreground)]
+
+                      outline-none
+
+                      transition
+
+                      placeholder:text-[var(--admin-muted-light)]
+
+                      focus:border-[var(--company-primary)]
+
+                      focus:ring-2
+                      focus:ring-[var(--company-primary-soft)]
+                    "
+                  />
+                </FormField>
+
+                <FormField
+                  label={t("project.fields.completionYear")}
+                  hint={t("project.editor.yearHint")}
+                >
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min="1900"
+                    max="2200"
+                    value={form.projectInfo.completionYear ?? ""}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+
+                        projectInfo: {
+                          ...current.projectInfo,
+
+                          completionYear: event.target.value,
+                        },
+                      }))
+                    }
+                    placeholder="2025"
+                    className="
+                      h-11
+                      w-full
+
+                      rounded-xl
+
+                      border
+                      border-[var(--admin-border)]
+
+                      bg-[var(--admin-surface)]
+
+                      px-3
+
+                      admin-text-14
+
+                      text-[var(--admin-foreground)]
+
+                      outline-none
+
+                      transition
+
+                      placeholder:text-[var(--admin-muted-light)]
+
+                      focus:border-[var(--company-primary)]
+
+                      focus:ring-2
+                      focus:ring-[var(--company-primary-soft)]
+                    "
+                  />
+                </FormField>
+              </div>
+
+              {/* AREA */}
+
+              <div
+                className="
+                  grid
+                  gap-3
+
+                  sm:grid-cols-[minmax(0,1fr)_160px]
+                "
+              >
+                <FormField
+                  label={t("project.fields.area")}
+                  infoTitle={t("project.editor.area.infoTitle")}
+                  infoContent={t("project.editor.area.infoDescription")}
+                >
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    min="0"
+                    step="0.01"
+                    value={form.projectInfo.area.value ?? ""}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+
+                        projectInfo: {
+                          ...current.projectInfo,
+
+                          area: {
+                            ...current.projectInfo.area,
+
+                            value: event.target.value,
+                          },
+                        },
+                      }))
+                    }
+                    placeholder="450"
+                    className="
+                      h-11
+                      w-full
+
+                      rounded-xl
+
+                      border
+                      border-[var(--admin-border)]
+
+                      bg-[var(--admin-surface)]
+
+                      px-3
+
+                      admin-text-14
+
+                      text-[var(--admin-foreground)]
+
+                      outline-none
+
+                      transition
+
+                      placeholder:text-[var(--admin-muted-light)]
+
+                      focus:border-[var(--company-primary)]
+
+                      focus:ring-2
+                      focus:ring-[var(--company-primary-soft)]
+                    "
+                  />
+                </FormField>
+
+                <FormField label={t("project.fields.unit")}>
+                  <select
+                    value={form.projectInfo.area.unit}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+
+                        projectInfo: {
+                          ...current.projectInfo,
+
+                          area: {
+                            ...current.projectInfo.area,
+
+                            unit: event.target.value,
+                          },
+                        },
+                      }))
+                    }
+                    className="
+                      h-11
+                      w-full
+
+                      rounded-xl
+
+                      border
+                      border-[var(--admin-border)]
+
+                      bg-[var(--admin-surface)]
+
+                      px-3
+
+                      admin-text-14
+
+                      text-[var(--admin-foreground)]
+
+                      outline-none
+
+                      transition
+
+                      focus:border-[var(--company-primary)]
+
+                      focus:ring-2
+                      focus:ring-[var(--company-primary-soft)]
+                    "
+                  >
+                    <option value="sqm">m²</option>
+
+                    <option value="sqft">ft²</option>
+
+                    <option value="rai">{t("project.editor.units.rai")}</option>
+                  </select>
+                </FormField>
+              </div>
+            </div>
+          </section>
+
+          {/* ===============================
+              CREDITS
+          =============================== */}
+
+          <ProjectCreditsSection
+            credits={form.projectInfo.credits}
+            onChange={(credits) =>
+              setForm((current) => ({
+                ...current,
+
+                projectInfo: {
+                  ...current.projectInfo,
+
+                  credits,
+                },
+              }))
+            }
+          />
+
+          {/* ===============================
+              TAGS
+          =============================== */}
+
+          <section
+            className="
+              mt-10
+
+              border-t
+              border-[var(--admin-border)]
+
+              pt-8
+            "
+          >
+            <SectionHeader
+              title={t("project.tags")}
+              description={t("project.editor.tagsDescription")}
+            />
+
+            <div className="mt-4">
+              <TagInput
+                value={form.tags}
+                suggestions={tagSuggestions}
+                loadingSuggestions={tagSuggestionsLoading}
+                placeholder={t("project.editor.tagsPlaceholder")}
+                onChange={(tags) =>
+                  setForm((current) => ({
+                    ...current,
+
+                    tags,
+                  }))
+                }
+              />
+            </div>
+          </section>
+
+          {/* ===============================
+              FEATURED
+          =============================== */}
+
+          <section
+            className="
+              mt-10
+
+              border-t
+              border-[var(--admin-border)]
+
+              pt-8
+            "
+          >
+            <label
+              className={cn(
+                "flex cursor-pointer items-start gap-3",
+
+                "rounded-2xl",
+
+                "border",
+
+                "p-4",
+
+                "transition",
+
+                form.featured
+                  ? "border-[var(--company-primary-border)] bg-[var(--company-primary-soft)]"
+                  : "border-[var(--admin-border)] hover:bg-[var(--admin-hover)]",
+              )}
+            >
+              <input
+                type="checkbox"
+                checked={form.featured}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+
+                    featured: event.target.checked,
+                  }))
+                }
+                className="
+                  mt-1
+
+                  accent-[var(--company-primary)]
+                "
+              />
+
+              <span
+                className="
+                  flex
+                  min-w-0
+                  flex-1
+
+                  items-start
+                  gap-3
+                "
+              >
+                <span
+                  className="
+                    flex
+                    h-9
+                    w-9
+                    shrink-0
+
+                    items-center
+                    justify-center
+
+                    rounded-xl
+
+                    bg-[var(--company-primary-soft)]
+
+                    text-[var(--company-primary)]
+                  "
+                >
+                  <Star size={16} />
+                </span>
+
+                <span>
+                  <span
+                    className="
+                      block
+
+                      admin-text-14
+                      font-medium
+
+                      text-[var(--admin-foreground)]
+                    "
+                  >
+                    {t("project.editor.featured.title")}
+                  </span>
+
+                  <span
+                    className="
+                      mt-1
+                      block
+
+                      admin-text-12
+                      leading-[1.6]
+
+                      text-[var(--admin-muted)]
+                    "
+                  >
+                    {t("project.editor.featured.description")}
+                  </span>
+                </span>
+              </span>
+            </label>
+          </section>
 
           {/* ===============================
               MEDIA
@@ -961,244 +1654,6 @@ export default function ProjectEditor({
           />
 
           {/* ===============================
-              PROJECT INFO
-          =============================== */}
-
-          <section className="mt-10">
-            <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
-              Project Information
-            </h3>
-
-            <div className="mt-4">
-              <LocalizedFormField
-                label="Location"
-                value={form.projectInfo.location}
-                onChange={(language, value) =>
-                  updateProjectInfoLocalized("location", language, value)
-                }
-                inputClassName={smallInputClass}
-              />
-            </div>
-
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <FormField label="Design Year">
-                <input
-                  type="number"
-                  min="1900"
-                  max="2200"
-                  value={form.projectInfo.designYear ?? ""}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-
-                      projectInfo: {
-                        ...current.projectInfo,
-
-                        designYear: event.target.value,
-                      },
-                    }))
-                  }
-                  className={smallInputClass}
-                />
-              </FormField>
-
-              <FormField label="Completion Year">
-                <input
-                  type="number"
-                  min="1900"
-                  max="2200"
-                  value={form.projectInfo.completionYear ?? ""}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-
-                      projectInfo: {
-                        ...current.projectInfo,
-
-                        completionYear: event.target.value,
-                      },
-                    }))
-                  }
-                  className={smallInputClass}
-                />
-              </FormField>
-
-              <FormField label="Area">
-                <input
-                  type="number"
-                  min="0"
-                  value={form.projectInfo.area.value ?? ""}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-
-                      projectInfo: {
-                        ...current.projectInfo,
-
-                        area: {
-                          ...current.projectInfo.area,
-
-                          value: event.target.value,
-                        },
-                      },
-                    }))
-                  }
-                  className={smallInputClass}
-                />
-              </FormField>
-
-              <FormField label="Unit">
-                <select
-                  value={form.projectInfo.area.unit}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-
-                      projectInfo: {
-                        ...current.projectInfo,
-
-                        area: {
-                          ...current.projectInfo.area,
-
-                          unit: event.target.value,
-                        },
-                      },
-                    }))
-                  }
-                  className={smallInputClass}
-                >
-                  <option value="sqm">sqm</option>
-
-                  <option value="sqft">sqft</option>
-                </select>
-              </FormField>
-            </div>
-
-            <div className="mt-4">
-              <LocalizedFormField
-                label="Client"
-                value={form.projectInfo.client}
-                onChange={(language, value) =>
-                  updateProjectInfoLocalized("client", language, value)
-                }
-                inputClassName={smallInputClass}
-              />
-            </div>
-          </section>
-
-          {/* ===============================
-              CREDITS
-          =============================== */}
-
-          <ProjectCreditsSection
-            credits={form.projectInfo.credits}
-            onChange={(credits) =>
-              setForm((current) => ({
-                ...current,
-
-                projectInfo: {
-                  ...current.projectInfo,
-
-                  credits,
-                },
-              }))
-            }
-          />
-
-          {/* ===============================
-              CONTENT
-          =============================== */}
-
-          <section className="mt-10">
-            <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
-              Content
-            </h3>
-
-            <p className="mt-1 text-xs leading-5 text-[var(--admin-muted)]">
-              Write the project summary and description.
-            </p>
-
-            <div className="mt-4">
-              <LocalizedRichTextEditor
-                label="Content"
-                value={form.content}
-                minHeight={300}
-                onChange={(language, value) =>
-                  updateLocalized("content", language, value)
-                }
-              />
-            </div>
-          </section>
-
-          {/* ===============================
-              TAGS
-          =============================== */}
-
-          <section className="mt-10">
-            <h3 className="text-sm font-semibold text-[var(--admin-foreground)]">
-              Tags
-            </h3>
-
-            <p className="mt-1 text-xs leading-5 text-[var(--admin-muted)]">
-              Add keywords used for classification, search and related content.
-            </p>
-
-            <div className="mt-4">
-              <TagInput
-                value={form.tags}
-                suggestions={tagSuggestions}
-                placeholder="architecture"
-                onChange={(tags) =>
-                  setForm((current) => ({
-                    ...current,
-
-                    tags,
-                  }))
-                }
-              />
-            </div>
-          </section>
-
-          {/* ===============================
-              FEATURED
-          =============================== */}
-
-          <section
-            className="
-              mt-10
-              border-t
-              border-[var(--admin-border)]
-              pt-8
-            "
-          >
-            <label className="flex items-start gap-3">
-              <input
-                type="checkbox"
-                checked={form.featured}
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-
-                    featured: event.target.checked,
-                  }))
-                }
-                className="mt-0.5 h-4 w-4 accent-[var(--company-primary)]"
-              />
-
-              <span>
-                <span className="block text-sm font-medium text-[var(--admin-foreground)]">
-                  Featured Project
-                </span>
-
-                <span className="mt-1 block text-xs leading-5 text-[var(--admin-muted)]">
-                  Mark this project as featured for highlighted sections of the
-                  website.
-                </span>
-              </span>
-            </label>
-          </section>
-
-          {/* ===============================
               SEO
           =============================== */}
 
@@ -1223,61 +1678,117 @@ export default function ProjectEditor({
           className="
             flex
             shrink-0
-            items-center
-            justify-end
-            gap-2
+
+            flex-col
+            gap-3
+
             border-t
             border-[var(--admin-border)]
+
             bg-[var(--admin-surface)]
+
             px-5
             py-4
+
+            sm:flex-row
+            sm:items-center
+            sm:justify-between
+
             sm:px-8
           "
         >
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={saving}
+          <div
             className="
-              h-10
-              rounded-xl
-              px-4
-              text-sm
-              font-medium
+              admin-text-11
+              leading-[1.55]
+
               text-[var(--admin-muted)]
-              transition
-              hover:bg-[var(--admin-hover)]
-              hover:text-[var(--admin-foreground)]
-              disabled:opacity-50
             "
           >
-            Cancel
-          </button>
+            {t("project.editor.saveHint")}
+          </div>
 
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={saving}
-            className={cn(
-              "inline-flex h-10 min-w-24 items-center justify-center gap-2",
+          <div
+            className="
+              flex
+              shrink-0
+              items-center
+              justify-end
 
-              "rounded-xl",
-
-              "bg-[var(--company-primary)] px-5",
-
-              "text-sm font-medium",
-
-              "text-[var(--company-primary-foreground)]",
-
-              "transition hover:opacity-90",
-
-              "disabled:cursor-not-allowed disabled:opacity-50",
-            )}
+              gap-2
+            "
           >
-            {saving && <LoaderCircle size={15} className="animate-spin" />}
+            <button
+              type="button"
+              onClick={handleClose}
+              disabled={saving}
+              className="
+                h-10
 
-            {saving ? "Saving..." : project ? "Save Changes" : "Create Project"}
-          </button>
+                rounded-xl
+
+                px-4
+
+                admin-text-14
+                font-medium
+
+                text-[var(--admin-muted)]
+
+                transition
+
+                hover:bg-[var(--admin-hover)]
+
+                disabled:opacity-50
+              "
+            >
+              {t("common.cancel")}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={saving}
+              className="
+                inline-flex
+                h-10
+                min-w-32
+
+                items-center
+                justify-center
+                gap-2
+
+                rounded-xl
+
+                bg-[var(--company-primary)]
+
+                px-5
+
+                admin-text-14
+                font-medium
+
+                text-[var(--company-primary-foreground)]
+
+                transition
+
+                hover:bg-[var(--company-primary-hover)]
+
+                disabled:cursor-not-allowed
+                disabled:opacity-50
+              "
+            >
+              {saving ? (
+                <LoaderCircle size={15} className="animate-spin" />
+              ) : (
+                <Save size={15} />
+              )}
+
+              {saving
+                ? t("common.saving")
+                : project
+                  ? t("common.saveChanges")
+                  : t("common.create")}
+            </button>
+          </div>
         </footer>
       </div>
     </div>

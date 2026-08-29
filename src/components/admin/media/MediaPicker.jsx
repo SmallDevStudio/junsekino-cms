@@ -14,9 +14,17 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { toast } from "sonner";
 
+import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
+
 import { cn } from "@/utils/cn";
 
 import MediaUploadDropzone from "./MediaUploadDropzone";
+
+/*
+ * =========================================================
+ * HELPERS
+ * =========================================================
+ */
 
 function normalizeMedia(payload) {
   if (Array.isArray(payload?.data)) {
@@ -30,10 +38,8 @@ function normalizeMedia(payload) {
   return [];
 }
 
-function getMediaName(media) {
-  return (
-    media?.originalFileName || media?.fileName || media?.id || "Untitled image"
-  );
+function getMediaName(media, fallback) {
+  return media?.originalFileName || media?.fileName || media?.id || fallback;
 }
 
 function formatBytes(bytes) {
@@ -53,6 +59,23 @@ function formatBytes(bytes) {
 
   return `${(value / (1024 * 1024)).toFixed(1)} MB`;
 }
+
+/*
+ * =========================================================
+ * THUMBNAIL
+ * =========================================================
+ *
+ * The Admin preview API returns a runtime
+ * signed Storage URL.
+ *
+ * We intentionally keep <img> here rather
+ * than Next Image because the hostname of
+ * signed preview URLs is runtime-dependent.
+ *
+ * Public website image rendering still uses
+ * the established Next Image pipeline.
+ * =========================================================
+ */
 
 function MediaThumbnail({ companyId, media }) {
   const [url, setUrl] = useState(null);
@@ -86,13 +109,13 @@ function MediaThumbnail({ companyId, media }) {
         const payload = await response.json();
 
         if (!response.ok || payload?.success === false) {
-          throw new Error(payload?.message || "Preview unavailable.");
+          throw new Error("MEDIA_PREVIEW_FAILED");
         }
 
         const previewUrl = payload?.data?.url || payload?.url || null;
 
         if (!previewUrl) {
-          throw new Error("Preview URL missing.");
+          throw new Error("MEDIA_PREVIEW_URL_MISSING");
         }
 
         if (!cancelled) {
@@ -116,10 +139,22 @@ function MediaThumbnail({ companyId, media }) {
 
   if (loading) {
     return (
-      <div className="flex h-full w-full items-center justify-center">
+      <div
+        className="
+          flex
+          h-full
+          w-full
+
+          items-center
+          justify-center
+        "
+      >
         <LoaderCircle
           size={18}
-          className="animate-spin text-[var(--admin-muted)]"
+          className="
+            animate-spin
+            text-[var(--admin-muted)]
+          "
         />
       </div>
     );
@@ -127,7 +162,16 @@ function MediaThumbnail({ companyId, media }) {
 
   if (!url) {
     return (
-      <div className="flex h-full w-full items-center justify-center">
+      <div
+        className="
+          flex
+          h-full
+          w-full
+
+          items-center
+          justify-center
+        "
+      >
         <ImageIcon
           size={22}
           strokeWidth={1.5}
@@ -138,20 +182,32 @@ function MediaThumbnail({ companyId, media }) {
   }
 
   return (
-    <>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={url}
-        alt={media?.alt?.en || media?.alt?.th || ""}
-        loading="lazy"
-        decoding="async"
-        className="h-full w-full object-cover"
-      />
-    </>
+    // Signed preview URL is generated at runtime.
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={url}
+      alt={media?.alt?.en || media?.alt?.th || ""}
+      loading="lazy"
+      decoding="async"
+      className="
+        h-full
+        w-full
+
+        object-cover
+      "
+    />
   );
 }
 
+/*
+ * =========================================================
+ * IMPORT URL PANEL
+ * =========================================================
+ */
+
 function ImportUrlPanel({ companyId, onImported }) {
+  const { t } = useAdminTranslation();
+
   const [url, setUrl] = useState("");
 
   const [importing, setImporting] = useState(false);
@@ -160,7 +216,7 @@ function ImportUrlPanel({ companyId, onImported }) {
     const value = url.trim();
 
     if (!value) {
-      toast.error("Enter an image URL.");
+      toast.error(t("media.importUrl.errors.required"));
 
       return;
     }
@@ -169,10 +225,10 @@ function ImportUrlPanel({ companyId, onImported }) {
       const parsed = new URL(value);
 
       if (!["http:", "https:"].includes(parsed.protocol)) {
-        throw new Error("Only HTTP and HTTPS URLs are supported.");
+        throw new Error();
       }
     } catch {
-      toast.error("Enter a valid image URL.");
+      toast.error(t("media.importUrl.errors.invalid"));
 
       return;
     }
@@ -200,10 +256,10 @@ function ImportUrlPanel({ companyId, onImported }) {
       const payload = await response.json();
 
       if (!response.ok || payload?.success === false) {
-        throw new Error(payload?.message || "Unable to import image.");
+        throw new Error(payload?.message || t("media.importUrl.errors.failed"));
       }
 
-      toast.success("Image imported.");
+      toast.success(t("media.importUrl.messages.imported"));
 
       setUrl("");
 
@@ -211,31 +267,93 @@ function ImportUrlPanel({ companyId, onImported }) {
     } catch (error) {
       console.error("Import image URL error:", error);
 
-      toast.error(error?.message || "Unable to import image.");
+      toast.error(error?.message || t("media.importUrl.errors.failed"));
     } finally {
       setImporting(false);
     }
   }
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <div className="rounded-3xl border border-[var(--admin-border)] bg-[var(--admin-background)] p-5 sm:p-6">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--company-primary-soft)] text-[var(--company-primary)]">
+    <div
+      className="
+        mx-auto
+        max-w-2xl
+      "
+    >
+      <div
+        className="
+          rounded-3xl
+
+          border
+          border-[var(--admin-border)]
+
+          bg-[var(--admin-background)]
+
+          p-5
+
+          sm:p-6
+        "
+      >
+        <div
+          className="
+            flex
+            h-12
+            w-12
+
+            items-center
+            justify-center
+
+            rounded-2xl
+
+            bg-[var(--company-primary-soft)]
+
+            text-[var(--company-primary)]
+          "
+        >
           <Link2 size={20} />
         </div>
 
-        <h3 className="mt-4 text-sm font-semibold text-[var(--admin-foreground)]">
-          Import image from URL
+        <h3
+          className="
+            mt-4
+
+            admin-text-14
+            font-semibold
+
+            text-[var(--admin-foreground)]
+          "
+        >
+          {t("media.importUrl.title")}
         </h3>
 
-        <p className="mt-1 text-xs leading-5 text-[var(--admin-muted)]">
-          Paste a direct image URL. The image will be copied into this
-          company&apos;s Media Library and processed like a normal upload.
+        <p
+          className="
+            mt-1
+
+            admin-text-12
+            leading-[1.65]
+
+            text-[var(--admin-muted)]
+          "
+        >
+          {t("media.importUrl.description")}
         </p>
 
-        <label className="mt-5 block">
-          <span className="text-xs font-medium text-[var(--admin-muted)]">
-            Image URL
+        <label
+          className="
+            mt-5
+            block
+          "
+        >
+          <span
+            className="
+              admin-text-12
+              font-medium
+
+              text-[var(--admin-muted)]
+            "
+          >
+            {t("media.importUrl.fieldLabel")}
           </span>
 
           <input
@@ -251,36 +369,77 @@ function ImportUrlPanel({ companyId, onImported }) {
             }}
             disabled={importing}
             placeholder="https://example.com/image.jpg"
-            className={cn(
-              "mt-2 h-11 w-full rounded-xl",
+            className="
+              mt-2
 
-              "border border-[var(--admin-border)]",
+              h-11
+              w-full
 
-              "bg-[var(--admin-surface)] px-3",
+              rounded-xl
 
-              "text-sm text-[var(--admin-foreground)]",
+              border
+              border-[var(--admin-border)]
 
-              "outline-none transition",
+              bg-[var(--admin-surface)]
 
-              "placeholder:text-[var(--admin-muted-light)]",
+              px-3
 
-              "focus:border-[var(--company-primary)]",
+              admin-text-14
 
-              "focus:ring-2 focus:ring-[var(--company-primary-soft)]",
+              text-[var(--admin-foreground)]
 
-              "disabled:opacity-60",
-            )}
+              outline-none
+
+              transition
+
+              placeholder:text-[var(--admin-muted-light)]
+
+              focus:border-[var(--company-primary)]
+
+              focus:ring-2
+              focus:ring-[var(--company-primary-soft)]
+
+              disabled:opacity-60
+            "
           />
         </label>
 
-        <div className="mt-4 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4">
-          <div className="text-[11px] font-medium text-[var(--admin-foreground)]">
-            Direct image URLs only
+        <div
+          className="
+            mt-4
+
+            rounded-2xl
+
+            border
+            border-[var(--admin-border)]
+
+            bg-[var(--admin-surface)]
+
+            p-4
+          "
+        >
+          <div
+            className="
+              admin-text-11
+              font-medium
+
+              text-[var(--admin-foreground)]
+            "
+          >
+            {t("media.importUrl.directOnly")}
           </div>
 
-          <p className="mt-1 text-[11px] leading-5 text-[var(--admin-muted)]">
-            Supported formats are JPEG, PNG, WebP and AVIF. Web pages, local
-            network addresses and unsupported files are rejected.
+          <p
+            className="
+              mt-1
+
+              admin-text-11
+              leading-[1.65]
+
+              text-[var(--admin-muted)]
+            "
+          >
+            {t("media.importUrl.supportedFormats")}
           </p>
         </div>
 
@@ -288,21 +447,34 @@ function ImportUrlPanel({ companyId, onImported }) {
           type="button"
           onClick={handleImport}
           disabled={importing || !url.trim()}
-          className={cn(
-            "mt-5 inline-flex h-10 items-center justify-center gap-2",
+          className="
+            mt-5
 
-            "rounded-xl",
+            inline-flex
+            h-10
 
-            "bg-[var(--company-primary)] px-4",
+            items-center
+            justify-center
+            gap-2
 
-            "text-sm font-medium",
+            rounded-xl
 
-            "text-[var(--company-primary-foreground)]",
+            bg-[var(--company-primary)]
 
-            "transition hover:opacity-90",
+            px-4
 
-            "disabled:cursor-not-allowed disabled:opacity-40",
-          )}
+            admin-text-14
+            font-medium
+
+            text-[var(--company-primary-foreground)]
+
+            transition
+
+            hover:bg-[var(--company-primary-hover)]
+
+            disabled:cursor-not-allowed
+            disabled:opacity-40
+          "
         >
           {importing ? (
             <LoaderCircle size={15} className="animate-spin" />
@@ -310,22 +482,43 @@ function ImportUrlPanel({ companyId, onImported }) {
             <Link2 size={15} />
           )}
 
-          {importing ? "Importing..." : "Import Image"}
+          {importing
+            ? t("media.importUrl.importing")
+            : t("media.importUrl.action")}
         </button>
       </div>
     </div>
   );
 }
 
+/*
+ * =========================================================
+ * MEDIA PICKER
+ * =========================================================
+ */
+
 export default function MediaPicker({
   open,
+
   companyId,
+
   selectedIds = [],
+
   multiple = true,
-  title = "Select media",
+
+  /*
+   * Optional consumer-provided title.
+   *
+   * When omitted it follows Admin i18n.
+   */
+  title,
+
   onClose,
+
   onConfirm,
 }) {
+  const { t } = useAdminTranslation();
+
   const [items, setItems] = useState([]);
 
   const [selection, setSelection] = useState([]);
@@ -337,6 +530,14 @@ export default function MediaPicker({
   const [error, setError] = useState(null);
 
   const [activeTab, setActiveTab] = useState("library");
+
+  const dialogTitle = title || t("media.picker.title");
+
+  /*
+   * =======================================================
+   * LOAD
+   * =======================================================
+   */
 
   const loadMedia = useCallback(async () => {
     if (!companyId) {
@@ -361,7 +562,9 @@ export default function MediaPicker({
       const payload = await response.json();
 
       if (!response.ok || payload?.success === false) {
-        throw new Error(payload?.message || "Unable to load media.");
+        throw new Error(
+          payload?.message || t("media.picker.errors.loadFailed"),
+        );
       }
 
       const media = normalizeMedia(payload).filter(
@@ -377,19 +580,30 @@ export default function MediaPicker({
     } catch (loadError) {
       console.error("Media picker error:", loadError);
 
-      setError(loadError?.message || "Unable to load media.");
+      const message = loadError?.message || t("media.picker.errors.loadFailed");
+
+      setError(message);
 
       return [];
     } finally {
       setLoading(false);
     }
-  }, [companyId]);
+  }, [companyId, t]);
+
+  /*
+   * =======================================================
+   * OPEN RESET
+   * =======================================================
+   */
 
   useEffect(() => {
     if (!open) {
       return;
     }
 
+    /*
+     * React Compiler-safe.
+     */
     const timeoutId = window.setTimeout(() => {
       setSelection(Array.isArray(selectedIds) ? selectedIds : []);
 
@@ -402,6 +616,12 @@ export default function MediaPicker({
       window.clearTimeout(timeoutId);
     };
   }, [open, selectedIds]);
+
+  /*
+   * =======================================================
+   * OPEN LOAD
+   * =======================================================
+   */
 
   useEffect(() => {
     if (!open || !companyId) {
@@ -416,6 +636,12 @@ export default function MediaPicker({
       window.clearTimeout(timeoutId);
     };
   }, [open, companyId, loadMedia]);
+
+  /*
+   * =======================================================
+   * FILTER
+   * =======================================================
+   */
 
   const filteredItems = useMemo(() => {
     const keyword = search.trim().toLowerCase();
@@ -447,6 +673,12 @@ export default function MediaPicker({
       return searchable.includes(keyword);
     });
   }, [items, search]);
+
+  /*
+   * =======================================================
+   * SELECTION
+   * =======================================================
+   */
 
   function toggleMedia(mediaId) {
     if (!multiple) {
@@ -480,6 +712,12 @@ export default function MediaPicker({
     );
   }
 
+  /*
+   * =======================================================
+   * CREATED / IMPORTED
+   * =======================================================
+   */
+
   async function handleMediaCreated(media) {
     const refreshed = await loadMedia();
 
@@ -491,6 +729,12 @@ export default function MediaPicker({
 
     setActiveTab("library");
   }
+
+  /*
+   * =======================================================
+   * CONFIRM
+   * =======================================================
+   */
 
   function handleConfirm() {
     const selectedMedia = selection
@@ -506,77 +750,203 @@ export default function MediaPicker({
     return null;
   }
 
+  /*
+   * =======================================================
+   * TABS
+   * =======================================================
+   */
+
   const tabs = [
     {
       value: "library",
-      label: "Library",
+
+      label: t("media.picker.tabs.library"),
+
       icon: ImageIcon,
     },
+
     {
       value: "upload",
-      label: "Upload",
+
+      label: t("media.picker.tabs.upload"),
+
       icon: UploadCloud,
     },
+
     {
       value: "url",
-      label: "Import URL",
+
+      label: t("media.picker.tabs.importUrl"),
+
       icon: Link2,
     },
   ];
 
+  /*
+   * =======================================================
+   * RENDER
+   * =======================================================
+   */
+
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6">
+    <div
+      className="
+        fixed
+        inset-0
+        z-[200]
+
+        flex
+        items-center
+        justify-center
+
+        p-4
+
+        sm:p-6
+      "
+    >
+      {/* BACKDROP */}
+
       <button
         type="button"
-        aria-label="Close media picker"
+        aria-label={t("media.picker.close")}
         onClick={onClose}
-        className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
+        className="
+          absolute
+          inset-0
+
+          bg-black/40
+
+          backdrop-blur-[2px]
+        "
       />
+
+      {/* DIALOG */}
 
       <div
         role="dialog"
         aria-modal="true"
-        aria-label={title}
-        className={cn(
-          "relative z-10",
+        aria-label={dialogTitle}
+        className="
+          relative
+          z-10
 
-          "flex max-h-[88vh] w-full max-w-5xl flex-col",
+          flex
+          max-h-[88vh]
+          w-full
+          max-w-5xl
+          flex-col
 
-          "overflow-hidden rounded-3xl",
+          overflow-hidden
 
-          "border border-[var(--admin-border)]",
+          rounded-3xl
 
-          "bg-[var(--admin-surface)]",
+          border
+          border-[var(--admin-border)]
 
-          "shadow-[0_30px_100px_rgba(0,0,0,0.25)]",
-        )}
+          bg-[var(--admin-surface)]
+
+          shadow-[0_30px_100px_rgba(0,0,0,0.25)]
+        "
       >
-        {/* Header */}
+        {/* =================================
+            HEADER
+        ================================= */}
 
-        <div className="flex shrink-0 items-center justify-between border-b border-[var(--admin-border)] px-5 py-4 sm:px-6">
-          <div>
-            <h2 className="text-lg font-semibold tracking-[-0.02em] text-[var(--admin-foreground)]">
-              {title}
+        <div
+          className="
+            flex
+            shrink-0
+
+            items-center
+            justify-between
+
+            gap-4
+
+            border-b
+            border-[var(--admin-border)]
+
+            px-5
+            py-4
+
+            sm:px-6
+          "
+        >
+          <div className="min-w-0">
+            <h2
+              className="
+                admin-text-18
+                font-semibold
+                tracking-[-0.02em]
+
+                text-[var(--admin-foreground)]
+              "
+            >
+              {dialogTitle}
             </h2>
 
-            <p className="mt-1 text-xs text-[var(--admin-muted)]">
-              {multiple ? "Select one or more images." : "Select an image."}
+            <p
+              className="
+                mt-1
+
+                admin-text-12
+
+                text-[var(--admin-muted)]
+              "
+            >
+              {multiple
+                ? t("media.picker.multipleDescription")
+                : t("media.picker.singleDescription")}
             </p>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-[var(--admin-muted)] transition hover:bg-[var(--admin-hover)] hover:text-[var(--admin-foreground)]"
+            aria-label={t("common.close")}
+            title={t("common.close")}
+            className="
+              flex
+              h-9
+              w-9
+              shrink-0
+
+              items-center
+              justify-center
+
+              rounded-xl
+
+              text-[var(--admin-muted)]
+
+              transition
+
+              hover:bg-[var(--admin-hover)]
+
+              hover:text-[var(--admin-foreground)]
+            "
           >
             <X size={18} />
           </button>
         </div>
 
-        {/* Tabs */}
+        {/* =================================
+            TABS
+        ================================= */}
 
-        <div className="flex shrink-0 border-b border-[var(--admin-border)] px-4 sm:px-6">
+        <div
+          className="
+            flex
+            shrink-0
+
+            overflow-x-auto
+
+            border-b
+            border-[var(--admin-border)]
+
+            px-4
+
+            sm:px-6
+          "
+        >
           {tabs.map((tab) => {
             const Icon = tab.icon;
 
@@ -588,11 +958,15 @@ export default function MediaPicker({
                 type="button"
                 onClick={() => setActiveTab(tab.value)}
                 className={cn(
-                  "relative inline-flex items-center gap-2",
+                  "relative",
+
+                  "inline-flex shrink-0 items-center gap-2",
 
                   "px-4 py-3",
 
-                  "text-xs font-medium transition",
+                  "admin-text-12 font-medium",
+
+                  "transition",
 
                   active
                     ? "text-[var(--company-primary)]"
@@ -604,86 +978,339 @@ export default function MediaPicker({
                 {tab.label}
 
                 {active && (
-                  <span className="absolute inset-x-0 bottom-0 h-0.5 bg-[var(--company-primary)]" />
+                  <span
+                    className="
+                        absolute
+                        inset-x-0
+                        bottom-0
+
+                        h-0.5
+
+                        bg-[var(--company-primary)]
+                      "
+                  />
                 )}
               </button>
             );
           })}
         </div>
 
-        {/* Search */}
+        {/* =================================
+            BODY
+        ================================= */}
 
-        {activeTab === "library" && (
-          <div className="shrink-0 border-b border-[var(--admin-border)] p-4 sm:px-6">
-            <div className="relative max-w-md">
-              <Search
-                size={16}
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-muted)]"
-              />
+        <div
+          className="
+            min-h-0
+            flex-1
 
-              <input
-                type="search"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search images..."
-                className={cn(
-                  "h-10 w-full rounded-xl",
+            overflow-y-auto
 
-                  "border border-[var(--admin-border)]",
+            p-5
 
-                  "bg-[var(--admin-background)]",
+            sm:p-6
+          "
+        >
+          {/* ===============================
+              LIBRARY
+          =============================== */}
 
-                  "pl-10 pr-4",
-
-                  "text-sm text-[var(--admin-foreground)]",
-
-                  "outline-none transition",
-
-                  "placeholder:text-[var(--admin-muted-light)]",
-
-                  "focus:border-[var(--company-primary)]",
-
-                  "focus:ring-2 focus:ring-[var(--company-primary-soft)]",
-                )}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Content */}
-
-        <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
           {activeTab === "library" && (
             <>
-              {loading ? (
-                <div className="flex min-h-[320px] items-center justify-center">
-                  <LoaderCircle
-                    size={22}
-                    className="animate-spin text-[var(--company-primary)]"
+              {/* SEARCH */}
+
+              <div
+                className="
+                  flex
+                  flex-col
+                  gap-3
+
+                  sm:flex-row
+                  sm:items-center
+                  sm:justify-between
+                "
+              >
+                <div
+                  className="
+                    relative
+                    w-full
+                    max-w-[420px]
+                  "
+                >
+                  <Search
+                    size={15}
+                    className="
+                      pointer-events-none
+
+                      absolute
+                      left-3
+                      top-1/2
+
+                      -translate-y-1/2
+
+                      text-[var(--admin-muted-light)]
+                    "
+                  />
+
+                  <input
+                    type="search"
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                    placeholder={t("media.picker.searchPlaceholder")}
+                    className="
+                      h-10
+                      w-full
+
+                      rounded-xl
+
+                      border
+                      border-[var(--admin-border)]
+
+                      bg-[var(--admin-background)]
+
+                      pl-9
+                      pr-3
+
+                      admin-text-12
+
+                      text-[var(--admin-foreground)]
+
+                      outline-none
+
+                      transition
+
+                      placeholder:text-[var(--admin-muted-light)]
+
+                      focus:border-[var(--company-primary)]
+
+                      focus:ring-2
+                      focus:ring-[var(--company-primary-soft)]
+                    "
                   />
                 </div>
-              ) : error ? (
-                <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                  {error}
+
+                <div
+                  className="
+                    admin-text-11
+
+                    text-[var(--admin-muted)]
+                  "
+                >
+                  {t("media.picker.resultCount", {
+                    count: filteredItems.length,
+                  })}
                 </div>
-              ) : filteredItems.length === 0 ? (
-                <div className="flex min-h-[320px] flex-col items-center justify-center text-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--admin-background)] text-[var(--admin-muted)]">
-                    <ImageIcon size={21} />
+              </div>
+
+              {/* LOADING */}
+
+              {loading && (
+                <div
+                  className="
+                    flex
+                    min-h-[320px]
+
+                    items-center
+                    justify-center
+                  "
+                >
+                  <div className="text-center">
+                    <LoaderCircle
+                      size={22}
+                      className="
+                        mx-auto
+
+                        animate-spin
+
+                        text-[var(--company-primary)]
+                      "
+                    />
+
+                    <div
+                      className="
+                        mt-3
+
+                        admin-text-12
+
+                        text-[var(--admin-muted)]
+                      "
+                    >
+                      {t("media.picker.loading")}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ERROR */}
+
+              {!loading && error && (
+                <div
+                  className="
+                      mt-6
+
+                      rounded-2xl
+
+                      border
+                      border-red-200
+
+                      bg-red-50
+
+                      p-5
+                    "
+                >
+                  <div
+                    className="
+                        admin-text-12
+                        font-medium
+
+                        text-red-700
+                      "
+                  >
+                    {error}
                   </div>
 
-                  <div className="mt-4 text-sm font-medium text-[var(--admin-foreground)]">
-                    No images found
+                  <button
+                    type="button"
+                    onClick={loadMedia}
+                    className="
+                        mt-3
+
+                        admin-text-12
+                        font-medium
+
+                        text-[var(--company-primary)]
+
+                        hover:underline
+                      "
+                  >
+                    {t("common.retry")}
+                  </button>
+                </div>
+              )}
+
+              {/* EMPTY */}
+
+              {!loading && !error && filteredItems.length === 0 && (
+                <div
+                  className="
+                      flex
+                      min-h-[320px]
+
+                      flex-col
+                      items-center
+                      justify-center
+
+                      text-center
+                    "
+                >
+                  <div
+                    className="
+                        flex
+                        h-14
+                        w-14
+
+                        items-center
+                        justify-center
+
+                        rounded-2xl
+
+                        bg-[var(--admin-background)]
+
+                        text-[var(--admin-muted-light)]
+                      "
+                  >
+                    <ImageIcon size={23} strokeWidth={1.5} />
                   </div>
 
-                  <p className="mt-1 text-xs text-[var(--admin-muted)]">
-                    Upload a new image or import one from a URL.
-                  </p>
+                  <div
+                    className="
+                        mt-4
+
+                        admin-text-14
+                        font-medium
+
+                        text-[var(--admin-foreground)]
+                      "
+                  >
+                    {search.trim()
+                      ? t("media.picker.noSearchResults")
+                      : t("media.picker.emptyTitle")}
+                  </div>
+
+                  <div
+                    className="
+                        mt-1
+
+                        max-w-[360px]
+
+                        admin-text-12
+                        leading-[1.6]
+
+                        text-[var(--admin-muted)]
+                      "
+                  >
+                    {search.trim()
+                      ? t("media.picker.noSearchDescription")
+                      : t("media.picker.emptyDescription")}
+                  </div>
+
+                  {!search.trim() && (
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("upload")}
+                      className="
+                          mt-4
+
+                          inline-flex
+                          h-9
+
+                          items-center
+                          gap-2
+
+                          rounded-xl
+
+                          bg-[var(--company-primary)]
+
+                          px-3
+
+                          admin-text-12
+                          font-medium
+
+                          text-[var(--company-primary-foreground)]
+
+                          transition
+
+                          hover:bg-[var(--company-primary-hover)]
+                        "
+                    >
+                      <UploadCloud size={14} />
+
+                      {t("media.picker.tabs.upload")}
+                    </button>
+                  )}
                 </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              )}
+
+              {/* GRID */}
+
+              {!loading && !error && filteredItems.length > 0 && (
+                <div
+                  className="
+                      mt-5
+
+                      grid
+                      grid-cols-2
+                      gap-3
+
+                      sm:grid-cols-3
+
+                      lg:grid-cols-4
+                    "
+                >
                   {filteredItems.map((media) => {
                     const selected = selection.includes(media.id);
+
+                    const fileSize = formatBytes(media.size);
 
                     return (
                       <button
@@ -691,46 +1318,111 @@ export default function MediaPicker({
                         type="button"
                         onClick={() => toggleMedia(media.id)}
                         className={cn(
-                          "group overflow-hidden rounded-2xl border text-left transition",
+                          "group overflow-hidden",
+
+                          "rounded-2xl",
+
+                          "border",
+
+                          "text-left",
+
+                          "transition",
 
                           selected
-                            ? "border-[var(--company-primary)] ring-2 ring-[var(--company-primary-soft)]"
-                            : "border-[var(--admin-border)] hover:border-[var(--admin-muted-light)]",
+                            ? "border-[var(--company-primary)] bg-[var(--company-primary-soft)] ring-2 ring-[var(--company-primary-soft)]"
+                            : "border-[var(--admin-border)] bg-[var(--admin-surface)] hover:border-[var(--company-primary-border)]",
                         )}
                       >
-                        <div className="relative aspect-square overflow-hidden bg-[var(--admin-background)]">
+                        {/* IMAGE */}
+
+                        <div
+                          className="
+                                relative
+
+                                aspect-[4/3]
+
+                                overflow-hidden
+
+                                bg-[var(--admin-background)]
+                              "
+                        >
                           <MediaThumbnail companyId={companyId} media={media} />
+
+                          {/* CHECK */}
 
                           <span
                             className={cn(
                               "absolute right-2 top-2",
 
-                              "flex h-6 w-6 items-center justify-center",
+                              "flex h-6 w-6",
 
-                              "rounded-full border",
+                              "items-center justify-center",
+
+                              "rounded-full",
+
+                              "border",
+
+                              "transition",
 
                               selected
                                 ? "border-[var(--company-primary)] bg-[var(--company-primary)] text-[var(--company-primary-foreground)]"
-                                : "border-white/80 bg-black/30 text-transparent backdrop-blur",
+                                : "border-white/70 bg-white/85 text-transparent shadow-sm group-hover:text-black/30",
                             )}
                           >
-                            <Check size={13} strokeWidth={3} />
+                            <Check size={13} strokeWidth={2.4} />
                           </span>
                         </div>
 
-                        <div className="p-3">
-                          <div className="truncate text-xs font-medium text-[var(--admin-foreground)]">
-                            {getMediaName(media)}
+                        {/* META */}
+
+                        <div
+                          className="
+                                p-3
+                              "
+                        >
+                          <div
+                            className="
+                                  truncate
+
+                                  admin-text-11
+                                  font-medium
+
+                                  text-[var(--admin-foreground)]
+                                "
+                          >
+                            {getMediaName(
+                              media,
+
+                              t("media.picker.untitled"),
+                            )}
                           </div>
 
-                          <div className="mt-1 text-[10px] text-[var(--admin-muted)]">
-                            {media.width && media.height
-                              ? `${media.width} × ${media.height}`
-                              : "Image"}
+                          <div
+                            className="
+                                  mt-1
 
-                            {formatBytes(media.size)
-                              ? ` • ${formatBytes(media.size)}`
-                              : ""}
+                                  flex
+                                  items-center
+                                  gap-1.5
+
+                                  admin-text-9
+
+                                  text-[var(--admin-muted)]
+                                "
+                          >
+                            {media.format && (
+                              <span
+                                className="
+                                      uppercase
+                                    "
+                              >
+                                {media.format}
+                              </span>
+                            )}
+
+                            {media.format && fileSize && <span>•</span>}
+
+                            {fileSize && <span>{fileSize}</span>}
                           </div>
                         </div>
                       </button>
@@ -741,14 +1433,20 @@ export default function MediaPicker({
             </>
           )}
 
+          {/* ===============================
+              UPLOAD
+          =============================== */}
+
           {activeTab === "upload" && (
-            <div className="mx-auto max-w-3xl">
-              <MediaUploadDropzone
-                companyId={companyId}
-                onUploaded={handleMediaCreated}
-              />
-            </div>
+            <MediaUploadDropzone
+              companyId={companyId}
+              onUploaded={handleMediaCreated}
+            />
           )}
+
+          {/* ===============================
+              URL
+          =============================== */}
 
           {activeTab === "url" && (
             <ImportUrlPanel
@@ -758,45 +1456,119 @@ export default function MediaPicker({
           )}
         </div>
 
-        {/* Footer */}
+        {/* =================================
+            FOOTER
+        ================================= */}
 
-        <div className="flex shrink-0 items-center justify-between gap-4 border-t border-[var(--admin-border)] px-5 py-4 sm:px-6">
-          <div className="text-xs text-[var(--admin-muted)]">
-            {selection.length} selected
+        <div
+          className="
+            flex
+            shrink-0
+
+            flex-col
+            gap-3
+
+            border-t
+            border-[var(--admin-border)]
+
+            bg-[var(--admin-surface)]
+
+            px-5
+            py-4
+
+            sm:flex-row
+            sm:items-center
+            sm:justify-between
+
+            sm:px-6
+          "
+        >
+          <div
+            className="
+              admin-text-11
+
+              text-[var(--admin-muted)]
+            "
+          >
+            {selection.length > 0
+              ? t("media.picker.selectedCount", {
+                  count: selection.length,
+                })
+              : t("media.picker.noneSelected")}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div
+            className="
+              flex
+              items-center
+              justify-end
+              gap-2
+            "
+          >
             <button
               type="button"
               onClick={onClose}
-              className="h-10 rounded-xl px-4 text-sm font-medium text-[var(--admin-muted)] transition hover:bg-[var(--admin-hover)] hover:text-[var(--admin-foreground)]"
+              className="
+                h-10
+
+                rounded-xl
+
+                border
+                border-[var(--admin-border)]
+
+                px-4
+
+                admin-text-12
+                font-medium
+
+                text-[var(--admin-muted)]
+
+                transition
+
+                hover:bg-[var(--admin-hover)]
+
+                hover:text-[var(--admin-foreground)]
+              "
             >
-              Cancel
+              {t("common.cancel")}
             </button>
 
             <button
               type="button"
               onClick={handleConfirm}
               disabled={selection.length === 0}
-              className={cn(
-                "h-10 rounded-xl px-5",
+              className="
+                inline-flex
+                h-10
 
-                "bg-[var(--company-primary)]",
+                items-center
+                justify-center
+                gap-2
 
-                "text-sm font-medium",
+                rounded-xl
 
-                "text-[var(--company-primary-foreground)]",
+                bg-[var(--company-primary)]
 
-                "transition",
+                px-4
 
-                "disabled:cursor-not-allowed disabled:opacity-40",
-              )}
+                admin-text-12
+                font-medium
+
+                text-[var(--company-primary-foreground)]
+
+                transition
+
+                hover:bg-[var(--company-primary-hover)]
+
+                disabled:cursor-not-allowed
+                disabled:opacity-40
+              "
             >
+              <Check size={15} />
+
               {multiple
-                ? `Add ${selection.length} ${
-                    selection.length === 1 ? "image" : "images"
-                  }`
-                : "Select image"}
+                ? t("media.picker.confirmMultiple")
+                : t("media.picker.confirmSingle")}
             </button>
           </div>
         </div>

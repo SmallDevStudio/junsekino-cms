@@ -1,13 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-
 import {
   CalendarClock,
   FileText,
-  LoaderCircle,
   Pencil,
-  PlaySquare,
   Plus,
   RefreshCw,
   RotateCcw,
@@ -16,18 +12,22 @@ import {
   Trash2,
 } from "lucide-react";
 
+import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { toast } from "sonner";
 
 import { useCompanyWorkspace } from "@/components/admin/company/CompanyWorkspaceProvider";
 
+import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
+
 import ActionButton from "@/components/admin/ui/ActionButton";
 import ActionButtonGroup from "@/components/admin/ui/ActionButtonGroup";
 import StatusBadge from "@/components/admin/ui/StatusBadge";
+
 import { useAdminUiPreferences } from "@/components/admin/ui/AdminUiPreferencesProvider";
 
 import {
   PUBLIC_CONTENT_STATUS,
-  PUBLIC_CONTENT_TYPE,
   PUBLIC_CONTENT_TYPES,
   PUBLIC_PROVIDERS,
 } from "@/constants/public-content";
@@ -37,48 +37,13 @@ import { cn } from "@/utils/cn";
 import PublicContentConfirmDialog from "./PublicContentConfirmDialog";
 import PublicContentEditor from "./PublicContentEditor";
 import PublicContentPublishDialog from "./PublicContentPublishDialog";
+import PublicContentThumbnail from "./PublicContentThumbnail";
 
-const STATUS_OPTIONS = [
-  {
-    value: "",
-    label: "All statuses",
-  },
-  {
-    value: "draft",
-    label: "Draft",
-  },
-  {
-    value: "review",
-    label: "Review",
-  },
-  {
-    value: "scheduled",
-    label: "Scheduled",
-  },
-  {
-    value: "published",
-    label: "Published",
-  },
-  {
-    value: "archived",
-    label: "Archived",
-  },
-];
-
-const TYPE_LABELS = {
-  article: "Article",
-  video: "Video",
-  embed: "Embed",
-};
-
-const PROVIDER_LABELS = {
-  youtube: "YouTube",
-  facebook: "Facebook",
-  vimeo: "Vimeo",
-  instagram: "Instagram",
-  tiktok: "TikTok",
-  other: "Other",
-};
+/*
+ * =========================================================
+ * HELPERS
+ * =========================================================
+ */
 
 function normalizeArray(payload) {
   if (Array.isArray(payload?.data)) {
@@ -96,11 +61,11 @@ function getLocalized(value) {
   return value?.en?.trim() || value?.th?.trim() || "";
 }
 
-function getTitle(item) {
-  return getLocalized(item?.title) || item?.slug || "Untitled content";
+function getTitle(item, fallback) {
+  return getLocalized(item?.title) || item?.slug || fallback;
 }
 
-function formatDate(value) {
+function formatDate(value, locale) {
   if (!value) {
     return null;
   }
@@ -111,12 +76,12 @@ function formatDate(value) {
     return null;
   }
 
-  return new Intl.DateTimeFormat("en", {
+  return new Intl.DateTimeFormat(locale === "th" ? "th-TH" : "en-US", {
     dateStyle: "medium",
   }).format(date);
 }
 
-function formatDateTime(value) {
+function formatDateTime(value, locale) {
   if (!value) {
     return null;
   }
@@ -127,18 +92,11 @@ function formatDateTime(value) {
     return null;
   }
 
-  return new Intl.DateTimeFormat("en", {
+  return new Intl.DateTimeFormat(locale === "th" ? "th-TH" : "en-US", {
     dateStyle: "medium",
+
     timeStyle: "short",
   }).format(date);
-}
-
-function getTypeIcon(type) {
-  if (type === PUBLIC_CONTENT_TYPE.ARTICLE) {
-    return FileText;
-  }
-
-  return PlaySquare;
 }
 
 async function readResponse(response) {
@@ -149,6 +107,260 @@ async function readResponse(response) {
   }
 }
 
+/*
+ * =========================================================
+ * SKELETON
+ * =========================================================
+ */
+
+function PublicContentListSkeleton({ density }) {
+  const rowPadding =
+    density === "compact" ? "p-4" : density === "spacious" ? "p-6" : "p-5";
+
+  return (
+    <div
+      className="
+        mt-6
+
+        overflow-hidden
+
+        rounded-2xl
+
+        border
+        border-[var(--admin-border)]
+
+        bg-[var(--admin-surface)]
+      "
+    >
+      {Array.from({
+        length: 6,
+      }).map((_, index) => (
+        <div
+          key={index}
+          className={cn(
+            "flex gap-4",
+
+            rowPadding,
+
+            index !== 5 && "border-b border-[var(--admin-border)]",
+          )}
+        >
+          <div
+            className="
+                h-[86px]
+                w-[116px]
+
+                shrink-0
+
+                animate-pulse
+
+                rounded-xl
+
+                bg-[var(--admin-hover)]
+              "
+          />
+
+          <div
+            className="
+                min-w-0
+                flex-1
+              "
+          >
+            <div
+              className="
+                  flex
+                  items-center
+                  gap-2
+                "
+            >
+              <div
+                className="
+                    h-4
+                    w-[38%]
+
+                    animate-pulse
+
+                    rounded
+
+                    bg-[var(--admin-hover)]
+                  "
+              />
+
+              <div
+                className="
+                    h-5
+                    w-16
+
+                    animate-pulse
+
+                    rounded-full
+
+                    bg-[var(--admin-hover)]
+                  "
+              />
+            </div>
+
+            <div
+              className="
+                  mt-2
+
+                  h-3
+                  w-[24%]
+
+                  animate-pulse
+
+                  rounded
+
+                  bg-[var(--admin-hover)]
+                "
+            />
+
+            <div
+              className="
+                  mt-5
+
+                  flex
+                  gap-3
+                "
+            >
+              <div
+                className="
+                    h-3
+                    w-20
+
+                    animate-pulse
+
+                    rounded
+
+                    bg-[var(--admin-hover)]
+                  "
+              />
+
+              <div
+                className="
+                    h-3
+                    w-24
+
+                    animate-pulse
+
+                    rounded
+
+                    bg-[var(--admin-hover)]
+                  "
+              />
+            </div>
+          </div>
+
+          <div
+            className="
+                hidden
+
+                shrink-0
+
+                gap-2
+
+                lg:flex
+              "
+          >
+            <div
+              className="
+                  h-9
+                  w-20
+
+                  animate-pulse
+
+                  rounded-xl
+
+                  bg-[var(--admin-hover)]
+                "
+            />
+
+            <div
+              className="
+                  h-9
+                  w-20
+
+                  animate-pulse
+
+                  rounded-xl
+
+                  bg-[var(--admin-hover)]
+                "
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/*
+ * =========================================================
+ * STAT CARD
+ * =========================================================
+ */
+
+function PublicContentStatCard({ icon: Icon, value, label, tone = "neutral" }) {
+  const iconClass = {
+    neutral: "text-[var(--admin-muted)]",
+
+    company: "text-[var(--company-primary)]",
+
+    success: "text-emerald-600",
+
+    warning: "text-amber-600",
+  }[tone];
+
+  return (
+    <div
+      className="
+        rounded-2xl
+
+        border
+        border-[var(--admin-border)]
+
+        bg-[var(--admin-surface)]
+
+        p-4
+      "
+    >
+      <Icon size={17} className={iconClass} />
+
+      <div
+        className="
+          mt-4
+
+          admin-text-24
+          font-semibold
+          tracking-[-0.04em]
+
+          text-[var(--admin-foreground)]
+        "
+      >
+        {value}
+      </div>
+
+      <div
+        className="
+          mt-1
+
+          admin-text-12
+
+          text-[var(--admin-muted)]
+        "
+      >
+        {label}
+      </div>
+    </div>
+  );
+}
+
+/*
+ * =========================================================
+ * PUBLIC CONTENT MANAGER
+ * =========================================================
+ */
+
 export default function PublicContentManager() {
   const {
     activeCompany,
@@ -156,20 +368,29 @@ export default function PublicContentManager() {
     loading: companyLoading,
   } = useCompanyWorkspace();
 
+  const { t, locale } = useAdminTranslation();
+
   const { actionDisplay, tooltipEnabled, tooltipDelay, density } =
     useAdminUiPreferences();
 
   const [items, setItems] = useState([]);
+
   const [loading, setLoading] = useState(false);
+
   const [refreshing, setRefreshing] = useState(false);
+
   const [error, setError] = useState(null);
 
   const [search, setSearch] = useState("");
+
   const [statusFilter, setStatusFilter] = useState("");
+
   const [typeFilter, setTypeFilter] = useState("");
+
   const [providerFilter, setProviderFilter] = useState("");
 
   const [editorOpen, setEditorOpen] = useState(false);
+
   const [editingItem, setEditingItem] = useState(null);
 
   const [publishItem, setPublishItem] = useState(null);
@@ -187,10 +408,37 @@ export default function PublicContentManager() {
   const rowPadding =
     density === "compact" ? "p-4" : density === "spacious" ? "p-6" : "p-5";
 
+  /*
+   * =======================================================
+   * LABELS
+   * =======================================================
+   */
+
+  function typeLabel(type) {
+    const key = `publicContent.types.${type}`;
+
+    return t(key);
+  }
+
+  function providerLabel(provider) {
+    if (!provider) {
+      return "";
+    }
+
+    return t(`publicContent.providers.${provider}`);
+  }
+
+  /*
+   * =======================================================
+   * LOAD
+   * =======================================================
+   */
+
   const loadData = useCallback(
     async ({ silent = false } = {}) => {
       if (!activeCompanyId) {
         setItems([]);
+
         return;
       }
 
@@ -207,7 +455,9 @@ export default function PublicContentManager() {
           `/api/v1/companies/${activeCompanyId}/public-contents`,
           {
             method: "GET",
+
             cache: "no-store",
+
             credentials: "include",
           },
         );
@@ -216,7 +466,7 @@ export default function PublicContentManager() {
 
         if (!response.ok || payload?.success === false) {
           throw new Error(
-            payload?.message || "Unable to retrieve public content.",
+            payload?.message || t("publicContent.manager.errors.loadFailed"),
           );
         }
 
@@ -224,13 +474,15 @@ export default function PublicContentManager() {
       } catch (loadError) {
         console.error("Load public content error:", loadError);
 
-        setError(loadError?.message || "Unable to retrieve public content.");
+        setError(
+          loadError?.message || t("publicContent.manager.errors.loadFailed"),
+        );
       } finally {
         setLoading(false);
         setRefreshing(false);
       }
     },
-    [activeCompanyId],
+    [activeCompanyId, t],
   );
 
   useEffect(() => {
@@ -246,6 +498,12 @@ export default function PublicContentManager() {
       window.clearTimeout(timeoutId);
     };
   }, [activeCompanyId, loadData]);
+
+  /*
+   * =======================================================
+   * FILTER
+   * =======================================================
+   */
 
   const filteredItems = useMemo(() => {
     const keyword = search.trim().toLowerCase();
@@ -283,6 +541,12 @@ export default function PublicContentManager() {
     });
   }, [items, providerFilter, search, statusFilter, typeFilter]);
 
+  /*
+   * =======================================================
+   * COUNTS
+   * =======================================================
+   */
+
   const counts = useMemo(() => {
     return items.reduce(
       (result, item) => {
@@ -311,6 +575,12 @@ export default function PublicContentManager() {
     );
   }, [items]);
 
+  /*
+   * =======================================================
+   * EDITOR
+   * =======================================================
+   */
+
   function handleCreate() {
     setEditingItem(null);
     setEditorOpen(true);
@@ -334,6 +604,12 @@ export default function PublicContentManager() {
       silent: true,
     });
   }
+
+  /*
+   * =======================================================
+   * DIALOGS
+   * =======================================================
+   */
 
   function openPublishDialog(item) {
     setPublishItem(item);
@@ -367,6 +643,12 @@ export default function PublicContentManager() {
     });
   }
 
+  /*
+   * =======================================================
+   * PUBLISH
+   * =======================================================
+   */
+
   async function publishContent(item, scheduledAt = null) {
     if (!activeCompanyId || !item?.id || processingId) {
       return;
@@ -374,12 +656,14 @@ export default function PublicContentManager() {
 
     try {
       setProcessingId(item.id);
+
       setError(null);
 
       const response = await fetch(
         `/api/v1/companies/${activeCompanyId}/public-contents/${item.id}/publish`,
         {
           method: "POST",
+
           credentials: "include",
 
           headers: {
@@ -396,7 +680,7 @@ export default function PublicContentManager() {
 
       if (!response.ok || payload?.success === false) {
         throw new Error(
-          payload?.message || "Unable to publish public content.",
+          payload?.message || t("publicContent.manager.errors.publishFailed"),
         );
       }
 
@@ -404,8 +688,8 @@ export default function PublicContentManager() {
 
       toast.success(
         scheduledAt
-          ? "Public content scheduled successfully."
-          : "Public content published successfully.",
+          ? t("publicContent.manager.messages.scheduled")
+          : t("publicContent.manager.messages.published"),
       );
 
       await loadData({
@@ -414,11 +698,20 @@ export default function PublicContentManager() {
     } catch (publishError) {
       console.error("Publish public content error:", publishError);
 
-      toast.error(publishError?.message || "Unable to publish public content.");
+      toast.error(
+        publishError?.message ||
+          t("publicContent.manager.errors.publishFailed"),
+      );
     } finally {
       setProcessingId(null);
     }
   }
+
+  /*
+   * =======================================================
+   * UNPUBLISH
+   * =======================================================
+   */
 
   async function unpublishContent(item) {
     if (!activeCompanyId || !item?.id || processingId) {
@@ -427,12 +720,14 @@ export default function PublicContentManager() {
 
     try {
       setProcessingId(item.id);
+
       setError(null);
 
       const response = await fetch(
         `/api/v1/companies/${activeCompanyId}/public-contents/${item.id}/unpublish`,
         {
           method: "POST",
+
           credentials: "include",
 
           headers: {
@@ -447,7 +742,7 @@ export default function PublicContentManager() {
 
       if (!response.ok || payload?.success === false) {
         throw new Error(
-          payload?.message || "Unable to unpublish public content.",
+          payload?.message || t("publicContent.manager.errors.unpublishFailed"),
         );
       }
 
@@ -459,8 +754,8 @@ export default function PublicContentManager() {
 
       toast.success(
         item.status === PUBLIC_CONTENT_STATUS.SCHEDULED
-          ? "Scheduled publish cancelled."
-          : "Public content unpublished.",
+          ? t("publicContent.manager.messages.scheduleCancelled")
+          : t("publicContent.manager.messages.unpublished"),
       );
 
       await loadData({
@@ -470,12 +765,19 @@ export default function PublicContentManager() {
       console.error("Unpublish public content error:", unpublishError);
 
       toast.error(
-        unpublishError?.message || "Unable to unpublish public content.",
+        unpublishError?.message ||
+          t("publicContent.manager.errors.unpublishFailed"),
       );
     } finally {
       setProcessingId(null);
     }
   }
+
+  /*
+   * =======================================================
+   * DELETE
+   * =======================================================
+   */
 
   async function deleteContent(item) {
     if (!activeCompanyId || !item?.id || processingId) {
@@ -484,12 +786,14 @@ export default function PublicContentManager() {
 
     try {
       setProcessingId(item.id);
+
       setError(null);
 
       const response = await fetch(
         `/api/v1/companies/${activeCompanyId}/public-contents/${item.id}`,
         {
           method: "DELETE",
+
           credentials: "include",
         },
       );
@@ -497,7 +801,9 @@ export default function PublicContentManager() {
       const payload = await readResponse(response);
 
       if (!response.ok || payload?.success === false) {
-        throw new Error(payload?.message || "Unable to delete public content.");
+        throw new Error(
+          payload?.message || t("publicContent.manager.errors.deleteFailed"),
+        );
       }
 
       setConfirmState({
@@ -506,7 +812,7 @@ export default function PublicContentManager() {
         item: null,
       });
 
-      toast.success("Public content deleted.");
+      toast.success(t("publicContent.manager.messages.deleted"));
 
       await loadData({
         silent: true,
@@ -514,65 +820,194 @@ export default function PublicContentManager() {
     } catch (deleteError) {
       console.error("Delete public content error:", deleteError);
 
-      toast.error(deleteError?.message || "Unable to delete public content.");
+      toast.error(
+        deleteError?.message || t("publicContent.manager.errors.deleteFailed"),
+      );
     } finally {
       setProcessingId(null);
     }
   }
 
+  /*
+   * =======================================================
+   * WORKSPACE
+   * =======================================================
+   */
+
   if (companyLoading) {
     return (
-      <div className="flex min-h-[420px] items-center justify-center">
-        <div className="flex items-center gap-2 text-sm text-[var(--admin-muted)]">
-          <LoaderCircle size={16} className="animate-spin" />
-          Loading workspace...
-        </div>
+      <div>
+        <div
+          className="
+            h-8
+            w-48
+
+            animate-pulse
+
+            rounded
+
+            bg-[var(--admin-hover)]
+          "
+        />
+
+        <div
+          className="
+            mt-3
+
+            h-4
+            w-[380px]
+            max-w-full
+
+            animate-pulse
+
+            rounded
+
+            bg-[var(--admin-hover)]
+          "
+        />
+
+        <PublicContentListSkeleton density={density} />
       </div>
     );
   }
 
   if (!activeCompany) {
     return (
-      <div className="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-8">
-        <div className="text-sm font-medium text-[var(--admin-foreground)]">
-          No company selected
+      <div
+        className="
+          rounded-2xl
+
+          border
+          border-[var(--admin-border)]
+
+          bg-[var(--admin-surface)]
+
+          p-8
+        "
+      >
+        <div
+          className="
+            admin-text-14
+            font-medium
+
+            text-[var(--admin-foreground)]
+          "
+        >
+          {t("publicContent.manager.noCompany.title")}
         </div>
 
-        <p className="mt-1 text-sm text-[var(--admin-muted)]">
-          Select a workspace before managing public content.
+        <p
+          className="
+            mt-1
+
+            admin-text-14
+
+            text-[var(--admin-muted)]
+          "
+        >
+          {t("publicContent.manager.noCompany.description")}
         </p>
       </div>
     );
   }
 
+  const companyName =
+    activeCompany.name ||
+    activeCompany.displayName ||
+    activeCompany.slug ||
+    t("publicContent.manager.thisCompany");
+
+  const statusOptions = [
+    {
+      value: "",
+      label: t("publicContent.manager.filters.allStatuses"),
+    },
+    {
+      value: "draft",
+      label: t("status.draft"),
+    },
+    {
+      value: "review",
+      label: t("status.review"),
+    },
+    {
+      value: "scheduled",
+      label: t("status.scheduled"),
+    },
+    {
+      value: "published",
+      label: t("status.published"),
+    },
+    {
+      value: "archived",
+      label: t("status.archived"),
+    },
+  ];
+
   return (
     <div>
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      {/* HEADER */}
+
+      <div
+        className="
+          flex
+          flex-col
+          gap-5
+
+          lg:flex-row
+          lg:items-end
+          lg:justify-between
+        "
+      >
         <div>
-          <div className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--admin-muted)]">
-            Content Management
+          <div
+            className="
+              admin-text-12
+              font-medium
+              uppercase
+              tracking-[0.14em]
+
+              text-[var(--company-primary)]
+            "
+          >
+            {t("publicContent.manager.sectionLabel")}
           </div>
 
-          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.035em] text-[var(--admin-foreground)] sm:text-4xl">
-            Public Content
+          <h1
+            className="
+              mt-2
+
+              admin-text-32
+              font-semibold
+              tracking-[-0.035em]
+
+              text-[var(--admin-foreground)]
+            "
+          >
+            {t("publicContent.title")}
           </h1>
 
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--admin-muted)]">
-            Manage articles, videos and external media for{" "}
-            <span className="font-medium text-[var(--admin-foreground)]">
-              {activeCompany.name ||
-                activeCompany.displayName ||
-                activeCompany.slug ||
-                "this company"}
-            </span>
-            .
+          <p
+            className="
+              mt-2
+              max-w-2xl
+
+              admin-text-14
+              leading-[1.7]
+
+              text-[var(--admin-muted)]
+            "
+          >
+            {t("publicContent.manager.description", {
+              company: companyName,
+            })}
           </p>
         </div>
 
         <ActionButtonGroup>
           <ActionButton
             icon={RefreshCw}
-            label="Refresh"
+            label={t("common.refresh")}
             tone="neutral"
             display={actionDisplay}
             tooltip={tooltipEnabled}
@@ -588,7 +1023,7 @@ export default function PublicContentManager() {
 
           <ActionButton
             icon={Plus}
-            label="New Content"
+            label={t("publicContent.newContent")}
             tone="primary"
             display={actionDisplay}
             tooltip={tooltipEnabled}
@@ -599,61 +1034,149 @@ export default function PublicContentManager() {
         </ActionButtonGroup>
       </div>
 
-      <div className="mt-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {[
-          ["All content", counts.total, FileText],
-          ["Published", counts.published, Send],
-          ["Draft", counts.draft, FileText],
-          ["Scheduled", counts.scheduled, CalendarClock],
-        ].map(([label, value, Icon]) => (
-          <div
-            key={label}
-            className="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4"
-          >
-            <Icon size={17} className="text-[var(--admin-muted)]" />
+      {/* STATS */}
 
-            <div className="mt-4 text-2xl font-semibold tracking-[-0.04em] text-[var(--admin-foreground)]">
-              {value}
-            </div>
+      <div
+        className="
+          mt-8
 
-            <div className="mt-1 text-xs text-[var(--admin-muted)]">
-              {label}
-            </div>
-          </div>
-        ))}
+          grid
+          grid-cols-2
+          gap-3
+
+          lg:grid-cols-4
+        "
+      >
+        <PublicContentStatCard
+          icon={FileText}
+          value={counts.total}
+          label={t("publicContent.manager.stats.all")}
+          tone="company"
+        />
+
+        <PublicContentStatCard
+          icon={Send}
+          value={counts.published}
+          label={t("status.published")}
+          tone="success"
+        />
+
+        <PublicContentStatCard
+          icon={FileText}
+          value={counts.draft}
+          label={t("status.draft")}
+        />
+
+        <PublicContentStatCard
+          icon={CalendarClock}
+          value={counts.scheduled}
+          label={t("status.scheduled")}
+          tone="warning"
+        />
       </div>
 
-      <div className="mt-6 flex flex-col gap-3 xl:flex-row xl:items-center">
-        <div className="relative flex-1 xl:max-w-sm">
+      {/* FILTERS */}
+
+      <div
+        className="
+          mt-6
+
+          flex
+          flex-col
+          gap-3
+
+          xl:flex-row
+          xl:items-center
+        "
+      >
+        <div
+          className="
+            relative
+            flex-1
+
+            xl:max-w-sm
+          "
+        >
           <Search
             size={16}
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-muted)]"
+            className="
+              pointer-events-none
+
+              absolute
+              left-3
+              top-1/2
+
+              -translate-y-1/2
+
+              text-[var(--admin-muted)]
+            "
           />
 
           <input
             type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search public content..."
-            className={cn(
-              "h-11 w-full rounded-xl",
-              "border border-[var(--admin-border)]",
-              "bg-[var(--admin-surface)] pl-10 pr-4",
-              "text-sm text-[var(--admin-foreground)]",
-              "outline-none transition",
-              "placeholder:text-[var(--admin-muted-light)]",
-              "focus:border-[var(--company-primary)]",
-              "focus:ring-2 focus:ring-[var(--company-primary-soft)]",
-            )}
+            placeholder={t("publicContent.manager.searchPlaceholder")}
+            className="
+              h-11
+              w-full
+
+              rounded-xl
+
+              border
+              border-[var(--admin-border)]
+
+              bg-[var(--admin-surface)]
+
+              pl-10
+              pr-4
+
+              admin-text-14
+
+              text-[var(--admin-foreground)]
+
+              outline-none
+
+              transition
+
+              placeholder:text-[var(--admin-muted-light)]
+
+              focus:border-[var(--company-primary)]
+
+              focus:ring-2
+              focus:ring-[var(--company-primary-soft)]
+            "
           />
         </div>
 
         <select
           value={statusFilter}
           onChange={(event) => setStatusFilter(event.target.value)}
-          className="h-11 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm text-[var(--admin-foreground)] outline-none focus:border-[var(--company-primary)]"
+          className="
+            h-11
+
+            rounded-xl
+
+            border
+            border-[var(--admin-border)]
+
+            bg-[var(--admin-surface)]
+
+            px-3
+
+            admin-text-14
+
+            text-[var(--admin-foreground)]
+
+            outline-none
+
+            focus:border-[var(--company-primary)]
+
+            focus:ring-2
+            focus:ring-[var(--company-primary-soft)]
+          "
         >
-          {STATUS_OPTIONS.map((option) => (
+          {statusOptions.map((option) => (
             <option key={option.value || "all"} value={option.value}>
               {option.label}
             </option>
@@ -663,13 +1186,37 @@ export default function PublicContentManager() {
         <select
           value={typeFilter}
           onChange={(event) => setTypeFilter(event.target.value)}
-          className="h-11 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm text-[var(--admin-foreground)] outline-none focus:border-[var(--company-primary)]"
+          className="
+            h-11
+
+            rounded-xl
+
+            border
+            border-[var(--admin-border)]
+
+            bg-[var(--admin-surface)]
+
+            px-3
+
+            admin-text-14
+
+            text-[var(--admin-foreground)]
+
+            outline-none
+
+            focus:border-[var(--company-primary)]
+
+            focus:ring-2
+            focus:ring-[var(--company-primary-soft)]
+          "
         >
-          <option value="">All types</option>
+          <option value="">
+            {t("publicContent.manager.filters.allTypes")}
+          </option>
 
           {PUBLIC_CONTENT_TYPES.map((type) => (
             <option key={type} value={type}>
-              {TYPE_LABELS[type] || type}
+              {typeLabel(type)}
             </option>
           ))}
         </select>
@@ -677,65 +1224,172 @@ export default function PublicContentManager() {
         <select
           value={providerFilter}
           onChange={(event) => setProviderFilter(event.target.value)}
-          className="h-11 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-sm text-[var(--admin-foreground)] outline-none focus:border-[var(--company-primary)]"
+          className="
+            h-11
+
+            rounded-xl
+
+            border
+            border-[var(--admin-border)]
+
+            bg-[var(--admin-surface)]
+
+            px-3
+
+            admin-text-14
+
+            text-[var(--admin-foreground)]
+
+            outline-none
+
+            focus:border-[var(--company-primary)]
+
+            focus:ring-2
+            focus:ring-[var(--company-primary-soft)]
+          "
         >
-          <option value="">All providers</option>
+          <option value="">
+            {t("publicContent.manager.filters.allProviders")}
+          </option>
 
           {PUBLIC_PROVIDERS.map((provider) => (
             <option key={provider} value={provider}>
-              {PROVIDER_LABELS[provider] || provider}
+              {providerLabel(provider)}
             </option>
           ))}
         </select>
 
         <div className="xl:ml-auto">
-          <span className="text-xs text-[var(--admin-muted)]">
-            {filteredItems.length}{" "}
-            {filteredItems.length === 1 ? "item" : "items"}
+          <span
+            className="
+              admin-text-12
+
+              text-[var(--admin-muted)]
+            "
+          >
+            {t("publicContent.manager.itemCount", {
+              count: filteredItems.length,
+            })}
           </span>
         </div>
       </div>
 
       {error && (
-        <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div
+          className="
+            mt-6
+
+            rounded-2xl
+
+            border
+            border-red-200
+
+            bg-red-50
+
+            p-4
+
+            admin-text-14
+
+            text-red-700
+          "
+        >
           {error}
         </div>
       )}
 
       {loading ? (
-        <div className="mt-6 space-y-3">
-          {Array.from({
-            length: 6,
-          }).map((_, index) => (
-            <div
-              key={index}
-              className="h-24 animate-pulse rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"
-            />
-          ))}
-        </div>
+        <PublicContentListSkeleton density={density} />
       ) : filteredItems.length === 0 ? (
-        <div className="mt-6 flex min-h-[340px] flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface)] p-8 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--company-primary-soft)] text-[var(--company-primary)]">
+        <div
+          className="
+            mt-6
+
+            flex
+            min-h-[340px]
+
+            flex-col
+            items-center
+            justify-center
+
+            rounded-2xl
+
+            border
+            border-dashed
+            border-[var(--admin-border)]
+
+            bg-[var(--admin-surface)]
+
+            p-8
+
+            text-center
+          "
+        >
+          <div
+            className="
+              flex
+              h-12
+              w-12
+
+              items-center
+              justify-center
+
+              rounded-2xl
+
+              bg-[var(--company-primary-soft)]
+
+              text-[var(--company-primary)]
+            "
+          >
             <FileText size={21} strokeWidth={1.7} />
           </div>
 
-          <div className="mt-4 text-sm font-medium text-[var(--admin-foreground)]">
+          <div
+            className="
+              mt-4
+
+              admin-text-14
+              font-medium
+
+              text-[var(--admin-foreground)]
+            "
+          >
             {items.length === 0
-              ? "No public content yet"
-              : "No matching content"}
+              ? t("publicContent.manager.empty.title")
+              : t("publicContent.manager.empty.searchTitle")}
           </div>
 
-          <p className="mt-1 max-w-sm text-xs leading-5 text-[var(--admin-muted)]">
+          <p
+            className="
+              mt-1
+              max-w-sm
+
+              admin-text-12
+              leading-[1.6]
+
+              text-[var(--admin-muted)]
+            "
+          >
             {items.length === 0
-              ? "Create the first public content item for this company."
-              : "Try changing the search term or filters."}
+              ? t("publicContent.manager.empty.description")
+              : t("publicContent.manager.empty.searchDescription")}
           </p>
         </div>
       ) : (
-        <div className="mt-6 overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
-          {filteredItems.map((item, index) => {
-            const Icon = getTypeIcon(item.contentType);
+        <div
+          className="
+            mt-6
 
+            overflow-hidden
+
+            rounded-2xl
+
+            border
+            border-[var(--admin-border)]
+
+            bg-[var(--admin-surface)]
+          "
+        >
+          {filteredItems.map((item, index) => {
             const itemProcessing = processingId === item.id;
 
             const canDelete =
@@ -750,94 +1404,209 @@ export default function PublicContentManager() {
               item.status === PUBLIC_CONTENT_STATUS.PUBLISHED ||
               item.status === PUBLIC_CONTENT_STATUS.SCHEDULED;
 
+            const title = getTitle(item, t("publicContent.manager.untitled"));
+
             return (
               <article
                 key={item.id}
                 className={cn(
                   "flex flex-col gap-4",
+
                   rowPadding,
+
+                  "transition",
+
+                  "hover:bg-[var(--admin-background)]/60",
+
                   "lg:flex-row lg:items-center",
+
                   index !== filteredItems.length - 1 &&
                     "border-b border-[var(--admin-border)]",
                 )}
               >
-                <div className="flex min-w-0 flex-1 gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-background)] text-[var(--admin-muted)]">
-                    <Icon size={17} />
+                <PublicContentThumbnail
+                  companyId={activeCompanyId}
+                  item={item}
+                  alt={title}
+                />
+
+                <div
+                  className="
+                      min-w-0
+                      flex-1
+                    "
+                >
+                  <div
+                    className="
+                        flex
+                        flex-wrap
+                        items-center
+                        gap-2
+                      "
+                  >
+                    <h2
+                      className="
+                          truncate
+
+                          admin-text-14
+                          font-semibold
+
+                          text-[var(--admin-foreground)]
+                        "
+                    >
+                      {title}
+                    </h2>
+
+                    <StatusBadge
+                      status={item.status}
+                      size={density === "compact" ? "small" : "default"}
+                    />
+
+                    <span
+                      className="
+                          rounded-full
+
+                          border
+                          border-[var(--admin-border)]
+
+                          bg-[var(--admin-background)]
+
+                          px-2
+                          py-1
+
+                          admin-text-9
+                          font-semibold
+                          uppercase
+                          tracking-[0.08em]
+
+                          text-[var(--admin-muted)]
+                        "
+                    >
+                      {typeLabel(item.contentType)}
+                    </span>
+
+                    {item.source?.provider && (
+                      <span
+                        className="
+                            rounded-full
+
+                            border
+                            border-[var(--admin-border)]
+
+                            px-2
+                            py-1
+
+                            admin-text-9
+                            font-semibold
+                            uppercase
+                            tracking-[0.08em]
+
+                            text-[var(--admin-muted)]
+                          "
+                      >
+                        {providerLabel(item.source.provider)}
+                      </span>
+                    )}
+
+                    {item.featured && (
+                      <span
+                        className="
+                            rounded-full
+
+                            border
+                            border-[var(--company-primary-border)]
+
+                            bg-[var(--company-primary-soft)]
+
+                            px-2
+                            py-1
+
+                            admin-text-9
+                            font-semibold
+                            uppercase
+                            tracking-[0.08em]
+
+                            text-[var(--company-primary)]
+                          "
+                      >
+                        {t("publicContent.manager.featured")}
+                      </span>
+                    )}
                   </div>
 
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="truncate text-sm font-semibold text-[var(--admin-foreground)]">
-                        {getTitle(item)}
-                      </h2>
+                  <div
+                    className="
+                        mt-1
+                        truncate
 
-                      <StatusBadge
-                        status={item.status}
-                        size={density === "compact" ? "small" : "default"}
-                      />
+                        admin-text-12
 
-                      <span className="rounded-full border border-[var(--admin-border)] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.08em] text-[var(--admin-muted)]">
-                        {TYPE_LABELS[item.contentType] || item.contentType}
+                        text-[var(--admin-muted)]
+                      "
+                  >
+                    /{item.slug}
+                  </div>
+
+                  <div
+                    className="
+                        mt-3
+
+                        flex
+                        flex-wrap
+
+                        gap-x-4
+                        gap-y-1
+
+                        admin-text-11
+
+                        text-[var(--admin-muted)]
+                      "
+                  >
+                    {item.status === PUBLIC_CONTENT_STATUS.SCHEDULED &&
+                      item.scheduledAt && (
+                        <span className="text-amber-600">
+                          {t("publicContent.manager.dates.scheduled", {
+                            date: formatDateTime(item.scheduledAt, locale),
+                          })}
+                        </span>
+                      )}
+
+                    {item.status === PUBLIC_CONTENT_STATUS.PUBLISHED &&
+                      item.publishedAt && (
+                        <span className="text-emerald-600">
+                          {t("publicContent.manager.dates.published", {
+                            date: formatDate(item.publishedAt, locale),
+                          })}
+                        </span>
+                      )}
+
+                    {item.updatedAt && (
+                      <span>
+                        {t("publicContent.manager.dates.updated", {
+                          date: formatDate(item.updatedAt, locale),
+                        })}
                       </span>
-
-                      {item.featured && (
-                        <span className="rounded-full border border-[var(--company-primary-border)] bg-[var(--company-primary-soft)] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.08em] text-[var(--company-primary)]">
-                          Featured
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="mt-1 truncate text-xs text-[var(--admin-muted)]">
-                      /{item.slug}
-                    </div>
-
-                    <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[var(--admin-muted)]">
-                      {item.source?.provider && (
-                        <span>
-                          {PROVIDER_LABELS[item.source.provider] ||
-                            item.source.provider}
-                        </span>
-                      )}
-
-                      {item.status === PUBLIC_CONTENT_STATUS.SCHEDULED &&
-                        item.scheduledAt && (
-                          <span className="text-amber-600">
-                            Scheduled {formatDateTime(item.scheduledAt)}
-                          </span>
-                        )}
-
-                      {item.status === PUBLIC_CONTENT_STATUS.PUBLISHED &&
-                        item.publishedAt && (
-                          <span className="text-emerald-600">
-                            Published {formatDate(item.publishedAt)}
-                          </span>
-                        )}
-
-                      {item.updatedAt && (
-                        <span>Updated {formatDate(item.updatedAt)}</span>
-                      )}
-                    </div>
+                    )}
                   </div>
                 </div>
 
                 <ActionButtonGroup className="shrink-0" align="end">
                   <ActionButton
                     icon={Pencil}
-                    label="Edit"
+                    label={t("common.edit")}
                     tone="edit"
                     display={actionDisplay}
                     tooltip={tooltipEnabled}
                     tooltipDelay={tooltipDelay}
                     size={actionSize}
-                    disabled={Boolean(processingId) || itemProcessing}
+                    disabled={Boolean(processingId)}
                     onClick={() => handleEdit(item)}
                   />
 
                   {canPublish && (
                     <ActionButton
                       icon={Send}
-                      label="Publish"
+                      label={t("common.publish")}
                       tone="primary"
                       display={actionDisplay}
                       tooltip={tooltipEnabled}
@@ -854,8 +1623,8 @@ export default function PublicContentManager() {
                       icon={RotateCcw}
                       label={
                         item.status === PUBLIC_CONTENT_STATUS.SCHEDULED
-                          ? "Cancel Schedule"
-                          : "Unpublish"
+                          ? t("publicContent.manager.actions.cancelSchedule")
+                          : t("common.unpublish")
                       }
                       tone="warning"
                       display={actionDisplay}
@@ -871,7 +1640,7 @@ export default function PublicContentManager() {
                   {canDelete && (
                     <ActionButton
                       icon={Trash2}
-                      label="Delete"
+                      label={t("common.delete")}
                       tone="danger"
                       display={actionDisplay}
                       tooltip={tooltipEnabled}
