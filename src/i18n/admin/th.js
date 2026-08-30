@@ -2675,6 +2675,170 @@ export const adminTh = {
       testConnectionFailed: "ไม่สามารถเชื่อมต่อ SMTP Server ได้",
 
       testEmailPending: "ระบบส่งอีเมลทดสอบจะเปิดใช้งานในขั้นตอนถัดไป",
+
+      testEmailRecipientRequired:
+        "กรุณาเพิ่มผู้รับอย่างน้อย 1 อีเมลก่อนส่งอีเมลทดสอบ",
+
+      testEmailSent: "ส่งอีเมลทดสอบไปที่ {email} เรียบร้อยแล้ว",
+
+      testEmailFailed: "ไม่สามารถส่งอีเมลทดสอบได้",
+    },
+  },
+
+  notifications: {
+    title: "การแจ้งเตือน",
+
+    refresh: "รีเฟรชการแจ้งเตือน",
+
+    unreadCount: "ยังไม่ได้อ่าน {count} รายการ",
+
+    allCaughtUp: "ไม่มีการแจ้งเตือนใหม่",
+
+    fallbackTitle: "การแจ้งเตือน",
+
+    viewAllMessages: "ดูข้อความทั้งหมด",
+
+    empty: {
+      title: "ยังไม่มีการแจ้งเตือน",
+
+      description: "กิจกรรมใหม่จากเว็บไซต์จะแสดงที่นี่",
+    },
+
+    messages: {
+      loadFailed: "ไม่สามารถโหลดการแจ้งเตือนได้",
+    },
+  },
+
+  messages: {
+    sectionLabel: "การติดต่อ",
+
+    title: "ข้อความ",
+
+    description: "ดูและจัดการข้อความที่ส่งเข้ามาผ่านแบบฟอร์มบนเว็บไซต์",
+
+    mailbox: "กล่องข้อความ",
+
+    searchPlaceholder: "ค้นหาข้อความ...",
+
+    resultCount: "{count} ข้อความ",
+
+    fallbackMessage: "ข้อความ",
+
+    fallbackPreview: "ข้อมูลจากแบบฟอร์ม",
+
+    close: "ปิดข้อความ",
+
+    doubleClickHint:
+      "คลิกข้อความเพื่อดูรายละเอียด หรือดับเบิลคลิกเพื่อเปิดในหน้าต่างใหม่",
+
+    folders: {
+      inbox: "กล่องขาเข้า",
+
+      unread: "ยังไม่ได้อ่าน",
+
+      in_progress: "กำลังดำเนินการ",
+
+      resolved: "ดำเนินการแล้ว",
+
+      archived: "เก็บถาวร",
+
+      spam: "สแปม",
+
+      trash: "ถังขยะ",
+    },
+
+    actions: {
+      inProgress: "กำลังดำเนินการ",
+
+      resolved: "ดำเนินการแล้ว",
+
+      archive: "เก็บถาวร",
+
+      spam: "สแปม",
+
+      trash: "ย้ายไปถังขยะ",
+
+      restore: "กู้คืน",
+
+      deletePermanently: "ลบถาวร",
+
+      openWindow: "เปิดในหน้าต่างใหม่",
+    },
+
+    readers: {
+      none: "ยังไม่มีผู้เปิดอ่าน",
+
+      user: "ผู้ใช้งาน",
+
+      title: "อ่านแล้ว {count} คน",
+
+      readAt: "อ่านเมื่อ {date}",
+    },
+
+    drawer: {
+      sectionLabel: "ข้อมูลจากแบบฟอร์ม",
+
+      messageInformation: "รายละเอียดข้อความ",
+
+      submissionDetails: "ข้อมูลการส่ง",
+
+      form: "แบบฟอร์ม",
+
+      page: "หน้า",
+
+      referrer: "แหล่งที่มา",
+
+      received: "ได้รับเมื่อ",
+    },
+
+    deletePermanent: {
+      title: "ลบข้อความถาวร?",
+
+      description: "ข้อความนี้จะถูกลบออกจากระบบอย่างถาวรและไม่สามารถกู้คืนได้",
+
+      warning: "การลบถาวรสามารถทำได้เฉพาะข้อความที่อยู่ในถังขยะแล้วเท่านั้น",
+
+      action: "ลบถาวร",
+    },
+
+    messages: {
+      statusUpdated: "อัปเดตสถานะข้อความแล้ว",
+
+      movedToTrash: "ย้ายข้อความไปถังขยะแล้ว",
+
+      restored: "กู้คืนข้อความแล้ว",
+
+      deleted: "ลบข้อความถาวรแล้ว",
+    },
+
+    errors: {
+      loadFailed: "ไม่สามารถโหลดข้อความได้",
+
+      updateFailed: "ไม่สามารถอัปเดตข้อความได้",
+
+      trashFailed: "ไม่สามารถย้ายข้อความไปถังขยะได้",
+
+      restoreFailed: "ไม่สามารถกู้คืนข้อความได้",
+
+      deleteFailed: "ไม่สามารถลบข้อความถาวรได้",
+
+      notFound: "ไม่พบข้อความ",
+    },
+
+    empty: {
+      title: "ไม่มีข้อความ",
+
+      description: "ข้อความที่ตรงกับกล่องนี้จะแสดงที่นี่",
+    },
+
+    noCompany: {
+      title: "ยังไม่ได้เลือกบริษัท",
+
+      description: "กรุณาเลือก Workspace ก่อนดูข้อความ",
+    },
+
+    window: {
+      back: "ปิดหน้าต่าง",
     },
   },
 };

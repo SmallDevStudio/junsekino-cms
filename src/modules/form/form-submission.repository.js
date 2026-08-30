@@ -4,6 +4,12 @@ import { FieldValue } from "firebase-admin/firestore";
 
 import { adminDb } from "@/lib/firebase/admin";
 
+/*
+ * =========================================================
+ * COLLECTIONS
+ * =========================================================
+ */
+
 function getSubmissionCollection(companyId) {
   return adminDb
     .collection("companies")
@@ -25,6 +31,12 @@ function getRateLimitCollection(companyId) {
     .collection("formSubmissionRateLimits");
 }
 
+/*
+ * =========================================================
+ * GET
+ * =========================================================
+ */
+
 export async function getSubmissionById({ companyId, submissionId }) {
   const snapshot = await getSubmissionCollection(companyId)
     .doc(submissionId)
@@ -41,10 +53,17 @@ export async function getSubmissionById({ companyId, submissionId }) {
   };
 }
 
+/*
+ * =========================================================
+ * LIST
+ * =========================================================
+ */
+
 export async function listSubmissionRecords({
   companyId,
   formId = null,
   status = null,
+  folder = "inbox",
 }) {
   const snapshot = await getSubmissionCollection(companyId).get();
 
@@ -62,8 +81,22 @@ export async function listSubmissionRecords({
     items = items.filter((item) => item.status === status);
   }
 
+  /*
+   * Inbox and Trash are independent from workflow status.
+   */
+
+  if (folder === "trash") {
+    return items.filter((item) => Boolean(item.deletedAt));
+  }
+
   return items.filter((item) => !item.deletedAt);
 }
+
+/*
+ * =========================================================
+ * RATE LIMIT
+ * =========================================================
+ */
 
 export async function checkSubmissionRateLimit({
   companyId,
@@ -121,17 +154,11 @@ export async function checkSubmissionRateLimit({
 }
 
 /*
- * Creates the submission and claims all
- * private attachments atomically.
- *
- * attachmentBindings:
- * [
- *   {
- *     attachmentId,
- *     fieldId
- *   }
- * ]
+ * =========================================================
+ * CREATE
+ * =========================================================
  */
+
 export async function createSubmissionRecord({
   companyId,
   data,
@@ -145,12 +172,6 @@ export async function createSubmissionRecord({
   );
 
   await adminDb.runTransaction(async (transaction) => {
-    /*
-     * IMPORTANT:
-     * all Firestore reads occur
-     * before the first write.
-     */
-
     const attachmentSnapshots =
       attachmentRefs.length > 0
         ? await transaction.getAll(...attachmentRefs)
@@ -199,11 +220,33 @@ export async function createSubmissionRecord({
 
       assignedTo: null,
 
+      /*
+       * Legacy global read timestamp.
+       *
+       * Kept for backwards compatibility.
+       */
       readAt: null,
+
+      /*
+       * Per-user read receipt.
+       *
+       * {
+       *   uid: {
+       *     uid,
+       *     displayName,
+       *     email,
+       *     avatarUrl,
+       *     readAt
+       *   }
+       * }
+       */
+      readBy: {},
 
       resolvedAt: null,
 
       deletedAt: null,
+
+      deletedBy: null,
     });
 
     for (let index = 0; index < attachmentBindings.length; index += 1) {
@@ -227,6 +270,12 @@ export async function createSubmissionRecord({
     submissionId: submissionRef.id,
   });
 }
+
+/*
+ * =========================================================
+ * STATUS
+ * =========================================================
+ */
 
 export async function updateSubmissionStatusRecord({
   companyId,
@@ -273,5 +322,244 @@ export async function updateSubmissionStatusRecord({
       companyId,
       submissionId,
     }),
+  };
+}
+
+/*
+ * =========================================================
+ * MARK READ — PER USER
+ * =========================================================
+ */
+
+export async function markSubmissionReadRecord({
+  companyId,
+  submissionId,
+  reader,
+}) {
+  const ref = getSubmissionCollection(companyId).doc(submissionId);
+
+  let before = null;
+
+  await adminDb.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(ref);
+
+    if (!snapshot.exists || snapshot.data()?.deletedAt) {
+      throw new Error("FORM_SUBMISSION_NOT_FOUND");
+    }
+
+    before = {
+      id: snapshot.id,
+
+      ...snapshot.data(),
+    };
+
+    const existingReadBy =
+      before.readBy && typeof before.readBy === "object" ? before.readBy : {};
+
+    /*
+     * First read timestamp is more useful than updating
+     * every time the same person opens the message.
+     */
+
+    if (existingReadBy[reader.uid]) {
+      return;
+    }
+
+    const nextReadBy = {
+      ...existingReadBy,
+
+      [reader.uid]: {
+        uid: reader.uid,
+
+        displayName: reader.displayName || reader.email || "User",
+
+        email: reader.email || null,
+
+        avatarUrl: reader.avatarUrl || null,
+
+        readAt: new Date(),
+      },
+    };
+
+    const update = {
+      readBy: nextReadBy,
+
+      updatedAt: FieldValue.serverTimestamp(),
+    };
+
+    /*
+     * Preserve legacy global status behavior:
+     * the first person opening NEW changes it to READ.
+     *
+     * Individual unread state will still come from readBy.
+     */
+    if (before.status === "new") {
+      update.status = "read";
+
+      if (!before.readAt) {
+        update.readAt = FieldValue.serverTimestamp();
+      }
+    }
+
+    transaction.update(ref, update);
+  });
+
+  return {
+    before,
+
+    after: await getSubmissionById({
+      companyId,
+      submissionId,
+    }),
+  };
+}
+
+/*
+ * =========================================================
+ * MOVE TO TRASH
+ * =========================================================
+ */
+
+export async function trashSubmissionRecord({
+  companyId,
+  submissionId,
+  userId,
+}) {
+  const ref = getSubmissionCollection(companyId).doc(submissionId);
+
+  const snapshot = await ref.get();
+
+  if (!snapshot.exists) {
+    throw new Error("FORM_SUBMISSION_NOT_FOUND");
+  }
+
+  const before = {
+    id: snapshot.id,
+
+    ...snapshot.data(),
+  };
+
+  if (before.deletedAt) {
+    return {
+      before,
+
+      after: before,
+    };
+  }
+
+  await ref.update({
+    deletedAt: FieldValue.serverTimestamp(),
+
+    deletedBy: userId,
+
+    updatedAt: FieldValue.serverTimestamp(),
+
+    updatedBy: userId,
+  });
+
+  return {
+    before,
+
+    after: await getSubmissionById({
+      companyId,
+      submissionId,
+    }),
+  };
+}
+
+/*
+ * =========================================================
+ * RESTORE
+ * =========================================================
+ */
+
+export async function restoreSubmissionRecord({
+  companyId,
+  submissionId,
+  userId,
+}) {
+  const ref = getSubmissionCollection(companyId).doc(submissionId);
+
+  const snapshot = await ref.get();
+
+  if (!snapshot.exists) {
+    throw new Error("FORM_SUBMISSION_NOT_FOUND");
+  }
+
+  const before = {
+    id: snapshot.id,
+
+    ...snapshot.data(),
+  };
+
+  if (!before.deletedAt) {
+    return {
+      before,
+
+      after: before,
+    };
+  }
+
+  await ref.update({
+    deletedAt: null,
+
+    deletedBy: null,
+
+    restoredAt: FieldValue.serverTimestamp(),
+
+    restoredBy: userId,
+
+    updatedAt: FieldValue.serverTimestamp(),
+
+    updatedBy: userId,
+  });
+
+  return {
+    before,
+
+    after: await getSubmissionById({
+      companyId,
+      submissionId,
+    }),
+  };
+}
+
+/*
+ * =========================================================
+ * PERMANENT DELETE
+ * =========================================================
+ */
+
+export async function permanentlyDeleteSubmissionRecord({
+  companyId,
+  submissionId,
+}) {
+  const ref = getSubmissionCollection(companyId).doc(submissionId);
+
+  const snapshot = await ref.get();
+
+  if (!snapshot.exists) {
+    throw new Error("FORM_SUBMISSION_NOT_FOUND");
+  }
+
+  const before = {
+    id: snapshot.id,
+
+    ...snapshot.data(),
+  };
+
+  /*
+   * Safety:
+   * Permanent deletion is allowed only from Trash.
+   */
+
+  if (!before.deletedAt) {
+    throw new Error("FORM_SUBMISSION_NOT_IN_TRASH");
+  }
+
+  await ref.delete();
+
+  return {
+    before,
   };
 }

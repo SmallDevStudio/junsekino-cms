@@ -7,6 +7,10 @@ import {
   createSubmissionRecord,
   getSubmissionById,
   listSubmissionRecords,
+  markSubmissionReadRecord,
+  permanentlyDeleteSubmissionRecord,
+  restoreSubmissionRecord,
+  trashSubmissionRecord,
   updateSubmissionStatusRecord,
 } from "./form-submission.repository";
 
@@ -402,15 +406,25 @@ export async function submitPublicForm({
   };
 }
 
+/*
+ * =========================================================
+ * LIST SUBMISSIONS
+ * =========================================================
+ */
+
 export async function listFormSubmissions({
   companyId,
   formId = null,
   status = null,
+  folder = "inbox",
+  currentUser = null,
+  unreadOnly = false,
 }) {
   const items = await listSubmissionRecords({
     companyId,
     formId,
     status,
+    folder,
   });
 
   items.sort(
@@ -418,21 +432,89 @@ export async function listFormSubmissions({
       (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0),
   );
 
-  return items.map(serializeFirestoreDocument);
+  let result = items;
+
+  /*
+   * Unread is per-user.
+   */
+
+  if (unreadOnly && currentUser?.uid) {
+    result = result.filter((item) => {
+      const readBy =
+        item.readBy && typeof item.readBy === "object" ? item.readBy : {};
+
+      return !readBy[currentUser.uid];
+    });
+  }
+
+  return result.map((item) => {
+    const serialized = serializeFirestoreDocument(item);
+
+    const readBy =
+      serialized.readBy && typeof serialized.readBy === "object"
+        ? serialized.readBy
+        : {};
+
+    return {
+      ...serialized,
+
+      readBy,
+
+      readerCount: Object.keys(readBy).length,
+
+      readByCurrentUser: currentUser?.uid
+        ? Boolean(readBy[currentUser.uid])
+        : false,
+    };
+  });
 }
 
-export async function getFormSubmission({ companyId, submissionId }) {
+/*
+ * =========================================================
+ * GET SUBMISSION
+ * =========================================================
+ */
+
+export async function getFormSubmission({
+  companyId,
+  submissionId,
+  includeDeleted = false,
+  currentUser = null,
+}) {
   const item = await getSubmissionById({
     companyId,
     submissionId,
   });
 
-  if (!item || item.deletedAt) {
+  if (!item || (!includeDeleted && item.deletedAt)) {
     throw new Error("FORM_SUBMISSION_NOT_FOUND");
   }
 
-  return serializeFirestoreDocument(item);
+  const serialized = serializeFirestoreDocument(item);
+
+  const readBy =
+    serialized.readBy && typeof serialized.readBy === "object"
+      ? serialized.readBy
+      : {};
+
+  return {
+    ...serialized,
+
+    readBy,
+
+    readerCount: Object.keys(readBy).length,
+
+    readByCurrentUser: currentUser?.uid
+      ? Boolean(readBy[currentUser.uid])
+      : false,
+  };
 }
+
+/*
+ * =========================================================
+ * UPDATE WORKFLOW STATUS
+ * =========================================================
+ */
 
 export async function updateFormSubmissionStatus({
   companyId,
@@ -469,4 +551,197 @@ export async function updateFormSubmissionStatus({
   });
 
   return after;
+}
+
+/*
+ * =========================================================
+ * MARK READ
+ * =========================================================
+ */
+
+export async function markFormSubmissionRead({
+  companyId,
+  submissionId,
+  currentUser,
+}) {
+  const result = await markSubmissionReadRecord({
+    companyId,
+
+    submissionId,
+
+    reader: {
+      uid: currentUser.uid,
+
+      displayName: currentUser.displayName || null,
+
+      email: currentUser.email || null,
+
+      /*
+       * Current auth session does not expose an avatar yet.
+       * The read receipt schema is already ready for it.
+       */
+      avatarUrl: currentUser.avatarUrl || null,
+    },
+  });
+
+  const before = serializeFirestoreDocument(result.before);
+
+  const after = serializeFirestoreDocument(result.after);
+
+  /*
+   * Only create an audit entry when this user
+   * actually became a new reader.
+   */
+
+  if (!before?.readBy?.[currentUser.uid]) {
+    await createAuditLogSafe({
+      userId: currentUser.uid,
+
+      companyId,
+
+      action: "FORM_SUBMISSION_READ",
+
+      resource: "formSubmission",
+
+      resourceId: submissionId,
+
+      before,
+
+      after,
+    });
+  }
+
+  return {
+    ...after,
+
+    readByCurrentUser: true,
+
+    readerCount: Object.keys(after.readBy || {}).length,
+  };
+}
+
+/*
+ * =========================================================
+ * TRASH
+ * =========================================================
+ */
+
+export async function trashFormSubmission({
+  companyId,
+  submissionId,
+  currentUser,
+}) {
+  const result = await trashSubmissionRecord({
+    companyId,
+
+    submissionId,
+
+    userId: currentUser.uid,
+  });
+
+  const before = serializeFirestoreDocument(result.before);
+
+  const after = serializeFirestoreDocument(result.after);
+
+  await createAuditLogSafe({
+    userId: currentUser.uid,
+
+    companyId,
+
+    action: "FORM_SUBMISSION_TRASH",
+
+    resource: "formSubmission",
+
+    resourceId: submissionId,
+
+    before,
+
+    after,
+  });
+
+  return after;
+}
+
+/*
+ * =========================================================
+ * RESTORE
+ * =========================================================
+ */
+
+export async function restoreFormSubmission({
+  companyId,
+  submissionId,
+  currentUser,
+}) {
+  const result = await restoreSubmissionRecord({
+    companyId,
+
+    submissionId,
+
+    userId: currentUser.uid,
+  });
+
+  const before = serializeFirestoreDocument(result.before);
+
+  const after = serializeFirestoreDocument(result.after);
+
+  await createAuditLogSafe({
+    userId: currentUser.uid,
+
+    companyId,
+
+    action: "FORM_SUBMISSION_RESTORE",
+
+    resource: "formSubmission",
+
+    resourceId: submissionId,
+
+    before,
+
+    after,
+  });
+
+  return after;
+}
+
+/*
+ * =========================================================
+ * PERMANENT DELETE
+ * =========================================================
+ */
+
+export async function permanentlyDeleteFormSubmission({
+  companyId,
+  submissionId,
+  currentUser,
+}) {
+  const result = await permanentlyDeleteSubmissionRecord({
+    companyId,
+
+    submissionId,
+  });
+
+  const before = serializeFirestoreDocument(result.before);
+
+  await createAuditLogSafe({
+    userId: currentUser.uid,
+
+    companyId,
+
+    action: "FORM_SUBMISSION_PERMANENT_DELETE",
+
+    resource: "formSubmission",
+
+    resourceId: submissionId,
+
+    before,
+
+    after: null,
+  });
+
+  return {
+    id: submissionId,
+
+    deleted: true,
+  };
 }

@@ -8,13 +8,15 @@ import { useRouter } from "next/navigation";
 
 import { useCompanyWorkspace } from "@/components/admin/company/CompanyWorkspaceProvider";
 
+import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
+
 /*
  * =========================================================
  * HELPERS
  * =========================================================
  */
 
-function localized(value) {
+function localized(value, locale) {
   if (!value) {
     return "";
   }
@@ -23,10 +25,14 @@ function localized(value) {
     return value;
   }
 
+  if (locale === "th") {
+    return value.th || value.en || "";
+  }
+
   return value.en || value.th || "";
 }
 
-function formatDate(value) {
+function formatDate(value, locale) {
   if (!value) {
     return "";
   }
@@ -37,10 +43,13 @@ function formatDate(value) {
     return "";
   }
 
-  return new Intl.DateTimeFormat("en", {
+  return new Intl.DateTimeFormat(locale === "th" ? "th-TH" : "en-US", {
     day: "2-digit",
+
     month: "short",
+
     hour: "2-digit",
+
     minute: "2-digit",
   }).format(date);
 }
@@ -51,10 +60,14 @@ function formatDate(value) {
  * =========================================================
  */
 
-export default function AdminNotificationCenter({ label = "Notifications" }) {
+export default function AdminNotificationCenter({ label }) {
   const router = useRouter();
 
   const { activeCompanyId } = useCompanyWorkspace();
+
+  const { t, locale } = useAdminTranslation();
+
+  const resolvedLabel = label || t("header.notifications");
 
   const wrapperRef = useRef(null);
 
@@ -95,10 +108,18 @@ export default function AdminNotificationCenter({ label = "Notifications" }) {
         },
       );
 
-      const payload = await response.json();
+      let payload = null;
+
+      try {
+        payload = await response.json();
+      } catch {
+        payload = null;
+      }
 
       if (!response.ok || payload?.success === false) {
-        throw new Error(payload?.message || "Unable to load notifications.");
+        throw new Error(
+          payload?.message || t("notifications.messages.loadFailed"),
+        );
       }
 
       setItems(Array.isArray(payload?.data) ? payload.data : []);
@@ -109,10 +130,12 @@ export default function AdminNotificationCenter({ label = "Notifications" }) {
     } finally {
       setLoading(false);
     }
-  }, [activeCompanyId]);
+  }, [activeCompanyId, t]);
 
   /*
-   * Initial load.
+   * =======================================================
+   * INITIAL LOAD
+   * =======================================================
    */
 
   useEffect(() => {
@@ -130,11 +153,9 @@ export default function AdminNotificationCenter({ label = "Notifications" }) {
   }, [activeCompanyId, loadNotifications]);
 
   /*
-   * Refresh periodically.
-   *
-   * 60 seconds is sufficient for
-   * Admin notification UX without
-   * introducing realtime listeners yet.
+   * =======================================================
+   * AUTO REFRESH
+   * =======================================================
    */
 
   useEffect(() => {
@@ -152,7 +173,9 @@ export default function AdminNotificationCenter({ label = "Notifications" }) {
   }, [activeCompanyId, loadNotifications]);
 
   /*
-   * Close when clicking outside.
+   * =======================================================
+   * CLICK OUTSIDE
+   * =======================================================
    */
 
   useEffect(() => {
@@ -201,10 +224,16 @@ export default function AdminNotificationCenter({ label = "Notifications" }) {
         ),
       );
 
-      setUnreadCount((current) => Math.max(0, current - 1));
+      setUnreadCount((current) =>
+        Math.max(
+          0,
+
+          current - 1,
+        ),
+      );
 
       try {
-        await fetch(
+        const response = await fetch(
           `/api/v1/companies/${activeCompanyId}/notifications/${notification.id}/read`,
           {
             method: "POST",
@@ -212,15 +241,26 @@ export default function AdminNotificationCenter({ label = "Notifications" }) {
             credentials: "include",
           },
         );
+
+        if (!response.ok) {
+          throw new Error("NOTIFICATION_MARK_READ_FAILED");
+        }
       } catch (error) {
         console.error("Mark notification read error:", error);
+
+        /*
+         * Do not interrupt navigation.
+         *
+         * The next notification refresh can
+         * restore the authoritative state.
+         */
       }
     }
 
     setOpen(false);
 
     /*
-     * Form submission → Messages.
+     * Form Submission notification.
      */
 
     if (
@@ -239,14 +279,22 @@ export default function AdminNotificationCenter({ label = "Notifications" }) {
     router.push("/admin/messages");
   }
 
+  /*
+   * =======================================================
+   * RENDER
+   * =======================================================
+   */
+
   return (
     <div ref={wrapperRef} className="relative">
-      {/* BELL */}
+      {/* =================================
+          BELL
+      ================================= */}
 
       <button
         type="button"
-        aria-label={label}
-        title={label}
+        aria-label={resolvedLabel}
+        title={resolvedLabel}
         onClick={() => {
           setOpen((current) => !current);
 
@@ -312,7 +360,9 @@ export default function AdminNotificationCenter({ label = "Notifications" }) {
         )}
       </button>
 
-      {/* POPOVER */}
+      {/* =================================
+          POPOVER
+      ================================= */}
 
       {open && (
         <div
@@ -362,7 +412,7 @@ export default function AdminNotificationCenter({ label = "Notifications" }) {
                   text-[var(--admin-foreground)]
                 "
               >
-                Notifications
+                {t("notifications.title")}
               </div>
 
               <div
@@ -375,13 +425,17 @@ export default function AdminNotificationCenter({ label = "Notifications" }) {
                 "
               >
                 {unreadCount > 0
-                  ? `${unreadCount} unread`
-                  : "You're all caught up"}
+                  ? t("notifications.unreadCount", {
+                      count: unreadCount,
+                    })
+                  : t("notifications.allCaughtUp")}
               </div>
             </div>
 
             <button
               type="button"
+              aria-label={t("notifications.refresh")}
+              title={t("notifications.refresh")}
               onClick={loadNotifications}
               disabled={loading}
               className="
@@ -401,6 +455,8 @@ export default function AdminNotificationCenter({ label = "Notifications" }) {
                 hover:bg-[var(--admin-hover)]
 
                 hover:text-[var(--company-primary)]
+
+                disabled:opacity-50
               "
             >
               <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
@@ -468,7 +524,7 @@ export default function AdminNotificationCenter({ label = "Notifications" }) {
                     text-[var(--admin-foreground)]
                   "
                 >
-                  No notifications
+                  {t("notifications.empty.title")}
                 </div>
 
                 <div
@@ -476,11 +532,12 @@ export default function AdminNotificationCenter({ label = "Notifications" }) {
                     mt-1
 
                     admin-text-9
+                    leading-[1.5]
 
                     text-[var(--admin-muted)]
                   "
                 >
-                  New website activity will appear here.
+                  {t("notifications.empty.description")}
                 </div>
               </div>
             ) : (
@@ -568,13 +625,15 @@ export default function AdminNotificationCenter({ label = "Notifications" }) {
                               }
                             `}
                         >
-                          {localized(notification.title) || "Notification"}
+                          {localized(notification.title, locale) ||
+                            t("notifications.fallbackTitle")}
                         </div>
 
                         {!notification.read && (
                           <span
                             className="
                                 mt-1.5
+
                                 h-1.5
                                 w-1.5
                                 shrink-0
@@ -597,7 +656,7 @@ export default function AdminNotificationCenter({ label = "Notifications" }) {
                             text-[var(--admin-muted)]
                           "
                       >
-                        {localized(notification.message)}
+                        {localized(notification.message, locale)}
                       </div>
 
                       <div
@@ -609,7 +668,7 @@ export default function AdminNotificationCenter({ label = "Notifications" }) {
                             text-[var(--admin-muted-light)]
                           "
                       >
-                        {formatDate(notification.createdAt)}
+                        {formatDate(notification.createdAt, locale)}
                       </div>
                     </div>
                   </button>
@@ -652,7 +711,7 @@ export default function AdminNotificationCenter({ label = "Notifications" }) {
               hover:text-[var(--company-primary)]
             "
           >
-            View all messages
+            {t("notifications.viewAllMessages")}
           </button>
         </div>
       )}

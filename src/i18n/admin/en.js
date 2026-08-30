@@ -2711,6 +2711,172 @@ export const adminEn = {
       testConnectionFailed: "Unable to connect to the SMTP server.",
 
       testEmailPending: "Send Test Email will be enabled in the next step.",
+
+      testEmailRecipientRequired:
+        "Add at least one recipient before sending a test email.",
+
+      testEmailSent: "Test email sent to {email}.",
+
+      testEmailFailed: "Unable to send test email.",
+    },
+  },
+
+  notifications: {
+    title: "Notifications",
+
+    refresh: "Refresh notifications",
+
+    unreadCount: "{count} unread",
+
+    allCaughtUp: "You're all caught up",
+
+    fallbackTitle: "Notification",
+
+    viewAllMessages: "View all messages",
+
+    empty: {
+      title: "No notifications",
+
+      description: "New website activity will appear here.",
+    },
+
+    messages: {
+      loadFailed: "Unable to load notifications.",
+    },
+  },
+
+  messages: {
+    sectionLabel: "Communication",
+
+    title: "Messages",
+
+    description: "View and manage messages submitted through website forms.",
+
+    mailbox: "Mailbox",
+
+    searchPlaceholder: "Search messages...",
+
+    resultCount: "{count} messages",
+
+    fallbackMessage: "Message",
+
+    fallbackPreview: "Form submission",
+
+    close: "Close message",
+
+    doubleClickHint:
+      "Click a message to preview it. Double-click to open it in a new window.",
+
+    folders: {
+      inbox: "Inbox",
+
+      unread: "Unread",
+
+      in_progress: "In Progress",
+
+      resolved: "Resolved",
+
+      archived: "Archived",
+
+      spam: "Spam",
+
+      trash: "Trash",
+    },
+
+    actions: {
+      inProgress: "In Progress",
+
+      resolved: "Resolved",
+
+      archive: "Archive",
+
+      spam: "Spam",
+
+      trash: "Move to Trash",
+
+      restore: "Restore",
+
+      deletePermanently: "Delete Permanently",
+
+      openWindow: "Open in new window",
+    },
+
+    readers: {
+      none: "Not read yet",
+
+      user: "User",
+
+      title: "Read by {count} people",
+
+      readAt: "Read {date}",
+    },
+
+    drawer: {
+      sectionLabel: "Form Submission",
+
+      messageInformation: "Message Information",
+
+      submissionDetails: "Submission Details",
+
+      form: "Form",
+
+      page: "Page",
+
+      referrer: "Referrer",
+
+      received: "Received",
+    },
+
+    deletePermanent: {
+      title: "Delete permanently?",
+
+      description:
+        "This message will be permanently removed and cannot be restored.",
+
+      warning:
+        "Permanent deletion is only available for messages already in Trash.",
+
+      action: "Delete Permanently",
+    },
+
+    messages: {
+      statusUpdated: "Message status updated.",
+
+      movedToTrash: "Message moved to Trash.",
+
+      restored: "Message restored.",
+
+      deleted: "Message permanently deleted.",
+    },
+
+    errors: {
+      loadFailed: "Unable to retrieve messages.",
+
+      updateFailed: "Unable to update message.",
+
+      trashFailed: "Unable to move message to Trash.",
+
+      restoreFailed: "Unable to restore message.",
+
+      deleteFailed: "Unable to permanently delete message.",
+
+      notFound: "Message not found.",
+    },
+
+    empty: {
+      title: "No messages",
+
+      description: "Messages matching this mailbox will appear here.",
+    },
+
+    noCompany: {
+      title: "No company selected",
+
+      description: "Select a workspace before viewing messages.",
+    },
+
+    window: {
+      back: "Close Window",
     },
   },
 };

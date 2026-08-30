@@ -556,11 +556,77 @@ export default function EmailSettings() {
       return;
     }
 
-    /*
-     * Endpoint comes in next step.
-     */
+    if (!validateForm()) {
+      return;
+    }
 
-    toast.info(t("settings.email.messages.testEmailPending"));
+    if (form.recipients.length === 0) {
+      toast.error(t("settings.email.messages.testEmailRecipientRequired"));
+
+      return;
+    }
+
+    try {
+      setSendingTest(true);
+
+      /*
+       * Save latest provider configuration
+       * and a newly entered SMTP password first.
+       */
+
+      await handleSave();
+
+      const response = await fetch(
+        `/api/v1/companies/${activeCompanyId}/settings/communication/send-test-email`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          credentials: "include",
+
+          body: JSON.stringify({
+            /*
+             * Send to first configured recipient.
+             *
+             * Normal notifications may still use
+             * every configured recipient.
+             */
+            recipient: form.recipients[0],
+          }),
+        },
+      );
+
+      let payload = null;
+
+      try {
+        payload = await response.json();
+      } catch {
+        payload = null;
+      }
+
+      if (!response.ok || payload?.success === false) {
+        throw new Error(
+          payload?.message || t("settings.email.messages.testEmailFailed"),
+        );
+      }
+
+      toast.success(
+        t("settings.email.messages.testEmailSent", {
+          email: form.recipients[0],
+        }),
+      );
+    } catch (error) {
+      console.error("Send test email error:", error);
+
+      toast.error(
+        error?.message || t("settings.email.messages.testEmailFailed"),
+      );
+    } finally {
+      setSendingTest(false);
+    }
   }
 
   /*

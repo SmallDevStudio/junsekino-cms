@@ -3,14 +3,14 @@
 import {
   Archive,
   CheckCircle2,
-  Circle,
   Clock3,
   Inbox,
   LoaderCircle,
-  Mail,
+  MailOpen,
   RefreshCw,
+  RotateCcw,
   Search,
-  ShieldAlert,
+  Trash2,
 } from "lucide-react";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -21,9 +21,14 @@ import { toast } from "sonner";
 
 import { useCompanyWorkspace } from "@/components/admin/company/CompanyWorkspaceProvider";
 
+import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
+
 import { FORM_SUBMISSION_STATUS } from "@/constants/form";
 
+import { cn } from "@/utils/cn";
+
 import MessageDetailDrawer from "./MessageDetailDrawer";
+import MessageReaderAvatars from "./MessageReaderAvatars";
 
 /*
  * =========================================================
@@ -31,80 +36,7 @@ import MessageDetailDrawer from "./MessageDetailDrawer";
  * =========================================================
  */
 
-const FILTERS = [
-  {
-    value: "all",
-    label: "All",
-  },
-  {
-    value: FORM_SUBMISSION_STATUS.NEW,
-    label: "New",
-  },
-  {
-    value: FORM_SUBMISSION_STATUS.READ,
-    label: "Read",
-  },
-  {
-    value: FORM_SUBMISSION_STATUS.IN_PROGRESS,
-    label: "In Progress",
-  },
-  {
-    value: FORM_SUBMISSION_STATUS.RESOLVED,
-    label: "Resolved",
-  },
-  {
-    value: FORM_SUBMISSION_STATUS.ARCHIVED,
-    label: "Archived",
-  },
-];
-
-/*
- * =========================================================
- * DATE
- * =========================================================
- */
-
-function getDateValue(value) {
-  if (!value) {
-    return 0;
-  }
-
-  if (typeof value === "string") {
-    const result = new Date(value).getTime();
-
-    return Number.isNaN(result) ? 0 : result;
-  }
-
-  if (typeof value === "number") {
-    return value;
-  }
-
-  return 0;
-}
-
-function formatDate(value) {
-  const timestamp = getDateValue(value);
-
-  if (!timestamp) {
-    return "—";
-  }
-
-  return new Intl.DateTimeFormat("en", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(timestamp));
-}
-
-/*
- * =========================================================
- * LOCALIZED VALUE
- * =========================================================
- */
-
-function localized(value) {
+function localized(value, locale) {
   if (!value) {
     return "";
   }
@@ -113,16 +45,61 @@ function localized(value) {
     return value;
   }
 
+  if (locale === "th") {
+    return value.th || value.en || "";
+  }
+
   return value.en || value.th || "";
 }
 
-/*
- * =========================================================
- * FIELD HELPERS
- * =========================================================
- */
+function getDateValue(value) {
+  if (!value) {
+    return 0;
+  }
 
-function findField(submission, types = [], words = []) {
+  if (typeof value === "number") {
+    return value;
+  }
+
+  const result = new Date(value).getTime();
+
+  return Number.isNaN(result) ? 0 : result;
+}
+
+function formatDate(value, locale) {
+  const timestamp = getDateValue(value);
+
+  if (!timestamp) {
+    return "—";
+  }
+
+  const date = new Date(timestamp);
+
+  const now = new Date();
+
+  const sameDay =
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate();
+
+  if (sameDay) {
+    return new Intl.DateTimeFormat(locale === "th" ? "th-TH" : "en-US", {
+      hour: "2-digit",
+
+      minute: "2-digit",
+    }).format(date);
+  }
+
+  return new Intl.DateTimeFormat(locale === "th" ? "th-TH" : "en-US", {
+    day: "2-digit",
+
+    month: "short",
+
+    year: date.getFullYear() === now.getFullYear() ? undefined : "numeric",
+  }).format(date);
+}
+
+function findField(submission, types = [], words = [], locale = "en") {
   const fields = Array.isArray(submission?.fieldsSnapshot)
     ? submission.fieldsSnapshot
     : [];
@@ -132,72 +109,64 @@ function findField(submission, types = [], words = []) {
       continue;
     }
 
-    const label = localized(field?.label).toLowerCase();
+    const label = localized(field?.label, locale).toLowerCase();
 
     const matchType = types.includes(field?.type);
 
     const matchWord = words.some((word) => label.includes(word));
 
-    if (matchType || matchWord) {
-      const value = submission?.values?.[field.id];
+    if (!matchType && !matchWord) {
+      continue;
+    }
 
-      if (value !== undefined && value !== null && String(value).trim()) {
-        return String(value);
-      }
+    const value = submission?.values?.[field.id];
+
+    if (value !== undefined && value !== null && String(value).trim()) {
+      return String(value);
     }
   }
 
   return "";
 }
 
-function getSenderName(submission) {
+function getSenderName(submission, locale) {
   return (
-    findField(submission, ["text"], ["name", "surname", "ชื่อ", "นามสกุล"]) ||
-    localized(submission?.formName) ||
+    findField(
+      submission,
+
+      ["text"],
+
+      ["name", "surname", "ชื่อ", "นามสกุล"],
+
+      locale,
+    ) ||
+    localized(submission?.formName, locale) ||
     "Website visitor"
   );
 }
 
-function getSenderEmail(submission) {
-  return findField(submission, ["email"], ["email", "e-mail", "อีเมล"]);
-}
-
-function getMessagePreview(submission) {
+function getSenderEmail(submission, locale) {
   return findField(
     submission,
-    ["textarea"],
-    ["message", "information", "detail", "ข้อความ", "รายละเอียด"],
+
+    ["email"],
+
+    ["email", "e-mail", "อีเมล"],
+
+    locale,
   );
 }
 
-/*
- * =========================================================
- * STATUS ICON
- * =========================================================
- */
+function getMessagePreview(submission, locale) {
+  return findField(
+    submission,
 
-function StatusIcon({ status }) {
-  if (status === FORM_SUBMISSION_STATUS.NEW) {
-    return <Circle size={12} fill="currentColor" />;
-  }
+    ["textarea"],
 
-  if (status === FORM_SUBMISSION_STATUS.IN_PROGRESS) {
-    return <Clock3 size={14} />;
-  }
+    ["message", "information", "detail", "ข้อความ", "รายละเอียด"],
 
-  if (status === FORM_SUBMISSION_STATUS.RESOLVED) {
-    return <CheckCircle2 size={14} />;
-  }
-
-  if (status === FORM_SUBMISSION_STATUS.ARCHIVED) {
-    return <Archive size={14} />;
-  }
-
-  if (status === FORM_SUBMISSION_STATUS.SPAM) {
-    return <ShieldAlert size={14} />;
-  }
-
-  return <Mail size={14} />;
+    locale,
+  );
 }
 
 /*
@@ -213,9 +182,15 @@ export default function MessageManager() {
     loading: companyLoading,
   } = useCompanyWorkspace();
 
+  const { t, locale } = useAdminTranslation();
+
   const searchParams = useSearchParams();
 
   const requestedSubmissionId = searchParams.get("submission");
+
+  const [folder, setFolder] = useState("inbox");
+
+  const [view, setView] = useState("all");
 
   const [items, setItems] = useState([]);
 
@@ -223,11 +198,43 @@ export default function MessageManager() {
 
   const [refreshing, setRefreshing] = useState(false);
 
-  const [filter, setFilter] = useState("all");
-
   const [search, setSearch] = useState("");
 
   const [selected, setSelected] = useState(null);
+
+  const [actingId, setActingId] = useState(null);
+
+  /*
+   * =======================================================
+   * QUERY
+   * =======================================================
+   */
+
+  const queryString = useMemo(() => {
+    const params = new URLSearchParams();
+
+    params.set("folder", folder);
+
+    if (folder === "inbox") {
+      if (view === "unread") {
+        params.set("unread", "1");
+      }
+
+      if (view === "in_progress") {
+        params.set("status", FORM_SUBMISSION_STATUS.IN_PROGRESS);
+      }
+
+      if (view === "resolved") {
+        params.set("status", FORM_SUBMISSION_STATUS.RESOLVED);
+      }
+
+      if (view === "archived") {
+        params.set("status", FORM_SUBMISSION_STATUS.ARCHIVED);
+      }
+    }
+
+    return params.toString();
+  }, [folder, view]);
 
   /*
    * =======================================================
@@ -249,7 +256,7 @@ export default function MessageManager() {
         }
 
         const response = await fetch(
-          `/api/v1/companies/${activeCompanyId}/form-submissions`,
+          `/api/v1/companies/${activeCompanyId}/form-submissions?${queryString}`,
           {
             method: "GET",
 
@@ -259,33 +266,26 @@ export default function MessageManager() {
           },
         );
 
-        const payload = await response.json();
+        let payload = null;
+
+        try {
+          payload = await response.json();
+        } catch {
+          payload = null;
+        }
 
         if (!response.ok || payload?.success === false) {
-          throw new Error(payload?.message || "Unable to retrieve messages.");
+          throw new Error(
+            payload?.message || t("messages.messages.loadFailed"),
+          );
         }
 
         const loadedItems = Array.isArray(payload?.data) ? payload.data : [];
 
-        /*
-         * Store loaded submissions.
-         */
-
         setItems(loadedItems);
 
         /*
-         * Deep-link support.
-         *
-         * Notification Center sends:
-         *
-         * /admin/messages?submission=SUBMISSION_ID
-         *
-         * Select that submission immediately after
-         * loading the inbox.
-         *
-         * Do not use another effect watching `items`.
-         * That could repeatedly reopen the drawer when
-         * the selected submission is updated.
+         * Notification deep-link.
          */
 
         if (requestedSubmissionId) {
@@ -300,32 +300,20 @@ export default function MessageManager() {
       } catch (error) {
         console.error("Load messages error:", error);
 
-        toast.error(error?.message || "Unable to retrieve messages.");
+        toast.error(error?.message || t("messages.messages.loadFailed"));
       } finally {
         setLoading(false);
 
         setRefreshing(false);
       }
     },
-    [activeCompanyId, requestedSubmissionId],
+    [activeCompanyId, queryString, requestedSubmissionId, t],
   );
-
-  /*
-   * =======================================================
-   * INITIAL LOAD
-   * =======================================================
-   */
 
   useEffect(() => {
     if (!activeCompanyId) {
       return;
     }
-
-    /*
-     * Schedule outside the effect body so React Compiler
-     * does not flag synchronous state changes triggered
-     * indirectly by loadItems().
-     */
 
     const timeoutId = window.setTimeout(() => {
       loadItems();
@@ -338,71 +326,25 @@ export default function MessageManager() {
 
   /*
    * =======================================================
-   * SUMMARY
-   * =======================================================
-   */
-
-  const summary = useMemo(() => {
-    const result = {
-      all: items.length,
-
-      new: 0,
-
-      inProgress: 0,
-
-      resolved: 0,
-    };
-
-    for (const item of items) {
-      if (item.status === FORM_SUBMISSION_STATUS.NEW) {
-        result.new += 1;
-      }
-
-      if (item.status === FORM_SUBMISSION_STATUS.IN_PROGRESS) {
-        result.inProgress += 1;
-      }
-
-      if (item.status === FORM_SUBMISSION_STATUS.RESOLVED) {
-        result.resolved += 1;
-      }
-    }
-
-    return result;
-  }, [items]);
-
-  /*
-   * =======================================================
-   * FILTER + SEARCH
+   * SEARCH
    * =======================================================
    */
 
   const visibleItems = useMemo(() => {
     const keyword = search.trim().toLowerCase();
 
+    if (!keyword) {
+      return items;
+    }
+
     return items.filter((item) => {
-      /*
-       * Status filter.
-       */
+      const sender = getSenderName(item, locale);
 
-      if (filter !== "all" && item.status !== filter) {
-        return false;
-      }
+      const email = getSenderEmail(item, locale);
 
-      /*
-       * No search term.
-       */
+      const message = getMessagePreview(item, locale);
 
-      if (!keyword) {
-        return true;
-      }
-
-      const sender = getSenderName(item);
-
-      const email = getSenderEmail(item);
-
-      const message = getMessagePreview(item);
-
-      const formName = localized(item.formName);
+      const formName = localized(item.formName, locale);
 
       return [sender, email, message, formName, item.formSlug]
         .filter(Boolean)
@@ -410,38 +352,18 @@ export default function MessageManager() {
         .toLowerCase()
         .includes(keyword);
     });
-  }, [filter, items, search]);
+  }, [items, locale, search]);
 
   /*
    * =======================================================
-   * OPEN MESSAGE
+   * MARK READ
    * =======================================================
    */
 
-  async function openMessage(item) {
-    if (!item) {
-      return;
+  async function markRead(item) {
+    if (!item?.id || item.readByCurrentUser) {
+      return item;
     }
-
-    /*
-     * Open immediately.
-     */
-
-    setSelected(item);
-
-    /*
-     * Already read / processed.
-     */
-
-    if (item.status !== FORM_SUBMISSION_STATUS.NEW) {
-      return;
-    }
-
-    /*
-     * Mark NEW message as READ.
-     *
-     * Drawer opens without waiting for the API.
-     */
 
     try {
       const response = await fetch(
@@ -456,32 +378,16 @@ export default function MessageManager() {
           credentials: "include",
 
           body: JSON.stringify({
-            status: FORM_SUBMISSION_STATUS.READ,
+            action: "mark_read",
           }),
         },
       );
 
-      let payload = null;
-
-      try {
-        payload = await response.json();
-      } catch {
-        payload = null;
-      }
+      const payload = await response.json();
 
       if (!response.ok || payload?.success === false) {
-        console.error("Unable to mark message as read:", payload?.message);
-
-        return;
+        return item;
       }
-
-      if (!payload?.data) {
-        return;
-      }
-
-      /*
-       * Update Inbox.
-       */
 
       setItems((current) =>
         current.map((currentItem) =>
@@ -489,18 +395,151 @@ export default function MessageManager() {
         ),
       );
 
-      /*
-       * Update Drawer.
-       */
-
-      setSelected(payload.data);
+      return payload.data;
     } catch (error) {
-      /*
-       * Do not block opening the message if
-       * marking it as read fails.
-       */
-
       console.error("Mark message read error:", error);
+
+      return item;
+    }
+  }
+
+  /*
+   * =======================================================
+   * SINGLE CLICK
+   * =======================================================
+   */
+
+  async function openMessage(item) {
+    setSelected(item);
+
+    const updated = await markRead(item);
+
+    setSelected(updated);
+  }
+
+  /*
+   * =======================================================
+   * DOUBLE CLICK
+   * =======================================================
+   */
+
+  function openMessageWindow(item) {
+    if (!item?.id) {
+      return;
+    }
+
+    window.open(
+      `/admin/messages/${encodeURIComponent(item.id)}`,
+      "_blank",
+      "noopener,noreferrer",
+    );
+  }
+
+  /*
+   * =======================================================
+   * TRASH
+   * =======================================================
+   */
+
+  async function moveToTrash(item) {
+    if (!item?.id || actingId) {
+      return;
+    }
+
+    try {
+      setActingId(item.id);
+
+      const response = await fetch(
+        `/api/v1/companies/${activeCompanyId}/form-submissions/${item.id}`,
+        {
+          method: "PATCH",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          credentials: "include",
+
+          body: JSON.stringify({
+            action: "trash",
+          }),
+        },
+      );
+
+      const payload = await response.json();
+
+      if (!response.ok || payload?.success === false) {
+        throw new Error(payload?.message || t("messages.messages.trashFailed"));
+      }
+
+      setItems((current) =>
+        current.filter((currentItem) => currentItem.id !== item.id),
+      );
+
+      if (selected?.id === item.id) {
+        setSelected(null);
+      }
+
+      toast.success(t("messages.messages.movedToTrash"));
+    } catch (error) {
+      console.error("Move message to trash error:", error);
+
+      toast.error(error?.message || t("messages.messages.trashFailed"));
+    } finally {
+      setActingId(null);
+    }
+  }
+
+  /*
+   * =======================================================
+   * RESTORE
+   * =======================================================
+   */
+
+  async function restoreMessage(item) {
+    if (!item?.id || actingId) {
+      return;
+    }
+
+    try {
+      setActingId(item.id);
+
+      const response = await fetch(
+        `/api/v1/companies/${activeCompanyId}/form-submissions/${item.id}`,
+        {
+          method: "PATCH",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          credentials: "include",
+
+          body: JSON.stringify({
+            action: "restore",
+          }),
+        },
+      );
+
+      const payload = await response.json();
+
+      if (!response.ok || payload?.success === false) {
+        throw new Error(
+          payload?.message || t("messages.messages.restoreFailed"),
+        );
+      }
+
+      setItems((current) =>
+        current.filter((currentItem) => currentItem.id !== item.id),
+      );
+
+      toast.success(t("messages.messages.restored"));
+    } catch (error) {
+      console.error("Restore message error:", error);
+
+      toast.error(error?.message || t("messages.messages.restoreFailed"));
+    } finally {
+      setActingId(null);
     }
   }
 
@@ -524,36 +563,80 @@ export default function MessageManager() {
 
   /*
    * =======================================================
-   * CLOSE DRAWER
+   * NAV ITEMS
    * =======================================================
    */
 
-  function handleCloseDrawer() {
-    setSelected(null);
-  }
+  const navigation = [
+    {
+      id: "all",
+
+      label: t("messages.folders.inbox"),
+
+      icon: Inbox,
+    },
+
+    {
+      id: "unread",
+
+      label: t("messages.folders.unread"),
+
+      icon: MailOpen,
+    },
+
+    {
+      id: "in_progress",
+
+      label: t("messages.folders.inProgress"),
+
+      icon: Clock3,
+    },
+
+    {
+      id: "resolved",
+
+      label: t("messages.folders.resolved"),
+
+      icon: CheckCircle2,
+    },
+
+    {
+      id: "archived",
+
+      label: t("messages.folders.archived"),
+
+      icon: Archive,
+    },
+  ];
 
   /*
    * =======================================================
-   * COMPANY LOADING
+   * LOADING COMPANY
    * =======================================================
    */
 
   if (companyLoading) {
     return (
-      <div className="flex min-h-[320px] items-center justify-center">
+      <div
+        className="
+          flex
+          min-h-[320px]
+
+          items-center
+          justify-center
+        "
+      >
         <LoaderCircle
           size={20}
-          className="animate-spin text-[var(--company-primary)]"
+          className="
+            animate-spin
+
+            text-[var(--company-primary)]
+          "
         />
       </div>
     );
   }
-
-  /*
-   * =======================================================
-   * NO COMPANY
-   * =======================================================
-   */
 
   if (!activeCompany || !activeCompanyId) {
     return (
@@ -561,25 +644,45 @@ export default function MessageManager() {
         className="
           flex
           min-h-[320px]
+
           flex-col
           items-center
           justify-center
-          px-5
+
           text-center
         "
       >
         <Inbox
           size={28}
           strokeWidth={1.4}
-          className="text-[var(--admin-muted-light)]"
+          className="
+            text-[var(--admin-muted-light)]
+          "
         />
 
-        <div className="mt-4 admin-text-14 font-semibold text-[var(--admin-foreground)]">
-          No company selected
+        <div
+          className="
+            mt-4
+
+            admin-text-14
+            font-semibold
+
+            text-[var(--admin-foreground)]
+          "
+        >
+          {t("messages.noCompany.title")}
         </div>
 
-        <div className="mt-1 admin-text-11 text-[var(--admin-muted)]">
-          Select a workspace before viewing messages.
+        <div
+          className="
+            mt-1
+
+            admin-text-11
+
+            text-[var(--admin-muted)]
+          "
+        >
+          {t("messages.noCompany.description")}
         </div>
       </div>
     );
@@ -620,7 +723,7 @@ export default function MessageManager() {
                 text-[var(--company-primary)]
               "
             >
-              Communication
+              {t("messages.sectionLabel")}
             </div>
 
             <h1
@@ -634,13 +737,13 @@ export default function MessageManager() {
                 text-[var(--admin-foreground)]
               "
             >
-              Messages
+              {t("messages.title")}
             </h1>
 
             <p
               className="
                 mt-2
-                max-w-[680px]
+                max-w-[720px]
 
                 admin-text-12
                 leading-[1.65]
@@ -648,16 +751,14 @@ export default function MessageManager() {
                 text-[var(--admin-muted)]
               "
             >
-              View and manage enquiries submitted through website forms.
+              {t("messages.description")}
             </p>
           </div>
 
-          {/* REFRESH */}
-
           <button
             type="button"
-            aria-label="Refresh messages"
-            title="Refresh messages"
+            aria-label={t("common.refresh")}
+            title={t("common.refresh")}
             onClick={() =>
               loadItems({
                 silent: true,
@@ -682,10 +783,11 @@ export default function MessageManager() {
               transition
 
               hover:border-[var(--company-primary-border)]
+
               hover:bg-[var(--admin-hover)]
+
               hover:text-[var(--company-primary)]
 
-              disabled:cursor-not-allowed
               disabled:opacity-50
             "
           >
@@ -694,215 +796,16 @@ export default function MessageManager() {
         </div>
 
         {/* =================================
-            SUMMARY
+            MAIL CLIENT
         ================================= */}
 
         <div
           className="
             mt-7
+
             grid
-            gap-3
 
-            sm:grid-cols-2
-
-            xl:grid-cols-4
-          "
-        >
-          {[
-            {
-              label: "All Messages",
-              value: summary.all,
-              icon: Inbox,
-            },
-            {
-              label: "New",
-              value: summary.new,
-              icon: Circle,
-            },
-            {
-              label: "In Progress",
-              value: summary.inProgress,
-              icon: Clock3,
-            },
-            {
-              label: "Resolved",
-              value: summary.resolved,
-              icon: CheckCircle2,
-            },
-          ].map((item) => {
-            const Icon = item.icon;
-
-            return (
-              <div
-                key={item.label}
-                className="
-                  rounded-2xl
-
-                  border
-                  border-[var(--admin-border)]
-
-                  bg-[var(--admin-surface)]
-
-                  p-4
-                "
-              >
-                <div className="flex items-center justify-between">
-                  <span
-                    className="
-                      admin-text-10
-                      font-medium
-
-                      text-[var(--admin-muted)]
-                    "
-                  >
-                    {item.label}
-                  </span>
-
-                  <Icon size={15} className="text-[var(--company-primary)]" />
-                </div>
-
-                <div
-                  className="
-                    mt-3
-
-                    admin-text-24
-                    font-semibold
-                    tracking-[-0.03em]
-
-                    text-[var(--admin-foreground)]
-                  "
-                >
-                  {item.value}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* =================================
-            TOOLBAR
-        ================================= */}
-
-        <div
-          className="
-            mt-6
-
-            flex
-            flex-col
-            gap-3
-
-            xl:flex-row
-            xl:items-center
-            xl:justify-between
-          "
-        >
-          {/* SEARCH */}
-
-          <div className="relative w-full xl:max-w-[420px]">
-            <Search
-              size={15}
-              className="
-                pointer-events-none
-
-                absolute
-                left-3
-                top-1/2
-
-                -translate-y-1/2
-
-                text-[var(--admin-muted-light)]
-              "
-            />
-
-            <input
-              type="search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search name, email or message..."
-              className="
-                h-10
-                w-full
-
-                rounded-xl
-
-                border
-                border-[var(--admin-border)]
-
-                bg-[var(--admin-surface)]
-
-                pl-9
-                pr-3
-
-                admin-text-11
-
-                text-[var(--admin-foreground)]
-
-                outline-none
-
-                transition
-
-                placeholder:text-[var(--admin-muted-light)]
-
-                focus:border-[var(--company-primary)]
-
-                focus:ring-2
-                focus:ring-[var(--company-primary-soft)]
-              "
-            />
-          </div>
-
-          {/* FILTER */}
-
-          <div
-            className="
-              flex
-              flex-wrap
-              items-center
-              gap-1
-
-              rounded-xl
-
-              bg-[var(--admin-hover)]
-
-              p-1
-            "
-          >
-            {FILTERS.map((item) => (
-              <button
-                key={item.value}
-                type="button"
-                onClick={() => setFilter(item.value)}
-                className={`
-                  rounded-lg
-
-                  px-3
-                  py-1.5
-
-                  admin-text-9
-                  font-semibold
-
-                  transition
-
-                  ${
-                    filter === item.value
-                      ? "bg-[var(--admin-surface)] text-[var(--company-primary)] shadow-sm"
-                      : "text-[var(--admin-muted)] hover:text-[var(--admin-foreground)]"
-                  }
-                `}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* =================================
-            LIST
-        ================================= */}
-
-        <div
-          className="
-            mt-5
+            min-h-[620px]
 
             overflow-hidden
 
@@ -912,209 +815,581 @@ export default function MessageManager() {
             border-[var(--admin-border)]
 
             bg-[var(--admin-surface)]
+
+            lg:grid-cols-[210px_minmax(0,1fr)]
           "
         >
-          {/* LOADING */}
+          {/* =============================
+              LEFT FOLDERS
+          ============================= */}
 
-          {loading ? (
-            <div className="flex min-h-[300px] items-center justify-center">
-              <LoaderCircle
-                size={20}
-                className="animate-spin text-[var(--company-primary)]"
-              />
-            </div>
-          ) : visibleItems.length === 0 ? (
-            /* EMPTY */
+          <aside
+            className="
+              border-b
+              border-[var(--admin-border)]
 
+              bg-[var(--admin-background)]
+
+              p-3
+
+              lg:border-b-0
+              lg:border-r
+            "
+          >
             <div
               className="
                 flex
-                min-h-[300px]
+                gap-1
 
-                flex-col
-                items-center
-                justify-center
+                overflow-x-auto
 
-                px-5
-
-                text-center
+                lg:block
+                lg:space-y-1
               "
             >
-              <Inbox
-                size={27}
-                strokeWidth={1.4}
-                className="text-[var(--admin-muted-light)]"
-              />
+              {navigation.map((item) => {
+                const Icon = item.icon;
 
-              <div
-                className="
-                  mt-4
-
-                  admin-text-14
-                  font-semibold
-
-                  text-[var(--admin-foreground)]
-                "
-              >
-                No messages found
-              </div>
-
-              <div
-                className="
-                  mt-1
-
-                  admin-text-11
-
-                  text-[var(--admin-muted)]
-                "
-              >
-                Website form submissions will appear here.
-              </div>
-            </div>
-          ) : (
-            /* ITEMS */
-
-            <div className="divide-y divide-[var(--admin-border)]">
-              {visibleItems.map((item) => {
-                const sender = getSenderName(item);
-
-                const email = getSenderEmail(item);
-
-                const preview = getMessagePreview(item);
-
-                const isNew = item.status === FORM_SUBMISSION_STATUS.NEW;
+                const active = folder === "inbox" && view === item.id;
 
                 return (
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => openMessage(item)}
-                    className="
-                      grid
-                      w-full
-                      gap-3
+                    onClick={() => {
+                      setFolder("inbox");
 
-                      px-4
-                      py-4
+                      setView(item.id);
+                    }}
+                    className={cn(
+                      "flex shrink-0 items-center gap-3",
 
-                      text-left
+                      "rounded-xl",
 
-                      transition
+                      "px-3 py-2.5",
 
-                      hover:bg-[var(--admin-hover)]
+                      "admin-text-10 font-medium",
 
-                      sm:grid-cols-[18px_minmax(150px,0.8fr)_minmax(180px,1fr)_minmax(220px,1.5fr)_150px]
-                      sm:items-center
-                      sm:px-5
-                    "
+                      "transition",
+
+                      "lg:w-full",
+
+                      active
+                        ? "bg-[var(--company-primary-soft)] text-[var(--company-primary)]"
+                        : "text-[var(--admin-muted)] hover:bg-[var(--admin-hover)] hover:text-[var(--admin-foreground)]",
+                    )}
                   >
-                    {/* STATUS */}
+                    <Icon size={14} />
 
-                    <span
-                      className={
-                        isNew
-                          ? "text-[var(--company-primary)]"
-                          : "text-[var(--admin-muted-light)]"
-                      }
-                    >
-                      <StatusIcon status={item.status} />
-                    </span>
-
-                    {/* SENDER */}
-
-                    <div className="min-w-0">
-                      <div
-                        className={`
-                          truncate
-
-                          admin-text-11
-
-                          ${
-                            isNew
-                              ? "font-semibold text-[var(--admin-foreground)]"
-                              : "font-medium text-[var(--admin-foreground)]"
-                          }
-                        `}
-                      >
-                        {sender}
-                      </div>
-
-                      <div
-                        className="
-                          mt-0.5
-                          truncate
-
-                          admin-text-9
-
-                          text-[var(--admin-muted)]
-                        "
-                      >
-                        {localized(item.formName) || item.formSlug}
-                      </div>
-                    </div>
-
-                    {/* EMAIL */}
-
-                    <div
-                      className="
-                        truncate
-
-                        admin-text-10
-
-                        text-[var(--admin-muted)]
-                      "
-                    >
-                      {email || "—"}
-                    </div>
-
-                    {/* MESSAGE */}
-
-                    <div
-                      className={`
-                        truncate
-
-                        admin-text-10
-
-                        ${
-                          isNew
-                            ? "font-medium text-[var(--admin-foreground)]"
-                            : "text-[var(--admin-muted)]"
-                        }
-                      `}
-                    >
-                      {preview || "Form submission"}
-                    </div>
-
-                    {/* DATE */}
-
-                    <div
-                      className="
-                        admin-text-9
-
-                        text-[var(--admin-muted-light)]
-
-                        sm:text-right
-                      "
-                    >
-                      {formatDate(item.createdAt)}
-                    </div>
+                    <span>{item.label}</span>
                   </button>
                 );
               })}
+
+              <div
+                className="
+                  hidden
+
+                  my-2
+
+                  border-t
+                  border-[var(--admin-border)]
+
+                  lg:block
+                "
+              />
+
+              <button
+                type="button"
+                onClick={() => {
+                  setFolder("trash");
+
+                  setView("all");
+                }}
+                className={cn(
+                  "flex shrink-0 items-center gap-3",
+
+                  "rounded-xl",
+
+                  "px-3 py-2.5",
+
+                  "admin-text-10 font-medium",
+
+                  "transition",
+
+                  "lg:w-full",
+
+                  folder === "trash"
+                    ? "bg-red-50 text-red-600"
+                    : "text-[var(--admin-muted)] hover:bg-[var(--admin-hover)] hover:text-red-500",
+                )}
+              >
+                <Trash2 size={14} />
+
+                <span>{t("messages.folders.trash")}</span>
+              </button>
             </div>
-          )}
+          </aside>
+
+          {/* =============================
+              RIGHT CONTENT
+          ============================= */}
+
+          <section className="min-w-0">
+            {/* TOOLBAR */}
+
+            <div
+              className="
+                flex
+                flex-col
+                gap-3
+
+                border-b
+                border-[var(--admin-border)]
+
+                px-4
+                py-3
+
+                sm:flex-row
+                sm:items-center
+                sm:justify-between
+              "
+            >
+              <div
+                className="
+                  relative
+
+                  w-full
+
+                  sm:max-w-[420px]
+                "
+              >
+                <Search
+                  size={14}
+                  className="
+                    pointer-events-none
+
+                    absolute
+                    left-3
+                    top-1/2
+
+                    -translate-y-1/2
+
+                    text-[var(--admin-muted-light)]
+                  "
+                />
+
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder={t("messages.searchPlaceholder")}
+                  className="
+                    h-10
+                    w-full
+
+                    rounded-xl
+
+                    border
+                    border-[var(--admin-border)]
+
+                    bg-[var(--admin-background)]
+
+                    pl-9
+                    pr-3
+
+                    admin-text-10
+
+                    text-[var(--admin-foreground)]
+
+                    outline-none
+
+                    placeholder:text-[var(--admin-muted-light)]
+
+                    focus:border-[var(--company-primary)]
+
+                    focus:ring-2
+                    focus:ring-[var(--company-primary-soft)]
+                  "
+                />
+              </div>
+
+              <div
+                className="
+                  admin-text-9
+
+                  text-[var(--admin-muted)]
+                "
+              >
+                {t("messages.resultCount", {
+                  count: visibleItems.length,
+                })}
+              </div>
+            </div>
+
+            {/* MESSAGE LIST */}
+
+            {loading ? (
+              <div
+                className="
+                  flex
+                  min-h-[480px]
+
+                  items-center
+                  justify-center
+                "
+              >
+                <LoaderCircle
+                  size={20}
+                  className="
+                    animate-spin
+
+                    text-[var(--company-primary)]
+                  "
+                />
+              </div>
+            ) : visibleItems.length === 0 ? (
+              <div
+                className="
+                  flex
+                  min-h-[480px]
+
+                  flex-col
+                  items-center
+                  justify-center
+
+                  px-5
+
+                  text-center
+                "
+              >
+                {folder === "trash" ? (
+                  <Trash2
+                    size={27}
+                    strokeWidth={1.4}
+                    className="
+                      text-[var(--admin-muted-light)]
+                    "
+                  />
+                ) : (
+                  <Inbox
+                    size={27}
+                    strokeWidth={1.4}
+                    className="
+                      text-[var(--admin-muted-light)]
+                    "
+                  />
+                )}
+
+                <div
+                  className="
+                    mt-4
+
+                    admin-text-13
+                    font-semibold
+
+                    text-[var(--admin-foreground)]
+                  "
+                >
+                  {folder === "trash"
+                    ? t("messages.empty.trashTitle")
+                    : t("messages.empty.title")}
+                </div>
+
+                <div
+                  className="
+                    mt-1
+
+                    admin-text-10
+
+                    text-[var(--admin-muted)]
+                  "
+                >
+                  {folder === "trash"
+                    ? t("messages.empty.trashDescription")
+                    : t("messages.empty.description")}
+                </div>
+              </div>
+            ) : (
+              <div>
+                {visibleItems.map((item) => {
+                  const sender = getSenderName(item, locale);
+
+                  const email = getSenderEmail(item, locale);
+
+                  const preview = getMessagePreview(item, locale);
+
+                  const unread = item.readByCurrentUser !== true;
+
+                  const acting = actingId === item.id;
+
+                  return (
+                    <div
+                      key={item.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => openMessage(item)}
+                      onDoubleClick={() => openMessageWindow(item)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          openMessage(item);
+                        }
+                      }}
+                      className={cn(
+                        "group",
+
+                        "grid",
+
+                        "cursor-pointer",
+
+                        "gap-3",
+
+                        "border-b border-[var(--admin-border)]",
+
+                        "px-4 py-3.5",
+
+                        "transition",
+
+                        "last:border-b-0",
+
+                        "hover:bg-[var(--admin-hover)]",
+
+                        "md:grid-cols-[8px_minmax(145px,0.8fr)_minmax(240px,1.8fr)_auto_auto]",
+
+                        "md:items-center",
+
+                        unread
+                          ? "bg-[var(--company-primary-soft)]/20"
+                          : "bg-[var(--admin-surface)]",
+                      )}
+                    >
+                      {/* UNREAD DOT */}
+
+                      <div>
+                        <span
+                          className={cn(
+                            "block",
+
+                            "h-2 w-2",
+
+                            "rounded-full",
+
+                            unread
+                              ? "bg-[var(--company-primary)]"
+                              : "bg-transparent",
+                          )}
+                        />
+                      </div>
+
+                      {/* SENDER */}
+
+                      <div className="min-w-0">
+                        <div
+                          className={cn(
+                            "truncate",
+
+                            "admin-text-10",
+
+                            unread
+                              ? "font-semibold text-[var(--admin-foreground)]"
+                              : "font-medium text-[var(--admin-foreground)]",
+                          )}
+                        >
+                          {sender}
+                        </div>
+
+                        <div
+                          className="
+                              mt-0.5
+                              truncate
+
+                              admin-text-8
+
+                              text-[var(--admin-muted)]
+                            "
+                        >
+                          {email ||
+                            localized(item.formName, locale) ||
+                            item.formSlug}
+                        </div>
+                      </div>
+
+                      {/* SUBJECT + PREVIEW */}
+
+                      <div className="min-w-0">
+                        <div
+                          className={cn(
+                            "truncate",
+
+                            "admin-text-10",
+
+                            unread
+                              ? "font-semibold text-[var(--admin-foreground)]"
+                              : "font-medium text-[var(--admin-foreground)]",
+                          )}
+                        >
+                          {localized(item.formName, locale) ||
+                            t("messages.fallbackSubject")}
+                        </div>
+
+                        <div
+                          className="
+                              mt-0.5
+                              truncate
+
+                              admin-text-9
+
+                              text-[var(--admin-muted)]
+                            "
+                        >
+                          {preview || t("messages.fallbackPreview")}
+                        </div>
+                      </div>
+
+                      {/* READERS */}
+
+                      <div onClick={(event) => event.stopPropagation()}>
+                        <MessageReaderAvatars
+                          readBy={item.readBy}
+                          max={3}
+                          compact
+                        />
+                      </div>
+
+                      {/* DATE + ACTION */}
+
+                      <div
+                        className="
+                            flex
+                            items-center
+                            justify-end
+                            gap-1
+                          "
+                      >
+                        <span
+                          className="
+                              whitespace-nowrap
+
+                              admin-text-8
+
+                              text-[var(--admin-muted-light)]
+                            "
+                        >
+                          {formatDate(item.createdAt, locale)}
+                        </span>
+
+                        {folder === "trash" ? (
+                          <button
+                            type="button"
+                            title={t("messages.actions.restore")}
+                            disabled={acting}
+                            onClick={(event) => {
+                              event.stopPropagation();
+
+                              restoreMessage(item);
+                            }}
+                            className="
+                                ml-1
+
+                                flex
+                                h-8
+                                w-8
+
+                                items-center
+                                justify-center
+
+                                rounded-lg
+
+                                text-[var(--admin-muted-light)]
+
+                                opacity-0
+
+                                transition
+
+                                group-hover:opacity-100
+
+                                hover:bg-[var(--admin-surface)]
+
+                                hover:text-[var(--company-primary)]
+
+                                disabled:opacity-30
+                              "
+                          >
+                            {acting ? (
+                              <LoaderCircle
+                                size={13}
+                                className="animate-spin"
+                              />
+                            ) : (
+                              <RotateCcw size={13} />
+                            )}
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            title={t("messages.actions.trash")}
+                            disabled={acting}
+                            onClick={(event) => {
+                              event.stopPropagation();
+
+                              moveToTrash(item);
+                            }}
+                            className="
+                                ml-1
+
+                                flex
+                                h-8
+                                w-8
+
+                                items-center
+                                justify-center
+
+                                rounded-lg
+
+                                text-[var(--admin-muted-light)]
+
+                                opacity-0
+
+                                transition
+
+                                group-hover:opacity-100
+
+                                hover:bg-red-50
+
+                                hover:text-red-500
+
+                                disabled:opacity-30
+                              "
+                          >
+                            {acting ? (
+                              <LoaderCircle
+                                size={13}
+                                className="animate-spin"
+                              />
+                            ) : (
+                              <Trash2 size={13} />
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </section>
         </div>
       </div>
 
       {/* =================================
-          MESSAGE DETAIL
+          EXISTING DRAWER
       ================================= */}
 
       <MessageDetailDrawer
         open={Boolean(selected)}
         companyId={activeCompanyId}
         submission={selected}
-        onClose={handleCloseDrawer}
+        onClose={() => setSelected(null)}
         onUpdated={handleUpdated}
       />
     </>

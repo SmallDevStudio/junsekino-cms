@@ -10,6 +10,12 @@ import { getCompanyPermission } from "@/lib/auth/company-guards";
 
 import { listFormSubmissions } from "@/modules/form/form-submission.service";
 
+/*
+ * =========================================================
+ * GET
+ * =========================================================
+ */
+
 export async function GET(request, context) {
   try {
     const params = await context.params;
@@ -20,6 +26,7 @@ export async function GET(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Invalid company.",
         },
         {
@@ -31,10 +38,6 @@ export async function GET(request, context) {
     const access = await getCompanyPermission({
       companyId: company.data,
 
-      /*
-       * Temporary until central
-       * permission consistency pass.
-       */
       permission: PERMISSIONS.COMPANY_UPDATE,
     });
 
@@ -42,6 +45,7 @@ export async function GET(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: access.reason,
         },
         {
@@ -56,6 +60,10 @@ export async function GET(request, context) {
 
     const status = searchParams.get("status");
 
+    const folder = searchParams.get("folder") || "inbox";
+
+    const unreadOnly = searchParams.get("unread") === "1";
+
     if (status && !FORM_SUBMISSION_STATUSES.includes(status)) {
       return NextResponse.json(
         {
@@ -69,15 +77,36 @@ export async function GET(request, context) {
       );
     }
 
+    if (!["inbox", "trash"].includes(folder)) {
+      return NextResponse.json(
+        {
+          success: false,
+
+          message: "Invalid message folder.",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
     const data = await listFormSubmissions({
       companyId: company.data,
 
       formId,
+
       status,
+
+      folder,
+
+      unreadOnly,
+
+      currentUser: access.user,
     });
 
     return NextResponse.json({
       success: true,
+
       data,
     });
   } catch (error) {

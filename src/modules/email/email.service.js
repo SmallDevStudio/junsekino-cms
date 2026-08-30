@@ -4,9 +4,11 @@ import { Resend } from "resend";
 
 import { getCommunicationSettings } from "@/modules/settings/communication-settings.service";
 
+import { createCompanySmtpTransport } from "./smtp.service";
+
 /*
  * =========================================================
- * HTML
+ * HELPERS
  * =========================================================
  */
 
@@ -18,12 +20,6 @@ function escapeHtml(value) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
-
-/*
- * =========================================================
- * VALUE
- * =========================================================
- */
 
 function formatValue(value) {
   if (Array.isArray(value)) {
@@ -39,7 +35,86 @@ function formatValue(value) {
 
 /*
  * =========================================================
- * EMAIL HTML
+ * RESEND
+ * =========================================================
+ */
+
+function getResend() {
+  const apiKey = process.env.RESEND_API_KEY;
+
+  if (!apiKey) {
+    return null;
+  }
+
+  return new Resend(apiKey);
+}
+
+/*
+ * =========================================================
+ * SENDER
+ * =========================================================
+ */
+
+function resolveSender(emailSettings) {
+  const senderEmail =
+    emailSettings?.senderEmail?.trim() || process.env.EMAIL_FROM?.trim() || "";
+
+  if (!senderEmail) {
+    return "";
+  }
+
+  const senderName = emailSettings?.senderName?.trim() || "";
+
+  /*
+   * Environment variable may already contain:
+   *
+   * Junsekino <mail@example.com>
+   */
+  if (senderEmail.includes("<") && senderEmail.includes(">")) {
+    return senderEmail;
+  }
+
+  if (!senderName) {
+    return senderEmail;
+  }
+
+  return `${senderName} <${senderEmail}>`;
+}
+
+/*
+ * =========================================================
+ * RECIPIENTS
+ * =========================================================
+ */
+
+function resolveRecipients({ emailSettings, form = null }) {
+  const companyRecipients = Array.isArray(emailSettings?.recipients)
+    ? emailSettings.recipients
+        .map((item) => String(item).trim().toLowerCase())
+        .filter(Boolean)
+    : [];
+
+  if (companyRecipients.length > 0) {
+    return Array.from(new Set(companyRecipients));
+  }
+
+  /*
+   * Legacy form-level recipients.
+   */
+
+  const formRecipients =
+    form && Array.isArray(form.settings?.notificationEmails)
+      ? form.settings.notificationEmails
+          .map((item) => String(item).trim().toLowerCase())
+          .filter(Boolean)
+      : [];
+
+  return Array.from(new Set(formRecipients));
+}
+
+/*
+ * =========================================================
+ * FORM EMAIL HTML
  * =========================================================
  */
 
@@ -53,7 +128,7 @@ function createFormEmailHtml({ form, submission }) {
         !["heading", "paragraph"].includes(field.type),
     )
     .map((field) => {
-      const label = field.label?.th || field.label?.en || field.id;
+      const label = field.label?.en || field.label?.th || field.id;
 
       const value = submission.values?.[field.id];
 
@@ -91,9 +166,7 @@ function createFormEmailHtml({ form, submission }) {
 
     <html>
       <head>
-        <meta
-          charset="utf-8"
-        />
+        <meta charset="utf-8" />
 
         <meta
           name="viewport"
@@ -125,7 +198,7 @@ function createFormEmailHtml({ form, submission }) {
               color:#777777;
             "
           >
-            Junsekino CMS
+            JUNSEKINO CMS
           </div>
 
           <h2
@@ -149,7 +222,7 @@ function createFormEmailHtml({ form, submission }) {
               line-height:1.7;
             "
           >
-            A new submission was received from the Junsekino website.
+            A new submission was received from the website.
           </p>
 
           <table
@@ -170,7 +243,6 @@ function createFormEmailHtml({ form, submission }) {
               border-top:1px solid #eeeeee;
               color:#888888;
               font-size:11px;
-              line-height:1.6;
             "
           >
             Submission ID:
@@ -184,98 +256,274 @@ function createFormEmailHtml({ form, submission }) {
 
 /*
  * =========================================================
- * RESEND
+ * TEST EMAIL HTML
  * =========================================================
  */
 
-function getResend() {
-  const apiKey = process.env.RESEND_API_KEY;
+function createTestEmailHtml({ companyName, provider }) {
+  return `
+    <!doctype html>
 
-  if (!apiKey) {
-    return null;
-  }
+    <html>
+      <head>
+        <meta charset="utf-8" />
+      </head>
 
-  return new Resend(apiKey);
+      <body
+        style="
+          margin:0;
+          padding:0;
+          background:#ffffff;
+          font-family:Arial,Helvetica,sans-serif;
+          color:#111111;
+        "
+      >
+        <div
+          style="
+            max-width:640px;
+            margin:0 auto;
+            padding:48px 24px;
+          "
+        >
+          <div
+            style="
+              font-size:11px;
+              letter-spacing:.14em;
+              text-transform:uppercase;
+              color:#777777;
+            "
+          >
+            JUNSEKINO CMS
+          </div>
+
+          <h2
+            style="
+              margin:14px 0 0;
+              font-size:20px;
+              font-weight:600;
+            "
+          >
+            Email configuration test
+          </h2>
+
+          <p
+            style="
+              margin:14px 0 0;
+              font-size:13px;
+              line-height:1.8;
+              color:#555555;
+            "
+          >
+            This message confirms that email delivery for
+            ${escapeHtml(companyName || "this company")}
+            is working correctly.
+          </p>
+
+          <div
+            style="
+              margin-top:24px;
+              padding:14px 16px;
+              background:#f7f7f7;
+              font-size:12px;
+              color:#555555;
+            "
+          >
+            Provider:
+            <strong>
+              ${escapeHtml(String(provider || "").toUpperCase())}
+            </strong>
+          </div>
+
+          <p
+            style="
+              margin-top:28px;
+              font-size:11px;
+              color:#999999;
+            "
+          >
+            Sent automatically from Junsekino CMS.
+          </p>
+        </div>
+      </body>
+    </html>
+  `;
 }
 
 /*
  * =========================================================
- * SENDER
+ * SEND VIA RESEND
  * =========================================================
  */
 
-function resolveSender({ emailSettings }) {
-  /*
-   * Company-level sender email takes priority.
-   *
-   * IMPORTANT:
-   * The address must belong to a domain verified
-   * with the configured Resend account.
-   */
+async function sendWithResend({
+  emailSettings,
+  recipients,
+  subject,
+  html,
+  idempotencyKey = null,
+}) {
+  const resend = getResend();
 
-  const senderEmail =
-    emailSettings?.senderEmail?.trim() || process.env.EMAIL_FROM?.trim() || "";
+  const from = resolveSender(emailSettings);
 
-  if (!senderEmail) {
-    return "";
+  if (!resend || !from) {
+    return {
+      sent: false,
+
+      skipped: "RESEND_NOT_CONFIGURED",
+    };
   }
 
-  const senderName = emailSettings?.senderName?.trim();
+  const payload = {
+    from,
 
-  if (!senderName) {
-    return senderEmail;
+    to: recipients,
+
+    subject,
+
+    html,
+  };
+
+  if (emailSettings?.replyTo?.trim()) {
+    payload.replyTo = emailSettings.replyTo.trim();
   }
 
-  /*
-   * If EMAIL_FROM already contains:
-   *
-   * Junsekino <mail@example.com>
-   *
-   * don't wrap it again.
-   */
+  const options = idempotencyKey
+    ? {
+        idempotencyKey,
+      }
+    : undefined;
 
-  if (senderEmail.includes("<") && senderEmail.includes(">")) {
-    return senderEmail;
+  const { data, error } = await resend.emails.send(payload, options);
+
+  if (error) {
+    console.error("Resend email error:", error);
+
+    return {
+      sent: false,
+
+      provider: "resend",
+
+      error,
+    };
   }
 
-  return `${senderName} <${senderEmail}>`;
+  return {
+    sent: true,
+
+    provider: "resend",
+
+    emailId: data?.id || null,
+  };
 }
 
 /*
  * =========================================================
- * RECIPIENTS
+ * SEND VIA SMTP
  * =========================================================
  */
 
-function resolveRecipients({ emailSettings, form }) {
-  /*
-   * New company-level settings take priority.
-   */
+async function sendWithSmtp({
+  companyId,
+  emailSettings,
+  recipients,
+  subject,
+  html,
+}) {
+  const from = resolveSender(emailSettings);
 
-  const companyRecipients = Array.isArray(emailSettings?.recipients)
-    ? emailSettings.recipients
-        .map((item) => String(item).trim().toLowerCase())
-        .filter(Boolean)
-    : [];
+  if (!from) {
+    return {
+      sent: false,
 
-  if (companyRecipients.length > 0) {
-    return Array.from(new Set(companyRecipients));
+      skipped: "SENDER_NOT_CONFIGURED",
+    };
   }
 
-  /*
-   * Backward compatibility:
-   *
-   * Existing forms may already contain
-   * notificationEmails.
-   */
+  const transport = await createCompanySmtpTransport({
+    companyId,
 
-  const legacyRecipients = Array.isArray(form.settings?.notificationEmails)
-    ? form.settings.notificationEmails
-        .map((item) => String(item).trim().toLowerCase())
-        .filter(Boolean)
-    : [];
+    smtp: emailSettings.smtp,
+  });
 
-  return Array.from(new Set(legacyRecipients));
+  const message = {
+    from,
+
+    to: recipients.join(", "),
+
+    subject,
+
+    html,
+  };
+
+  if (emailSettings?.replyTo?.trim()) {
+    message.replyTo = emailSettings.replyTo.trim();
+  }
+
+  const info = await transport.sendMail(message);
+
+  return {
+    sent: true,
+
+    provider: "smtp",
+
+    emailId: info?.messageId || null,
+
+    accepted: info?.accepted || [],
+
+    rejected: info?.rejected || [],
+  };
+}
+
+/*
+ * =========================================================
+ * PROVIDER ROUTER
+ * =========================================================
+ */
+
+async function sendCompanyEmail({
+  companyId,
+  emailSettings,
+  recipients,
+  subject,
+  html,
+  idempotencyKey = null,
+}) {
+  const provider = emailSettings?.provider || "resend";
+
+  if (provider === "smtp") {
+    return sendWithSmtp({
+      companyId,
+
+      emailSettings,
+
+      recipients,
+
+      subject,
+
+      html,
+    });
+  }
+
+  if (provider === "resend") {
+    return sendWithResend({
+      emailSettings,
+
+      recipients,
+
+      subject,
+
+      html,
+
+      idempotencyKey,
+    });
+  }
+
+  return {
+    sent: false,
+
+    skipped: "EMAIL_PROVIDER_UNSUPPORTED",
+  };
 }
 
 /*
@@ -285,12 +533,6 @@ function resolveRecipients({ emailSettings, form }) {
  */
 
 export async function sendFormSubmissionEmail({ companyId, form, submission }) {
-  /*
-   * =======================================================
-   * COMMUNICATION SETTINGS
-   * =======================================================
-   */
-
   const communication = await getCommunicationSettings({
     companyId,
   });
@@ -302,7 +544,7 @@ export async function sendFormSubmissionEmail({ companyId, form, submission }) {
   const formSubmission = notifications?.events?.formSubmission || {};
 
   /*
-   * Email provider/channel disabled.
+   * Company email master switch.
    */
 
   if (emailSettings.enabled !== true) {
@@ -314,7 +556,7 @@ export async function sendFormSubmissionEmail({ companyId, form, submission }) {
   }
 
   /*
-   * Notification email channel disabled globally.
+   * Notification email master switch.
    */
 
   if (notifications.email !== true) {
@@ -326,7 +568,7 @@ export async function sendFormSubmissionEmail({ companyId, form, submission }) {
   }
 
   /*
-   * Form Submission event email disabled.
+   * Event-level switch.
    */
 
   if (formSubmission.email !== true) {
@@ -338,13 +580,7 @@ export async function sendFormSubmissionEmail({ companyId, form, submission }) {
   }
 
   /*
-   * Keep legacy Form Core switch.
-   *
-   * A form that explicitly disables its own email
-   * should still be respected.
-   *
-   * However, undefined is allowed because new
-   * Communication Settings are now authoritative.
+   * Legacy per-form switch.
    */
 
   if (form.settings?.sendEmailNotification === false) {
@@ -354,12 +590,6 @@ export async function sendFormSubmissionEmail({ companyId, form, submission }) {
       skipped: "FORM_EMAIL_DISABLED",
     };
   }
-
-  /*
-   * =======================================================
-   * RECIPIENTS
-   * =======================================================
-   */
 
   const recipients = resolveRecipients({
     emailSettings,
@@ -375,91 +605,99 @@ export async function sendFormSubmissionEmail({ companyId, form, submission }) {
     };
   }
 
-  /*
-   * =======================================================
-   * PROVIDER
-   * =======================================================
-   */
-
-  const resend = getResend();
-
-  const from = resolveSender({
-    emailSettings,
-  });
-
-  if (!resend || !from) {
-    console.warn(
-      "Form email notification skipped: RESEND_API_KEY or sender email is not configured.",
-    );
-
-    return {
-      sent: false,
-
-      skipped: "EMAIL_NOT_CONFIGURED",
-    };
-  }
-
-  /*
-   * =======================================================
-   * SUBJECT
-   * =======================================================
-   */
-
   const subject = `New submission: ${
     form.name?.en || form.name?.th || form.slug
   }`;
 
-  /*
-   * =======================================================
-   * SEND
-   * =======================================================
-   */
+  const html = createFormEmailHtml({
+    form,
+    submission,
+  });
 
-  const emailPayload = {
-    from,
+  return sendCompanyEmail({
+    companyId,
 
-    to: recipients,
+    emailSettings,
+
+    recipients,
 
     subject,
 
-    html: createFormEmailHtml({
-      form,
+    html,
 
-      submission,
-    }),
-  };
-
-  /*
-   * Optional Reply-To.
-   */
-
-  if (emailSettings?.replyTo?.trim()) {
-    emailPayload.replyTo = emailSettings.replyTo.trim();
-  }
-
-  const { data, error } = await resend.emails.send(emailPayload, {
-    /*
-     * One outgoing email per submission.
-     *
-     * Prevents accidental duplicate sends
-     * during retries.
-     */
     idempotencyKey: `form-submission/${submission.id}`,
   });
+}
 
-  if (error) {
-    console.error("Resend email error:", error);
+/*
+ * =========================================================
+ * SEND TEST EMAIL
+ * =========================================================
+ */
 
-    return {
-      sent: false,
+export async function sendCompanyTestEmail({
+  companyId,
+  companyName,
+  recipient = null,
+}) {
+  const communication = await getCommunicationSettings({
+    companyId,
+  });
 
-      error,
-    };
+  const emailSettings = communication?.email || {};
+
+  /*
+   * Test Email intentionally does not require
+   * notification event switches.
+   *
+   * It tests the provider configuration itself.
+   */
+
+  const recipients = recipient
+    ? [String(recipient).trim().toLowerCase()]
+    : resolveRecipients({
+        emailSettings,
+      });
+
+  if (recipients.length === 0) {
+    throw new Error("TEST_EMAIL_RECIPIENT_REQUIRED");
+  }
+
+  const subject = "Junsekino CMS - Email Test";
+
+  const html = createTestEmailHtml({
+    companyName,
+
+    provider: emailSettings.provider,
+  });
+
+  const result = await sendCompanyEmail({
+    companyId,
+
+    emailSettings,
+
+    recipients,
+
+    subject,
+
+    html,
+
+    idempotencyKey: null,
+  });
+
+  if (result.sent !== true) {
+    const reason = result.skipped || "TEST_EMAIL_FAILED";
+
+    throw new Error(reason);
   }
 
   return {
     sent: true,
 
-    emailId: data?.id || null,
+    provider: result.provider,
+
+    emailId: result.emailId || null,
+
+    recipients,
   };
 }
