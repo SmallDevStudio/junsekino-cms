@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import ContactForm from "./ContactForm";
 
 /*
@@ -22,6 +24,46 @@ function hasText(value) {
   return Boolean(String(value || "").trim());
 }
 
+function normalizeDisplayName(value) {
+  return String(value || "").trim();
+}
+
+function resolveCompanyLabel(company) {
+  const shortName = normalizeDisplayName(company?.shortName);
+
+  if (shortName) {
+    if (/^junsekino\b/i.test(shortName)) {
+      return shortName.toUpperCase();
+    }
+
+    return `JUNSEKINO ${shortName}`.toUpperCase();
+  }
+
+  return normalizeDisplayName(company?.name).toUpperCase();
+}
+
+function uniqueNames(...values) {
+  const names = [];
+
+  for (const value of values) {
+    const name = normalizeDisplayName(value);
+
+    if (!name) {
+      continue;
+    }
+
+    const duplicate = names.some(
+      (current) => current.toLocaleLowerCase() === name.toLocaleLowerCase(),
+    );
+
+    if (!duplicate) {
+      names.push(name);
+    }
+  }
+
+  return names;
+}
+
 /*
  * =========================================================
  * CONTENT
@@ -29,6 +71,8 @@ function hasText(value) {
  */
 
 export default function ContactPageContent({
+  company,
+
   companySlug,
 
   page,
@@ -41,7 +85,23 @@ export default function ContactPageContent({
 }) {
   const contact = page?.contact || {};
 
-  const displayName = localized(contact.companyDisplayName, locale);
+  const displayNameEn = normalizeDisplayName(contact.companyDisplayName?.en);
+
+  const displayNameTh = normalizeDisplayName(contact.companyDisplayName?.th);
+
+  const fallbackDisplayName = localized(contact.companyDisplayName, locale);
+
+  const displayNames = uniqueNames(
+    displayNameEn,
+    displayNameTh,
+    fallbackDisplayName,
+  );
+
+  const primaryDisplayName = displayNames[0] || "";
+
+  const contactHeading = displayNameTh || displayNameEn || fallbackDisplayName;
+
+  const companyLabel = resolveCompanyLabel(company);
 
   const caption = localized(contact.coverCaption, locale);
 
@@ -58,301 +118,255 @@ export default function ContactPageContent({
   const resolvedCoverUrl = coverUrl || page?.featuredImage?.largeUrl || null;
 
   const coverAlt =
-    localized(page?.featuredImage?.alt, locale) || displayName || "Contact";
+    localized(page?.featuredImage?.alt, locale) ||
+    primaryDisplayName ||
+    "Contact";
+
+  const hasCompanyIntroduction =
+    displayNames.length > 0 || hasText(companyLabel) || hasText(year);
 
   const hasContactDetails =
     hasText(address) || hasText(telephone) || hasText(email);
 
+  const showForm = contact.form?.enabled !== false && Boolean(form);
+
   return (
-    <div
-      className="
-        mx-auto
-        w-full
-        max-w-[1320px]
-
-        px-5
-        pb-20
-        pt-4
-
-        sm:px-8
-
-        lg:px-12
-        lg:pb-28
-      "
-    >
-      {/* =================================
-          COVER
-      ================================= */}
-
-      {resolvedCoverUrl && (
-        <section>
-          <div
-            className="
-              mx-auto
-              w-full
-              max-w-[1040px]
-
-              overflow-hidden
-            "
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={resolvedCoverUrl}
-              alt={coverAlt}
-              className="
-                aspect-[17/10]
-                w-full
-
-                object-cover
-              "
-            />
-          </div>
-
-          {hasText(caption) && (
-            <div
-              className="
-                mx-auto
-                mt-2
-                w-full
-                max-w-[1040px]
-
-                text-right
-
-                text-[9px]
-                leading-[1.5]
-
-                text-black/35
-              "
-            >
-              {caption}
-            </div>
-          )}
-        </section>
-      )}
-
-      {/* =================================
-          INTRO
-      ================================= */}
-
-      <section
+    <div className="w-full flex-1 bg-[#f4f4f6] text-black">
+      <div
         className="
           mx-auto
-          mt-14
           w-full
-          max-w-[1040px]
+          max-w-[968px]
 
-          sm:mt-16
+          px-5
+          pb-16
+          pt-2
+
+          sm:px-6
+          sm:pb-20
         "
       >
-        {hasText(displayName) && (
-          <div>
-            <h1
-              className="
-                text-[13px]
-                font-normal
-                uppercase
-                leading-[1.6]
-                tracking-[0.015em]
+        <div className="mx-auto w-full max-w-[920px]">
+          {/* =================================
+              COVER
+          ================================= */}
 
-                text-black
-              "
-            >
-              {displayName}
-            </h1>
-
-            {year && (
-              <div
-                className="
-                  mt-4
-
-                  text-[10px]
-                  leading-[1.6]
-
-                  text-black/55
-                "
-              >
-                (Established {year})
+          {resolvedCoverUrl && (
+            <section>
+              <div className="relative aspect-[17/10] w-full overflow-hidden bg-black/[0.04]">
+                <Image
+                  src={resolvedCoverUrl}
+                  alt={coverAlt}
+                  fill
+                  sizes="(max-width: 968px) 100vw, 920px"
+                  className="object-cover"
+                  unoptimized
+                  priority={!preview}
+                />
               </div>
-            )}
-          </div>
-        )}
-      </section>
 
-      {/* =================================
-          DIVIDER
-      ================================= */}
-
-      {hasContactDetails && (
-        <div
-          className="
-            mx-auto
-            my-12
-            w-full
-            max-w-[1040px]
-
-            border-t
-            border-black/15
-          "
-        />
-      )}
-
-      {/* =================================
-          CONTACT INFORMATION
-      ================================= */}
-
-      {hasContactDetails && (
-        <section
-          className="
-            mx-auto
-            w-full
-            max-w-[1040px]
-          "
-        >
-          {hasText(displayName) && (
-            <h2
-              className="
-                mb-8
-
-                text-[11px]
-                font-normal
-                uppercase
-                leading-[1.6]
-
-                text-black
-              "
-            >
-              {displayName}
-            </h2>
-          )}
-
-          <div
-            className="
-              grid
-              gap-y-4
-
-              text-[10px]
-              leading-[1.8]
-
-              text-black/75
-
-              sm:grid-cols-[90px_1fr]
-            "
-          >
-            {hasText(address) && (
-              <>
-                <div className="text-black/45">Address</div>
-
-                <div
+              {hasText(caption) && (
+                <p
                   className="
-                    whitespace-pre-line
+                    mt-2
+                    text-right
+                    text-[10px]
+                    leading-[1.5]
+                    text-black/45
                   "
                 >
-                  {address}
-                </div>
-              </>
-            )}
+                  {caption}
+                </p>
+              )}
+            </section>
+          )}
 
-            {hasText(telephone) && (
-              <>
-                <div className="text-black/45">Tel</div>
+          {/* =================================
+              COMPANY INTRODUCTION
+          ================================= */}
 
-                <div>
-                  <a
-                    href={`tel:${telephone.replace(/\s+/g, "")}`}
-                    className="
-                      transition
-
-                      hover:text-[var(--public-primary)]
-                    "
-                  >
-                    {telephone}
-                  </a>
-                </div>
-              </>
-            )}
-
-            {hasText(email) && (
-              <>
-                <div className="text-black/45">Email</div>
-
-                <div>
-                  <a
-                    href={`mailto:${email}`}
-                    className="
-                      transition
-
-                      hover:text-[var(--public-primary)]
-                    "
-                  >
-                    {email}
-                  </a>
-                </div>
-              </>
-            )}
-          </div>
-        </section>
-      )}
-
-      {/* =================================
-          FORM
-      ================================= */}
-
-      {contact.form?.enabled !== false && form && (
-        <>
-          <div
-            className="
-                mx-auto
-                my-12
-                w-full
-                max-w-[1040px]
-
-                border-t
-                border-black/15
-              "
-          />
-
-          <section
-            className="
-                mx-auto
-                w-full
-                max-w-[1040px]
-              "
-          >
-            <div
-              className="
-                  grid
-                  gap-10
-
-                  lg:grid-cols-[1fr_1.15fr]
-                "
-            >
-              <div />
-
-              <div>
-                <h2
+          {hasCompanyIntroduction && (
+            <section className={resolvedCoverUrl ? "mt-5" : "mt-8"}>
+              <div className="space-y-0.5">
+                <p
                   className="
-                      mb-7
+                    text-[16px]
+                    font-semibold
+                    leading-[1.35]
+                    tracking-[-0.025em]
+                    sm:text-[17px]
+                  "
+                >
+                  JUNSEKINO ARCHITECT AND DESIGN CO.,LTD
+                </p>
+                {displayNames.map((name, index) => (
+                  <p
+                    key={`${name}-${index}`}
+                    className={
+                      index === 0
+                        ? "text-[16px] font-semibold leading-[1.35] tracking-[-0.025em] sm:text-[17px]"
+                        : "text-[13px] font-medium leading-[1.5] sm:text-[14px]"
+                    }
+                  >
+                    {index === 0 ? name.toUpperCase() : name}
+                  </p>
+                ))}
 
+                {hasText(companyLabel) && (
+                  <p
+                    className="
+                      pt-0.5
                       text-[13px]
-                      font-normal
+                      font-medium
+                      leading-[1.5]
+                      text-[var(--public-primary)]
 
-                      text-black
+                      sm:text-[14px]
                     "
+                  >
+                    ({companyLabel})
+                  </p>
+                )}
+
+                {hasText(year) && (
+                  <p className="pt-1 text-[11px] leading-[1.6] text-black/55">
+                    (Established {year})
+                  </p>
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* =================================
+              CONTACT INFORMATION
+          ================================= */}
+
+          {hasContactDetails && (
+            <>
+              <div className="my-6 border-t border-black/15 sm:my-7" />
+
+              <section>
+                {hasText(contactHeading) && (
+                  <h1
+                    className="
+                      mb-5
+                      text-[14px]
+                      font-semibold
+                      leading-[1.55]
+
+                      sm:text-[15px]
+                    "
+                  >
+                    {contactHeading}
+                  </h1>
+                )}
+
+                <dl
+                  className="
+                    grid
+                    gap-x-8
+                    gap-y-3.5
+                    text-[13px]
+                    leading-[1.65]
+
+                    sm:grid-cols-[166px_minmax(0,1fr)]
+                    sm:text-[14px]
+                  "
+                >
+                  {hasText(address) && (
+                    <>
+                      <dt className="font-semibold">Address</dt>
+
+                      <dd className="whitespace-pre-line">{address}</dd>
+                    </>
+                  )}
+
+                  {hasText(telephone) && (
+                    <>
+                      <dt className="font-semibold">Tel</dt>
+
+                      <dd>
+                        <a
+                          href={`tel:${telephone.replace(/[^+\d]/g, "")}`}
+                          className="transition-colors hover:text-[var(--public-primary)]"
+                        >
+                          {telephone}
+                        </a>
+                      </dd>
+                    </>
+                  )}
+
+                  {hasText(email) && (
+                    <>
+                      <dt className="font-semibold">Email</dt>
+
+                      <dd>
+                        <a
+                          href={`mailto:${email}`}
+                          className="break-all transition-colors hover:text-[var(--public-primary)]"
+                        >
+                          {email}
+                        </a>
+                      </dd>
+                    </>
+                  )}
+                </dl>
+              </section>
+            </>
+          )}
+
+          {/* =================================
+              FORM
+          ================================= */}
+
+          {showForm && (
+            <>
+              <div className="my-6 border-t border-black/15 sm:my-7" />
+
+              <section aria-labelledby="contact-form-title">
+                <h2
+                  id="contact-form-title"
+                  className="
+                    mb-2.5
+                    text-center
+                    text-[15px]
+                    font-semibold
+                    leading-[1.5]
+
+                    sm:text-[16px]
+                  "
                 >
                   {localized(form.name, locale) || "Contact Us"}
                 </h2>
 
-                <ContactForm
-                  companySlug={companySlug}
-                  form={form}
-                  locale={locale}
-                  preview={preview}
-                />
-              </div>
-            </div>
-          </section>
-        </>
-      )}
+                <div
+                  className="
+                    rounded-xl
+                    border
+                    border-black/[0.08]
+                    bg-white
+
+                    px-3.5
+                    py-4
+
+                    shadow-[0_1px_3px_rgba(0,0,0,0.08)]
+
+                    sm:px-4
+                    sm:py-4
+                  "
+                >
+                  <ContactForm
+                    companySlug={companySlug}
+                    form={form}
+                    locale={locale}
+                    preview={preview}
+                  />
+                </div>
+              </section>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

@@ -30,7 +30,14 @@ function createInitialValues(fields) {
       continue;
     }
 
-    if (["checkbox", "consent"].includes(field.type)) {
+    if (field.type === "checkbox") {
+      result[field.id] =
+        Array.isArray(field.options) && field.options.length ? [] : false;
+
+      continue;
+    }
+
+    if (field.type === "consent") {
       result[field.id] = false;
 
       continue;
@@ -40,6 +47,73 @@ function createInitialValues(fields) {
   }
 
   return result;
+}
+
+function getFieldWidthClass(width) {
+  if (width === "half") {
+    return "col-span-12 md:col-span-6";
+  }
+
+  if (width === "third") {
+    return "col-span-12 md:col-span-4";
+  }
+
+  return "col-span-12";
+}
+
+function createControlId(form, field) {
+  return `contact-${form?.id || form?.slug || "form"}-${field.id}`.replace(
+    /[^a-zA-Z0-9_-]/g,
+    "-",
+  );
+}
+
+function isMissingRequiredValue(field, value) {
+  if (field.type === "consent") {
+    return value !== true;
+  }
+
+  if (field.type === "checkbox") {
+    return Array.isArray(value) ? value.length === 0 : value !== true;
+  }
+
+  return value === undefined || value === null || String(value).trim() === "";
+}
+
+function inputType(fieldType) {
+  if (fieldType === "email") {
+    return "email";
+  }
+
+  if (fieldType === "phone") {
+    return "tel";
+  }
+
+  if (fieldType === "number") {
+    return "number";
+  }
+
+  if (fieldType === "date") {
+    return "date";
+  }
+
+  return "text";
+}
+
+function autoComplete(field, label) {
+  if (field.type === "email") {
+    return "email";
+  }
+
+  if (field.type === "phone") {
+    return "tel";
+  }
+
+  if (/name|surname|ชื่อ|นามสกุล/i.test(label)) {
+    return "name";
+  }
+
+  return "off";
 }
 
 /*
@@ -60,6 +134,8 @@ export default function ContactForm({
   const fields = Array.isArray(form?.fields) ? form.fields : [];
 
   const [values, setValues] = useState(() => createInitialValues(fields));
+
+  const [website, setWebsite] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -95,6 +171,16 @@ export default function ContactForm({
     });
   }
 
+  function toggleCheckboxOption(fieldId, optionValue, checked) {
+    const current = Array.isArray(values[fieldId]) ? values[fieldId] : [];
+
+    const next = checked
+      ? Array.from(new Set([...current, optionValue]))
+      : current.filter((value) => value !== optionValue);
+
+    updateValue(fieldId, next);
+  }
+
   function validate() {
     const nextErrors = {};
 
@@ -109,23 +195,19 @@ export default function ContactForm({
 
       const value = values[field.id];
 
-      const isBooleanField = ["checkbox", "consent"].includes(field.type);
+      if (field.required && isMissingRequiredValue(field, value)) {
+        const booleanField = ["checkbox", "consent"].includes(field.type);
 
-      const missingRequiredValue = isBooleanField
-        ? value !== true
-        : value === undefined ||
-          value === null ||
-          String(value).trim() === "";
-
-      if (field.required && missingRequiredValue) {
         nextErrors[field.id] =
           locale === "th"
-            ? isBooleanField
-              ? "กรุณายอมรับเงื่อนไข"
+            ? booleanField
+              ? "กรุณายอมรับหรือเลือกข้อมูลในช่องนี้"
               : "กรุณากรอกข้อมูล"
-            : isBooleanField
-              ? "You must accept this field."
+            : booleanField
+              ? "Please accept or select this field."
               : "This field is required.";
+
+        continue;
       }
 
       if (
@@ -185,10 +267,7 @@ export default function ContactForm({
                   : null,
             },
 
-            /*
-             * Honeypot.
-             */
-            website: "",
+            website,
           }),
         },
       );
@@ -220,6 +299,8 @@ export default function ContactForm({
       setSuccess(true);
 
       setValues(createInitialValues(fields));
+
+      setWebsite("");
     } catch (submitError) {
       setError(
         submitError?.message ||
@@ -234,56 +315,28 @@ export default function ContactForm({
 
   if (success) {
     return (
-      <div
-        className="
-          py-10
-          text-center
-        "
-      >
+      <div className="py-9 text-center" role="status">
         <div
           className="
             mx-auto
             flex
             h-10
             w-10
-
             items-center
             justify-center
-
             rounded-full
-
-            border
-            border-black/10
+            bg-[var(--public-primary)]
+            text-white
           "
         >
-          <Check size={16} strokeWidth={1.4} />
+          <Check size={17} strokeWidth={1.7} />
         </div>
 
-        <div
-          className="
-            mt-4
-
-            text-[13px]
-            font-normal
-
-            text-black
-          "
-        >
+        <h3 className="mt-4 text-[15px] font-semibold text-black">
           {localized(form.settings?.successTitle, locale, "Thank you")}
-        </div>
+        </h3>
 
-        <p
-          className="
-            mx-auto
-            mt-2
-            max-w-[440px]
-
-            text-[11px]
-            leading-[1.7]
-
-            text-black/45
-          "
-        >
+        <p className="mx-auto mt-2 max-w-[440px] text-[12px] leading-[1.7] text-black/55">
           {localized(
             form.settings?.successMessage,
             locale,
@@ -294,26 +347,54 @@ export default function ContactForm({
     );
   }
 
+  const controlClass = `
+    mt-1.5
+    w-full
+    rounded-md
+    border
+    border-transparent
+    bg-[#f4f4f6]
+    px-2.5
+    text-[13px]
+    text-black
+    outline-none
+    transition
+    placeholder:text-black/40
+    hover:border-black/10
+    focus:border-[var(--public-primary)]
+    disabled:cursor-not-allowed
+    disabled:opacity-60
+  `;
+
   return (
     <form onSubmit={handleSubmit} noValidate>
-      <div
-        className="
-          space-y-5
-        "
-      >
+      <div className="pointer-events-none absolute -left-[10000px] top-auto h-px w-px overflow-hidden">
+        <label htmlFor="contact-website">Website</label>
+
+        <input
+          id="contact-website"
+          name="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          value={website}
+          onChange={(event) => setWebsite(event.target.value)}
+        />
+      </div>
+
+      <div className="grid grid-cols-12 gap-x-4 gap-y-3">
         {fields.map((field) => {
           if (field.enabled === false) {
             return null;
           }
 
+          const widthClass = getFieldWidthClass(field.width);
+
           if (field.type === "heading") {
             return (
               <h3
                 key={field.id}
-                className="
-                    text-[13px]
-                    font-normal
-                  "
+                className={`${widthClass} pt-1 text-[14px] font-semibold leading-[1.5]`}
               >
                 {localized(field.label, locale)}
               </h3>
@@ -324,12 +405,7 @@ export default function ContactForm({
             return (
               <p
                 key={field.id}
-                className="
-                    text-[11px]
-                    leading-[1.7]
-
-                    text-black/55
-                  "
+                className={`${widthClass} text-[12px] leading-[1.7] text-black/60`}
               >
                 {localized(field.label, locale)}
               </p>
@@ -340,182 +416,355 @@ export default function ContactForm({
 
           const placeholder = localized(field.placeholder, locale);
 
+          const helpText = localized(field.helpText, locale);
+
           const hasError = Boolean(fieldErrors[field.id]);
 
-          const commonClass = `
-              mt-1.5
-              w-full
+          const controlId = createControlId(form, field);
 
-              border
-              bg-white
+          const errorId = `${controlId}-error`;
 
-              px-3
+          const helpId = `${controlId}-help`;
 
-              text-[12px]
-              text-black
+          const describedBy = hasError
+            ? errorId
+            : helpText
+              ? helpId
+              : undefined;
 
-              outline-none
+          if (field.type === "consent") {
+            return (
+              <div key={field.id} className={widthClass}>
+                <label
+                  htmlFor={controlId}
+                  className="flex cursor-pointer items-start gap-2.5 pt-1"
+                >
+                  <input
+                    id={controlId}
+                    type="checkbox"
+                    checked={values[field.id] === true}
+                    disabled={preview || submitting}
+                    aria-invalid={hasError}
+                    aria-describedby={describedBy}
+                    onChange={(event) =>
+                      updateValue(field.id, event.target.checked)
+                    }
+                    className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--public-primary)]"
+                  />
 
-              transition
+                  <span className="text-[12px] leading-[1.6] text-black/65">
+                    {label}
 
-              placeholder:text-black/25
+                    {field.required && (
+                      <span className="ml-1 text-[var(--public-primary)]">
+                        *
+                      </span>
+                    )}
+                  </span>
+                </label>
 
-              ${
-                hasError
-                  ? "border-red-400"
-                  : "border-black/20 focus:border-black/55"
-              }
-            `;
+                {helpText && !hasError && (
+                  <p
+                    id={helpId}
+                    className="mt-1 text-[10px] leading-[1.6] text-black/45"
+                  >
+                    {helpText}
+                  </p>
+                )}
+
+                {hasError && (
+                  <p
+                    id={errorId}
+                    role="alert"
+                    className="mt-1 text-[10px] text-red-600"
+                  >
+                    {fieldErrors[field.id]}
+                  </p>
+                )}
+              </div>
+            );
+          }
+
+          if (field.type === "radio") {
+            return (
+              <fieldset key={field.id} className={widthClass}>
+                <legend className="text-[13px] leading-[1.4] text-black">
+                  {label}
+
+                  {field.required && (
+                    <span className="ml-1 text-[var(--public-primary)]">*</span>
+                  )}
+                </legend>
+
+                <div className="mt-2 flex flex-wrap gap-x-5 gap-y-2">
+                  {(field.options || []).map((option) => (
+                    <label
+                      key={option.value}
+                      className="flex cursor-pointer items-center gap-2 text-[12px] text-black/70"
+                    >
+                      <input
+                        type="radio"
+                        name={controlId}
+                        value={option.value}
+                        checked={values[field.id] === option.value}
+                        disabled={preview || submitting}
+                        onChange={(event) =>
+                          updateValue(field.id, event.target.value)
+                        }
+                        className="h-4 w-4 accent-[var(--public-primary)]"
+                      />
+
+                      {localized(option.label, locale, option.value)}
+                    </label>
+                  ))}
+                </div>
+
+                {hasError && (
+                  <p
+                    id={errorId}
+                    role="alert"
+                    className="mt-1 text-[10px] text-red-600"
+                  >
+                    {fieldErrors[field.id]}
+                  </p>
+                )}
+              </fieldset>
+            );
+          }
+
+          if (field.type === "checkbox") {
+            const options = Array.isArray(field.options) ? field.options : [];
+
+            if (options.length) {
+              return (
+                <fieldset key={field.id} className={widthClass}>
+                  <legend className="text-[13px] leading-[1.4] text-black">
+                    {label}
+
+                    {field.required && (
+                      <span className="ml-1 text-[var(--public-primary)]">
+                        *
+                      </span>
+                    )}
+                  </legend>
+
+                  <div className="mt-2 flex flex-wrap gap-x-5 gap-y-2">
+                    {options.map((option) => (
+                      <label
+                        key={option.value}
+                        className="flex cursor-pointer items-center gap-2 text-[12px] text-black/70"
+                      >
+                        <input
+                          type="checkbox"
+                          value={option.value}
+                          checked={
+                            Array.isArray(values[field.id]) &&
+                            values[field.id].includes(option.value)
+                          }
+                          disabled={preview || submitting}
+                          onChange={(event) =>
+                            toggleCheckboxOption(
+                              field.id,
+                              option.value,
+                              event.target.checked,
+                            )
+                          }
+                          className="h-4 w-4 accent-[var(--public-primary)]"
+                        />
+
+                        {localized(option.label, locale, option.value)}
+                      </label>
+                    ))}
+                  </div>
+
+                  {hasError && (
+                    <p
+                      id={errorId}
+                      role="alert"
+                      className="mt-1 text-[10px] text-red-600"
+                    >
+                      {fieldErrors[field.id]}
+                    </p>
+                  )}
+                </fieldset>
+              );
+            }
+
+            return (
+              <div key={field.id} className={widthClass}>
+                <label
+                  htmlFor={controlId}
+                  className="flex cursor-pointer items-center gap-2.5 pt-1"
+                >
+                  <input
+                    id={controlId}
+                    type="checkbox"
+                    checked={values[field.id] === true}
+                    disabled={preview || submitting}
+                    onChange={(event) =>
+                      updateValue(field.id, event.target.checked)
+                    }
+                    className="h-4 w-4 accent-[var(--public-primary)]"
+                  />
+
+                  <span className="text-[12px] leading-[1.6] text-black/65">
+                    {label}
+
+                    {field.required && (
+                      <span className="ml-1 text-[var(--public-primary)]">
+                        *
+                      </span>
+                    )}
+                  </span>
+                </label>
+
+                {hasError && (
+                  <p
+                    id={errorId}
+                    role="alert"
+                    className="mt-1 text-[10px] text-red-600"
+                  >
+                    {fieldErrors[field.id]}
+                  </p>
+                )}
+              </div>
+            );
+          }
 
           return (
-            <label key={field.id} className="block">
-              <div
-                className="
-                    text-[11px]
-                    leading-none
-
-                    text-black/75
-                  "
+            <div key={field.id} className={widthClass}>
+              <label
+                htmlFor={controlId}
+                className="block text-[13px] leading-[1.4] text-black"
               >
                 {label}
 
-                {field.required && <span className="ml-0.5">*</span>}
-              </div>
+                {field.required && (
+                  <span className="ml-1 text-[var(--public-primary)]">*</span>
+                )}
+              </label>
 
               {field.type === "textarea" ? (
                 <textarea
+                  id={controlId}
                   rows={6}
                   value={values[field.id] || ""}
                   placeholder={placeholder}
                   disabled={preview || submitting}
+                  required={field.required}
+                  aria-invalid={hasError}
+                  aria-describedby={describedBy}
                   onChange={(event) =>
                     updateValue(field.id, event.target.value)
                   }
-                  className={`${commonClass} min-h-[130px] resize-y py-3`}
+                  className={`${controlClass} min-h-[124px] resize-y py-2.5`}
                 />
-              ) : field.type === "consent" ? (
-                <div className="mt-2">
-                  <label
-                    className="
-                        flex
-                        items-start
-                        gap-2
-                      "
-                  >
-                    <input
-                      type="checkbox"
-                      checked={values[field.id] === true}
-                      disabled={preview || submitting}
-                      onChange={(event) =>
-                        updateValue(field.id, event.target.checked)
-                      }
-                    />
+              ) : field.type === "select" ? (
+                <select
+                  id={controlId}
+                  value={values[field.id] || ""}
+                  disabled={preview || submitting}
+                  required={field.required}
+                  aria-invalid={hasError}
+                  aria-describedby={describedBy}
+                  onChange={(event) =>
+                    updateValue(field.id, event.target.value)
+                  }
+                  className={`${controlClass} h-[38px]`}
+                >
+                  <option value="">{placeholder || "—"}</option>
 
-                    <span
-                      className="
-                          text-[10px]
-                          leading-[1.6]
-
-                          text-black/60
-                        "
-                    >
-                      {label}
-                    </span>
-                  </label>
-                </div>
+                  {(field.options || []).map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {localized(option.label, locale, option.value)}
+                    </option>
+                  ))}
+                </select>
               ) : (
                 <input
-                  type={
-                    field.type === "email"
-                      ? "email"
-                      : field.type === "phone"
-                        ? "tel"
-                        : "text"
-                  }
-                  value={values[field.id] || ""}
+                  id={controlId}
+                  type={inputType(field.type)}
+                  value={values[field.id] ?? ""}
                   placeholder={placeholder}
                   disabled={preview || submitting}
+                  required={field.required}
+                  autoComplete={autoComplete(field, label)}
+                  min={field.validation?.min ?? undefined}
+                  max={field.validation?.max ?? undefined}
+                  minLength={field.validation?.minLength ?? undefined}
+                  maxLength={field.validation?.maxLength ?? undefined}
+                  pattern={field.validation?.pattern || undefined}
+                  aria-invalid={hasError}
+                  aria-describedby={describedBy}
                   onChange={(event) =>
-                    updateValue(field.id, event.target.value)
+                    updateValue(
+                      field.id,
+                      field.type === "number" && event.target.value !== ""
+                        ? Number(event.target.value)
+                        : event.target.value,
+                    )
                   }
-                  className={`${commonClass} h-9`}
+                  className={`${controlClass} h-[38px]`}
                 />
+              )}
+
+              {helpText && !hasError && (
+                <p
+                  id={helpId}
+                  className="mt-1 text-[10px] leading-[1.6] text-black/45"
+                >
+                  {helpText}
+                </p>
               )}
 
               {hasError && (
-                <div
-                  className="
-                      mt-1
-
-                      text-[9px]
-
-                      text-red-500
-                    "
+                <p
+                  id={errorId}
+                  role="alert"
+                  className="mt-1 text-[10px] text-red-600"
                 >
                   {fieldErrors[field.id]}
-                </div>
+                </p>
               )}
-            </label>
+            </div>
           );
         })}
       </div>
 
       {error && (
-        <div
-          className="
-            mt-4
-
-            text-[10px]
-
-            text-red-500
-          "
-        >
+        <p role="alert" className="mt-4 text-center text-[11px] text-red-600">
           {error}
-        </div>
+        </p>
       )}
 
-      <div
-        className="
-          mt-6
-          flex
-          justify-end
-        "
-      >
+      <div className="mt-5 flex justify-center">
         <button
           type="submit"
           disabled={preview || submitting}
           className="
             inline-flex
-            min-w-[92px]
-
+            min-h-[37px]
+            min-w-[77px]
             items-center
             justify-center
             gap-2
-
-            border
-            border-black
-
-            bg-black
-
+            rounded-md
+            bg-[var(--public-primary)]
             px-5
-            py-2.5
-
-            text-[10px]
-            uppercase
-            tracking-[0.14em]
-
+            py-2
+            text-[13px]
+            font-medium
             text-white
-
-            transition
-
-            hover:bg-white
-            hover:text-black
-
+            transition-opacity
+            hover:opacity-85
+            focus-visible:outline-2
+            focus-visible:outline-offset-2
+            focus-visible:outline-[var(--public-primary)]
             disabled:cursor-not-allowed
-            disabled:opacity-40
+            disabled:opacity-45
           "
         >
-          {submitting && <LoaderCircle size={12} className="animate-spin" />}
+          {submitting && <LoaderCircle size={14} className="animate-spin" />}
 
           {localized(
             form.settings?.submitLabel,
