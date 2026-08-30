@@ -2768,6 +2768,8 @@ export const adminTh = {
     readers: {
       none: "ยังไม่มีผู้เปิดอ่าน",
 
+      unknown: "ไม่ทราบชื่อผู้ใช้",
+
       user: "ผู้ใช้งาน",
 
       title: "อ่านแล้ว {count} คน",
@@ -2829,6 +2831,10 @@ export const adminTh = {
       title: "ไม่มีข้อความ",
 
       description: "ข้อความที่ตรงกับกล่องนี้จะแสดงที่นี่",
+
+      trashTitle: "ถังขยะว่างเปล่า",
+
+      trashDescription: "ข้อความที่ถูกลบจะแสดงที่นี่จนกว่าจะถูกลบถาวร",
     },
 
     noCompany: {
