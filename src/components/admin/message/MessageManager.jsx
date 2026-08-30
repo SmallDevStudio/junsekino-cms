@@ -276,7 +276,7 @@ export default function MessageManager() {
 
         if (!response.ok || payload?.success === false) {
           throw new Error(
-            payload?.message || t("messages.messages.loadFailed"),
+            payload?.message || t("messages.errors.loadFailed"),
           );
         }
 
@@ -300,7 +300,7 @@ export default function MessageManager() {
       } catch (error) {
         console.error("Load messages error:", error);
 
-        toast.error(error?.message || t("messages.messages.loadFailed"));
+        toast.error(error?.message || t("messages.errors.loadFailed"));
       } finally {
         setLoading(false);
 
@@ -469,7 +469,7 @@ export default function MessageManager() {
       const payload = await response.json();
 
       if (!response.ok || payload?.success === false) {
-        throw new Error(payload?.message || t("messages.messages.trashFailed"));
+        throw new Error(payload?.message || t("messages.errors.trashFailed"));
       }
 
       setItems((current) =>
@@ -484,7 +484,7 @@ export default function MessageManager() {
     } catch (error) {
       console.error("Move message to trash error:", error);
 
-      toast.error(error?.message || t("messages.messages.trashFailed"));
+      toast.error(error?.message || t("messages.errors.trashFailed"));
     } finally {
       setActingId(null);
     }
@@ -525,7 +525,7 @@ export default function MessageManager() {
 
       if (!response.ok || payload?.success === false) {
         throw new Error(
-          payload?.message || t("messages.messages.restoreFailed"),
+          payload?.message || t("messages.errors.restoreFailed"),
         );
       }
 
@@ -537,7 +537,7 @@ export default function MessageManager() {
     } catch (error) {
       console.error("Restore message error:", error);
 
-      toast.error(error?.message || t("messages.messages.restoreFailed"));
+      toast.error(error?.message || t("messages.errors.restoreFailed"));
     } finally {
       setActingId(null);
     }
@@ -587,7 +587,7 @@ export default function MessageManager() {
     {
       id: "in_progress",
 
-      label: t("messages.folders.inProgress"),
+      label: t("messages.folders.in_progress"),
 
       icon: Clock3,
     },
