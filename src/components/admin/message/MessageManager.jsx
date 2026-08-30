@@ -307,7 +307,7 @@ export default function MessageManager() {
         setRefreshing(false);
       }
     },
-    [activeCompanyId, queryString, requestedSubmissionId, t],
+    [activeCompanyId, queryString, requestedSubmissionId, setSelected, t],
   );
 
   useEffect(() => {
