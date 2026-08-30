@@ -2804,6 +2804,8 @@ export const adminEn = {
     readers: {
       none: "Not read yet",
 
+      unknown: "Unknown user",
+
       user: "User",
 
       title: "Read by {count} people",
@@ -2867,6 +2869,10 @@ export const adminEn = {
       title: "No messages",
 
       description: "Messages matching this mailbox will appear here.",
+
+      trashTitle: "Trash is empty",
+
+      trashDescription: "Deleted messages will appear here until permanently removed.",
     },
 
     noCompany: {
