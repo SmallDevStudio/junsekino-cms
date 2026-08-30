@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Play } from "lucide-react";
 
 import PublicContentEngagement from "./PublicContentEngagement";
+import PublicExpandableDescription from "./PublicExpandableDescription";
 
 function localized(value, locale) {
   return (
@@ -144,22 +145,13 @@ export default function PublicContentCard({
     >
       {/* THUMBNAIL */}
 
-      <Link
-        href={href}
-        className="
-          group
-          block
-        "
-      >
+      <Link href={href} className="group block">
         <div
           className="
             relative
-
             aspect-video
             w-full
-
             overflow-hidden
-
             bg-[var(--public-surface)]
           "
         >
@@ -197,7 +189,6 @@ export default function PublicContentCard({
                 text-[9px]
                 uppercase
                 tracking-[0.08em]
-
                 text-black/20
               "
             >
@@ -215,19 +206,15 @@ export default function PublicContentCard({
                 flex
                 h-8
                 w-8
-
                 items-center
                 justify-center
 
                 rounded-full
-
                 border
                 border-white/70
-
                 bg-black/20
 
                 text-white/90
-
                 backdrop-blur-[2px]
 
                 transition-all
@@ -271,7 +258,6 @@ export default function PublicContentCard({
             hover:opacity-65
 
             sm:text-[17px]
-
             lg:text-[18px]
           "
           style={{
@@ -290,7 +276,6 @@ export default function PublicContentCard({
             flex
             flex-wrap
             items-center
-
             gap-2
           "
         >
@@ -300,7 +285,6 @@ export default function PublicContentCard({
               items-center
 
               rounded-full
-
               border
 
               px-2.5
@@ -322,7 +306,6 @@ export default function PublicContentCard({
               className="
                 text-[9px]
                 tracking-[0.025em]
-
                 text-black/30
               "
             >
@@ -341,7 +324,7 @@ export default function PublicContentCard({
             initialViews={item.engagement?.views || 0}
             initialLikes={item.engagement?.likes || 0}
             trackView={false}
-            interactiveLike={false}
+            interactiveLike
             showShare
           />
         </div>
@@ -349,25 +332,22 @@ export default function PublicContentCard({
         {/* DESCRIPTION */}
 
         {excerpt && (
-          <p
+          <PublicExpandableDescription
+            lines={5}
             className="
               mt-4
 
               max-w-[680px]
 
-              line-clamp-5
-              whitespace-pre-line
-
               text-[11px]
               leading-[1.65]
-
               text-black/55
 
               sm:text-[12px]
             "
           >
             {excerpt}
-          </p>
+          </PublicExpandableDescription>
         )}
 
         {/* TAG */}
@@ -375,24 +355,23 @@ export default function PublicContentCard({
         {Array.isArray(item.tags) && item.tags.length > 0 && (
           <div
             className="
-                mt-4
+              mt-4
 
-                flex
-                flex-wrap
+              flex
+              flex-wrap
 
-                gap-x-3
-                gap-y-1
-              "
+              gap-x-3
+              gap-y-1
+            "
           >
             {item.tags.map((tag) => (
               <span
                 key={tag}
                 className="
-                      text-[9px]
-                      tracking-[0.03em]
-
-                      text-black/25
-                    "
+                  text-[9px]
+                  tracking-[0.03em]
+                  text-black/25
+                "
               >
                 #{tag}
               </span>

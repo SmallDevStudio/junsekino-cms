@@ -23,7 +23,6 @@ function Tooltip({ label }) {
     <span
       className="
         pointer-events-none
-
         absolute
         bottom-full
         left-1/2
@@ -267,10 +266,6 @@ export default function PublicContentShare({ companySlug, slug, title }) {
   }
 
   function openShare(url, channel) {
-    /*
-     * Open immediately inside the click
-     * event so browsers do not block it.
-     */
     window.open(url, "_blank", "noopener,noreferrer,width=680,height=620");
 
     recordShare(channel);
@@ -328,7 +323,7 @@ export default function PublicContentShare({ companySlug, slug, title }) {
 
   return (
     <div ref={containerRef} className="relative">
-      {/* SHARE */}
+      {/* SHARE BUTTON */}
 
       <button
         type="button"
@@ -346,14 +341,29 @@ export default function PublicContentShare({ companySlug, slug, title }) {
           items-center
           justify-center
 
-          text-black/25
+          rounded-full
 
-          transition-colors
+          border
+          border-black/10
 
-          hover:text-[var(--public-primary)]
+          bg-white
+
+          text-[var(--public-primary)]
+
+          shadow-[0_1px_2px_rgba(0,0,0,0.04)]
+
+          transition-all
+          duration-200
+
+          hover:border-[var(--public-primary)]
+          hover:bg-black/[0.025]
+
+          focus-visible:outline-2
+          focus-visible:outline-offset-2
+          focus-visible:outline-[var(--public-primary)]
         "
       >
-        <Share2 size={16} strokeWidth={1.15} />
+        <Share2 size={16} strokeWidth={1.25} />
 
         {!open && <Tooltip label="Share" />}
       </button>
@@ -372,15 +382,19 @@ export default function PublicContentShare({ companySlug, slug, title }) {
 
             min-w-[205px]
 
+            overflow-hidden
+
+            rounded-xl
+
             border
-            border-black/[0.06]
+            border-black/[0.08]
 
             bg-[var(--public-background)]
 
             px-3
             py-3
 
-            shadow-[0_14px_40px_rgba(0,0,0,0.08)]
+            shadow-[0_16px_45px_rgba(0,0,0,0.12)]
           "
         >
           <div

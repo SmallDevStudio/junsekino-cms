@@ -128,7 +128,7 @@ export default function PublicContentIndex({
         className="
           mx-auto
           w-full
-          max-w-[1280px]
+          max-w-[1100px]
         "
       >
         {/* =====================================

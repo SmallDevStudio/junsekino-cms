@@ -162,7 +162,7 @@ export default function PublicAwardIndex({
         className="
           mx-auto
           w-full
-          max-w-[1440px]
+          max-w-[1100px]
         "
       >
         {/* =====================================

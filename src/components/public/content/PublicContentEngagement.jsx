@@ -213,9 +213,9 @@ export default function PublicContentEngagement({
     <div
       className="
         flex
+        flex-wrap
         items-center
-
-        gap-4
+        gap-2
       "
     >
       {/* LIKE */}
@@ -229,16 +229,33 @@ export default function PublicContentEngagement({
           onClick={handleLike}
           className="
             group
-
-            flex
+            inline-flex
             h-8
             items-center
             gap-1.5
 
-            text-[10px]
-            text-black/40
+            rounded-full
+            border
+            border-black/10
+            bg-white
 
-            transition-opacity
+            px-3
+
+            text-[10px]
+            font-medium
+            text-black/55
+
+            shadow-[0_1px_2px_rgba(0,0,0,0.04)]
+
+            transition-all
+            duration-200
+
+            hover:border-[var(--public-primary)]
+            hover:text-[var(--public-primary)]
+
+            focus-visible:outline-2
+            focus-visible:outline-offset-2
+            focus-visible:outline-[var(--public-primary)]
 
             disabled:cursor-wait
             disabled:opacity-50
@@ -263,21 +280,29 @@ export default function PublicContentEngagement({
       ) : (
         <div
           className="
-            flex
+            inline-flex
             h-8
             items-center
             gap-1.5
 
+            rounded-full
+            border
+            border-black/10
+            bg-white
+
+            px-3
+
             text-[10px]
-            text-black/40
+            font-medium
+            text-black/55
+
+            shadow-[0_1px_2px_rgba(0,0,0,0.04)]
           "
         >
           <Heart
             size={15}
             strokeWidth={1.25}
-            className="
-              text-[var(--public-primary)]
-            "
+            className="text-[var(--public-primary)]"
           />
 
           <span>{formatNumber(engagement.likes)}</span>
@@ -288,18 +313,32 @@ export default function PublicContentEngagement({
 
       <div
         className="
-          flex
+          inline-flex
           h-8
           items-center
           gap-1.5
 
+          rounded-full
+          border
+          border-black/10
+          bg-white
+
+          px-3
+
           text-[10px]
-          text-black/40
+          font-medium
+          text-black/55
+
+          shadow-[0_1px_2px_rgba(0,0,0,0.04)]
         "
       >
-        <Eye size={15} strokeWidth={1.15} />
+        <Eye
+          size={15}
+          strokeWidth={1.25}
+          className="text-[var(--public-primary)]"
+        />
 
-        <span>{formatNumber(engagement.views)}</span>
+        <span>{formatNumber(engagement.views)} views</span>
       </div>
 
       {/* SHARE */}

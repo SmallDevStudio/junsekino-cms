@@ -1,19 +1,31 @@
 import Image from "next/image";
 import Link from "next/link";
 
+/*
+ * =========================================================
+ * LOCALIZATION
+ * =========================================================
+ */
+
 function getLocalizedValue(value, locale = "en") {
   if (!value) {
     return "";
   }
 
   if (typeof value === "string") {
-    return value;
+    return value.trim();
   }
 
   return (
     value?.[locale]?.trim() || value?.en?.trim() || value?.th?.trim() || ""
   );
 }
+
+/*
+ * =========================================================
+ * MEDIA
+ * =========================================================
+ */
 
 function createMediaUrl({ companySlug, mediaId }) {
   if (!companySlug || !mediaId) {
@@ -25,6 +37,12 @@ function createMediaUrl({ companySlug, mediaId }) {
   )}/media/${encodeURIComponent(mediaId)}?variant=medium`;
 }
 
+/*
+ * =========================================================
+ * PROJECT CARD
+ * =========================================================
+ */
+
 export default function PublicProjectCard({
   companySlug,
   project,
@@ -35,6 +53,8 @@ export default function PublicProjectCard({
     project?.slug ||
     "Untitled Project";
 
+  const location = getLocalizedValue(project?.projectInfo?.location, locale);
+
   const mediaId = project?.featuredImage?.mediaId || null;
 
   const imageUrl = createMediaUrl({
@@ -44,9 +64,15 @@ export default function PublicProjectCard({
 
   const href = `/${companySlug}/project/${project.slug}`;
 
+  const linkLabel = location ? `${title}, ${location}` : title;
+
   return (
-    <article>
-      <Link href={href} className="group block text-center">
+    <article className="w-full">
+      <Link
+        href={href}
+        aria-label={linkLabel}
+        className="group block w-full outline-none"
+      >
         <div
           className="
             relative
@@ -71,15 +97,17 @@ export default function PublicProjectCard({
               className="
                 select-none
                 object-cover
+                grayscale
 
-                opacity-[0.48]
-
-                transition-all
+                transition-[transform,filter]
                 duration-500
                 ease-out
 
-                group-hover:scale-[1.025]
-                group-hover:opacity-100
+                group-hover:scale-[1.055]
+                group-hover:grayscale-0
+
+                group-focus-visible:scale-[1.055]
+                group-focus-visible:grayscale-0
               "
             />
           ) : (
@@ -94,35 +122,120 @@ export default function PublicProjectCard({
                 text-[9px]
                 uppercase
                 tracking-[0.08em]
-                text-black/20
+                text-black/25
               "
             >
               No Image
             </div>
           )}
+
+          {/* =================================
+              HOVER OVERLAY
+          ================================= */}
+
+          <div
+            className="
+              pointer-events-none
+              absolute
+              inset-0
+
+              flex
+              items-end
+
+              bg-gradient-to-t
+              from-black/70
+              via-black/10
+              to-transparent
+
+              p-4
+
+              opacity-0
+
+              transition-opacity
+              duration-300
+              ease-out
+
+              group-hover:opacity-100
+              group-focus-visible:opacity-100
+
+              sm:p-5
+            "
+          >
+            <div
+              className="
+                w-full
+                translate-y-2
+
+                text-left
+                text-white
+
+                opacity-0
+
+                transition-all
+                delay-75
+                duration-300
+                ease-out
+
+                group-hover:translate-y-0
+                group-hover:opacity-100
+
+                group-focus-visible:translate-y-0
+                group-focus-visible:opacity-100
+              "
+            >
+              <h3
+                className="
+                  text-[14px]
+                  font-medium
+                  leading-[1.35]
+                  tracking-[0.01em]
+
+                  sm:text-[15px]
+                  lg:text-[16px]
+                "
+              >
+                {title}
+              </h3>
+
+              {location && (
+                <p
+                  className="
+                    mt-1
+                    text-[10px]
+                    font-normal
+                    leading-[1.45]
+                    tracking-[0.02em]
+                    text-white/80
+
+                    sm:text-[11px]
+                  "
+                >
+                  {location}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* =================================
+              KEYBOARD FOCUS
+          ================================= */}
+
+          <span
+            aria-hidden="true"
+            className="
+              pointer-events-none
+              absolute
+              inset-0
+
+              border-2
+              border-transparent
+
+              transition-colors
+
+              group-focus-visible:border-[var(--public-primary)]
+            "
+          />
         </div>
-
-        <h3
-          className="
-            mt-3
-
-            text-[15px]
-            font-normal
-            leading-tight
-            tracking-[0.01em]
-            text-[#181818]
-
-            transition-colors
-            duration-300
-
-            group-hover:text-[var(--public-primary)]
-
-            sm:text-[16px]
-            lg:text-[17px]
-          "
-        >
-          {title}
-        </h3>
       </Link>
     </article>
   );

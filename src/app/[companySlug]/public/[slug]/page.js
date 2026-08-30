@@ -9,6 +9,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import PublicContentEngagement from "@/components/public/content/PublicContentEngagement";
+import PublicExpandableDescription from "@/components/public/content/PublicExpandableDescription";
 
 import { getPublicCompany } from "@/modules/public/public-company.service";
 
@@ -216,19 +217,11 @@ export default async function PublicContentDetailPage({ params }) {
         pb-20
 
         sm:px-8
-
         lg:px-12
-
         xl:px-16
       "
     >
-      <div
-        className="
-          mx-auto
-          w-full
-          max-w-[1200px]
-        "
-      >
+      <div className="mx-auto w-full max-w-[1200px]">
         {/* =====================================
             BREADCRUMB
         ===================================== */}
@@ -284,7 +277,6 @@ export default async function PublicContentDetailPage({ params }) {
             href={`/${companySlug}/public/${categoryPath}`}
             className="
               font-medium
-
               text-[var(--public-primary)]
 
               transition-opacity
@@ -301,14 +293,6 @@ export default async function PublicContentDetailPage({ params }) {
         ===================================== */}
 
         {embedUrl ? (
-          /*
-           * Video intentionally smaller
-           * than full page content.
-           *
-           * overflow-hidden + scrolling=no
-           * prevents visual scrollbars
-           * around the iframe.
-           */
           <div
             className="
               mx-auto
@@ -326,12 +310,9 @@ export default async function PublicContentDetailPage({ params }) {
             <div
               className="
                 relative
-
                 aspect-video
                 w-full
-
                 overflow-hidden
-
                 bg-black
               "
             >
@@ -348,7 +329,6 @@ export default async function PublicContentDetailPage({ params }) {
                   w-full
 
                   overflow-hidden
-
                   border-0
                 "
                 allow="
@@ -380,12 +360,9 @@ export default async function PublicContentDetailPage({ params }) {
             <div
               className="
                 relative
-
                 aspect-video
                 w-full
-
                 overflow-hidden
-
                 bg-[var(--public-surface)]
               "
             >
@@ -430,20 +407,16 @@ export default async function PublicContentDetailPage({ params }) {
               text-[18px]
               font-semibold
               leading-[1.45]
-
               text-[var(--public-primary)]
 
               sm:text-[20px]
-
               lg:text-[22px]
             "
           >
             {title}
           </h1>
 
-          {/* ===================================
-              PROVIDER / SOURCE
-          =================================== */}
+          {/* PROVIDER / SOURCE */}
 
           <div
             className="
@@ -458,7 +431,6 @@ export default async function PublicContentDetailPage({ params }) {
 
               text-[9px]
               tracking-[0.025em]
-
               text-black/35
 
               sm:text-[10px]
@@ -507,9 +479,7 @@ export default async function PublicContentDetailPage({ params }) {
             )}
           </div>
 
-          {/* ===================================
-              METRICS
-          =================================== */}
+          {/* METRICS */}
 
           <div className="mt-3">
             <PublicContentEngagement
@@ -524,32 +494,26 @@ export default async function PublicContentDetailPage({ params }) {
             />
           </div>
 
-          {/* ===================================
-              DESCRIPTION
-          =================================== */}
+          {/* DESCRIPTION */}
 
           {description && (
-            <p
+            <PublicExpandableDescription
+              lines={5}
               className="
                 mt-5
 
-                whitespace-pre-line
-
                 text-[12px]
                 leading-[1.7]
-
                 text-black/60
 
                 sm:text-[13px]
               "
             >
               {description}
-            </p>
+            </PublicExpandableDescription>
           )}
 
-          {/* ===================================
-              CONTENT
-          =================================== */}
+          {/* CONTENT */}
 
           {content && (
             <div
@@ -558,7 +522,6 @@ export default async function PublicContentDetailPage({ params }) {
 
                 text-[12px]
                 leading-[1.75]
-
                 text-black/70
 
                 sm:text-[13px]
@@ -608,29 +571,28 @@ export default async function PublicContentDetailPage({ params }) {
           {Array.isArray(item.tags) && item.tags.length > 0 && (
             <div
               className="
-                  mt-8
+                mt-8
 
-                  flex
-                  flex-wrap
+                flex
+                flex-wrap
 
-                  gap-x-3
-                  gap-y-2
+                gap-x-3
+                gap-y-2
 
-                  border-t
-                  border-black/[0.06]
+                border-t
+                border-black/[0.06]
 
-                  pt-5
-                "
+                pt-5
+              "
             >
               {item.tags.map((tag) => (
                 <span
                   key={tag}
                   className="
-                        text-[9px]
-                        tracking-[0.03em]
-
-                        text-black/25
-                      "
+                    text-[9px]
+                    tracking-[0.03em]
+                    text-black/25
+                  "
                 >
                   #{tag}
                 </span>

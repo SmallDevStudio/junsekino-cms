@@ -44,16 +44,6 @@ function getTimestampMillis(value) {
 }
 
 function sortProjects(a, b) {
-  /*
-   * Featured projects first.
-   */
-  if (a.featured !== b.featured) {
-    return a.featured ? -1 : 1;
-  }
-
-  /*
-   * Newest published project first.
-   */
   return getTimestampMillis(b.publishedAt) - getTimestampMillis(a.publishedAt);
 }
 
@@ -94,14 +84,17 @@ function normalizeSearchProject(project) {
  * PUBLIC PROJECT SEARCH DATA
  * =========================================================
  *
- * Important:
+ * This dataset contains every published project.
  *
- * The normal /project page displays only
- * the first 6 projects inside each category.
+ * The main Project page uses it for:
  *
- * Search must therefore load ALL published
- * projects rather than searching only the
- * currently visible 6-item sections.
+ * - showing every project
+ * - sorting by published date
+ * - searching every project
+ *
+ * Category-specific pages continue using
+ * the category service.
+ * =========================================================
  */
 
 export async function getPublicProjectSearchData({ companyId }) {

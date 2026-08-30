@@ -131,7 +131,7 @@ export default function ContactPageContent({
   const showForm = contact.form?.enabled !== false && Boolean(form);
 
   return (
-    <div className="w-full flex-1 bg-[#f4f4f6] text-black">
+    <div className="w-full flex-1">
       <div
         className="
           mx-auto

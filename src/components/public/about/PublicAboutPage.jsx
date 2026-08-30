@@ -77,7 +77,13 @@ function getLocalizedRichText(value, locale = "en") {
  * =========================================================
  */
 
-function PublicAboutImage({ image, locale, className, sizes }) {
+function PublicAboutImage({
+  image,
+  locale,
+  className,
+  sizes,
+  priority = false,
+}) {
   if (!image?.largeUrl) {
     return null;
   }
@@ -105,7 +111,8 @@ function PublicAboutImage({ image, locale, className, sizes }) {
       alt={alt}
       fill
       unoptimized
-      sizes={sizes || "(max-width: 1024px) 100vw, 80vw"}
+      priority={priority}
+      sizes={sizes || "(max-width: 968px) 100vw, 920px"}
       className={cn(objectFit, className)}
       style={{
         objectPosition: `${focalX * 100}% ${focalY * 100}%`,
@@ -130,13 +137,13 @@ function RichTextSection({ section, locale }) {
   const width = section.data?.width || "medium";
 
   const widthClass = {
-    narrow: "max-w-[680px]",
+    narrow: "max-w-[560px]",
 
-    medium: "max-w-[880px]",
+    medium: "max-w-[680px]",
 
-    wide: "max-w-[1180px]",
+    wide: "max-w-[920px]",
 
-    full: "max-w-none",
+    full: "max-w-[920px]",
   }[width];
 
   const align = section.data?.textAlign || "left";
@@ -144,22 +151,25 @@ function RichTextSection({ section, locale }) {
   return (
     <section
       className={cn(
-        "mx-auto w-full",
+        "w-full",
 
         widthClass,
 
-        align === "center" && "text-center",
+        align === "left" && "mr-auto text-left",
 
-        align === "right" && "text-right",
+        align === "center" && "mx-auto text-center",
+
+        align === "right" && "ml-auto text-right",
       )}
     >
       <PublicRichText
         value={content}
         className="
-          text-[13px]
-          leading-[1.8]
+          text-[12px]
+          leading-[1.7]
+          text-black/80
 
-          sm:text-[14px]
+          sm:text-[13px]
         "
       />
     </section>
@@ -182,50 +192,33 @@ function ImageSection({ section, locale }) {
   const width = section.data?.width || "wide";
 
   const widthClass = {
-    medium: "max-w-[880px]",
+    medium: "max-w-[680px]",
 
-    wide: "max-w-[1240px]",
+    wide: "max-w-[920px]",
 
-    full: "max-w-none",
+    full: "max-w-[920px]",
   }[width];
 
   const caption = getLocalizedValue(image.caption, locale);
 
   return (
-    <section
-      className={cn(
-        "mx-auto w-full",
-
-        widthClass,
-      )}
-    >
+    <section className={cn("mx-auto w-full", widthClass)}>
       <div
         className="
           relative
-          aspect-[16/9]
+          aspect-[2/1]
           w-full
-
           overflow-hidden
-
-          bg-black/[0.03]
+          bg-black/[0.04]
         "
       >
         <PublicAboutImage image={image} locale={locale} />
       </div>
 
       {section.data?.showCaption && caption && (
-        <div
-          className="
-              mt-2
-
-              text-[10px]
-              leading-5
-
-              text-black/40
-            "
-        >
+        <p className="mt-1.5 text-[10px] leading-[1.5] text-black/45">
           {caption}
-        </div>
+        </p>
       )}
     </section>
   );
@@ -246,75 +239,116 @@ function ImageTextSection({ section, locale }) {
     return null;
   }
 
+  if (!image?.largeUrl) {
+    return (
+      <RichTextSection
+        section={{
+          ...section,
+
+          data: {
+            ...section.data,
+
+            width: "medium",
+          },
+        }}
+        locale={locale}
+      />
+    );
+  }
+
   const imageRight = section.data?.imagePosition === "right";
+
+  const imageWidth = section.data?.imageWidth || "50";
 
   const verticalAlign = section.data?.verticalAlign || "center";
 
-  return (
-    <section
-      className="
-        mx-auto
-        grid
-        w-full
-        max-w-[1380px]
+  let gridTemplateColumns = "minmax(0, 1fr) minmax(0, 1fr)";
 
-        gap-7
+  if (imageRight) {
+    if (imageWidth === "40") {
+      gridTemplateColumns = "minmax(0, 1.5fr) minmax(0, 1fr)";
+    }
 
-        lg:grid-cols-2
-        lg:gap-12
-      "
+    if (imageWidth === "60") {
+      gridTemplateColumns = "minmax(0, 1fr) minmax(0, 1.5fr)";
+    }
+  } else {
+    if (imageWidth === "40") {
+      gridTemplateColumns = "minmax(0, 1fr) minmax(0, 1.5fr)";
+    }
+
+    if (imageWidth === "60") {
+      gridTemplateColumns = "minmax(0, 1.5fr) minmax(0, 1fr)";
+    }
+  }
+
+  const imageElement = (
+    <div className="relative aspect-[2/1] w-full overflow-hidden bg-black/[0.04]">
+      <PublicAboutImage
+        image={image}
+        locale={locale}
+        sizes="(max-width: 767px) 100vw, 50vw"
+      />
+    </div>
+  );
+
+  const textElement = content ? (
+    <div
+      className={cn(
+        "flex min-w-0",
+
+        verticalAlign === "start"
+          ? "items-start"
+          : verticalAlign === "end"
+            ? "items-end"
+            : "items-center",
+      )}
     >
-      {image?.largeUrl && (
-        <div
-          className={cn(
-            "relative",
+      <PublicRichText
+        value={content}
+        className="
+          w-full
+          text-right
+          text-[12px]
+          leading-[1.7]
+          text-black/80
 
-            "aspect-[4/3]",
+          sm:text-[13px]
+        "
+      />
+    </div>
+  ) : (
+    <div aria-hidden="true" />
+  );
 
-            "overflow-hidden",
+  return (
+    <section className="mx-auto w-full max-w-[920px]">
+      <div className="grid gap-5 md:hidden">
+        {imageElement}
 
-            "bg-black/[0.03]",
+        {textElement}
+      </div>
 
-            imageRight && "lg:order-2",
-          )}
-        >
-          <PublicAboutImage
-            image={image}
-            locale={locale}
-            sizes="
-              (max-width: 1024px)
-              100vw,
-              50vw
-            "
-          />
-        </div>
-      )}
+      <div
+        className="hidden gap-5 md:grid"
+        style={{
+          gridTemplateColumns,
+        }}
+      >
+        {imageRight ? (
+          <>
+            {textElement}
 
-      {content && (
-        <div
-          className={cn(
-            "flex",
+            {imageElement}
+          </>
+        ) : (
+          <>
+            {imageElement}
 
-            verticalAlign === "start"
-              ? "items-start"
-              : verticalAlign === "end"
-                ? "items-end"
-                : "items-center",
-
-            imageRight && "lg:order-1",
-          )}
-        >
-          <PublicRichText
-            value={content}
-            className="
-              text-[13px]
-              leading-[1.8]
-
-              sm:text-[14px]
-            "
-          />
-        </div>
-      )}
+            {textElement}
+          </>
+        )}
+      </div>
     </section>
   );
 }
@@ -344,41 +378,26 @@ function GallerySection({ section, locale }) {
     4: "md:grid-cols-4",
   }[columns];
 
-  return (
-    <section
-      className="
-        mx-auto
-        w-full
-        max-w-[1500px]
-      "
-    >
-      <div
-        className={cn(
-          "grid grid-cols-1 gap-4",
+  const gapClass = {
+    small: "gap-2",
 
-          gridClass,
-        )}
-      >
+    medium: "gap-4",
+
+    large: "gap-6",
+  }[section.data?.gap || "medium"];
+
+  return (
+    <section className="mx-auto w-full max-w-[920px]">
+      <div className={cn("grid grid-cols-1", gridClass, gapClass)}>
         {images.map((image, index) => (
           <div
             key={image.mediaId || index}
-            className="
-                relative
-                aspect-[4/3]
-
-                overflow-hidden
-
-                bg-black/[0.03]
-              "
+            className="relative aspect-[4/3] overflow-hidden bg-black/[0.04]"
           >
             <PublicAboutImage
               image={image}
               locale={locale}
-              sizes="
-                  (max-width: 768px)
-                  100vw,
-                  33vw
-                "
+              sizes="(max-width: 767px) 100vw, 33vw"
             />
           </div>
         ))}
@@ -397,13 +416,13 @@ function SpacerSection({ section }) {
   const size = section.data?.size || "medium";
 
   const className = {
-    small: "h-6 sm:h-8",
+    small: "h-3 sm:h-4",
 
-    medium: "h-10 sm:h-14",
+    medium: "h-5 sm:h-6",
 
-    large: "h-16 sm:h-20",
+    large: "h-8 sm:h-10",
 
-    xlarge: "h-24 sm:h-32",
+    xlarge: "h-12 sm:h-16",
   }[size];
 
   return <div aria-hidden="true" className={className} />;
@@ -444,151 +463,91 @@ function AboutSection({ section, locale }) {
  */
 
 export default function PublicAboutPage({ page, locale = "en" }) {
-  const title = getLocalizedValue(page.title, locale) || "About";
-
   const content = getLocalizedRichText(page.content, locale);
 
   const sections = Array.isArray(page.sections) ? page.sections : [];
 
+  const hasCover = Boolean(page.featuredImage?.largeUrl);
+
   return (
-    <div
-      className="
-        w-full
-
-        px-5
-        pb-16
-
-        sm:px-8
-
-        lg:px-12
-        lg:pb-24
-
-        xl:px-16
-      "
-    >
+    <div className="w-full flex-1 text-black">
       <div
         className="
           mx-auto
           w-full
-          max-w-[1680px]
+          max-w-[968px]
+
+          px-5
+          pb-16
+          pt-2
+
+          sm:px-6
+          sm:pb-20
         "
       >
-        {/* =================================
-            PAGE TITLE
-        ================================= */}
+        <div className="mx-auto w-full max-w-[920px]">
+          {/* =================================
+              COVER
+          ================================= */}
 
-        <div
-          className="
-            pt-5
-
-            sm:pt-7
-
-            lg:pt-9
-          "
-        >
-          <h1
-            className="
-              text-[11px]
-              font-semibold
-              uppercase
-              tracking-[0.16em]
-
-              text-[var(--public-primary)]
-            "
-          >
-            {title}
-          </h1>
-        </div>
-
-        {/* =================================
-            COVER
-        ================================= */}
-
-        {page.featuredImage?.largeUrl && (
-          <div
-            className="
-              relative
-
-              mt-7
-
-              aspect-[16/8]
-              w-full
-
-              overflow-hidden
-
-              bg-black/[0.03]
-
-              sm:mt-9
-
-              lg:mt-10
-            "
-          >
-            <PublicAboutImage
-              image={page.featuredImage}
-              locale={locale}
-              sizes="100vw"
-            />
-          </div>
-        )}
-
-        {/* =================================
-            LEGACY / PRIMARY CONTENT
-        ================================= */}
-
-        {content && (
-          <div
-            className="
-              mx-auto
-
-              max-w-[900px]
-
-              pt-10
-
-              sm:pt-14
-
-              lg:pt-16
-            "
-          >
-            <PublicRichText
-              value={content}
-              className="
-                text-[13px]
-                leading-[1.85]
-
-                text-black/75
-
-                sm:text-[14px]
-              "
-            />
-          </div>
-        )}
-
-        {/* =================================
-            PAGE BUILDER SECTIONS
-        ================================= */}
-
-        {sections.length > 0 && (
-          <div
-            className="
-              mt-12
-              space-y-12
-
-              sm:mt-16
-              sm:space-y-16
-
-              lg:mt-20
-              lg:space-y-20
-            "
-          >
-            {sections.map((section, index) => (
-              <AboutSection
-                key={section.id || `${section.type}-${index}`}
-                section={section}
+          {hasCover && (
+            <div className="relative aspect-[17/10] w-full overflow-hidden bg-black/[0.04]">
+              <PublicAboutImage
+                image={page.featuredImage}
                 locale={locale}
+                sizes="(max-width: 968px) 100vw, 920px"
+                priority
               />
-            ))}
-          </div>
-        )}
+            </div>
+          )}
+
+          {/* =================================
+              PRIMARY CONTENT
+          ================================= */}
+
+          {content && (
+            <section
+              className={cn(
+                "w-full",
+
+                hasCover ? "mt-6" : "mt-8",
+              )}
+            >
+              <PublicRichText
+                value={content}
+                className="
+                  text-[12px]
+                  leading-[1.7]
+                  text-black/80
+
+                  sm:text-[13px]
+                "
+              />
+            </section>
+          )}
+
+          {/* =================================
+              PAGE BUILDER SECTIONS
+          ================================= */}
+
+          {sections.length > 0 && (
+            <div
+              className={cn(
+                "space-y-5",
+
+                content || hasCover ? "mt-5" : "mt-8",
+              )}
+            >
+              {sections.map((section, index) => (
+                <AboutSection
+                  key={section.id || `${section.type}-${index}`}
+                  section={section}
+                  locale={locale}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

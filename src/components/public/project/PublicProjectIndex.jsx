@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -12,19 +10,11 @@ import { IoCloseOutline } from "react-icons/io5";
 import PublicProjectBreadcrumbs from "./PublicProjectBreadcrumbs";
 import PublicProjectCard from "./PublicProjectCard";
 
-function getLocalizedValue(value, locale = "en") {
-  if (!value) {
-    return "";
-  }
-
-  if (typeof value === "string") {
-    return value;
-  }
-
-  return (
-    value?.[locale]?.trim() || value?.en?.trim() || value?.th?.trim() || ""
-  );
-}
+/*
+ * =========================================================
+ * SEARCH
+ * =========================================================
+ */
 
 function matchesSearch(project, keyword) {
   const normalizedKeyword = String(keyword || "")
@@ -98,14 +88,21 @@ function SearchTooltip() {
   );
 }
 
+/*
+ * =========================================================
+ * PROJECT INDEX
+ * =========================================================
+ */
+
 export default function PublicProjectIndex({
   companySlug,
-  sections = [],
-  searchProjects = [],
+  projects = [],
   locale = "en",
 }) {
   const router = useRouter();
+
   const pathname = usePathname();
+
   const searchParams = useSearchParams();
 
   const searchInputRef = useRef(null);
@@ -117,37 +114,37 @@ export default function PublicProjectIndex({
   const [searchValue, setSearchValue] = useState(currentQuery);
 
   /*
-   * Only use the effect for DOM focus.
-   *
-   * We intentionally do not synchronize
-   * searchValue with currentQuery here.
-   * The input value is restored from the
-   * URL whenever the search control opens.
+   * DOM focus only.
    */
   useEffect(() => {
     if (searchOpen && searchInputRef.current) {
       searchInputRef.current.focus();
+
       searchInputRef.current.select();
     }
   }, [searchOpen]);
 
-  const filteredProjects = useMemo(() => {
+  /*
+   * Projects already arrive from the server
+   * sorted by publishedAt descending.
+   */
+  const visibleProjects = useMemo(() => {
     if (!currentQuery) {
-      return [];
+      return projects;
     }
 
-    return searchProjects.filter((project) =>
-      matchesSearch(project, currentQuery),
-    );
-  }, [currentQuery, searchProjects]);
+    return projects.filter((project) => matchesSearch(project, currentQuery));
+  }, [currentQuery, projects]);
 
   function openSearch() {
     setSearchValue(currentQuery);
+
     setSearchOpen(true);
   }
 
   function closeSearch() {
     setSearchValue(currentQuery);
+
     setSearchOpen(false);
   }
 
@@ -158,6 +155,7 @@ export default function PublicProjectIndex({
 
     if (!normalized) {
       clearSearch();
+
       return;
     }
 
@@ -171,10 +169,6 @@ export default function PublicProjectIndex({
       scroll: false,
     });
 
-    /*
-     * After searching, collapse the input
-     * back to the clean search icon.
-     */
     setSearchOpen(false);
   }
 
@@ -190,6 +184,7 @@ export default function PublicProjectIndex({
     });
 
     setSearchValue("");
+
     setSearchOpen(false);
   }
 
@@ -219,13 +214,7 @@ export default function PublicProjectIndex({
         xl:px-16
       "
     >
-      <div
-        className="
-          mx-auto
-          w-full
-          max-w-[1440px]
-        "
-      >
+      <div className="mx-auto w-full max-w-[1440px]">
         {/* =====================================
             BREADCRUMB + SEARCH
         ===================================== */}
@@ -265,7 +254,6 @@ export default function PublicProjectIndex({
                   flex
                   w-[210px]
                   max-w-[52vw]
-
                   items-center
                   gap-2
 
@@ -282,13 +270,7 @@ export default function PublicProjectIndex({
                   sm:w-[260px]
                 "
               >
-                <CiSearch
-                  size={18}
-                  className="
-                    shrink-0
-                    text-black/25
-                  "
-                />
+                <CiSearch size={18} className="shrink-0 text-black/25" />
 
                 <input
                   ref={searchInputRef}
@@ -302,7 +284,6 @@ export default function PublicProjectIndex({
                   className="
                     min-w-0
                     flex-1
-
                     bg-transparent
 
                     text-[11px]
@@ -326,7 +307,6 @@ export default function PublicProjectIndex({
                     shrink-0
                     items-center
                     justify-center
-
                     text-black/25
 
                     transition-colors
@@ -346,14 +326,11 @@ export default function PublicProjectIndex({
                 className="
                   group
                   relative
-
                   flex
                   h-8
                   w-8
-
                   items-center
                   justify-center
-
                   text-black/25
 
                   transition-colors
@@ -367,7 +344,6 @@ export default function PublicProjectIndex({
                   className="
                     transition-transform
                     duration-200
-
                     group-hover:scale-110
                   "
                 />
@@ -379,375 +355,169 @@ export default function PublicProjectIndex({
         </div>
 
         {/* =====================================
-            SEARCH RESULTS
+            SEARCH INFORMATION
         ===================================== */}
 
-        {hasSearch ? (
-          <section
+        {hasSearch && (
+          <div
             className="
               mt-10
+              flex
+              items-center
+              gap-4
 
               sm:mt-12
+              sm:gap-5
+
               lg:mt-14
             "
           >
-            {/* SEARCH RESULT HEADER */}
-
-            <div
-              className="
-                flex
-                items-center
-                gap-4
-
-                sm:gap-5
-              "
-            >
-              <div
-                className="
-                  flex
-                  min-w-0
-                  items-center
-                  gap-2
-                "
-              >
-                <span
-                  className="
-                    shrink-0
-
-                    text-[10px]
-                    uppercase
-                    tracking-[0.07em]
-
-                    text-black/30
-                  "
-                >
-                  Search:
-                </span>
-
-                <span
-                  className="
-                    max-w-[180px]
-                    truncate
-
-                    text-[11px]
-                    font-medium
-                    uppercase
-                    tracking-[0.06em]
-
-                    text-[var(--public-primary)]
-
-                    sm:max-w-[420px]
-                    sm:text-[12px]
-                  "
-                >
-                  {currentQuery}
-                </span>
-
-                <button
-                  type="button"
-                  aria-label="Clear search"
-                  title="Clear search"
-                  onClick={clearSearch}
-                  className="
-                    flex
-                    h-6
-                    w-6
-
-                    shrink-0
-
-                    items-center
-                    justify-center
-
-                    text-black/20
-
-                    transition-colors
-                    duration-200
-
-                    hover:text-[var(--public-primary)]
-                  "
-                >
-                  <IoCloseOutline size={16} />
-                </button>
-              </div>
-
-              <div
-                className="
-                  h-px
-                  min-w-0
-                  flex-1
-
-                  bg-black/10
-                "
-              />
-
+            <div className="flex min-w-0 items-center gap-2">
               <span
                 className="
                   shrink-0
-
-                  text-[9px]
+                  text-[10px]
                   uppercase
                   tracking-[0.07em]
-
-                  text-black/25
-
-                  sm:text-[10px]
+                  text-black/30
                 "
               >
-                {filteredProjects.length}{" "}
-                {filteredProjects.length === 1 ? "result" : "results"}
+                Search:
               </span>
-            </div>
 
-            {/* SEARCH RESULT GRID */}
-
-            {filteredProjects.length ? (
-              <div
+              <span
                 className="
-                  mt-8
+                  max-w-[180px]
+                  truncate
 
-                  grid
-                  grid-cols-1
+                  text-[11px]
+                  font-medium
+                  uppercase
+                  tracking-[0.06em]
+                  text-[var(--public-primary)]
 
-                  gap-x-[clamp(2rem,6vw,6.5rem)]
-                  gap-y-12
-
-                  sm:grid-cols-2
-
-                  lg:mt-10
-                  lg:grid-cols-3
-                  lg:gap-y-16
+                  sm:max-w-[420px]
+                  sm:text-[12px]
                 "
               >
-                {filteredProjects.map((project) => (
-                  <PublicProjectCard
-                    key={project.id}
-                    companySlug={companySlug}
-                    project={project}
-                    locale={locale}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div
+                {currentQuery}
+              </span>
+
+              <button
+                type="button"
+                aria-label="Clear search"
+                title="Clear search"
+                onClick={clearSearch}
                 className="
                   flex
-                  min-h-[320px]
-                  flex-col
-
+                  h-6
+                  w-6
+                  shrink-0
                   items-center
                   justify-center
+                  text-black/20
 
-                  text-center
+                  transition-colors
+                  duration-200
+
+                  hover:text-[var(--public-primary)]
                 "
               >
-                <p
-                  className="
-                    text-[10px]
-                    uppercase
-                    tracking-[0.08em]
-                    text-black/25
-                  "
-                >
-                  No projects found
-                </p>
+                <IoCloseOutline size={16} />
+              </button>
+            </div>
 
-                <button
-                  type="button"
-                  onClick={clearSearch}
-                  className="
-                    mt-4
+            <div className="h-px min-w-0 flex-1 bg-black/10" />
 
-                    text-[9px]
-                    uppercase
-                    tracking-[0.08em]
+            <span
+              className="
+                shrink-0
+                text-[9px]
+                uppercase
+                tracking-[0.07em]
+                text-black/25
 
-                    text-[var(--public-primary)]
+                sm:text-[10px]
+              "
+            >
+              {visibleProjects.length}{" "}
+              {visibleProjects.length === 1 ? "result" : "results"}
+            </span>
+          </div>
+        )}
 
-                    transition-opacity
-                    duration-200
+        {/* =====================================
+            PROJECTS BY PUBLISHED DATE
+        ===================================== */}
 
-                    hover:opacity-60
-                  "
-                >
-                  Clear Search
-                </button>
-              </div>
-            )}
-          </section>
-        ) : !sections.length ? (
-          /* =====================================
-             EMPTY PROJECT
-          ===================================== */
+        {visibleProjects.length ? (
+          <div className={hasSearch ? "mt-8 lg:mt-10" : "mt-12 lg:mt-14"}>
+            <div
+              className="
+                grid
+                grid-cols-1
 
+                gap-x-[clamp(2rem,6vw,6.5rem)]
+                gap-y-12
+
+                sm:grid-cols-2
+
+                lg:grid-cols-3
+                lg:gap-y-16
+              "
+            >
+              {visibleProjects.map((project) => (
+                <PublicProjectCard
+                  key={project.id}
+                  companySlug={companySlug}
+                  project={project}
+                  locale={locale}
+                />
+              ))}
+            </div>
+          </div>
+        ) : (
           <div
             className="
               flex
               min-h-[50vh]
+              flex-col
               items-center
               justify-center
-
-              text-[11px]
-              uppercase
-              tracking-[0.08em]
-              text-black/25
+              text-center
             "
           >
-            No projects available
-          </div>
-        ) : (
-          /* =====================================
-             DEFAULT CATEGORY VIEW
-          ===================================== */
+            <p
+              className="
+                text-[10px]
+                uppercase
+                tracking-[0.08em]
+                text-black/25
+              "
+            >
+              {hasSearch ? "No projects found" : "No projects available"}
+            </p>
 
-          <div
-            className="
-              mt-10
-              space-y-20
+            {hasSearch && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                className="
+                  mt-4
+                  text-[9px]
+                  uppercase
+                  tracking-[0.08em]
+                  text-[var(--public-primary)]
 
-              sm:mt-12
+                  transition-opacity
+                  duration-200
 
-              lg:mt-14
-              lg:space-y-28
-            "
-          >
-            {sections.map((section) => {
-              const categoryName = getLocalizedValue(
-                section.category?.name,
-                locale,
-              );
-
-              return (
-                <section key={section.category.id}>
-                  {/* =====================
-                      CATEGORY DIVIDER
-                  ====================== */}
-
-                  <div
-                    className="
-                      flex
-                      items-center
-                      gap-5
-
-                      sm:gap-7
-                    "
-                  >
-                    <h2
-                      className="
-                        shrink-0
-
-                        text-[12px]
-                        font-medium
-                        uppercase
-                        tracking-[0.06em]
-
-                        text-[var(--public-primary)]
-
-                        sm:text-[13px]
-                      "
-                    >
-                      {categoryName}
-                    </h2>
-
-                    <div
-                      className="
-                        h-px
-                        flex-1
-                        bg-black/10
-                      "
-                    />
-                  </div>
-
-                  {/* =====================
-                      PROJECT GRID
-                  ====================== */}
-
-                  <div
-                    className="
-                      mt-8
-
-                      grid
-                      grid-cols-1
-
-                      gap-x-[clamp(2rem,6vw,6.5rem)]
-                      gap-y-12
-
-                      sm:grid-cols-2
-
-                      lg:mt-10
-                      lg:grid-cols-3
-                      lg:gap-y-16
-                    "
-                  >
-                    {section.projects.map((project) => (
-                      <PublicProjectCard
-                        key={project.id}
-                        companySlug={companySlug}
-                        project={project}
-                        locale={locale}
-                      />
-                    ))}
-                  </div>
-
-                  {/* =====================
-                      READ MORE
-                  ====================== */}
-
-                  {section.hasMore && (
-                    <div
-                      className="
-                        mt-10
-                        flex
-                        justify-center
-
-                        lg:mt-12
-                      "
-                    >
-                      <Link
-                        href={`/${companySlug}/project/${section.category.slug}`}
-                        className="
-                          group
-
-                          inline-flex
-                          items-center
-                          gap-3
-
-                          text-[10px]
-                          font-normal
-                          uppercase
-                          tracking-[0.08em]
-
-                          text-black/35
-
-                          transition-colors
-                          duration-300
-
-                          hover:text-[var(--public-primary)]
-
-                          sm:text-[11px]
-                        "
-                      >
-                        <span>Read More</span>
-
-                        <span
-                          className="
-                            block
-                            h-px
-                            w-8
-
-                            bg-current
-
-                            transition-all
-                            duration-300
-
-                            group-hover:w-12
-                          "
-                        />
-                      </Link>
-                    </div>
-                  )}
-                </section>
-              );
-            })}
+                  hover:opacity-60
+                "
+              >
+                Clear Search
+              </button>
+            )}
           </div>
         )}
       </div>

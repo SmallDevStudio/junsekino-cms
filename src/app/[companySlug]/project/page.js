@@ -6,8 +6,6 @@ import { getPublicCompany } from "@/modules/public/public-company.service";
 
 import { getPublicProjectSearchData } from "@/modules/public/public-project-search.service";
 
-import { getPublicProjectIndex } from "@/modules/public/public-project.service";
-
 function normalizeSlug(value) {
   return String(value || "")
     .trim()
@@ -81,32 +79,21 @@ export default async function PublicProjectPage({ params }) {
   const companyId = companyData.company.id;
 
   /*
-   * Load both datasets in parallel:
+   * The main Project page displays every
+   * published project by published date.
    *
-   * 1. Project Index
-   *    - grouped by category
-   *    - maximum 6 projects/category
-   *
-   * 2. Search Dataset
-   *    - every published project
+   * Category filtering remains available
+   * through the Project submenu and the
+   * category-specific route.
    */
-  const [projectIndex, searchProjects] = await Promise.all([
-    getPublicProjectIndex({
-      companyId,
-
-      limitPerCategory: 6,
-    }),
-
-    getPublicProjectSearchData({
-      companyId,
-    }),
-  ]);
+  const projects = await getPublicProjectSearchData({
+    companyId,
+  });
 
   return (
     <PublicProjectIndex
       companySlug={companySlug}
-      sections={projectIndex.sections}
-      searchProjects={searchProjects}
+      projects={projects}
       locale="en"
     />
   );

@@ -10,6 +10,7 @@ import {
   Home,
   Image,
   LayoutDashboard,
+  Mail,
   Megaphone,
   Newspaper,
   Search,
@@ -101,6 +102,13 @@ export const ADMIN_NAVIGATION = [
     labelKey: "navigation.management",
 
     items: [
+      {
+        id: "messages",
+        labelKey: "messages.title",
+        href: "/admin/messages",
+        icon: Mail,
+      },
+
       {
         id: "media",
         labelKey: "navigation.media",
