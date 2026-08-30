@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, FileImage, LoaderCircle } from "lucide-react";
+import { ExternalLink, FileImage, LoaderCircle, Trash2 } from "lucide-react";
 
 import { useEffect, useState } from "react";
 
@@ -32,35 +32,12 @@ function formatBytes(bytes) {
   return `${(value / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-/*
- * =========================================================
- * PREVIEW
- * =========================================================
- */
-
-async function fetchPreviewUrl({ companyId, mediaId }) {
-  const response = await fetch(
-    `/api/v1/companies/${companyId}/media/${mediaId}/preview`,
-    {
-      cache: "no-store",
-
-      credentials: "include",
-    },
-  );
-
-  const payload = await response.json();
-
-  if (!response.ok || payload?.success === false) {
-    throw new Error(payload?.message || "MEDIA_PREVIEW_FAILED");
+async function readResponse(response) {
+  try {
+    return await response.json();
+  } catch {
+    return null;
   }
-
-  const url = payload?.data?.url || payload?.url || null;
-
-  if (!url) {
-    throw new Error("MEDIA_PREVIEW_URL_MISSING");
-  }
-
-  return url;
 }
 
 /*
@@ -69,7 +46,17 @@ async function fetchPreviewUrl({ companyId, mediaId }) {
  * =========================================================
  */
 
-export default function MediaCard({ companyId, media, title }) {
+export default function MediaCard({
+  companyId,
+
+  media,
+
+  title,
+
+  onOpen,
+
+  onDelete,
+}) {
   const { t, statusLabel } = useAdminTranslation();
 
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -84,7 +71,7 @@ export default function MediaCard({ companyId, media, title }) {
 
   /*
    * =======================================================
-   * LOAD PREVIEW
+   * PREVIEW
    * =======================================================
    */
 
@@ -103,10 +90,26 @@ export default function MediaCard({ companyId, media, title }) {
           setPreviewError(false);
         }
 
-        const url = await fetchPreviewUrl({
-          companyId,
-          mediaId,
-        });
+        const response = await fetch(
+          `/api/v1/companies/${companyId}/media/${mediaId}/preview?variant=thumbnail`,
+          {
+            cache: "no-store",
+
+            credentials: "include",
+          },
+        );
+
+        const payload = await readResponse(response);
+
+        if (!response.ok || payload?.success === false) {
+          throw new Error("MEDIA_PREVIEW_FAILED");
+        }
+
+        const url = payload?.data?.url || payload?.url || null;
+
+        if (!url) {
+          throw new Error("MEDIA_PREVIEW_URL_MISSING");
+        }
 
         if (!cancelled) {
           setPreviewUrl(url);
@@ -133,42 +136,31 @@ export default function MediaCard({ companyId, media, title }) {
 
   /*
    * =======================================================
-   * RETRY
+   * EVENTS
    * =======================================================
    */
 
-  async function handleRetryPreview() {
-    if (!companyId || !mediaId) {
-      return;
-    }
+  function handleOpen() {
+    onOpen?.(media);
+  }
 
-    try {
-      setLoadingPreview(true);
+  function handleKeyDown(event) {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
 
-      setPreviewError(false);
-
-      const url = await fetchPreviewUrl({
-        companyId,
-        mediaId,
-      });
-
-      setPreviewUrl(url);
-    } catch (error) {
-      console.error("Media preview retry error:", error);
-
-      setPreviewError(true);
-    } finally {
-      setLoadingPreview(false);
+      handleOpen();
     }
   }
 
-  /*
-   * =======================================================
-   * OPEN ORIGINAL PREVIEW
-   * =======================================================
-   */
+  function handleDelete(event) {
+    event.stopPropagation();
 
-  function handleOpenPreview() {
+    onDelete?.(media);
+  }
+
+  function handleOpenPreview(event) {
+    event.stopPropagation();
+
     if (!previewUrl) {
       return;
     }
@@ -178,37 +170,46 @@ export default function MediaCard({ companyId, media, title }) {
 
   const size = formatBytes(media?.size);
 
+  const displayTitle = media?.title?.en || media?.title?.th || title;
+
   const translatedStatus = mediaStatus
     ? statusLabel(mediaStatus)
     : t("media.card.statusUnknown");
 
-  /*
-   * =======================================================
-   * RENDER
-   * =======================================================
-   */
-
   return (
     <article
-      className={cn(
-        "group overflow-hidden",
+      role="button"
+      tabIndex={0}
+      onClick={handleOpen}
+      onKeyDown={handleKeyDown}
+      className="
+        group
+        cursor-pointer
 
-        "rounded-2xl",
+        overflow-hidden
 
-        "border border-[var(--admin-border)]",
+        rounded-2xl
 
-        "bg-[var(--admin-surface)]",
+        border
+        border-[var(--admin-border)]
 
-        "transition",
+        bg-[var(--admin-surface)]
 
-        "hover:border-[var(--company-primary-border)]",
+        outline-none
 
-        "hover:shadow-[0_8px_30px_rgba(0,0,0,0.05)]",
-      )}
+        transition
+
+        hover:border-[var(--company-primary-border)]
+
+        hover:shadow-[0_10px_34px_rgba(0,0,0,0.055)]
+
+        focus-visible:border-[var(--company-primary)]
+
+        focus-visible:ring-2
+        focus-visible:ring-[var(--company-primary-soft)]
+      "
     >
-      {/* =====================================
-          IMAGE
-      ===================================== */}
+      {/* PREVIEW */}
 
       <div
         className="
@@ -222,11 +223,10 @@ export default function MediaCard({ companyId, media, title }) {
         "
       >
         {previewUrl ? (
-          // Signed Admin preview URL.
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={previewUrl}
-            alt={title || ""}
+            alt={media?.alt?.en || media?.alt?.th || displayTitle || ""}
             loading="lazy"
             decoding="async"
             className="
@@ -246,6 +246,7 @@ export default function MediaCard({ companyId, media, title }) {
             className="
               flex
               h-full
+              w-full
 
               items-center
               justify-center
@@ -263,56 +264,39 @@ export default function MediaCard({ companyId, media, title }) {
             ) : (
               <FileImage
                 size={24}
-                strokeWidth={1.5}
-                className="text-[var(--admin-muted-light)]"
+                strokeWidth={1.4}
+                className={
+                  previewError
+                    ? "text-red-300"
+                    : "text-[var(--admin-muted-light)]"
+                }
               />
             )}
           </div>
         )}
 
-        {/* =================================
-            STATUS
-        ================================= */}
+        <span
+          className={cn(
+            "absolute left-3 top-3",
 
-        <div
-          className="
-            absolute
-            left-3
-            top-3
-          "
+            "inline-flex rounded-full border",
+
+            "px-2 py-1",
+
+            "admin-text-9 font-semibold uppercase tracking-[0.08em]",
+
+            mediaStatus === "ready"
+              ? "border-emerald-200 bg-emerald-50/95 text-emerald-700"
+              : "border-amber-200 bg-amber-50/95 text-amber-700",
+          )}
         >
-          <span
-            className={cn(
-              "inline-flex",
-
-              "rounded-full",
-
-              "border",
-
-              "px-2 py-1",
-
-              "admin-text-9 font-semibold",
-
-              "uppercase tracking-[0.08em]",
-
-              mediaStatus === "ready"
-                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                : "border-amber-200 bg-amber-50 text-amber-700",
-            )}
-          >
-            {translatedStatus}
-          </span>
-        </div>
-
-        {/* =================================
-            OPEN PREVIEW
-        ================================= */}
+          {translatedStatus}
+        </span>
 
         {previewUrl && (
           <button
             type="button"
             onClick={handleOpenPreview}
-            aria-label={t("media.card.openPreview")}
             title={t("media.card.openPreview")}
             className="
               absolute
@@ -328,7 +312,7 @@ export default function MediaCard({ companyId, media, title }) {
 
               rounded-lg
 
-              bg-black/60
+              bg-black/55
 
               text-white
 
@@ -343,120 +327,97 @@ export default function MediaCard({ companyId, media, title }) {
               focus:opacity-100
             "
           >
-            <ExternalLink size={14} />
+            <ExternalLink size={13} />
           </button>
         )}
       </div>
 
-      {/* =====================================
-          INFORMATION
-      ===================================== */}
+      {/* INFO */}
 
-      <div className="p-4">
-        <div
-          title={title}
-          className="
-            truncate
+      <div
+        className="
+          flex
+          min-h-[84px]
 
-            admin-text-13
-            font-medium
+          items-end
 
-            text-[var(--admin-foreground)]
-          "
-        >
-          {title}
-        </div>
+          gap-3
 
-        <div
-          className="
-            mt-2
-
-            flex
-            items-center
-            gap-2
-
-            admin-text-10
-
-            text-[var(--admin-muted)]
-          "
-        >
-          {media?.mimeType && (
-            <span
-              className="
-                truncate
-              "
-            >
-              {media.mimeType}
-            </span>
-          )}
-
-          {media?.mimeType && size && <span>•</span>}
-
-          {size && (
-            <span
-              className="
-                shrink-0
-              "
-            >
-              {size}
-            </span>
-          )}
-        </div>
-
-        {/* =================================
-            PREVIEW ERROR
-        ================================= */}
-
-        {previewError && (
+          px-4
+          py-3.5
+        "
+      >
+        <div className="min-w-0 flex-1">
           <div
             className="
-              mt-3
+              truncate
 
-              rounded-xl
+              admin-text-12
+              font-medium
 
-              bg-red-50
+              text-[var(--admin-foreground)]
+            "
+            title={displayTitle}
+          >
+            {displayTitle}
+          </div>
 
-              px-3
-              py-2
+          <div
+            className="
+              mt-1
+
+              flex
+              min-w-0
+              items-center
+
+              gap-2
+
+              admin-text-9
+
+              text-[var(--admin-muted)]
             "
           >
-            <div
-              className="
-                admin-text-10
-                leading-[1.5]
+            {media?.mimeType && (
+              <span className="truncate">{media.mimeType}</span>
+            )}
 
-                text-red-600
-              "
-            >
-              {t("media.card.previewFailed")}
-            </div>
+            {media?.mimeType && size && <span>•</span>}
 
-            <button
-              type="button"
-              onClick={handleRetryPreview}
-              disabled={loadingPreview}
-              className="
-                mt-1
-
-                admin-text-11
-                font-medium
-
-                text-[var(--company-primary)]
-
-                transition
-
-                hover:underline
-
-                disabled:cursor-not-allowed
-                disabled:opacity-50
-              "
-            >
-              {loadingPreview
-                ? t("media.card.loadingPreview")
-                : t("media.card.retryPreview")}
-            </button>
+            {size && <span className="shrink-0">{size}</span>}
           </div>
-        )}
+        </div>
+
+        <button
+          type="button"
+          onClick={handleDelete}
+          title={t("media.delete.delete")}
+          aria-label={t("media.delete.delete")}
+          className="
+            flex
+            h-8
+            w-8
+            shrink-0
+
+            items-center
+            justify-center
+
+            rounded-lg
+
+            text-black/25
+
+            transition
+
+            hover:bg-red-50
+
+            hover:text-red-600
+
+            focus:bg-red-50
+
+            focus:text-red-600
+          "
+        >
+          <Trash2 size={14} strokeWidth={1.7} />
+        </button>
       </div>
     </article>
   );

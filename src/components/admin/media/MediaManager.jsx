@@ -1,10 +1,14 @@
 "use client";
 
 import {
+  ArrowUpDown,
+  File,
+  FileImage,
   Image as ImageIcon,
-  LoaderCircle,
+  ListFilter,
   RefreshCw,
   Search,
+  Upload,
 } from "lucide-react";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -16,7 +20,51 @@ import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
 import { cn } from "@/utils/cn";
 
 import MediaCard from "./MediaCard";
-import MediaUploadDropzone from "./MediaUploadDropzone";
+import MediaDeleteDialog from "./MediaDeleteDialog";
+import MediaDetailDrawer from "./MediaDetailDrawer";
+import MediaUploadDialog from "./MediaUploadDialog";
+
+/*
+ * =========================================================
+ * CONSTANTS
+ * =========================================================
+ */
+
+const FILTER = Object.freeze({
+  ALL: "all",
+  IMAGE: "image",
+  DOCUMENT: "document",
+  OTHER: "other",
+});
+
+const SORT = Object.freeze({
+  NEWEST: "newest",
+  OLDEST: "oldest",
+  NAME_ASC: "name-asc",
+  NAME_DESC: "name-desc",
+  SIZE_DESC: "size-desc",
+  SIZE_ASC: "size-asc",
+});
+
+const DOCUMENT_MIME_TYPES = new Set([
+  "application/pdf",
+
+  "application/msword",
+
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+
+  "application/vnd.ms-excel",
+
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+
+  "application/vnd.ms-powerpoint",
+
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+
+  "text/plain",
+
+  "text/csv",
+]);
 
 /*
  * =========================================================
@@ -48,8 +96,10 @@ function normalizeMediaResponse(payload) {
   return [];
 }
 
-function getMediaName(media, fallback) {
+function getMediaName(media, fallback = "") {
   return (
+    media?.title?.en ||
+    media?.title?.th ||
     media?.originalFileName ||
     media?.fileName ||
     media?.name ||
@@ -58,9 +108,198 @@ function getMediaName(media, fallback) {
   );
 }
 
+function getMediaCategory(media) {
+  const mimeType = String(media?.mimeType || "").toLowerCase();
+
+  if (mimeType.startsWith("image/")) {
+    return FILTER.IMAGE;
+  }
+
+  if (DOCUMENT_MIME_TYPES.has(mimeType)) {
+    return FILTER.DOCUMENT;
+  }
+
+  return FILTER.OTHER;
+}
+
+function getTimestamp(value) {
+  if (!value) {
+    return 0;
+  }
+
+  if (typeof value === "string" || typeof value === "number") {
+    const result = new Date(value).getTime();
+
+    return Number.isFinite(result) ? result : 0;
+  }
+
+  if (value instanceof Date) {
+    return value.getTime();
+  }
+
+  if (Number.isFinite(value?.seconds)) {
+    return value.seconds * 1000;
+  }
+
+  if (Number.isFinite(value?._seconds)) {
+    return value._seconds * 1000;
+  }
+
+  return 0;
+}
+
+async function readResponse(response) {
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
 /*
  * =========================================================
- * MEDIA MANAGER
+ * SKELETON
+ * =========================================================
+ */
+
+function MediaCardSkeleton() {
+  return (
+    <div
+      className="
+        overflow-hidden
+
+        rounded-2xl
+
+        border
+        border-[var(--admin-border)]
+
+        bg-[var(--admin-surface)]
+      "
+    >
+      <div
+        className="
+          aspect-[4/3]
+
+          animate-pulse
+
+          bg-[var(--admin-hover)]
+        "
+      />
+
+      <div className="p-4">
+        <div
+          className="
+            h-3.5
+            w-3/4
+
+            animate-pulse
+
+            rounded
+
+            bg-[var(--admin-hover)]
+          "
+        />
+
+        <div
+          className="
+            mt-2
+
+            h-2.5
+            w-1/2
+
+            animate-pulse
+
+            rounded
+
+            bg-[var(--admin-hover)]
+          "
+        />
+      </div>
+    </div>
+  );
+}
+
+/*
+ * =========================================================
+ * SUMMARY CARD
+ * =========================================================
+ */
+
+function SummaryCard({
+  active,
+
+  icon,
+
+  label,
+
+  count,
+
+  onClick,
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "flex min-w-0 items-center gap-3",
+
+        "rounded-2xl border",
+
+        "px-4 py-4",
+
+        "text-left",
+
+        "transition",
+
+        active
+          ? "border-[var(--company-primary-border)] bg-[var(--company-primary-soft)]"
+          : "border-[var(--admin-border)] bg-[var(--admin-surface)] hover:bg-[var(--admin-hover)]",
+      )}
+    >
+      <div
+        className={cn(
+          "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+
+          active
+            ? "bg-white text-[var(--company-primary)]"
+            : "bg-[var(--admin-background)] text-[var(--admin-muted)]",
+        )}
+      >
+        {icon}
+      </div>
+
+      <div className="min-w-0">
+        <div
+          className="
+            admin-text-10
+
+            text-[var(--admin-muted)]
+          "
+        >
+          {label}
+        </div>
+
+        <div
+          className="
+            mt-0.5
+
+            admin-text-20
+            font-semibold
+            tracking-[-0.035em]
+
+            text-[var(--admin-foreground)]
+          "
+        >
+          {count}
+        </div>
+      </div>
+    </button>
+  );
+}
+
+/*
+ * =========================================================
+ * MANAGER
  * =========================================================
  */
 
@@ -82,6 +321,26 @@ export default function MediaManager() {
   const [error, setError] = useState(null);
 
   const [search, setSearch] = useState("");
+
+  const [filter, setFilter] = useState(FILTER.ALL);
+
+  const [sort, setSort] = useState(SORT.NEWEST);
+
+  const [uploadOpen, setUploadOpen] = useState(false);
+
+  const [selectedMedia, setSelectedMedia] = useState(null);
+
+  /*
+   * DELETE
+   */
+
+  const [deleteMedia, setDeleteMedia] = useState(null);
+
+  const [deleteUsage, setDeleteUsage] = useState(null);
+
+  const [deleteUsageLoading, setDeleteUsageLoading] = useState(false);
+
+  const [deleteUsageError, setDeleteUsageError] = useState(null);
 
   /*
    * =======================================================
@@ -117,7 +376,7 @@ export default function MediaManager() {
           },
         );
 
-        const payload = await response.json();
+        const payload = await readResponse(response);
 
         if (!response.ok || payload?.success === false) {
           throw new Error(
@@ -125,7 +384,9 @@ export default function MediaManager() {
           );
         }
 
-        setItems(normalizeMediaResponse(payload));
+        setItems(
+          normalizeMediaResponse(payload).filter((item) => !item?.deletedAt),
+        );
       } catch (loadError) {
         console.error("Load media error:", loadError);
 
@@ -138,10 +399,6 @@ export default function MediaManager() {
     },
     [activeCompanyId, t],
   );
-
-  /*
-   * React Compiler-safe.
-   */
 
   useEffect(() => {
     if (!activeCompanyId) {
@@ -159,18 +416,48 @@ export default function MediaManager() {
 
   /*
    * =======================================================
-   * FILTER
+   * SUMMARY
+   * =======================================================
+   */
+
+  const summary = useMemo(() => {
+    const result = {
+      all: items.length,
+
+      image: 0,
+
+      document: 0,
+
+      other: 0,
+    };
+
+    items.forEach((media) => {
+      const category = getMediaCategory(media);
+
+      result[category] += 1;
+    });
+
+    return result;
+  }, [items]);
+
+  /*
+   * =======================================================
+   * FILTER / SEARCH / SORT
    * =======================================================
    */
 
   const filteredItems = useMemo(() => {
     const keyword = search.trim().toLowerCase();
 
-    if (!keyword) {
-      return items;
-    }
+    let result = items.filter((media) => {
+      if (filter !== FILTER.ALL && getMediaCategory(media) !== filter) {
+        return false;
+      }
 
-    return items.filter((media) => {
+      if (!keyword) {
+        return true;
+      }
+
       const text = [
         media.id,
 
@@ -186,6 +473,10 @@ export default function MediaManager() {
 
         media.status,
 
+        media.title?.en,
+
+        media.title?.th,
+
         media.alt?.en,
 
         media.alt?.th,
@@ -193,6 +484,12 @@ export default function MediaManager() {
         media.caption?.en,
 
         media.caption?.th,
+
+        media.description?.en,
+
+        media.description?.th,
+
+        ...(Array.isArray(media.tags) ? media.tags : []),
       ]
         .filter(Boolean)
         .join(" ")
@@ -200,7 +497,153 @@ export default function MediaManager() {
 
       return text.includes(keyword);
     });
-  }, [items, search]);
+
+    result = [...result].sort((first, second) => {
+      switch (sort) {
+        case SORT.OLDEST:
+          return (
+            getTimestamp(first?.createdAt) - getTimestamp(second?.createdAt)
+          );
+
+        case SORT.NAME_ASC:
+          return getMediaName(first).localeCompare(getMediaName(second));
+
+        case SORT.NAME_DESC:
+          return getMediaName(second).localeCompare(getMediaName(first));
+
+        case SORT.SIZE_DESC:
+          return Number(second?.size || 0) - Number(first?.size || 0);
+
+        case SORT.SIZE_ASC:
+          return Number(first?.size || 0) - Number(second?.size || 0);
+
+        case SORT.NEWEST:
+        default:
+          return (
+            (getTimestamp(second?.updatedAt) ||
+              getTimestamp(second?.createdAt)) -
+            (getTimestamp(first?.updatedAt) || getTimestamp(first?.createdAt))
+          );
+      }
+    });
+
+    return result;
+  }, [items, search, filter, sort]);
+
+  /*
+   * =======================================================
+   * UPLOAD
+   * =======================================================
+   */
+
+  async function handleUploaded() {
+    await loadMedia({
+      silent: true,
+    });
+  }
+
+  /*
+   * =======================================================
+   * DELETE USAGE
+   * =======================================================
+   */
+
+  async function loadDeleteUsage(media) {
+    if (!activeCompanyId || !media?.id) {
+      return;
+    }
+
+    try {
+      setDeleteUsageLoading(true);
+
+      setDeleteUsageError(null);
+
+      const response = await fetch(
+        `/api/v1/companies/${activeCompanyId}/media/${media.id}/usage`,
+        {
+          method: "GET",
+
+          cache: "no-store",
+
+          credentials: "include",
+        },
+      );
+
+      const payload = await readResponse(response);
+
+      if (!response.ok || payload?.success === false) {
+        throw new Error(
+          payload?.message || t("media.details.usage.errors.loadFailed"),
+        );
+      }
+
+      setDeleteUsage({
+        usageCount: payload?.data?.usageCount || 0,
+
+        modules: payload?.data?.modules || {},
+
+        usages: Array.isArray(payload?.data?.usages) ? payload.data.usages : [],
+      });
+    } catch (usageError) {
+      console.error("Load delete media usage error:", usageError);
+
+      setDeleteUsageError(
+        usageError?.message || t("media.details.usage.errors.loadFailed"),
+      );
+    } finally {
+      setDeleteUsageLoading(false);
+    }
+  }
+
+  function handleOpenDelete(media) {
+    setDeleteMedia(media);
+
+    setDeleteUsage(null);
+
+    setDeleteUsageError(null);
+
+    loadDeleteUsage(media);
+  }
+
+  function handleCloseDelete() {
+    if (deleteUsageLoading) {
+      return;
+    }
+
+    setDeleteMedia(null);
+
+    setDeleteUsage(null);
+
+    setDeleteUsageError(null);
+  }
+
+  async function handleDeleted(mediaId) {
+    /*
+     * Remove immediately from Manager.
+     */
+
+    setItems((current) => current.filter((item) => item.id !== mediaId));
+
+    /*
+     * Close Detail Drawer if same Media.
+     */
+
+    setSelectedMedia((current) => (current?.id === mediaId ? null : current));
+
+    setDeleteMedia(null);
+
+    setDeleteUsage(null);
+
+    setDeleteUsageError(null);
+
+    /*
+     * Server reconciliation.
+     */
+
+    await loadMedia({
+      silent: true,
+    });
+  }
 
   /*
    * =======================================================
@@ -210,36 +653,56 @@ export default function MediaManager() {
 
   if (companyLoading) {
     return (
-      <div
-        className="
-          flex
-          min-h-[420px]
-
-          items-center
-          justify-center
-        "
-      >
+      <div>
         <div
           className="
-            flex
-            items-center
-            gap-2
+            h-8
+            w-32
 
-            admin-text-14
+            animate-pulse
 
-            text-[var(--admin-muted)]
+            rounded
+
+            bg-[var(--admin-hover)]
+          "
+        />
+
+        <div
+          className="
+            mt-3
+
+            h-4
+            w-[420px]
+            max-w-full
+
+            animate-pulse
+
+            rounded
+
+            bg-[var(--admin-hover)]
+          "
+        />
+
+        <div
+          className="
+            mt-8
+
+            grid
+            grid-cols-2
+            gap-4
+
+            sm:grid-cols-3
+
+            lg:grid-cols-4
+
+            2xl:grid-cols-5
           "
         >
-          <LoaderCircle
-            size={17}
-            className="
-              animate-spin
-
-              text-[var(--company-primary)]
-            "
-          />
-
-          {t("media.manager.loadingWorkspace")}
+          {Array.from({
+            length: 10,
+          }).map((_, index) => (
+            <MediaCardSkeleton key={index} />
+          ))}
         </div>
       </div>
     );
@@ -281,7 +744,6 @@ export default function MediaManager() {
             mt-1
 
             admin-text-14
-            leading-[1.6]
 
             text-[var(--admin-muted)]
           "
@@ -299,418 +761,599 @@ export default function MediaManager() {
    */
 
   return (
-    <div>
-      {/* =====================================
-          HEADER
-      ===================================== */}
+    <>
+      <div>
+        {/* HEADER */}
 
-      <div
-        className={cn(
-          "flex flex-col gap-5",
+        <div
+          className="
+            flex
+            flex-col
 
-          "lg:flex-row lg:items-end lg:justify-between",
-        )}
-      >
-        <div>
-          <div
-            className="
-              admin-text-12
+            gap-5
 
-              font-medium
-              uppercase
-              tracking-[0.14em]
+            xl:flex-row
+            xl:items-end
+            xl:justify-between
+          "
+        >
+          <div>
+            <div
+              className="
+                admin-text-12
+                font-medium
+                uppercase
+                tracking-[0.14em]
 
-              text-[var(--company-primary)]
-            "
-          >
-            {t("media.manager.sectionLabel")}
+                text-[var(--company-primary)]
+              "
+            >
+              {t("media.manager.sectionLabel")}
+            </div>
+
+            <h1
+              className="
+                mt-2
+
+                admin-text-32
+                font-semibold
+                tracking-[-0.035em]
+
+                text-[var(--admin-foreground)]
+              "
+            >
+              {t("media.manager.title")}
+            </h1>
+
+            <p
+              className="
+                mt-2
+                max-w-2xl
+
+                admin-text-14
+                leading-[1.7]
+
+                text-[var(--admin-muted)]
+              "
+            >
+              {t("media.manager.description")}
+            </p>
           </div>
 
-          <h1
-            className="
-              mt-2
-
-              admin-text-32
-              font-semibold
-              tracking-[-0.035em]
-
-              text-[var(--admin-foreground)]
-            "
-          >
-            {t("media.manager.title")}
-          </h1>
-
-          <p
-            className="
-              mt-2
-              max-w-2xl
-
-              admin-text-14
-              leading-[1.7]
-
-              text-[var(--admin-muted)]
-            "
-          >
-            {t("media.manager.description")}
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={() =>
-            loadMedia({
-              silent: true,
-            })
-          }
-          disabled={refreshing}
-          className={cn(
-            "inline-flex h-10 items-center justify-center gap-2",
-
-            "self-start rounded-xl",
-
-            "border border-[var(--admin-border)]",
-
-            "bg-[var(--admin-surface)] px-4",
-
-            "admin-text-14 font-medium",
-
-            "text-[var(--admin-foreground)]",
-
-            "transition",
-
-            "hover:border-[var(--company-primary-border)]",
-
-            "hover:bg-[var(--company-primary-soft)]",
-
-            "hover:text-[var(--company-primary)]",
-
-            "disabled:cursor-not-allowed disabled:opacity-60",
-
-            "lg:self-auto",
-          )}
-        >
-          <RefreshCw size={15} className={cn(refreshing && "animate-spin")} />
-
-          {refreshing ? t("media.manager.refreshing") : t("common.refresh")}
-        </button>
-      </div>
-
-      {/* =====================================
-          UPLOAD
-      ===================================== */}
-
-      <div className="mt-8">
-        <MediaUploadDropzone
-          companyId={activeCompanyId}
-          onUploaded={() =>
-            loadMedia({
-              silent: true,
-            })
-          }
-        />
-      </div>
-
-      {/* =====================================
-          SEARCH + COUNT
-      ===================================== */}
-
-      <div
-        className={cn(
-          "mt-6 flex flex-col gap-4",
-
-          "sm:flex-row sm:items-center sm:justify-between",
-        )}
-      >
-        <div
-          className="
-            relative
-
-            w-full
-
-            sm:max-w-sm
-          "
-        >
-          <Search
-            size={16}
-            className="
-              pointer-events-none
-
-              absolute
-              left-3
-              top-1/2
-
-              -translate-y-1/2
-
-              text-[var(--admin-muted)]
-            "
-          />
-
-          <input
-            type="search"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder={t("media.manager.searchPlaceholder")}
-            className="
-              h-11
-              w-full
-
-              rounded-xl
-
-              border
-              border-[var(--admin-border)]
-
-              bg-[var(--admin-surface)]
-
-              pl-10
-              pr-4
-
-              admin-text-14
-
-              text-[var(--admin-foreground)]
-
-              outline-none
-
-              transition
-
-              placeholder:text-[var(--admin-muted-light)]
-
-              focus:border-[var(--company-primary)]
-
-              focus:ring-2
-              focus:ring-[var(--company-primary-soft)]
-            "
-          />
-        </div>
-
-        <div
-          className="
-            admin-text-12
-
-            text-[var(--admin-muted)]
-          "
-        >
-          {t("media.manager.assetCount", {
-            count: filteredItems.length,
-          })}
-        </div>
-      </div>
-
-      {/* =====================================
-          ERROR
-      ===================================== */}
-
-      {error && (
-        <div
-          className="
-            mt-6
-
-            rounded-2xl
-
-            border
-            border-red-200
-
-            bg-red-50
-
-            p-4
-
-            admin-text-14
-
-            text-red-700
-          "
-        >
-          {error}
-        </div>
-      )}
-
-      {/* =====================================
-          LOADING
-      ===================================== */}
-
-      {loading ? (
-        <div
-          className={cn(
-            "mt-6 grid gap-4",
-
-            "grid-cols-2",
-
-            "sm:grid-cols-3",
-
-            "lg:grid-cols-4",
-
-            "2xl:grid-cols-5",
-          )}
-        >
-          {Array.from({
-            length: 10,
-          }).map((_, index) => (
-            <div
-              key={index}
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() =>
+                loadMedia({
+                  silent: true,
+                })
+              }
+              disabled={refreshing}
               className="
-                  overflow-hidden
+                inline-flex
+                h-10
 
-                  rounded-2xl
+                items-center
+                justify-center
+                gap-2
 
-                  border
-                  border-[var(--admin-border)]
+                rounded-xl
 
-                  bg-[var(--admin-surface)]
-                "
+                border
+                border-[var(--admin-border)]
+
+                bg-[var(--admin-surface)]
+
+                px-4
+
+                admin-text-12
+                font-medium
+
+                text-[var(--admin-foreground)]
+
+                transition
+
+                hover:bg-[var(--admin-hover)]
+
+                disabled:opacity-60
+              "
             >
-              <div
-                className="
-                    aspect-[4/3]
-
-                    animate-pulse
-
-                    bg-[var(--admin-hover)]
-                  "
+              <RefreshCw
+                size={15}
+                className={cn(refreshing && "animate-spin")}
               />
 
-              <div className="space-y-2 p-4">
-                <div
-                  className="
-                      h-3
-                      w-3/4
+              {t("common.refresh")}
+            </button>
 
-                      animate-pulse
+            <button
+              type="button"
+              onClick={() => setUploadOpen(true)}
+              className="
+                inline-flex
+                h-10
 
-                      rounded
+                items-center
+                justify-center
+                gap-2
 
-                      bg-[var(--admin-hover)]
-                    "
-                />
+                rounded-xl
 
-                <div
-                  className="
-                      h-2.5
-                      w-1/2
+                bg-[var(--company-primary)]
 
-                      animate-pulse
+                px-4
 
-                      rounded
+                admin-text-12
+                font-medium
 
-                      bg-[var(--admin-hover)]
-                    "
-                />
-              </div>
-            </div>
-          ))}
+                text-[var(--company-primary-foreground)]
+
+                transition
+
+                hover:bg-[var(--company-primary-hover)]
+              "
+            >
+              <Upload size={15} />
+
+              {t("media.manager.upload")}
+            </button>
+          </div>
         </div>
-      ) : filteredItems.length === 0 ? (
-        /*
-         * ===================================
-         * EMPTY
-         * ===================================
-         */
+
+        {/* SUMMARY */}
+
+        <div
+          className="
+            mt-7
+
+            grid
+            grid-cols-2
+            gap-3
+
+            xl:grid-cols-4
+          "
+        >
+          <SummaryCard
+            active={filter === FILTER.ALL}
+            icon={<File size={18} />}
+            label={t("media.manager.summary.all")}
+            count={summary.all}
+            onClick={() => setFilter(FILTER.ALL)}
+          />
+
+          <SummaryCard
+            active={filter === FILTER.IMAGE}
+            icon={<ImageIcon size={18} />}
+            label={t("media.manager.summary.images")}
+            count={summary.image}
+            onClick={() => setFilter(FILTER.IMAGE)}
+          />
+
+          <SummaryCard
+            active={filter === FILTER.DOCUMENT}
+            icon={<FileImage size={18} />}
+            label={t("media.manager.summary.documents")}
+            count={summary.document}
+            onClick={() => setFilter(FILTER.DOCUMENT)}
+          />
+
+          <SummaryCard
+            active={filter === FILTER.OTHER}
+            icon={<File size={18} />}
+            label={t("media.manager.summary.other")}
+            count={summary.other}
+            onClick={() => setFilter(FILTER.OTHER)}
+          />
+        </div>
+
+        {/* SEARCH / FILTER / SORT */}
 
         <div
           className="
             mt-6
 
             flex
-            min-h-[320px]
-
             flex-col
-            items-center
-            justify-center
 
-            rounded-2xl
+            gap-3
 
-            border
-            border-dashed
-            border-[var(--admin-border)]
-
-            bg-[var(--admin-surface)]
-
-            p-8
-
-            text-center
+            lg:flex-row
+            lg:items-center
+            lg:justify-between
           "
         >
           <div
             className="
-              flex
-              h-12
-              w-12
+              relative
 
+              w-full
+
+              lg:max-w-[420px]
+            "
+          >
+            <Search
+              size={16}
+              className="
+                pointer-events-none
+
+                absolute
+                left-3
+                top-1/2
+
+                -translate-y-1/2
+
+                text-[var(--admin-muted)]
+              "
+            />
+
+            <input
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder={t("media.manager.searchPlaceholder")}
+              className="
+                h-11
+                w-full
+
+                rounded-xl
+
+                border
+                border-[var(--admin-border)]
+
+                bg-[var(--admin-surface)]
+
+                pl-10
+                pr-4
+
+                admin-text-13
+
+                text-[var(--admin-foreground)]
+
+                outline-none
+
+                transition
+
+                focus:border-[var(--company-primary)]
+
+                focus:ring-2
+                focus:ring-[var(--company-primary-soft)]
+              "
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative">
+              <ListFilter
+                size={14}
+                className="
+                  pointer-events-none
+
+                  absolute
+                  left-3
+                  top-1/2
+
+                  -translate-y-1/2
+
+                  text-[var(--admin-muted)]
+                "
+              />
+
+              <select
+                value={filter}
+                onChange={(event) => setFilter(event.target.value)}
+                className="
+                  h-10
+
+                  appearance-none
+
+                  rounded-xl
+
+                  border
+                  border-[var(--admin-border)]
+
+                  bg-[var(--admin-surface)]
+
+                  pl-9
+                  pr-8
+
+                  admin-text-11
+                  font-medium
+
+                  text-[var(--admin-foreground)]
+
+                  outline-none
+                "
+              >
+                <option value={FILTER.ALL}>
+                  {t("media.manager.filters.all")}
+                </option>
+
+                <option value={FILTER.IMAGE}>
+                  {t("media.manager.filters.images")}
+                </option>
+
+                <option value={FILTER.DOCUMENT}>
+                  {t("media.manager.filters.documents")}
+                </option>
+
+                <option value={FILTER.OTHER}>
+                  {t("media.manager.filters.other")}
+                </option>
+              </select>
+            </div>
+
+            <div className="relative">
+              <ArrowUpDown
+                size={14}
+                className="
+                  pointer-events-none
+
+                  absolute
+                  left-3
+                  top-1/2
+
+                  -translate-y-1/2
+
+                  text-[var(--admin-muted)]
+                "
+              />
+
+              <select
+                value={sort}
+                onChange={(event) => setSort(event.target.value)}
+                className="
+                  h-10
+
+                  appearance-none
+
+                  rounded-xl
+
+                  border
+                  border-[var(--admin-border)]
+
+                  bg-[var(--admin-surface)]
+
+                  pl-9
+                  pr-8
+
+                  admin-text-11
+                  font-medium
+
+                  text-[var(--admin-foreground)]
+
+                  outline-none
+                "
+              >
+                <option value={SORT.NEWEST}>
+                  {t("media.manager.sort.newest")}
+                </option>
+
+                <option value={SORT.OLDEST}>
+                  {t("media.manager.sort.oldest")}
+                </option>
+
+                <option value={SORT.NAME_ASC}>
+                  {t("media.manager.sort.nameAsc")}
+                </option>
+
+                <option value={SORT.NAME_DESC}>
+                  {t("media.manager.sort.nameDesc")}
+                </option>
+
+                <option value={SORT.SIZE_DESC}>
+                  {t("media.manager.sort.largest")}
+                </option>
+
+                <option value={SORT.SIZE_ASC}>
+                  {t("media.manager.sort.smallest")}
+                </option>
+              </select>
+            </div>
+
+            <div
+              className="
+                ml-1
+
+                admin-text-10
+
+                text-[var(--admin-muted)]
+              "
+            >
+              {t("media.manager.assetCount", {
+                count: filteredItems.length,
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* ERROR */}
+
+        {error && (
+          <div
+            className="
+              mt-6
+
+              rounded-2xl
+
+              border
+              border-red-200
+
+              bg-red-50
+
+              p-4
+
+              admin-text-12
+
+              text-red-700
+            "
+          >
+            {error}
+          </div>
+        )}
+
+        {/* GRID */}
+
+        {loading ? (
+          <div
+            className="
+              mt-6
+
+              grid
+              grid-cols-2
+              gap-4
+
+              sm:grid-cols-3
+
+              lg:grid-cols-4
+
+              2xl:grid-cols-5
+            "
+          >
+            {Array.from({
+              length: 10,
+            }).map((_, index) => (
+              <MediaCardSkeleton key={index} />
+            ))}
+          </div>
+        ) : filteredItems.length === 0 ? (
+          <div
+            className="
+              mt-6
+
+              flex
+              min-h-[300px]
+
+              flex-col
               items-center
               justify-center
 
               rounded-2xl
 
-              bg-[var(--company-primary-soft)]
+              border
+              border-dashed
+              border-[var(--admin-border)]
 
-              text-[var(--company-primary)]
+              bg-[var(--admin-surface)]
+
+              p-8
+
+              text-center
             "
           >
-            <ImageIcon size={21} strokeWidth={1.7} />
-          </div>
+            <div
+              className="
+                flex
+                h-12
+                w-12
 
+                items-center
+                justify-center
+
+                rounded-2xl
+
+                bg-[var(--company-primary-soft)]
+
+                text-[var(--company-primary)]
+              "
+            >
+              <ImageIcon size={21} />
+            </div>
+
+            <div
+              className="
+                mt-4
+
+                admin-text-14
+                font-medium
+
+                text-[var(--admin-foreground)]
+              "
+            >
+              {t("media.manager.empty.searchTitle")}
+            </div>
+          </div>
+        ) : (
           <div
             className="
-              mt-4
+              mt-6
 
-              admin-text-14
-              font-medium
+              grid
+              grid-cols-2
+              gap-4
 
-              text-[var(--admin-foreground)]
+              sm:grid-cols-3
+
+              lg:grid-cols-4
+
+              2xl:grid-cols-5
             "
           >
-            {search
-              ? t("media.manager.empty.searchTitle")
-              : t("media.manager.empty.title")}
+            {filteredItems.map((media) => (
+              <MediaCard
+                key={media.id}
+                companyId={activeCompanyId}
+                media={media}
+                title={getMediaName(media, t("media.manager.untitled"))}
+                onOpen={setSelectedMedia}
+                onDelete={handleOpenDelete}
+              />
+            ))}
           </div>
+        )}
+      </div>
 
-          <p
-            className="
-              mt-1
-              max-w-sm
+      {/* UPLOAD */}
 
-              admin-text-12
-              leading-[1.65]
+      <MediaUploadDialog
+        open={uploadOpen}
+        companyId={activeCompanyId}
+        onClose={() => setUploadOpen(false)}
+        onUploaded={handleUploaded}
+      />
 
-              text-[var(--admin-muted)]
-            "
-          >
-            {search
-              ? t("media.manager.empty.searchDescription")
-              : t("media.manager.empty.description")}
-          </p>
-        </div>
-      ) : (
-        /*
-         * ===================================
-         * GRID
-         * ===================================
-         */
+      {/* DETAIL */}
 
-        <div
-          className={cn(
-            "mt-6 grid gap-4",
+      <MediaDetailDrawer
+        open={Boolean(selectedMedia)}
+        companyId={activeCompanyId}
+        media={selectedMedia}
+        onClose={() => setSelectedMedia(null)}
+        onDeleted={handleDeleted}
+        onSaved={async (updatedMedia) => {
+          setItems((current) =>
+            current.map((item) =>
+              item.id === updatedMedia.id
+                ? {
+                    ...item,
+                    ...updatedMedia,
+                  }
+                : item,
+            ),
+          );
 
-            "grid-cols-2",
+          await loadMedia({
+            silent: true,
+          });
+        }}
+      />
 
-            "sm:grid-cols-3",
+      {/* DELETE */}
 
-            "lg:grid-cols-4",
-
-            "2xl:grid-cols-5",
-          )}
-        >
-          {filteredItems.map((media) => (
-            <MediaCard
-              key={media.id}
-              companyId={activeCompanyId}
-              media={media}
-              title={getMediaName(
-                media,
-
-                t("media.manager.untitled"),
-              )}
-            />
-          ))}
-        </div>
-      )}
-    </div>
+      <MediaDeleteDialog
+        open={Boolean(deleteMedia)}
+        companyId={activeCompanyId}
+        media={deleteMedia}
+        usageData={deleteUsage}
+        usageLoading={deleteUsageLoading}
+        usageError={deleteUsageError}
+        onRetryUsage={() => {
+          if (deleteMedia) {
+            loadDeleteUsage(deleteMedia);
+          }
+        }}
+        onClose={handleCloseDelete}
+        onDeleted={handleDeleted}
+      />
+    </>
   );
 }

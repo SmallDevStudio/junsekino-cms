@@ -977,12 +977,15 @@ export const adminEn = {
         failed: "Unable to import image.",
       },
     },
+
     manager: {
+      upload: "Upload Media",
+
       sectionLabel: "Content Management",
 
       title: "Media",
 
-      description: "Upload and manage images used across the website.",
+      description: "Upload and manage media assets used across the website.",
 
       loadingWorkspace: "Loading workspace...",
 
@@ -1004,15 +1007,49 @@ export const adminEn = {
         title: "No media yet",
 
         description:
-          "Upload the first image to start building your media library.",
+          "Upload your first media asset to start building the Media Library.",
 
         searchTitle: "No matching media",
 
-        searchDescription: "Try another filename or keyword.",
+        searchDescription: "Try another file name, title, tag or keyword.",
       },
 
       errors: {
         loadFailed: "Unable to retrieve media.",
+      },
+
+      summary: {
+        all: "All Media",
+
+        images: "Images",
+
+        documents: "Documents",
+
+        other: "Other",
+      },
+
+      filters: {
+        all: "All",
+
+        images: "Images",
+
+        documents: "Documents",
+
+        other: "Other",
+      },
+
+      sort: {
+        newest: "Newest",
+
+        oldest: "Oldest",
+
+        nameAsc: "Name A–Z",
+
+        nameDesc: "Name Z–A",
+
+        largest: "Largest",
+
+        smallest: "Smallest",
       },
     },
 
@@ -1041,15 +1078,169 @@ export const adminEn = {
       avatarDescription: "Position the photo inside the circular avatar area.",
 
       zoom: "Zoom",
+
       zoomIn: "Zoom in",
+
       zoomOut: "Zoom out",
 
       aspect: "Aspect Ratio",
 
       rotateLeft: "Rotate left",
+
       rotateRight: "Rotate right",
 
       apply: "Apply Crop",
+    },
+
+    uploadDialog: {
+      title: "Upload Media",
+
+      description: "Add assets to this company's Media Library.",
+
+      hint: "Uploaded assets are processed automatically before becoming available.",
+    },
+
+    details: {
+      sectionLabel: "Media Asset",
+
+      loadingPreview: "Loading preview…",
+
+      previewFailed: "Unable to load preview.",
+
+      metadata: {
+        title: "Metadata",
+
+        description:
+          "Default information attached to this media asset. Other content can inherit these values automatically.",
+      },
+
+      fields: {
+        title: "Title",
+
+        alt: "Alternative Text",
+
+        altHint: "Describe the image for accessibility and search engines.",
+
+        description: "Description",
+
+        caption: "Caption",
+
+        credit: "Credit",
+
+        tags: "Tags",
+
+        tagsPlaceholder: "Type and press Enter",
+      },
+
+      fileInfo: {
+        title: "File Information",
+
+        fileName: "File Name",
+
+        dimensions: "Dimensions",
+
+        size: "File Size",
+
+        type: "MIME Type",
+
+        format: "Format",
+      },
+
+      usage: {
+        title: "Used In",
+
+        description: "Content currently referencing this media asset.",
+
+        retry: "Try again",
+
+        untitled: "Untitled content",
+
+        modules: {
+          project: "Project",
+
+          award: "Award",
+
+          homeSlideshow: "Home",
+
+          page: "Page",
+
+          publicContent: "Public",
+        },
+
+        locations: {
+          featuredImage: "Cover Image",
+
+          hero: "Hero Image",
+
+          gallery: "Gallery · Image {number}",
+
+          slideshow: "Slideshow · Slide {number}",
+
+          sectionImage: "Section {number} · Image",
+
+          sectionGallery: "Section {section} · Gallery Image {number}",
+        },
+
+        empty: {
+          title: "Not currently used",
+
+          description:
+            "This media asset is not referenced by any tracked content.",
+        },
+
+        errors: {
+          loadFailed: "Unable to retrieve media usage.",
+        },
+      },
+
+      messages: {
+        saved: "Media metadata updated.",
+      },
+
+      errors: {
+        loadFailed: "Unable to load media metadata.",
+
+        saveFailed: "Unable to save media metadata.",
+      },
+    },
+
+    /*
+     * IMPORTANT:
+     * delete MUST be a sibling of details.
+     *
+     * Correct:
+     * media.delete.title
+     *
+     * Not:
+     * media.details.delete.title
+     */
+
+    delete: {
+      title: "Delete Media",
+
+      delete: "Delete Media",
+
+      removeAndDelete: "Remove from content & delete",
+
+      checkingUsage: "Checking where this media is being used…",
+
+      inUseTitle: "Used in {count} places",
+
+      inUseDescription:
+        "Deleting this media will also remove its references from the content listed below.",
+
+      unusedDescription:
+        "This media is not currently used by any tracked content. It can be deleted safely.",
+
+      messages: {
+        deleted: "Media deleted.",
+
+        detachedAndDeleted: "Media removed from content and deleted.",
+      },
+
+      errors: {
+        failed: "Unable to delete media.",
+      },
     },
   },
 

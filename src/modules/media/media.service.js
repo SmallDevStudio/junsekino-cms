@@ -526,7 +526,17 @@ export async function createMediaUpload({ companyId, input, currentUser }) {
 
       storageGeneration: null,
 
+      title: input.title || {
+        th: "",
+        en: "",
+      },
+
       alt: input.alt || {
+        th: "",
+        en: "",
+      },
+
+      description: input.description || {
         th: "",
         en: "",
       },
@@ -535,6 +545,13 @@ export async function createMediaUpload({ companyId, input, currentUser }) {
         th: "",
         en: "",
       },
+
+      credit: input.credit || {
+        th: "",
+        en: "",
+      },
+
+      tags: Array.isArray(input.tags) ? input.tags : [],
 
       checksum: null,
 

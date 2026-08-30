@@ -6,11 +6,38 @@ import {
   MEDIA_USAGE,
 } from "@/constants/media";
 
-const localizedStringSchema = z.object({
-  th: z.string().max(500).default(""),
+/*
+ * =========================================================
+ * LOCALIZED STRING
+ * =========================================================
+ */
 
+const localizedShortStringSchema = z.object({
+  th: z.string().max(500).default(""),
   en: z.string().max(500).default(""),
 });
+
+const localizedLongStringSchema = z.object({
+  th: z.string().max(5000).default(""),
+  en: z.string().max(5000).default(""),
+});
+
+/*
+ * =========================================================
+ * TAGS
+ * =========================================================
+ */
+
+const mediaTagsSchema = z
+  .array(z.string().trim().min(1).max(80))
+  .max(50)
+  .default([]);
+
+/*
+ * =========================================================
+ * CREATE UPLOAD
+ * =========================================================
+ */
 
 export const createMediaUploadSchema = z.object({
   fileName: z.string().trim().min(1).max(255),
@@ -25,27 +52,63 @@ export const createMediaUploadSchema = z.object({
 
   usage: z.enum(Object.values(MEDIA_USAGE)).default(MEDIA_USAGE.GENERAL),
 
-  alt: localizedStringSchema.optional(),
+  title: localizedShortStringSchema.optional(),
 
-  caption: localizedStringSchema.optional(),
+  alt: localizedShortStringSchema.optional(),
+
+  description: localizedLongStringSchema.optional(),
+
+  caption: localizedLongStringSchema.optional(),
+
+  credit: localizedShortStringSchema.optional(),
+
+  tags: mediaTagsSchema.optional(),
 });
+
+/*
+ * =========================================================
+ * IMPORT URL
+ * =========================================================
+ */
 
 export const importMediaUrlSchema = z.object({
   url: z.string().trim().url("Invalid image URL.").max(4000),
 
   usage: z.enum(Object.values(MEDIA_USAGE)).default(MEDIA_USAGE.GENERAL),
 
-  alt: localizedStringSchema.optional(),
+  title: localizedShortStringSchema.optional(),
 
-  caption: localizedStringSchema.optional(),
+  alt: localizedShortStringSchema.optional(),
+
+  description: localizedLongStringSchema.optional(),
+
+  caption: localizedLongStringSchema.optional(),
+
+  credit: localizedShortStringSchema.optional(),
+
+  tags: mediaTagsSchema.optional(),
 });
 
 export const finalizeMediaSchema = z.object({});
 
-export const updateMediaSchema = z.object({
-  alt: localizedStringSchema.optional(),
+/*
+ * =========================================================
+ * UPDATE MEDIA METADATA
+ * =========================================================
+ */
 
-  caption: localizedStringSchema.optional(),
+export const updateMediaSchema = z.object({
+  title: localizedShortStringSchema.optional(),
+
+  alt: localizedShortStringSchema.optional(),
+
+  description: localizedLongStringSchema.optional(),
+
+  caption: localizedLongStringSchema.optional(),
+
+  credit: localizedShortStringSchema.optional(),
+
+  tags: mediaTagsSchema.optional(),
 
   usage: z.enum(Object.values(MEDIA_USAGE)).optional(),
 });

@@ -874,77 +874,77 @@ export const adminTh = {
     upload: {
       dropTitle: "ลากรูปมาวางที่นี่ หรือคลิกเพื่ออัปโหลด",
 
-      formats: "รองรับ JPG, PNG, WebP หรือ AVIF • ขนาดไม่เกิน {size}",
+      formats: "JPG, PNG, WebP หรือ AVIF • สูงสุด {size}",
 
       errors: {
-        unsupportedType: "ไม่รองรับไฟล์ประเภทนี้",
+        unsupportedType: "ไม่รองรับประเภทไฟล์นี้",
 
         fileTooLarge: "ไฟล์มีขนาดเกิน {size}",
 
-        failed: "อัปโหลดไฟล์ไม่สำเร็จ",
+        failed: "อัปโหลดไม่สำเร็จ",
       },
     },
 
     picker: {
-      title: "เลือกสื่อ",
+      title: "เลือก Media",
 
-      close: "ปิดหน้าต่างเลือกสื่อ",
+      close: "ปิดหน้าต่างเลือก Media",
 
-      multipleDescription: "เลือกภาพได้หนึ่งภาพหรือหลายภาพ",
+      multipleDescription: "เลือกรูปภาพได้หนึ่งรูปหรือหลายรูป",
 
-      singleDescription: "เลือกภาพที่ต้องการ",
+      singleDescription: "เลือกรูปภาพหนึ่งรูป",
 
       tabs: {
-        library: "คลังสื่อ",
+        library: "คลัง Media",
 
         upload: "อัปโหลด",
 
         importUrl: "นำเข้าจาก URL",
       },
 
-      searchPlaceholder: "ค้นหารูปภาพ...",
+      searchPlaceholder: "ค้นหา Media...",
 
       resultCount: "{count} รูป",
 
-      loading: "กำลังโหลดคลังสื่อ...",
+      loading: "กำลังโหลด Media...",
 
       emptyTitle: "ยังไม่มีรูปภาพ",
 
-      emptyDescription: "อัปโหลดรูปภาพหรือนำเข้ารูปจาก URL",
+      emptyDescription: "อัปโหลดรูปภาพหรือนำเข้าจาก URL",
 
       noSearchResults: "ไม่พบรูปภาพที่ค้นหา",
 
-      noSearchDescription: "ลองค้นหาด้วยชื่อไฟล์ คำอธิบาย หรือคำอื่น",
+      noSearchDescription: "ลองค้นหาด้วยชื่อไฟล์ คำบรรยาย หรือคำค้นอื่น",
 
       selectedCount: "เลือกแล้ว {count} รูป",
 
-      noneSelected: "ยังไม่ได้เลือกรูปภาพ",
+      noneSelected: "ยังไม่ได้เลือกรูป",
 
-      confirmSingle: "เลือกรูปภาพ",
+      confirmSingle: "เลือกรูป",
 
       confirmMultiple: "เพิ่มรูปที่เลือก",
 
-      untitled: "รูปภาพไม่มีชื่อ",
+      untitled: "รูปไม่มีชื่อ",
 
       errors: {
-        loadFailed: "ไม่สามารถโหลดคลังสื่อได้",
+        loadFailed: "ไม่สามารถโหลด Media ได้",
       },
 
       crop: {
         selectDescription:
-          "เลือกรูปภาพ จากนั้นจัดตำแหน่งและพื้นที่ที่ต้องการให้แสดง",
+          "เลือกรูปภาพ แล้วดำเนินการต่อเพื่อปรับพื้นที่การแสดงผล",
 
-        noteTitle: "สามารถจัดตำแหน่งรูปได้",
+        noteTitle: "สามารถปรับ Crop ได้",
 
         noteDescription:
-          "หลังเลือกรูปแล้ว สามารถเลื่อน ขยาย และกำหนดพื้นที่ที่ต้องการให้แสดงก่อนนำไปใช้งาน",
+          "หลังเลือกรูป สามารถเลื่อน ซูม และปรับพื้นที่การแสดงผลก่อนนำไปใช้งาน",
 
-        continue: "จัดตำแหน่งรูป",
+        continue: "ปรับรูปภาพ",
 
         preparing: "กำลังเตรียมรูป...",
 
         errors: {
-          previewFailed: "ไม่สามารถเตรียมรูปภาพสำหรับ Crop ได้",
+          previewFailed: "ไม่สามารถเตรียมรูปสำหรับ Crop ได้",
         },
       },
     },
@@ -953,71 +953,108 @@ export const adminTh = {
       title: "นำเข้ารูปภาพจาก URL",
 
       description:
-        "วาง URL ของไฟล์รูปภาพโดยตรง ระบบจะคัดลอกรูปเข้าคลังสื่อของบริษัทและประมวลผลเหมือนการอัปโหลดปกติ",
+        "วาง URL ของรูปภาพโดยตรง ระบบจะคัดลอกรูปเข้ามาเก็บใน Media Library ของบริษัทและประมวลผลเหมือนการอัปโหลดตามปกติ",
 
       fieldLabel: "URL รูปภาพ",
 
-      directOnly: "รองรับ URL ของไฟล์รูปภาพโดยตรงเท่านั้น",
+      directOnly: "รองรับเฉพาะ URL ของรูปภาพโดยตรง",
 
       supportedFormats:
-        "รองรับ JPEG, PNG, WebP และ AVIF ไม่รองรับหน้าเว็บไซต์ ที่อยู่เครือข่ายภายใน หรือไฟล์ประเภทอื่น",
+        "รองรับ JPEG, PNG, WebP และ AVIF ไม่รองรับหน้าเว็บไซต์ ที่อยู่ภายในเครือข่าย หรือไฟล์ประเภทอื่น",
 
-      action: "นำเข้ารูปภาพ",
+      action: "นำเข้ารูป",
 
       importing: "กำลังนำเข้า...",
 
       messages: {
-        imported: "นำเข้ารูปภาพเรียบร้อยแล้ว",
+        imported: "นำเข้ารูปเรียบร้อยแล้ว",
       },
 
       errors: {
-        required: "กรุณาระบุ URL รูปภาพ",
+        required: "กรุณาระบุ URL ของรูป",
 
-        invalid: "กรุณาระบุ URL รูปภาพแบบ HTTP หรือ HTTPS ที่ถูกต้อง",
+        invalid: "กรุณาระบุ HTTP หรือ HTTPS URL ที่ถูกต้อง",
 
         failed: "ไม่สามารถนำเข้ารูปภาพได้",
       },
     },
+
     manager: {
-      sectionLabel: "การจัดการเนื้อหา",
+      upload: "อัปโหลด Media",
 
-      title: "คลังสื่อ",
+      sectionLabel: "จัดการเนื้อหา",
 
-      description: "อัปโหลดและจัดการรูปภาพที่ใช้ภายในเว็บไซต์",
+      title: "Media",
 
-      loadingWorkspace: "กำลังโหลดบริษัท...",
+      description: "อัปโหลดและจัดการ Media ที่ใช้ภายในเว็บไซต์",
+
+      loadingWorkspace: "กำลังโหลด Workspace...",
 
       refreshing: "กำลังรีเฟรช...",
 
-      searchPlaceholder: "ค้นหาสื่อ...",
+      searchPlaceholder: "ค้นหา Media...",
 
       assetCount: "{count} รายการ",
 
-      untitled: "สื่อไม่มีชื่อ",
+      untitled: "Media ไม่มีชื่อ",
 
       noCompany: {
         title: "ยังไม่ได้เลือกบริษัท",
 
-        description: "กรุณาเลือกบริษัทก่อนจัดการคลังสื่อ",
+        description: "กรุณาเลือก Workspace ก่อนจัดการ Media",
       },
 
       empty: {
-        title: "ยังไม่มีสื่อ",
+        title: "ยังไม่มี Media",
 
-        description: "อัปโหลดรูปภาพแรกเพื่อเริ่มสร้างคลังสื่อ",
+        description: "อัปโหลด Media รายการแรกเพื่อเริ่มสร้าง Media Library",
 
-        searchTitle: "ไม่พบสื่อที่ค้นหา",
+        searchTitle: "ไม่พบ Media ที่ค้นหา",
 
-        searchDescription: "ลองค้นหาด้วยชื่อไฟล์หรือคำอื่น",
+        searchDescription: "ลองค้นหาด้วยชื่อไฟล์ ชื่อรูป แท็ก หรือคำค้นอื่น",
       },
 
       errors: {
-        loadFailed: "ไม่สามารถโหลดคลังสื่อได้",
+        loadFailed: "ไม่สามารถโหลด Media ได้",
+      },
+
+      summary: {
+        all: "Media ทั้งหมด",
+
+        images: "รูปภาพ",
+
+        documents: "เอกสาร",
+
+        other: "อื่น ๆ",
+      },
+
+      filters: {
+        all: "ทั้งหมด",
+
+        images: "รูปภาพ",
+
+        documents: "เอกสาร",
+
+        other: "อื่น ๆ",
+      },
+
+      sort: {
+        newest: "ล่าสุด",
+
+        oldest: "เก่าสุด",
+
+        nameAsc: "ชื่อ A–Z",
+
+        nameDesc: "ชื่อ Z–A",
+
+        largest: "ไฟล์ใหญ่สุด",
+
+        smallest: "ไฟล์เล็กสุด",
       },
     },
 
     card: {
-      openPreview: "เปิดดูภาพ",
+      openPreview: "เปิดดูรูป",
 
       previewFailed: "ไม่สามารถแสดงตัวอย่างได้",
 
@@ -1031,25 +1068,172 @@ export const adminTh = {
     crop: {
       sectionLabel: "ตำแหน่งรูปภาพ",
 
-      coverTitle: "จัดตำแหน่งภาพ Cover",
+      coverTitle: "ปรับรูป Cover",
 
       coverDescription:
-        "เลื่อนและขยายรูปเพื่อเลือกตำแหน่งที่ต้องการให้แสดงใน Cover",
+        "เลื่อนและซูมรูปเพื่อเลือกพื้นที่ที่ต้องการให้แสดงใน Cover",
 
-      avatarTitle: "จัดตำแหน่ง Avatar",
+      avatarTitle: "ปรับรูป Avatar",
 
-      avatarDescription: "จัดตำแหน่งรูปภาพให้อยู่ภายในพื้นที่วงกลมของ Avatar",
+      avatarDescription: "จัดตำแหน่งรูปให้อยู่ภายในกรอบ Avatar แบบวงกลม",
 
-      zoom: "ขยายภาพ",
-      zoomIn: "ขยาย",
-      zoomOut: "ย่อ",
+      zoom: "ซูม",
 
-      aspect: "สัดส่วน",
+      zoomIn: "ซูมเข้า",
+
+      zoomOut: "ซูมออก",
+
+      aspect: "อัตราส่วนภาพ",
 
       rotateLeft: "หมุนซ้าย",
+
       rotateRight: "หมุนขวา",
 
-      apply: "ใช้ตำแหน่งนี้",
+      apply: "ใช้การ Crop",
+    },
+
+    uploadDialog: {
+      title: "อัปโหลด Media",
+
+      description: "เพิ่ม Media เข้าสู่ Media Library ของบริษัทนี้",
+
+      hint: "ระบบจะประมวลผลไฟล์ที่อัปโหลดโดยอัตโนมัติก่อนนำไปใช้งาน",
+    },
+
+    details: {
+      sectionLabel: "ข้อมูล Media",
+
+      loadingPreview: "กำลังโหลดรูป…",
+
+      previewFailed: "ไม่สามารถโหลดตัวอย่างได้",
+
+      metadata: {
+        title: "Metadata",
+
+        description:
+          "ข้อมูลเริ่มต้นของ Media นี้ โดย Content ใน Module อื่นสามารถนำข้อมูลชุดนี้ไปใช้โดยอัตโนมัติได้",
+      },
+
+      fields: {
+        title: "ชื่อ",
+
+        alt: "ข้อความ Alt",
+
+        altHint: "อธิบายรูปภาพเพื่อช่วยเรื่อง Accessibility และ Search Engine",
+
+        description: "รายละเอียด",
+
+        caption: "คำบรรยาย",
+
+        credit: "เครดิต",
+
+        tags: "แท็ก",
+
+        tagsPlaceholder: "พิมพ์แล้วกด Enter",
+      },
+
+      fileInfo: {
+        title: "ข้อมูลไฟล์",
+
+        fileName: "ชื่อไฟล์",
+
+        dimensions: "ขนาดรูป",
+
+        size: "ขนาดไฟล์",
+
+        type: "ประเภทไฟล์",
+
+        format: "Format",
+      },
+
+      usage: {
+        title: "ถูกใช้งานอยู่",
+
+        description: "รายการ Content ที่กำลังอ้างอิง Media นี้",
+
+        retry: "ลองอีกครั้ง",
+
+        untitled: "Content ไม่มีชื่อ",
+
+        modules: {
+          project: "Project",
+
+          award: "Award",
+
+          homeSlideshow: "Home",
+
+          page: "Page",
+
+          publicContent: "Public",
+        },
+
+        locations: {
+          featuredImage: "รูป Cover",
+
+          hero: "รูป Hero",
+
+          gallery: "Gallery · รูปที่ {number}",
+
+          slideshow: "Slideshow · รูปที่ {number}",
+
+          sectionImage: "Section {number} · รูปภาพ",
+
+          sectionGallery: "Section {section} · Gallery รูปที่ {number}",
+        },
+
+        empty: {
+          title: "ยังไม่ได้ถูกใช้งาน",
+
+          description: "ยังไม่มี Content ที่อ้างอิง Media รายการนี้",
+        },
+
+        errors: {
+          loadFailed: "ไม่สามารถโหลดข้อมูลการใช้งาน Media ได้",
+        },
+      },
+
+      messages: {
+        saved: "บันทึก Metadata เรียบร้อยแล้ว",
+      },
+
+      errors: {
+        loadFailed: "ไม่สามารถโหลด Metadata ของ Media ได้",
+
+        saveFailed: "ไม่สามารถบันทึก Metadata ของ Media ได้",
+      },
+    },
+
+    /*
+     * ต้องอยู่ระดับ media.delete
+     * ห้ามใส่ไว้ใน details
+     */
+
+    delete: {
+      title: "ลบ Media",
+
+      delete: "ลบ Media",
+
+      removeAndDelete: "นำออกจาก Content และลบ",
+
+      checkingUsage: "กำลังตรวจสอบตำแหน่งที่ใช้งาน Media นี้…",
+
+      inUseTitle: "กำลังถูกใช้งาน {count} ตำแหน่ง",
+
+      inUseDescription:
+        "หากลบ Media นี้ ระบบจะนำ Media ออกจาก Content ที่แสดงด้านล่างก่อนทำการลบ",
+
+      unusedDescription:
+        "Media นี้ยังไม่ได้ถูกใช้งานใน Content สามารถลบได้โดยไม่กระทบเนื้อหาอื่น",
+
+      messages: {
+        deleted: "ลบ Media เรียบร้อยแล้ว",
+
+        detachedAndDeleted: "นำ Media ออกจาก Content และลบเรียบร้อยแล้ว",
+      },
+
+      errors: {
+        failed: "ไม่สามารถลบ Media ได้",
+      },
     },
   },
 
