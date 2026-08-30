@@ -30,7 +30,7 @@ function createInitialValues(fields) {
       continue;
     }
 
-    if (field.type === "checkbox") {
+    if (["checkbox", "consent"].includes(field.type)) {
       result[field.id] = false;
 
       continue;
@@ -109,12 +109,23 @@ export default function ContactForm({
 
       const value = values[field.id];
 
-      if (
-        field.required &&
-        (value === undefined || value === null || String(value).trim() === "")
-      ) {
+      const isBooleanField = ["checkbox", "consent"].includes(field.type);
+
+      const missingRequiredValue = isBooleanField
+        ? value !== true
+        : value === undefined ||
+          value === null ||
+          String(value).trim() === "";
+
+      if (field.required && missingRequiredValue) {
         nextErrors[field.id] =
-          locale === "th" ? "กรุณากรอกข้อมูล" : "This field is required.";
+          locale === "th"
+            ? isBooleanField
+              ? "กรุณายอมรับเงื่อนไข"
+              : "กรุณากรอกข้อมูล"
+            : isBooleanField
+              ? "You must accept this field."
+              : "This field is required.";
       }
 
       if (
