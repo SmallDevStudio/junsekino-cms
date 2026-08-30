@@ -14,6 +14,407 @@ import { cn } from "@/utils/cn";
 
 /*
  * =========================================================
+ * HELPERS
+ * =========================================================
+ */
+
+function getLocalizedValue(value, locale) {
+  if (!value) {
+    return null;
+  }
+
+  return value?.[locale] || value?.en || value?.th || null;
+}
+
+function getMediaUrl(companyId, mediaId, variant = "large") {
+  if (!companyId || !mediaId) {
+    return null;
+  }
+
+  return `/api/v1/companies/${encodeURIComponent(
+    companyId,
+  )}/media/${encodeURIComponent(mediaId)}?variant=${variant}`;
+}
+
+function getCropPosition(image) {
+  /*
+   * =======================================================
+   * NEW MEDIA CROP CORE
+   * =======================================================
+   *
+   * react-easy-crop stores crop as translation values.
+   * We should not use image.crop.x/y directly as CSS
+   * object-position percentages.
+   *
+   * If croppedArea exists, use the center of that area
+   * for the Admin Preview.
+   * =======================================================
+   */
+
+  const croppedArea = image?.crop?.croppedArea;
+
+  if (
+    croppedArea &&
+    Number.isFinite(croppedArea.x) &&
+    Number.isFinite(croppedArea.y) &&
+    Number.isFinite(croppedArea.width) &&
+    Number.isFinite(croppedArea.height)
+  ) {
+    const x = Math.max(0, Math.min(100, croppedArea.x + croppedArea.width / 2));
+
+    const y = Math.max(
+      0,
+      Math.min(100, croppedArea.y + croppedArea.height / 2),
+    );
+
+    return {
+      x,
+      y,
+    };
+  }
+
+  /*
+   * =======================================================
+   * LEGACY PRESENTATION
+   * =======================================================
+   *
+   * Keep old About records working while Media Crop Core
+   * gradually replaces the old presentation structure.
+   * =======================================================
+   */
+
+  const focalPoint = image?.presentation?.focalPoint;
+
+  if (focalPoint) {
+    return {
+      x: (focalPoint.x ?? 0.5) * 100,
+
+      y: (focalPoint.y ?? 0.5) * 100,
+    };
+  }
+
+  return {
+    x: 50,
+
+    y: 50,
+  };
+}
+
+/*
+ * =========================================================
+ * PREVIEW IMAGE
+ * =========================================================
+ */
+
+function PreviewImage({ companyId, image, className }) {
+  const mediaId = image?.mediaId;
+
+  const mediaUrl = getMediaUrl(companyId, mediaId, "large");
+
+  if (!mediaUrl) {
+    return null;
+  }
+
+  const position = getCropPosition(image);
+
+  const objectFit =
+    image?.presentation?.objectFit === "contain" ? "contain" : "cover";
+
+  return (
+    <div
+      className={cn(
+        "overflow-hidden",
+
+        "bg-black/[0.03]",
+
+        className,
+      )}
+    >
+      {/*
+       * Admin preview uses the protected Media endpoint.
+       *
+       * We intentionally use img here because this URL is
+       * an authenticated API route and not a static image
+       * URL that should be optimized by next/image.
+       */}
+
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={mediaUrl}
+        alt=""
+        className="
+          h-full
+          w-full
+        "
+        style={{
+          objectFit,
+
+          objectPosition: `${position.x}% ${position.y}%`,
+        }}
+      />
+    </div>
+  );
+}
+
+/*
+ * =========================================================
+ * TEXT SECTION
+ * =========================================================
+ */
+
+function TextSection({ section, locale }) {
+  const content = getLocalizedValue(section?.data?.content, locale);
+
+  if (!content) {
+    return null;
+  }
+
+  return (
+    <section
+      className="
+        mx-auto
+        w-full
+        max-w-[900px]
+      "
+    >
+      <PublicRichText
+        value={content}
+        className="
+          text-[13px]
+          leading-[1.8]
+
+          sm:text-[14px]
+        "
+      />
+    </section>
+  );
+}
+
+/*
+ * =========================================================
+ * IMAGE + TEXT SECTION
+ * =========================================================
+ */
+
+function ImageTextSection({ companyId, section, locale }) {
+  const content = getLocalizedValue(section?.data?.content, locale);
+
+  const image = section?.data?.image || null;
+
+  const imagePosition =
+    section?.data?.imagePosition === "right" ? "right" : "left";
+
+  const imageWidth = section?.data?.imageWidth || "50";
+
+  /*
+   * =======================================================
+   * GRID WIDTH
+   * =======================================================
+   *
+   * imageWidth describes the width allocated to the image.
+   *
+   * 40 = image 40 / text 60
+   * 50 = image 50 / text 50
+   * 60 = image 60 / text 40
+   * =======================================================
+   */
+
+  let gridTemplateColumns = "minmax(0, 1fr) minmax(0, 1fr)";
+
+  if (imagePosition === "left") {
+    if (imageWidth === "40") {
+      gridTemplateColumns = "minmax(0, 0.8fr) minmax(0, 1.2fr)";
+    }
+
+    if (imageWidth === "60") {
+      gridTemplateColumns = "minmax(0, 1.2fr) minmax(0, 0.8fr)";
+    }
+  } else {
+    if (imageWidth === "40") {
+      gridTemplateColumns = "minmax(0, 1.2fr) minmax(0, 0.8fr)";
+    }
+
+    if (imageWidth === "60") {
+      gridTemplateColumns = "minmax(0, 0.8fr) minmax(0, 1.2fr)";
+    }
+  }
+
+  /*
+   * =======================================================
+   * DRAFT WITHOUT IMAGE
+   * =======================================================
+   *
+   * Image + Text blocks are allowed to temporarily have
+   * no image while editing.
+   *
+   * Preview them as text-only instead of showing a broken
+   * image area.
+   * =======================================================
+   */
+
+  if (!image?.mediaId) {
+    return <TextSection section={section} locale={locale} />;
+  }
+
+  /*
+   * =======================================================
+   * IMAGE
+   * =======================================================
+   */
+
+  const imageElement = (
+    <PreviewImage
+      companyId={companyId}
+      image={image}
+      className="
+        aspect-[4/3]
+        w-full
+      "
+    />
+  );
+
+  /*
+   * =======================================================
+   * TEXT
+   * =======================================================
+   */
+
+  const textElement = (
+    <div
+      className="
+        flex
+        min-w-0
+        items-center
+      "
+    >
+      {content && (
+        <PublicRichText
+          value={content}
+          className="
+            w-full
+
+            text-[13px]
+            leading-[1.8]
+
+            sm:text-[14px]
+          "
+        />
+      )}
+    </div>
+  );
+
+  return (
+    <section
+      className="
+        mx-auto
+        w-full
+        max-w-[1180px]
+      "
+    >
+      {/* =================================
+          MOBILE
+      ================================= */}
+
+      <div
+        className="
+          grid
+          gap-6
+
+          md:hidden
+        "
+      >
+        {imageElement}
+
+        {textElement}
+      </div>
+
+      {/* =================================
+          DESKTOP
+      ================================= */}
+
+      <div
+        className="
+          hidden
+          gap-10
+
+          md:grid
+
+          lg:gap-14
+        "
+        style={{
+          gridTemplateColumns,
+        }}
+      >
+        {imagePosition === "left" ? (
+          <>
+            {imageElement}
+
+            {textElement}
+          </>
+        ) : (
+          <>
+            {textElement}
+
+            {imageElement}
+          </>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/*
+ * =========================================================
+ * ABOUT SECTION
+ * =========================================================
+ */
+
+function AboutSection({ companyId, section, locale }) {
+  if (!section || section.enabled === false) {
+    return null;
+  }
+
+  /*
+   * =======================================================
+   * TEXT ONLY
+   * =======================================================
+   */
+
+  if (section.type === "richText") {
+    return <TextSection section={section} locale={locale} />;
+  }
+
+  /*
+   * =======================================================
+   * IMAGE + TEXT
+   * =======================================================
+   */
+
+  if (section.type === "imageText") {
+    return (
+      <ImageTextSection
+        companyId={companyId}
+        section={section}
+        locale={locale}
+      />
+    );
+  }
+
+  /*
+   * About Admin currently exposes only:
+   *
+   * - richText
+   * - imageText
+   *
+   * Ignore unsupported Page Builder block types instead
+   * of breaking the whole Preview.
+   */
+
+  return null;
+}
+
+/*
+ * =========================================================
  * PREVIEW
  * =========================================================
  */
@@ -30,9 +431,24 @@ export default function AboutPreviewDialog({
 
   const [locale, setLocale] = useState("en");
 
-  if (!open) {
-    return null;
-  }
+  /*
+   * =======================================================
+   * LOCALES
+   * =======================================================
+   *
+   * Do not synchronize locale state through useEffect.
+   *
+   * activeLocale already provides a safe derived fallback
+   * when the currently selected locale is not available.
+   *
+   * Example:
+   *
+   * locale = "en"
+   * contentLocales = ["th"]
+   *
+   * activeLocale becomes "th" automatically.
+   * =======================================================
+   */
 
   const locales =
     Array.isArray(contentLocales) && contentLocales.length
@@ -41,17 +457,44 @@ export default function AboutPreviewDialog({
 
   const activeLocale = locales.includes(locale) ? locale : locales[0];
 
-  const title = value?.title?.[activeLocale] || value?.title?.en || "";
+  /*
+   * =======================================================
+   * CLOSED
+   * =======================================================
+   */
 
-  const content = value?.content?.[activeLocale] || value?.content?.en || null;
+  if (!open) {
+    return null;
+  }
 
-  const mediaId = value?.featuredImage?.mediaId || null;
+  /*
+   * =======================================================
+   * CONTENT
+   * =======================================================
+   */
 
-  const mediaUrl = mediaId
-    ? `/api/v1/companies/${encodeURIComponent(
-        companyId,
-      )}/media/${encodeURIComponent(mediaId)}?variant=large`
-    : null;
+  const title = getLocalizedValue(value?.title, activeLocale) || "";
+
+  const content = getLocalizedValue(value?.content, activeLocale);
+
+  const featuredImage = value?.featuredImage || null;
+
+  /*
+   * =======================================================
+   * SECTIONS
+   * =======================================================
+   *
+   * Clone before sort so Preview never mutates form state.
+   * =======================================================
+   */
+
+  const sections = Array.isArray(value?.sections)
+    ? [...value.sections]
+        .filter((section) => section?.enabled !== false)
+        .sort(
+          (first, second) => (first?.sortOrder ?? 0) - (second?.sortOrder ?? 0),
+        )
+    : [];
 
   return (
     <div
@@ -69,6 +512,10 @@ export default function AboutPreviewDialog({
         sm:p-6
       "
     >
+      {/* =================================
+          BACKDROP
+      ================================= */}
+
       <button
         type="button"
         aria-label={t("common.close")}
@@ -82,6 +529,10 @@ export default function AboutPreviewDialog({
           backdrop-blur-[2px]
         "
       />
+
+      {/* =================================
+          DIALOG
+      ================================= */}
 
       <div
         className="
@@ -115,6 +566,8 @@ export default function AboutPreviewDialog({
             items-center
             justify-between
 
+            gap-3
+
             border-b
             border-black/[0.06]
 
@@ -124,7 +577,7 @@ export default function AboutPreviewDialog({
             sm:px-7
           "
         >
-          <div>
+          <div className="min-w-0">
             <div
               className="
                 admin-text-10
@@ -151,7 +604,19 @@ export default function AboutPreviewDialog({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div
+            className="
+              flex
+              shrink-0
+
+              items-center
+              gap-2
+            "
+          >
+            {/* ===============================
+                LANGUAGE
+            =============================== */}
+
             {locales.length > 1 && (
               <div
                 className="
@@ -188,6 +653,10 @@ export default function AboutPreviewDialog({
               </div>
             )}
 
+            {/* ===============================
+                CLOSE
+            =============================== */}
+
             <button
               type="button"
               onClick={onClose}
@@ -217,7 +686,13 @@ export default function AboutPreviewDialog({
 
         {/* =================================
             PUBLIC WEBSITE PREVIEW
-            DO NOT APPLY ADMIN FONT SCALE
+
+            IMPORTANT:
+            Do not apply Admin font scaling here.
+
+            This Preview represents Public content,
+            therefore Small / Medium / Large Admin
+            display settings must not affect it.
         ================================= */}
 
         <div
@@ -245,36 +720,25 @@ export default function AboutPreviewDialog({
               lg:py-12
             "
           >
-            {mediaUrl && (
-              <div
+            {/* ===============================
+                ABOUT COVER
+                4 : 1
+            =============================== */}
+
+            {featuredImage?.mediaId && (
+              <PreviewImage
+                companyId={companyId}
+                image={featuredImage}
                 className="
-                  aspect-[16/8]
+                  aspect-[4/1]
                   w-full
-
-                  overflow-hidden
-
-                  bg-black/[0.03]
                 "
-                style={{
-                  backgroundImage: `url("${mediaUrl}")`,
-
-                  backgroundSize:
-                    value?.featuredImage?.presentation?.objectFit === "contain"
-                      ? "contain"
-                      : "cover",
-
-                  backgroundRepeat: "no-repeat",
-
-                  backgroundPosition: `${
-                    (value?.featuredImage?.presentation?.focalPoint?.x ?? 0.5) *
-                    100
-                  }% ${
-                    (value?.featuredImage?.presentation?.focalPoint?.y ?? 0.5) *
-                    100
-                  }%`,
-                }}
               />
             )}
+
+            {/* ===============================
+                MAIN CONTENT
+            =============================== */}
 
             <div
               className="
@@ -304,16 +768,46 @@ export default function AboutPreviewDialog({
                 </h1>
               )}
 
-              <PublicRichText
-                value={content}
-                className="
-                  text-[13px]
-                  leading-[1.8]
+              {content && (
+                <PublicRichText
+                  value={content}
+                  className="
+                    text-[13px]
+                    leading-[1.8]
 
-                  sm:text-[14px]
-                "
-              />
+                    sm:text-[14px]
+                  "
+                />
+              )}
             </div>
+
+            {/* ===============================
+                ADDITIONAL SECTIONS
+            =============================== */}
+
+            {sections.length > 0 && (
+              <div
+                className="
+                  space-y-12
+
+                  pb-10
+
+                  sm:space-y-16
+                  sm:pb-14
+
+                  lg:space-y-20
+                "
+              >
+                {sections.map((section, index) => (
+                  <AboutSection
+                    key={section.id || index}
+                    companyId={companyId}
+                    section={section}
+                    locale={activeLocale}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

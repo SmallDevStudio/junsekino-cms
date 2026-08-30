@@ -36,6 +36,7 @@ export const adminTh = {
     creating: "กำลังสร้าง...",
     changeImage: "เปลี่ยนรูปภาพ",
     selectImage: "เลือกรูปภาพ",
+    reset: "รีเซ็ต",
   },
 
   navigation: {
@@ -218,6 +219,9 @@ export const adminTh = {
       change: "เปลี่ยนภาพหน้าปก",
 
       dialogTitle: "เลือกภาพหน้าปก About",
+
+      emptyDescription:
+        "เลือกรูปภาพจาก Media Library และจัดตำแหน่งพื้นที่ของรูปที่ต้องการให้แสดง",
     },
 
     content: {
@@ -285,6 +289,65 @@ export const adminTh = {
       deleteFailed: "ไม่สามารถลบ About ได้",
 
       deletePublished: "กรุณายกเลิกการเผยแพร่ About ก่อนลบ",
+    },
+
+    sections: {
+      title: "ส่วนเนื้อหาเพิ่มเติม",
+
+      description:
+        "เพิ่มเนื้อหา About แบบข้อความอย่างเดียว หรือรูปภาพคู่กับข้อความได้ตามต้องการ โดยไม่จำเป็นต้องเพิ่ม Section ก็ได้",
+
+      section: "ส่วนที่ {number}",
+
+      layout: "รูปแบบการจัดวาง",
+
+      layouts: {
+        "text-only": "ข้อความอย่างเดียว",
+
+        "image-left": "รูปด้านซ้าย",
+
+        "image-right": "รูปด้านขวา",
+      },
+
+      content: "เนื้อหา",
+
+      addText: "เพิ่มข้อความ",
+
+      addImageLeft: "เพิ่มรูปด้านซ้าย",
+
+      addImageRight: "เพิ่มรูปด้านขวา",
+
+      moveUp: "เลื่อนขึ้น",
+
+      moveDown: "เลื่อนลง",
+
+      duplicate: "ทำสำเนา Section",
+
+      delete: "ลบ Section",
+
+      deleteConfirm: "ต้องการลบ Section นี้หรือไม่?",
+
+      imageWidth: "ความกว้างของรูป",
+
+      image: {
+        title: "รูปภาพของ Section",
+
+        description:
+          "เลือกรูปและจัดตำแหน่งสำหรับใช้คู่กับเนื้อหาใน Section นี้",
+
+        emptyTitle: "ยังไม่ได้เลือกรูป",
+
+        emptyDescription: "เลือกรูปจาก Media Library ของบริษัท",
+
+        select: "เลือกรูปภาพ",
+      },
+
+      empty: {
+        title: "ยังไม่มีเนื้อหาเพิ่มเติม",
+
+        description:
+          "Section เป็นตัวเลือกเสริม สามารถใช้ About แบบ Cover และข้อความหลักเพียงอย่างเดียวได้",
+      },
     },
   },
 
@@ -866,6 +929,24 @@ export const adminTh = {
       errors: {
         loadFailed: "ไม่สามารถโหลดคลังสื่อได้",
       },
+
+      crop: {
+        selectDescription:
+          "เลือกรูปภาพ จากนั้นจัดตำแหน่งและพื้นที่ที่ต้องการให้แสดง",
+
+        noteTitle: "สามารถจัดตำแหน่งรูปได้",
+
+        noteDescription:
+          "หลังเลือกรูปแล้ว สามารถเลื่อน ขยาย และกำหนดพื้นที่ที่ต้องการให้แสดงก่อนนำไปใช้งาน",
+
+        continue: "จัดตำแหน่งรูป",
+
+        preparing: "กำลังเตรียมรูป...",
+
+        errors: {
+          previewFailed: "ไม่สามารถเตรียมรูปภาพสำหรับ Crop ได้",
+        },
+      },
     },
 
     importUrl: {
@@ -945,6 +1026,30 @@ export const adminTh = {
       loadingPreview: "กำลังโหลด...",
 
       statusUnknown: "ไม่ทราบสถานะ",
+    },
+
+    crop: {
+      sectionLabel: "ตำแหน่งรูปภาพ",
+
+      coverTitle: "จัดตำแหน่งภาพ Cover",
+
+      coverDescription:
+        "เลื่อนและขยายรูปเพื่อเลือกตำแหน่งที่ต้องการให้แสดงใน Cover",
+
+      avatarTitle: "จัดตำแหน่ง Avatar",
+
+      avatarDescription: "จัดตำแหน่งรูปภาพให้อยู่ภายในพื้นที่วงกลมของ Avatar",
+
+      zoom: "ขยายภาพ",
+      zoomIn: "ขยาย",
+      zoomOut: "ย่อ",
+
+      aspect: "สัดส่วน",
+
+      rotateLeft: "หมุนซ้าย",
+      rotateRight: "หมุนขวา",
+
+      apply: "ใช้ตำแหน่งนี้",
     },
   },
 
@@ -1995,6 +2100,175 @@ export const adminTh = {
       unpublishFailed: "ไม่สามารถยกเลิกการเผยแพร่ข่าวได้",
 
       deleteFailed: "ไม่สามารถลบข่าวได้",
+    },
+  },
+
+  coverImage: {
+    title: "ภาพ Cover",
+
+    description: "เลือกรูปภาพและกำหนดพื้นที่ของรูปที่ต้องการให้แสดง",
+
+    emptyTitle: "ยังไม่ได้เลือกภาพ Cover",
+
+    emptyDescription: "เลือกรูปภาพจาก Media Library ของบริษัท",
+
+    select: "เลือกรูปภาพ",
+
+    pickerTitle: "เลือกภาพ Cover",
+
+    selected: "รูปภาพที่เลือก",
+
+    adjust: "จัดตำแหน่ง",
+
+    cropped: "กำหนด Crop แล้ว",
+
+    remove: "นำรูปออก",
+
+    mediaId: "Media ID: {id}",
+
+    errors: {
+      previewFailed: "ไม่สามารถโหลดตัวอย่างรูปภาพได้",
+    },
+  },
+
+  homeSlideshow: {
+    editor: {
+      sectionLabel: "สไลด์หน้าแรก",
+
+      newTitle: "เพิ่ม Slideshow",
+
+      editTitle: "แก้ไข Slideshow",
+
+      description: "จัดการรูปภาพและลำดับการแสดงผลของ Slideshow หน้า Home",
+
+      createAction: "สร้าง Slideshow",
+
+      information: {
+        title: "ข้อมูล Slideshow",
+
+        description: "กำหนดชื่อและรายละเอียดสำหรับใช้จัดการภายในระบบ",
+      },
+
+      fields: {
+        name: "ชื่อ",
+
+        description: "รายละเอียด",
+
+        alt: "ข้อความ Alt",
+
+        caption: "คำบรรยาย",
+
+        url: "URL ที่เชื่อมโยง",
+      },
+
+      slides: {
+        title: "รูปภาพใน Slideshow",
+
+        count: "{count} รูป",
+
+        slide: "รูปที่ {number}",
+
+        add: "เพิ่มรูป",
+
+        emptyTitle: "ยังไม่มีรูปใน Slideshow",
+
+        emptyDescription: "เลือกรูปจาก Media Library เพื่อสร้าง Slideshow",
+
+        active: "ใช้งาน",
+
+        enableLink: "เพิ่มลิงก์",
+
+        newTab: "เปิดในแท็บใหม่",
+
+        moveUp: "เลื่อนขึ้น",
+
+        moveDown: "เลื่อนลง",
+
+        remove: "นำรูปออก",
+
+        pickerTitle: "เลือกรูปสำหรับ Slideshow",
+      },
+
+      validation: {
+        nameRequired: "กรุณาระบุชื่อ Slideshow ภาษาอังกฤษ",
+
+        slideRequired: "กรุณาเพิ่มรูปอย่างน้อย 1 รูป",
+      },
+
+      messages: {
+        created: "สร้าง Slideshow เรียบร้อยแล้ว",
+
+        updated: "อัปเดต Slideshow เรียบร้อยแล้ว",
+      },
+
+      errors: {
+        saveFailed: "ไม่สามารถบันทึก Slideshow ได้",
+      },
+    },
+
+    manager: {
+      sectionLabel: "จัดการเนื้อหา",
+
+      title: "Home",
+
+      description:
+        "จัดการชุด Slideshow หน้าแรกของ {company} โดยสามารถ Published ได้ครั้งละหนึ่งชุดเท่านั้น",
+
+      newSlideshow: "เพิ่ม Slideshow",
+
+      createSlideshow: "สร้าง Slideshow",
+
+      thisCompany: "บริษัทนี้",
+
+      publishConfirm:
+        'ต้องการเผยแพร่ "{name}" เป็น Slideshow หน้าแรกหรือไม่?\n\nSlideshow ที่ Published อยู่ในปัจจุบันจะถูกเปลี่ยนกลับเป็น Draft โดยอัตโนมัติ',
+
+      deleteConfirm:
+        'ต้องการลบ "{name}" หรือไม่?\n\nSlideshow ชุดนี้จะถูกนำออกจาก CMS',
+
+      messages: {
+        published: "เผยแพร่ Slideshow หน้าแรกเรียบร้อยแล้ว",
+
+        deleted: "ลบ Slideshow เรียบร้อยแล้ว",
+      },
+
+      errors: {
+        loadTitle: "ไม่สามารถโหลดข้อมูลหน้า Home ได้",
+
+        loadFailed: "ไม่สามารถโหลดข้อมูล Slideshow ได้",
+
+        publishFailed: "ไม่สามารถเผยแพร่ Slideshow ได้",
+
+        deleteFailed: "ไม่สามารถลบ Slideshow ได้",
+
+        publishedDelete:
+          "ไม่สามารถลบ Slideshow ที่ Published อยู่ได้ กรุณา Publish Slideshow ชุดอื่นก่อน",
+      },
+
+      noCompany: {
+        title: "ยังไม่ได้เลือกบริษัท",
+
+        description: "กรุณาเลือก Workspace ก่อนจัดการข้อมูลหน้า Home",
+      },
+
+      empty: {
+        title: "ยังไม่มี Slideshow หน้าแรก",
+
+        description:
+          "สร้าง Slideshow ชุดแรกและเลือกรูปภาพจาก Media Library ของบริษัท",
+      },
+    },
+
+    card: {
+      untitled: "Slideshow ไม่มีชื่อ",
+
+      totalImages: "รูปทั้งหมด",
+
+      activeImages: "รูปที่ใช้งาน",
+
+      currentHomepage: "Slideshow หน้าแรกที่ใช้งานอยู่",
+
+      updated: "แก้ไขล่าสุด {date}",
     },
   },
 };

@@ -1637,6 +1637,15 @@ export default function ProjectEditor({
             companyId={companyId}
             featuredImage={form.featuredImage}
             gallery={form.gallery}
+            /*
+             * Project listing on the Public website
+             * displays the project cover as a square.
+             *
+             * Keep the Admin crop aligned with
+             * the actual Public presentation.
+             */
+            coverCropPreset="square"
+            coverPreviewClassName="aspect-square"
             onFeaturedImageChange={(featuredImage) =>
               setForm((current) => ({
                 ...current,

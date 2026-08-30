@@ -7,15 +7,15 @@ import {
   Images,
   LoaderCircle,
   Plus,
-  RefreshCw,
   Trash2,
 } from "lucide-react";
 
 import { useEffect, useState } from "react";
 
-import MediaPicker from "@/components/admin/media/MediaPicker";
-
 import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
+
+import CoverImageField from "@/components/admin/media/CoverImageField";
+import MediaPicker from "@/components/admin/media/MediaPicker";
 
 import { cn } from "@/utils/cn";
 
@@ -33,6 +33,12 @@ function normalizeLocalized(value) {
   };
 }
 
+/*
+ * Gallery currently does not require crop.
+ *
+ * The function still preserves crop if a future
+ * consumer passes a cropped Media object.
+ */
 function mediaToContentImage(media) {
   if (!media?.id) {
     return null;
@@ -44,6 +50,12 @@ function mediaToContentImage(media) {
     alt: normalizeLocalized(media.alt),
 
     caption: normalizeLocalized(media.caption),
+
+    ...(media.crop
+      ? {
+          crop: media.crop,
+        }
+      : {}),
   };
 }
 
@@ -55,8 +67,11 @@ function mediaToContentImage(media) {
 
 function ContentImagePreview({
   companyId,
+
   image,
+
   variant = "thumbnail",
+
   className,
 }) {
   const { t } = useAdminTranslation();
@@ -138,7 +153,7 @@ function ContentImagePreview({
 
       window.clearTimeout(timeoutId);
     };
-  }, [companyId, mediaId, variant, t]);
+  }, [companyId, mediaId, t, variant]);
 
   return (
     <div
@@ -152,9 +167,7 @@ function ContentImagePreview({
         className,
       )}
     >
-      {/* =================================
-          SKELETON
-      ================================= */}
+      {/* SKELETON */}
 
       {loading && (
         <div
@@ -169,9 +182,7 @@ function ContentImagePreview({
         />
       )}
 
-      {/* =================================
-          IMAGE
-      ================================= */}
+      {/* IMAGE */}
 
       {previewUrl ? (
         // Signed Admin preview URL.
@@ -207,9 +218,9 @@ function ContentImagePreview({
             <ImageIcon
               size={24}
               strokeWidth={1.5}
-              className={cn(
-                error ? "text-red-400" : "text-[var(--admin-muted-light)]",
-              )}
+              className={
+                error ? "text-red-400" : "text-[var(--admin-muted-light)]"
+              }
             />
           )}
         </div>
@@ -224,7 +235,17 @@ function ContentImagePreview({
  * =========================================================
  */
 
-function EmptyMedia({ icon: Icon, title, description, actionLabel, onAction }) {
+function EmptyMedia({
+  icon: Icon,
+
+  title,
+
+  description,
+
+  actionLabel,
+
+  onAction,
+}) {
   return (
     <div
       className="
@@ -299,7 +320,11 @@ function EmptyMedia({ icon: Icon, title, description, actionLabel, onAction }) {
         type="button"
         onClick={onAction}
         className={cn(
-          "mt-4 inline-flex h-9",
+          "mt-4",
+
+          "inline-flex",
+
+          "h-9",
 
           "items-center justify-center gap-2",
 
@@ -350,15 +375,21 @@ export default function ContentMediaSection({
   onGalleryChange,
 
   /*
-   * Kept for backward compatibility.
+   * Cover crop can be changed per consumer later.
    *
-   * UI text now comes from i18n.
+   * Default:
+   * 16:9 cover
+   */
+  coverCropPreset = "cover",
+
+  coverPreviewClassName = "aspect-[16/9]",
+
+  /*
+   * Kept for backward compatibility.
    */
   contentLabel,
 }) {
   const { t } = useAdminTranslation();
-
-  const [featuredPickerOpen, setFeaturedPickerOpen] = useState(false);
 
   const [galleryPickerOpen, setGalleryPickerOpen] = useState(false);
 
@@ -366,17 +397,7 @@ export default function ContentMediaSection({
 
   /*
    * =======================================================
-   * FEATURED
-   * =======================================================
-   */
-
-  function handleFeaturedSelected(media) {
-    onFeaturedImageChange?.(media ? mediaToContentImage(media) : null);
-  }
-
-  /*
-   * =======================================================
-   * GALLERY
+   * GALLERY SELECT
    * =======================================================
    */
 
@@ -401,9 +422,21 @@ export default function ContentMediaSection({
     onGalleryChange?.([...gallery, ...newImages]);
   }
 
+  /*
+   * =======================================================
+   * REMOVE GALLERY
+   * =======================================================
+   */
+
   function removeGalleryImage(mediaId) {
     onGalleryChange?.(gallery.filter((image) => image.mediaId !== mediaId));
   }
+
+  /*
+   * =======================================================
+   * MOVE GALLERY
+   * =======================================================
+   */
 
   function moveGalleryImage(index, direction) {
     const targetIndex = index + direction;
@@ -475,182 +508,19 @@ export default function ContentMediaSection({
         ================================= */}
 
         <div className="mt-5">
-          <div
-            className="
-              flex
-              items-center
-              justify-between
-
-              gap-4
-            "
-          >
-            <div>
-              <div
-                className="
-                  admin-text-12
-                  font-medium
-
-                  text-[var(--admin-foreground)]
-                "
-              >
-                {t("contentMedia.cover.title")}
-              </div>
-
-              <div
-                className="
-                  mt-1
-
-                  admin-text-11
-                  leading-[1.6]
-
-                  text-[var(--admin-muted)]
-                "
-              >
-                {t("contentMedia.cover.description")}
-              </div>
-            </div>
-
-            {featuredImage && (
-              <button
-                type="button"
-                onClick={() => setFeaturedPickerOpen(true)}
-                className="
-                  inline-flex
-                  h-9
-
-                  items-center
-                  gap-2
-
-                  rounded-xl
-
-                  border
-                  border-[var(--admin-border)]
-
-                  px-3
-
-                  admin-text-12
-                  font-medium
-
-                  text-[var(--admin-foreground)]
-
-                  transition
-
-                  hover:border-[var(--company-primary-border)]
-
-                  hover:bg-[var(--company-primary-soft)]
-
-                  hover:text-[var(--company-primary)]
-                "
-              >
-                <RefreshCw size={13} />
-
-                {t("common.change")}
-              </button>
-            )}
-          </div>
-
-          <div className="mt-3">
-            {featuredImage ? (
-              <div
-                className="
-                  overflow-hidden
-
-                  rounded-2xl
-
-                  border
-                  border-[var(--admin-border)]
-
-                  bg-[var(--admin-surface)]
-                "
-              >
-                <ContentImagePreview
-                  companyId={companyId}
-                  image={featuredImage}
-                  variant="large"
-                  className="
-                    aspect-[16/9]
-                    w-full
-                  "
-                />
-
-                <div
-                  className="
-                    flex
-                    items-center
-                    justify-between
-
-                    gap-4
-
-                    p-4
-                  "
-                >
-                  <div className="min-w-0">
-                    <div
-                      className="
-                        admin-text-12
-                        font-medium
-
-                        text-[var(--admin-foreground)]
-                      "
-                    >
-                      {t("contentMedia.cover.selected")}
-                    </div>
-
-                    <div
-                      className="
-                        mt-1
-                        truncate
-
-                        admin-text-10
-
-                        text-[var(--admin-muted)]
-                      "
-                    >
-                      {t("contentMedia.mediaId", {
-                        id: featuredImage.mediaId,
-                      })}
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => onFeaturedImageChange?.(null)}
-                    aria-label={t("contentMedia.cover.remove")}
-                    title={t("contentMedia.cover.remove")}
-                    className="
-                      flex
-                      h-9
-                      w-9
-                      shrink-0
-
-                      items-center
-                      justify-center
-
-                      rounded-xl
-
-                      text-red-500
-
-                      transition
-
-                      hover:bg-red-50
-
-                      hover:text-red-600
-                    "
-                  >
-                    <Trash2 size={15} />
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <EmptyMedia
-                icon={ImageIcon}
-                title={t("contentMedia.cover.emptyTitle")}
-                description={t("contentMedia.cover.emptyDescription")}
-                actionLabel={t("contentMedia.cover.select")}
-                onAction={() => setFeaturedPickerOpen(true)}
-              />
-            )}
-          </div>
+          <CoverImageField
+            companyId={companyId}
+            value={featuredImage}
+            cropPreset={coverCropPreset}
+            previewClassName={coverPreviewClassName}
+            title={t("contentMedia.cover.title")}
+            description={t("contentMedia.cover.description")}
+            emptyTitle={t("contentMedia.cover.emptyTitle")}
+            emptyDescription={t("contentMedia.cover.emptyDescription")}
+            selectLabel={t("contentMedia.cover.select")}
+            pickerTitle={t("contentMedia.cover.select")}
+            onChange={onFeaturedImageChange}
+          />
         </div>
 
         {/* =================================
@@ -708,35 +578,40 @@ export default function ContentMediaSection({
               <button
                 type="button"
                 onClick={() => setGalleryPickerOpen(true)}
-                className={cn(
-                  "inline-flex h-9",
+                className="
+                  inline-flex
+                  h-9
 
-                  "items-center justify-center gap-2",
+                  self-start
 
-                  "self-start",
+                  items-center
+                  justify-center
+                  gap-2
 
-                  "rounded-xl",
+                  rounded-xl
 
-                  "border border-[var(--admin-border)]",
+                  border
+                  border-[var(--admin-border)]
 
-                  "bg-[var(--admin-surface)]",
+                  bg-[var(--admin-surface)]
 
-                  "px-3",
+                  px-3
 
-                  "admin-text-12 font-medium",
+                  admin-text-12
+                  font-medium
 
-                  "text-[var(--admin-foreground)]",
+                  text-[var(--admin-foreground)]
 
-                  "transition",
+                  transition
 
-                  "hover:border-[var(--company-primary-border)]",
+                  hover:border-[var(--company-primary-border)]
 
-                  "hover:bg-[var(--company-primary-soft)]",
+                  hover:bg-[var(--company-primary-soft)]
 
-                  "hover:text-[var(--company-primary)]",
+                  hover:text-[var(--company-primary)]
 
-                  "sm:self-auto",
-                )}
+                  sm:self-auto
+                "
               >
                 <Plus size={14} />
 
@@ -744,6 +619,10 @@ export default function ContentMediaSection({
               </button>
             )}
           </div>
+
+          {/* ===============================
+              EMPTY
+          =============================== */}
 
           <div className="mt-3">
             {gallery.length === 0 ? (
@@ -755,6 +634,10 @@ export default function ContentMediaSection({
                 onAction={() => setGalleryPickerOpen(true)}
               />
             ) : (
+              /* ===============================
+                 GRID
+              =============================== */
+
               <div
                 className="
                   grid
@@ -767,7 +650,7 @@ export default function ContentMediaSection({
                 "
               >
                 {gallery.map((image, index) => (
-                  <article
+                  <div
                     key={image.mediaId}
                     className="
                         group
@@ -780,184 +663,172 @@ export default function ContentMediaSection({
                         border-[var(--admin-border)]
 
                         bg-[var(--admin-surface)]
-
-                        transition
-
-                        hover:border-[var(--company-primary-border)]
                       "
                   >
-                    <div className="relative">
-                      <ContentImagePreview
-                        companyId={companyId}
-                        image={image}
-                        variant="thumbnail"
-                        className="
-                            aspect-square
-                            w-full
-                          "
-                      />
+                    {/* IMAGE */}
 
-                      <div
-                        className="
-                            absolute
-                            left-2
-                            top-2
-
-                            flex
-                            h-6
-                            min-w-6
-
-                            items-center
-                            justify-center
-
-                            rounded-full
-
-                            bg-black/60
-
-                            px-2
-
-                            admin-text-9
-                            font-semibold
-
-                            text-white
-
-                            backdrop-blur
-                          "
-                      >
-                        {index + 1}
-                      </div>
-                    </div>
-
-                    <div
+                    <ContentImagePreview
+                      companyId={companyId}
+                      image={image}
+                      variant="thumbnail"
                       className="
-                          flex
-                          items-center
-                          justify-between
-
-                          gap-1
-
-                          p-2
+                          aspect-[4/3]
+                          w-full
                         "
-                    >
+                    />
+
+                    {/* META */}
+
+                    <div className="p-3">
                       <div
                         className="
-                            flex
-                            items-center
+                            truncate
 
-                            gap-1
+                            admin-text-10
+
+                            text-[var(--admin-muted)]
                           "
                       >
-                        <button
-                          type="button"
-                          onClick={() => moveGalleryImage(index, -1)}
-                          disabled={index === 0}
-                          aria-label={t("contentMedia.gallery.movePrevious")}
-                          title={t("contentMedia.gallery.movePrevious")}
-                          className="
-                              flex
-                              h-8
-                              w-8
-
-                              items-center
-                              justify-center
-
-                              rounded-lg
-
-                              text-[var(--admin-muted)]
-
-                              transition
-
-                              hover:bg-[var(--admin-hover)]
-
-                              hover:text-[var(--company-primary)]
-
-                              disabled:cursor-not-allowed
-                              disabled:opacity-25
-                            "
-                        >
-                          <ArrowLeft size={14} />
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => moveGalleryImage(index, 1)}
-                          disabled={index === gallery.length - 1}
-                          aria-label={t("contentMedia.gallery.moveNext")}
-                          title={t("contentMedia.gallery.moveNext")}
-                          className="
-                              flex
-                              h-8
-                              w-8
-
-                              items-center
-                              justify-center
-
-                              rounded-lg
-
-                              text-[var(--admin-muted)]
-
-                              transition
-
-                              hover:bg-[var(--admin-hover)]
-
-                              hover:text-[var(--company-primary)]
-
-                              disabled:cursor-not-allowed
-                              disabled:opacity-25
-                            "
-                        >
-                          <ArrowRight size={14} />
-                        </button>
+                        {t("contentMedia.mediaId", {
+                          id: image.mediaId,
+                        })}
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => removeGalleryImage(image.mediaId)}
-                        aria-label={t("contentMedia.gallery.remove")}
-                        title={t("contentMedia.gallery.remove")}
+                      {/* ACTIONS */}
+
+                      <div
                         className="
+                            mt-3
+
                             flex
-                            h-8
-                            w-8
-
                             items-center
-                            justify-center
+                            justify-between
 
-                            rounded-lg
-
-                            text-red-500
-
-                            transition
-
-                            hover:bg-red-50
-
-                            hover:text-red-600
+                            gap-2
                           "
                       >
-                        <Trash2 size={14} />
-                      </button>
+                        {/* ORDER */}
+
+                        <div
+                          className="
+                              flex
+                              items-center
+                              gap-1
+                            "
+                        >
+                          <button
+                            type="button"
+                            disabled={index === 0}
+                            onClick={() => moveGalleryImage(index, -1)}
+                            aria-label={t("contentMedia.gallery.moveLeft")}
+                            title={t("contentMedia.gallery.moveLeft")}
+                            className="
+                                flex
+                                h-8
+                                w-8
+
+                                items-center
+                                justify-center
+
+                                rounded-lg
+
+                                text-[var(--admin-muted)]
+
+                                transition
+
+                                hover:bg-[var(--admin-hover)]
+
+                                hover:text-[var(--admin-foreground)]
+
+                                disabled:cursor-not-allowed
+                                disabled:opacity-25
+                              "
+                          >
+                            <ArrowLeft size={13} />
+                          </button>
+
+                          <span
+                            className="
+                                min-w-6
+                                text-center
+
+                                admin-text-10
+
+                                text-[var(--admin-muted)]
+                              "
+                          >
+                            {index + 1}
+                          </span>
+
+                          <button
+                            type="button"
+                            disabled={index === gallery.length - 1}
+                            onClick={() => moveGalleryImage(index, 1)}
+                            aria-label={t("contentMedia.gallery.moveRight")}
+                            title={t("contentMedia.gallery.moveRight")}
+                            className="
+                                flex
+                                h-8
+                                w-8
+
+                                items-center
+                                justify-center
+
+                                rounded-lg
+
+                                text-[var(--admin-muted)]
+
+                                transition
+
+                                hover:bg-[var(--admin-hover)]
+
+                                hover:text-[var(--admin-foreground)]
+
+                                disabled:cursor-not-allowed
+                                disabled:opacity-25
+                              "
+                          >
+                            <ArrowRight size={13} />
+                          </button>
+                        </div>
+
+                        {/* DELETE */}
+
+                        <button
+                          type="button"
+                          onClick={() => removeGalleryImage(image.mediaId)}
+                          aria-label={t("contentMedia.gallery.remove")}
+                          title={t("contentMedia.gallery.remove")}
+                          className="
+                              flex
+                              h-8
+                              w-8
+
+                              items-center
+                              justify-center
+
+                              rounded-lg
+
+                              text-red-500
+
+                              transition
+
+                              hover:bg-red-50
+
+                              hover:text-red-600
+                            "
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
                     </div>
-                  </article>
+                  </div>
                 ))}
               </div>
             )}
           </div>
         </div>
       </section>
-
-      {/* =====================================
-          COVER PICKER
-      ===================================== */}
-
-      <MediaPicker
-        open={featuredPickerOpen}
-        companyId={companyId}
-        selectedIds={featuredImage?.mediaId ? [featuredImage.mediaId] : []}
-        multiple={false}
-        title={t("contentMedia.cover.pickerTitle")}
-        onClose={() => setFeaturedPickerOpen(false)}
-        onConfirm={handleFeaturedSelected}
-      />
 
       {/* =====================================
           GALLERY PICKER
@@ -968,9 +839,14 @@ export default function ContentMediaSection({
         companyId={companyId}
         selectedIds={galleryIds}
         multiple
+        cropPreset={null}
         title={t("contentMedia.gallery.pickerTitle")}
         onClose={() => setGalleryPickerOpen(false)}
-        onConfirm={handleGallerySelected}
+        onConfirm={(mediaItems) => {
+          handleGallerySelected(mediaItems);
+
+          setGalleryPickerOpen(false);
+        }}
       />
     </>
   );

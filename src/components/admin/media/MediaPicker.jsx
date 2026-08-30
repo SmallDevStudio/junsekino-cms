@@ -18,6 +18,7 @@ import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
 
 import { cn } from "@/utils/cn";
 
+import ImageCropDialog from "./ImageCropDialog";
 import MediaUploadDropzone from "./MediaUploadDropzone";
 
 /*
@@ -58,6 +59,20 @@ function formatBytes(bytes) {
   }
 
   return `${(value / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/*
+ * =========================================================
+ * READ RESPONSE
+ * =========================================================
+ */
+
+async function readResponse(response) {
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
 }
 
 /*
@@ -175,7 +190,9 @@ function MediaThumbnail({ companyId, media }) {
         <ImageIcon
           size={22}
           strokeWidth={1.5}
-          className="text-[var(--admin-muted-light)]"
+          className="
+            text-[var(--admin-muted-light)]
+          "
         />
       </div>
     );
@@ -507,6 +524,36 @@ export default function MediaPicker({
   multiple = true,
 
   /*
+   * =======================================================
+   * CROP
+   * =======================================================
+   *
+   * null
+   *   → existing MediaPicker behavior
+   *
+   * "cover"
+   *   → rectangular crop
+   *
+   * "avatar"
+   *   → circular crop
+   *
+   * Other presets supported by
+   * MEDIA_CROP_PRESETS may also be used.
+   *
+   * Crop is intentionally enabled only for
+   * single-selection mode.
+   * =======================================================
+   */
+
+  cropPreset = null,
+
+  initialCrop = null,
+
+  cropTitle,
+
+  cropDescription,
+
+  /*
    * Optional consumer-provided title.
    *
    * When omitted it follows Admin i18n.
@@ -519,6 +566,12 @@ export default function MediaPicker({
 }) {
   const { t } = useAdminTranslation();
 
+  /*
+   * =======================================================
+   * MEDIA
+   * =======================================================
+   */
+
   const [items, setItems] = useState([]);
 
   const [selection, setSelection] = useState([]);
@@ -530,6 +583,28 @@ export default function MediaPicker({
   const [error, setError] = useState(null);
 
   const [activeTab, setActiveTab] = useState("library");
+
+  /*
+   * =======================================================
+   * CROP STATE
+   * =======================================================
+   */
+
+  const [cropDialogOpen, setCropDialogOpen] = useState(false);
+
+  const [cropMedia, setCropMedia] = useState(null);
+
+  const [cropImageUrl, setCropImageUrl] = useState(null);
+
+  const [cropLoading, setCropLoading] = useState(false);
+
+  const [cropError, setCropError] = useState(null);
+
+  /*
+   * Crop is intentionally supported only
+   * for one selected image at a time.
+   */
+  const cropEnabled = Boolean(cropPreset) && !multiple;
 
   const dialogTitle = title || t("media.picker.title");
 
@@ -610,6 +685,16 @@ export default function MediaPicker({
       setSearch("");
 
       setActiveTab("library");
+
+      setCropDialogOpen(false);
+
+      setCropMedia(null);
+
+      setCropImageUrl(null);
+
+      setCropLoading(false);
+
+      setCropError(null);
     }, 0);
 
     return () => {
@@ -732,14 +817,174 @@ export default function MediaPicker({
 
   /*
    * =======================================================
+   * SELECTED MEDIA
+   * =======================================================
+   */
+
+  function getSelectedMedia() {
+    return selection
+      .map((id) => items.find((item) => item.id === id))
+      .filter(Boolean);
+  }
+
+  /*
+   * =======================================================
+   * LOAD CROP PREVIEW
+   * =======================================================
+   */
+
+  async function openCropDialog(media) {
+    if (!companyId || !media?.id) {
+      return;
+    }
+
+    try {
+      setCropLoading(true);
+
+      setCropError(null);
+
+      setCropMedia(media);
+
+      /*
+       * We deliberately use the largest Admin preview
+       * available so react-easy-crop has enough resolution
+       * for accurate positioning.
+       */
+      const response = await fetch(
+        `/api/v1/companies/${companyId}/media/${media.id}/preview?variant=large`,
+        {
+          method: "GET",
+
+          cache: "no-store",
+
+          credentials: "include",
+        },
+      );
+
+      const payload = await readResponse(response);
+
+      if (!response.ok || payload?.success === false) {
+        throw new Error(
+          payload?.message || t("media.picker.crop.errors.previewFailed"),
+        );
+      }
+
+      const previewUrl = payload?.data?.url || payload?.url || null;
+
+      if (!previewUrl) {
+        throw new Error(t("media.picker.crop.errors.previewFailed"));
+      }
+
+      setCropImageUrl(previewUrl);
+
+      /*
+       * Opening only after URL is available avoids a
+       * flash of an empty Crop dialog.
+       */
+      setCropDialogOpen(true);
+    } catch (previewError) {
+      console.error("Media crop preview error:", previewError);
+
+      const message =
+        previewError?.message || t("media.picker.crop.errors.previewFailed");
+
+      setCropError(message);
+
+      toast.error(message);
+    } finally {
+      setCropLoading(false);
+    }
+  }
+
+  /*
+   * =======================================================
+   * CLOSE CROP
+   * =======================================================
+   */
+
+  function closeCropDialog() {
+    setCropDialogOpen(false);
+
+    setCropImageUrl(null);
+
+    setCropMedia(null);
+
+    setCropError(null);
+  }
+
+  /*
+   * =======================================================
+   * APPLY CROP
+   * =======================================================
+   */
+
+  function handleCropConfirm(cropMetadata) {
+    if (!cropMedia) {
+      return;
+    }
+
+    /*
+     * Backward-compatible Media object:
+     *
+     * {
+     *   ...existingMedia,
+     *   crop: {...}
+     * }
+     *
+     * Existing consumers which don't use cropPreset
+     * continue receiving the original object.
+     */
+    const result = {
+      ...cropMedia,
+
+      crop: cropMetadata,
+    };
+
+    setCropDialogOpen(false);
+
+    setCropImageUrl(null);
+
+    setCropMedia(null);
+
+    onConfirm?.(result);
+
+    onClose?.();
+  }
+
+  /*
+   * =======================================================
    * CONFIRM
    * =======================================================
    */
 
-  function handleConfirm() {
-    const selectedMedia = selection
-      .map((id) => items.find((item) => item.id === id))
-      .filter(Boolean);
+  async function handleConfirm() {
+    const selectedMedia = getSelectedMedia();
+
+    /*
+     * ===============================================
+     * CROP FLOW
+     * ===============================================
+     */
+
+    if (cropEnabled) {
+      const media = selectedMedia[0] || null;
+
+      if (!media) {
+        return;
+      }
+
+      await openCropDialog(media);
+
+      return;
+    }
+
+    /*
+     * ===============================================
+     * STANDARD FLOW
+     * ===============================================
+     *
+     * Existing MediaPicker behavior remains unchanged.
+     */
 
     onConfirm?.(multiple ? selectedMedia : selectedMedia[0] || null);
 
@@ -789,737 +1034,140 @@ export default function MediaPicker({
    */
 
   return (
-    <div
-      className="
-        fixed
-        inset-0
-        z-[200]
-
-        flex
-        items-center
-        justify-center
-
-        p-4
-
-        sm:p-6
-      "
-    >
-      {/* BACKDROP */}
-
-      <button
-        type="button"
-        aria-label={t("media.picker.close")}
-        onClick={onClose}
-        className="
-          absolute
-          inset-0
-
-          bg-black/40
-
-          backdrop-blur-[2px]
-        "
-      />
-
-      {/* DIALOG */}
-
+    <>
       <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={dialogTitle}
         className="
-          relative
-          z-10
+          fixed
+          inset-0
+          z-[200]
 
           flex
-          max-h-[88vh]
-          w-full
-          max-w-5xl
-          flex-col
+          items-center
+          justify-center
 
-          overflow-hidden
+          p-4
 
-          rounded-3xl
-
-          border
-          border-[var(--admin-border)]
-
-          bg-[var(--admin-surface)]
-
-          shadow-[0_30px_100px_rgba(0,0,0,0.25)]
+          sm:p-6
         "
       >
-        {/* =================================
-            HEADER
-        ================================= */}
+        {/* =====================================
+            BACKDROP
+        ===================================== */}
 
-        <div
+        <button
+          type="button"
+          aria-label={t("media.picker.close")}
+          onClick={onClose}
+          disabled={cropLoading}
           className="
-            flex
-            shrink-0
+            absolute
+            inset-0
 
-            items-center
-            justify-between
+            bg-black/40
 
-            gap-4
-
-            border-b
-            border-[var(--admin-border)]
-
-            px-5
-            py-4
-
-            sm:px-6
+            backdrop-blur-[2px]
           "
-        >
-          <div className="min-w-0">
-            <h2
-              className="
-                admin-text-18
-                font-semibold
-                tracking-[-0.02em]
+        />
 
-                text-[var(--admin-foreground)]
-              "
-            >
-              {dialogTitle}
-            </h2>
-
-            <p
-              className="
-                mt-1
-
-                admin-text-12
-
-                text-[var(--admin-muted)]
-              "
-            >
-              {multiple
-                ? t("media.picker.multipleDescription")
-                : t("media.picker.singleDescription")}
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label={t("common.close")}
-            title={t("common.close")}
-            className="
-              flex
-              h-9
-              w-9
-              shrink-0
-
-              items-center
-              justify-center
-
-              rounded-xl
-
-              text-[var(--admin-muted)]
-
-              transition
-
-              hover:bg-[var(--admin-hover)]
-
-              hover:text-[var(--admin-foreground)]
-            "
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        {/* =================================
-            TABS
-        ================================= */}
+        {/* =====================================
+            DIALOG
+        ===================================== */}
 
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={dialogTitle}
           className="
+            relative
+            z-10
+
             flex
-            shrink-0
-
-            overflow-x-auto
-
-            border-b
-            border-[var(--admin-border)]
-
-            px-4
-
-            sm:px-6
-          "
-        >
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-
-            const active = activeTab === tab.value;
-
-            return (
-              <button
-                key={tab.value}
-                type="button"
-                onClick={() => setActiveTab(tab.value)}
-                className={cn(
-                  "relative",
-
-                  "inline-flex shrink-0 items-center gap-2",
-
-                  "px-4 py-3",
-
-                  "admin-text-12 font-medium",
-
-                  "transition",
-
-                  active
-                    ? "text-[var(--company-primary)]"
-                    : "text-[var(--admin-muted)] hover:text-[var(--admin-foreground)]",
-                )}
-              >
-                <Icon size={14} />
-
-                {tab.label}
-
-                {active && (
-                  <span
-                    className="
-                        absolute
-                        inset-x-0
-                        bottom-0
-
-                        h-0.5
-
-                        bg-[var(--company-primary)]
-                      "
-                  />
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* =================================
-            BODY
-        ================================= */}
-
-        <div
-          className="
-            min-h-0
-            flex-1
-
-            overflow-y-auto
-
-            p-5
-
-            sm:p-6
-          "
-        >
-          {/* ===============================
-              LIBRARY
-          =============================== */}
-
-          {activeTab === "library" && (
-            <>
-              {/* SEARCH */}
-
-              <div
-                className="
-                  flex
-                  flex-col
-                  gap-3
-
-                  sm:flex-row
-                  sm:items-center
-                  sm:justify-between
-                "
-              >
-                <div
-                  className="
-                    relative
-                    w-full
-                    max-w-[420px]
-                  "
-                >
-                  <Search
-                    size={15}
-                    className="
-                      pointer-events-none
-
-                      absolute
-                      left-3
-                      top-1/2
-
-                      -translate-y-1/2
-
-                      text-[var(--admin-muted-light)]
-                    "
-                  />
-
-                  <input
-                    type="search"
-                    value={search}
-                    onChange={(event) => setSearch(event.target.value)}
-                    placeholder={t("media.picker.searchPlaceholder")}
-                    className="
-                      h-10
-                      w-full
-
-                      rounded-xl
-
-                      border
-                      border-[var(--admin-border)]
-
-                      bg-[var(--admin-background)]
-
-                      pl-9
-                      pr-3
-
-                      admin-text-12
-
-                      text-[var(--admin-foreground)]
-
-                      outline-none
-
-                      transition
-
-                      placeholder:text-[var(--admin-muted-light)]
-
-                      focus:border-[var(--company-primary)]
-
-                      focus:ring-2
-                      focus:ring-[var(--company-primary-soft)]
-                    "
-                  />
-                </div>
-
-                <div
-                  className="
-                    admin-text-11
-
-                    text-[var(--admin-muted)]
-                  "
-                >
-                  {t("media.picker.resultCount", {
-                    count: filteredItems.length,
-                  })}
-                </div>
-              </div>
-
-              {/* LOADING */}
-
-              {loading && (
-                <div
-                  className="
-                    flex
-                    min-h-[320px]
-
-                    items-center
-                    justify-center
-                  "
-                >
-                  <div className="text-center">
-                    <LoaderCircle
-                      size={22}
-                      className="
-                        mx-auto
-
-                        animate-spin
-
-                        text-[var(--company-primary)]
-                      "
-                    />
-
-                    <div
-                      className="
-                        mt-3
-
-                        admin-text-12
-
-                        text-[var(--admin-muted)]
-                      "
-                    >
-                      {t("media.picker.loading")}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* ERROR */}
-
-              {!loading && error && (
-                <div
-                  className="
-                      mt-6
-
-                      rounded-2xl
-
-                      border
-                      border-red-200
-
-                      bg-red-50
-
-                      p-5
-                    "
-                >
-                  <div
-                    className="
-                        admin-text-12
-                        font-medium
-
-                        text-red-700
-                      "
-                  >
-                    {error}
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={loadMedia}
-                    className="
-                        mt-3
-
-                        admin-text-12
-                        font-medium
-
-                        text-[var(--company-primary)]
-
-                        hover:underline
-                      "
-                  >
-                    {t("common.retry")}
-                  </button>
-                </div>
-              )}
-
-              {/* EMPTY */}
-
-              {!loading && !error && filteredItems.length === 0 && (
-                <div
-                  className="
-                      flex
-                      min-h-[320px]
-
-                      flex-col
-                      items-center
-                      justify-center
-
-                      text-center
-                    "
-                >
-                  <div
-                    className="
-                        flex
-                        h-14
-                        w-14
-
-                        items-center
-                        justify-center
-
-                        rounded-2xl
-
-                        bg-[var(--admin-background)]
-
-                        text-[var(--admin-muted-light)]
-                      "
-                  >
-                    <ImageIcon size={23} strokeWidth={1.5} />
-                  </div>
-
-                  <div
-                    className="
-                        mt-4
-
-                        admin-text-14
-                        font-medium
-
-                        text-[var(--admin-foreground)]
-                      "
-                  >
-                    {search.trim()
-                      ? t("media.picker.noSearchResults")
-                      : t("media.picker.emptyTitle")}
-                  </div>
-
-                  <div
-                    className="
-                        mt-1
-
-                        max-w-[360px]
-
-                        admin-text-12
-                        leading-[1.6]
-
-                        text-[var(--admin-muted)]
-                      "
-                  >
-                    {search.trim()
-                      ? t("media.picker.noSearchDescription")
-                      : t("media.picker.emptyDescription")}
-                  </div>
-
-                  {!search.trim() && (
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab("upload")}
-                      className="
-                          mt-4
-
-                          inline-flex
-                          h-9
-
-                          items-center
-                          gap-2
-
-                          rounded-xl
-
-                          bg-[var(--company-primary)]
-
-                          px-3
-
-                          admin-text-12
-                          font-medium
-
-                          text-[var(--company-primary-foreground)]
-
-                          transition
-
-                          hover:bg-[var(--company-primary-hover)]
-                        "
-                    >
-                      <UploadCloud size={14} />
-
-                      {t("media.picker.tabs.upload")}
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {/* GRID */}
-
-              {!loading && !error && filteredItems.length > 0 && (
-                <div
-                  className="
-                      mt-5
-
-                      grid
-                      grid-cols-2
-                      gap-3
-
-                      sm:grid-cols-3
-
-                      lg:grid-cols-4
-                    "
-                >
-                  {filteredItems.map((media) => {
-                    const selected = selection.includes(media.id);
-
-                    const fileSize = formatBytes(media.size);
-
-                    return (
-                      <button
-                        key={media.id}
-                        type="button"
-                        onClick={() => toggleMedia(media.id)}
-                        className={cn(
-                          "group overflow-hidden",
-
-                          "rounded-2xl",
-
-                          "border",
-
-                          "text-left",
-
-                          "transition",
-
-                          selected
-                            ? "border-[var(--company-primary)] bg-[var(--company-primary-soft)] ring-2 ring-[var(--company-primary-soft)]"
-                            : "border-[var(--admin-border)] bg-[var(--admin-surface)] hover:border-[var(--company-primary-border)]",
-                        )}
-                      >
-                        {/* IMAGE */}
-
-                        <div
-                          className="
-                                relative
-
-                                aspect-[4/3]
-
-                                overflow-hidden
-
-                                bg-[var(--admin-background)]
-                              "
-                        >
-                          <MediaThumbnail companyId={companyId} media={media} />
-
-                          {/* CHECK */}
-
-                          <span
-                            className={cn(
-                              "absolute right-2 top-2",
-
-                              "flex h-6 w-6",
-
-                              "items-center justify-center",
-
-                              "rounded-full",
-
-                              "border",
-
-                              "transition",
-
-                              selected
-                                ? "border-[var(--company-primary)] bg-[var(--company-primary)] text-[var(--company-primary-foreground)]"
-                                : "border-white/70 bg-white/85 text-transparent shadow-sm group-hover:text-black/30",
-                            )}
-                          >
-                            <Check size={13} strokeWidth={2.4} />
-                          </span>
-                        </div>
-
-                        {/* META */}
-
-                        <div
-                          className="
-                                p-3
-                              "
-                        >
-                          <div
-                            className="
-                                  truncate
-
-                                  admin-text-11
-                                  font-medium
-
-                                  text-[var(--admin-foreground)]
-                                "
-                          >
-                            {getMediaName(
-                              media,
-
-                              t("media.picker.untitled"),
-                            )}
-                          </div>
-
-                          <div
-                            className="
-                                  mt-1
-
-                                  flex
-                                  items-center
-                                  gap-1.5
-
-                                  admin-text-9
-
-                                  text-[var(--admin-muted)]
-                                "
-                          >
-                            {media.format && (
-                              <span
-                                className="
-                                      uppercase
-                                    "
-                              >
-                                {media.format}
-                              </span>
-                            )}
-
-                            {media.format && fileSize && <span>•</span>}
-
-                            {fileSize && <span>{fileSize}</span>}
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </>
-          )}
-
-          {/* ===============================
-              UPLOAD
-          =============================== */}
-
-          {activeTab === "upload" && (
-            <MediaUploadDropzone
-              companyId={companyId}
-              onUploaded={handleMediaCreated}
-            />
-          )}
-
-          {/* ===============================
-              URL
-          =============================== */}
-
-          {activeTab === "url" && (
-            <ImportUrlPanel
-              companyId={companyId}
-              onImported={handleMediaCreated}
-            />
-          )}
-        </div>
-
-        {/* =================================
-            FOOTER
-        ================================= */}
-
-        <div
-          className="
-            flex
-            shrink-0
-
+            max-h-[88vh]
+            w-full
+            max-w-5xl
             flex-col
-            gap-3
 
-            border-t
+            overflow-hidden
+
+            rounded-3xl
+
+            border
             border-[var(--admin-border)]
 
             bg-[var(--admin-surface)]
 
-            px-5
-            py-4
-
-            sm:flex-row
-            sm:items-center
-            sm:justify-between
-
-            sm:px-6
+            shadow-[0_30px_100px_rgba(0,0,0,0.25)]
           "
         >
-          <div
-            className="
-              admin-text-11
-
-              text-[var(--admin-muted)]
-            "
-          >
-            {selection.length > 0
-              ? t("media.picker.selectedCount", {
-                  count: selection.length,
-                })
-              : t("media.picker.noneSelected")}
-          </div>
+          {/* =================================
+              HEADER
+          ================================= */}
 
           <div
             className="
               flex
+              shrink-0
+
               items-center
-              justify-end
-              gap-2
+              justify-between
+
+              gap-4
+
+              border-b
+              border-[var(--admin-border)]
+
+              px-5
+              py-4
+
+              sm:px-6
             "
           >
+            <div className="min-w-0">
+              <h2
+                className="
+                  admin-text-18
+                  font-semibold
+                  tracking-[-0.02em]
+
+                  text-[var(--admin-foreground)]
+                "
+              >
+                {dialogTitle}
+              </h2>
+
+              <p
+                className="
+                  mt-1
+
+                  admin-text-12
+
+                  text-[var(--admin-muted)]
+                "
+              >
+                {cropEnabled
+                  ? t("media.picker.crop.selectDescription")
+                  : multiple
+                    ? t("media.picker.multipleDescription")
+                    : t("media.picker.singleDescription")}
+              </p>
+            </div>
+
             <button
               type="button"
               onClick={onClose}
+              disabled={cropLoading}
+              aria-label={t("common.close")}
+              title={t("common.close")}
               className="
-                h-10
+                flex
+                h-9
+                w-9
+                shrink-0
+
+                items-center
+                justify-center
 
                 rounded-xl
-
-                border
-                border-[var(--admin-border)]
-
-                px-4
-
-                admin-text-12
-                font-medium
 
                 text-[var(--admin-muted)]
 
@@ -1528,51 +1176,782 @@ export default function MediaPicker({
                 hover:bg-[var(--admin-hover)]
 
                 hover:text-[var(--admin-foreground)]
+
+                disabled:opacity-50
               "
             >
-              {t("common.cancel")}
+              <X size={18} />
             </button>
+          </div>
 
-            <button
-              type="button"
-              onClick={handleConfirm}
-              disabled={selection.length === 0}
+          {/* =================================
+              TABS
+          ================================= */}
+
+          <div
+            className="
+              flex
+              shrink-0
+
+              overflow-x-auto
+
+              border-b
+              border-[var(--admin-border)]
+
+              px-4
+
+              sm:px-6
+            "
+          >
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+
+              const active = activeTab === tab.value;
+
+              return (
+                <button
+                  key={tab.value}
+                  type="button"
+                  disabled={cropLoading}
+                  onClick={() => setActiveTab(tab.value)}
+                  className={cn(
+                    "relative",
+
+                    "inline-flex shrink-0 items-center gap-2",
+
+                    "px-4 py-3",
+
+                    "admin-text-12 font-medium",
+
+                    "transition",
+
+                    active
+                      ? "text-[var(--company-primary)]"
+                      : "text-[var(--admin-muted)] hover:text-[var(--admin-foreground)]",
+
+                    "disabled:opacity-50",
+                  )}
+                >
+                  <Icon size={14} />
+
+                  {tab.label}
+
+                  {active && (
+                    <span
+                      className="
+                          absolute
+                          inset-x-0
+                          bottom-0
+
+                          h-0.5
+
+                          bg-[var(--company-primary)]
+                        "
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* =================================
+              BODY
+          ================================= */}
+
+          <div
+            className="
+              admin-sidebar-scrollbar-hide
+
+              min-h-0
+              flex-1
+
+              overflow-y-auto
+
+              p-5
+
+              sm:p-6
+            "
+          >
+            {/* ===============================
+                LIBRARY
+            =============================== */}
+
+            {activeTab === "library" && (
+              <>
+                {/* =============================
+                    SEARCH
+                ============================= */}
+
+                <div
+                  className="
+                    flex
+                    flex-col
+                    gap-3
+
+                    sm:flex-row
+                    sm:items-center
+                    sm:justify-between
+                  "
+                >
+                  <div
+                    className="
+                      relative
+                      w-full
+                      max-w-[420px]
+                    "
+                  >
+                    <Search
+                      size={15}
+                      className="
+                        pointer-events-none
+
+                        absolute
+                        left-3
+                        top-1/2
+
+                        -translate-y-1/2
+
+                        text-[var(--admin-muted-light)]
+                      "
+                    />
+
+                    <input
+                      type="search"
+                      value={search}
+                      disabled={cropLoading}
+                      onChange={(event) => setSearch(event.target.value)}
+                      placeholder={t("media.picker.searchPlaceholder")}
+                      className="
+                        h-10
+                        w-full
+
+                        rounded-xl
+
+                        border
+                        border-[var(--admin-border)]
+
+                        bg-[var(--admin-background)]
+
+                        pl-9
+                        pr-3
+
+                        admin-text-12
+
+                        text-[var(--admin-foreground)]
+
+                        outline-none
+
+                        transition
+
+                        placeholder:text-[var(--admin-muted-light)]
+
+                        focus:border-[var(--company-primary)]
+
+                        focus:ring-2
+                        focus:ring-[var(--company-primary-soft)]
+
+                        disabled:opacity-50
+                      "
+                    />
+                  </div>
+
+                  <div
+                    className="
+                      admin-text-11
+
+                      text-[var(--admin-muted)]
+                    "
+                  >
+                    {t("media.picker.resultCount", {
+                      count: filteredItems.length,
+                    })}
+                  </div>
+                </div>
+
+                {/* =============================
+                    CROP NOTE
+                ============================= */}
+
+                {cropEnabled && (
+                  <div
+                    className="
+                      mt-4
+
+                      rounded-xl
+
+                      border
+                      border-[var(--company-primary-border)]
+
+                      bg-[var(--company-primary-soft)]
+
+                      px-4
+                      py-3
+                    "
+                  >
+                    <div
+                      className="
+                        admin-text-11
+                        font-medium
+
+                        text-[var(--company-primary)]
+                      "
+                    >
+                      {t("media.picker.crop.noteTitle")}
+                    </div>
+
+                    <p
+                      className="
+                        mt-1
+
+                        admin-text-11
+                        leading-[1.6]
+
+                        text-[var(--admin-muted)]
+                      "
+                    >
+                      {t("media.picker.crop.noteDescription")}
+                    </p>
+                  </div>
+                )}
+
+                {/* =============================
+                    CROP ERROR
+                ============================= */}
+
+                {cropError && (
+                  <div
+                    className="
+                      mt-4
+
+                      rounded-xl
+
+                      border
+                      border-red-200
+
+                      bg-red-50
+
+                      px-4
+                      py-3
+
+                      admin-text-12
+
+                      text-red-700
+                    "
+                  >
+                    {cropError}
+                  </div>
+                )}
+
+                {/* =============================
+                    LOADING
+                ============================= */}
+
+                {loading && (
+                  <div
+                    className="
+                      flex
+                      min-h-[320px]
+
+                      items-center
+                      justify-center
+                    "
+                  >
+                    <div className="text-center">
+                      <LoaderCircle
+                        size={22}
+                        className="
+                          mx-auto
+
+                          animate-spin
+
+                          text-[var(--company-primary)]
+                        "
+                      />
+
+                      <div
+                        className="
+                          mt-3
+
+                          admin-text-12
+
+                          text-[var(--admin-muted)]
+                        "
+                      >
+                        {t("media.picker.loading")}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* =============================
+                    ERROR
+                ============================= */}
+
+                {!loading && error && (
+                  <div
+                    className="
+                        mt-6
+
+                        rounded-2xl
+
+                        border
+                        border-red-200
+
+                        bg-red-50
+
+                        p-5
+                      "
+                  >
+                    <div
+                      className="
+                          admin-text-12
+                          font-medium
+
+                          text-red-700
+                        "
+                    >
+                      {error}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={loadMedia}
+                      className="
+                          mt-3
+
+                          admin-text-12
+                          font-medium
+
+                          text-[var(--company-primary)]
+
+                          hover:underline
+                        "
+                    >
+                      {t("common.retry")}
+                    </button>
+                  </div>
+                )}
+
+                {/* =============================
+                    EMPTY
+                ============================= */}
+
+                {!loading && !error && filteredItems.length === 0 && (
+                  <div
+                    className="
+                        flex
+                        min-h-[320px]
+
+                        flex-col
+                        items-center
+                        justify-center
+
+                        text-center
+                      "
+                  >
+                    <div
+                      className="
+                          flex
+                          h-14
+                          w-14
+
+                          items-center
+                          justify-center
+
+                          rounded-2xl
+
+                          bg-[var(--admin-background)]
+
+                          text-[var(--admin-muted-light)]
+                        "
+                    >
+                      <ImageIcon size={23} strokeWidth={1.5} />
+                    </div>
+
+                    <div
+                      className="
+                          mt-4
+
+                          admin-text-14
+                          font-medium
+
+                          text-[var(--admin-foreground)]
+                        "
+                    >
+                      {search.trim()
+                        ? t("media.picker.noSearchResults")
+                        : t("media.picker.emptyTitle")}
+                    </div>
+
+                    <div
+                      className="
+                          mt-1
+
+                          max-w-[360px]
+
+                          admin-text-12
+                          leading-[1.6]
+
+                          text-[var(--admin-muted)]
+                        "
+                    >
+                      {search.trim()
+                        ? t("media.picker.noSearchDescription")
+                        : t("media.picker.emptyDescription")}
+                    </div>
+
+                    {!search.trim() && (
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab("upload")}
+                        className="
+                            mt-4
+
+                            inline-flex
+                            h-9
+
+                            items-center
+                            gap-2
+
+                            rounded-xl
+
+                            bg-[var(--company-primary)]
+
+                            px-3
+
+                            admin-text-12
+                            font-medium
+
+                            text-[var(--company-primary-foreground)]
+
+                            transition
+
+                            hover:bg-[var(--company-primary-hover)]
+                          "
+                      >
+                        <UploadCloud size={14} />
+
+                        {t("media.picker.tabs.upload")}
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* =============================
+                    GRID
+                ============================= */}
+
+                {!loading && !error && filteredItems.length > 0 && (
+                  <div
+                    className="
+                        mt-5
+
+                        grid
+                        grid-cols-2
+                        gap-3
+
+                        sm:grid-cols-3
+
+                        lg:grid-cols-4
+                      "
+                  >
+                    {filteredItems.map((media) => {
+                      const selected = selection.includes(media.id);
+
+                      const fileSize = formatBytes(media.size);
+
+                      return (
+                        <button
+                          key={media.id}
+                          type="button"
+                          disabled={cropLoading}
+                          onClick={() => toggleMedia(media.id)}
+                          className={cn(
+                            "group overflow-hidden",
+
+                            "rounded-2xl",
+
+                            "border",
+
+                            "text-left",
+
+                            "transition",
+
+                            selected
+                              ? "border-[var(--company-primary)] bg-[var(--company-primary-soft)] ring-2 ring-[var(--company-primary-soft)]"
+                              : "border-[var(--admin-border)] bg-[var(--admin-surface)] hover:border-[var(--company-primary-border)]",
+
+                            "disabled:opacity-60",
+                          )}
+                        >
+                          {/* IMAGE */}
+
+                          <div
+                            className="
+                                  relative
+
+                                  aspect-[4/3]
+
+                                  overflow-hidden
+
+                                  bg-[var(--admin-background)]
+                                "
+                          >
+                            <MediaThumbnail
+                              companyId={companyId}
+                              media={media}
+                            />
+
+                            {/* CHECK */}
+
+                            <span
+                              className={cn(
+                                "absolute right-2 top-2",
+
+                                "flex h-6 w-6",
+
+                                "items-center justify-center",
+
+                                "rounded-full",
+
+                                "border",
+
+                                "transition",
+
+                                selected
+                                  ? "border-[var(--company-primary)] bg-[var(--company-primary)] text-[var(--company-primary-foreground)]"
+                                  : "border-white/70 bg-white/85 text-transparent shadow-sm group-hover:text-black/30",
+                              )}
+                            >
+                              <Check size={13} strokeWidth={2.4} />
+                            </span>
+                          </div>
+
+                          {/* META */}
+
+                          <div className="p-3">
+                            <div
+                              className="
+                                    truncate
+
+                                    admin-text-11
+                                    font-medium
+
+                                    text-[var(--admin-foreground)]
+                                  "
+                            >
+                              {getMediaName(
+                                media,
+
+                                t("media.picker.untitled"),
+                              )}
+                            </div>
+
+                            <div
+                              className="
+                                    mt-1
+
+                                    flex
+                                    items-center
+                                    gap-1.5
+
+                                    admin-text-9
+
+                                    text-[var(--admin-muted)]
+                                  "
+                            >
+                              {media.format && (
+                                <span
+                                  className="
+                                        uppercase
+                                      "
+                                >
+                                  {media.format}
+                                </span>
+                              )}
+
+                              {media.format && fileSize && <span>•</span>}
+
+                              {fileSize && <span>{fileSize}</span>}
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* ===============================
+                UPLOAD
+            =============================== */}
+
+            {activeTab === "upload" && (
+              <MediaUploadDropzone
+                companyId={companyId}
+                onUploaded={handleMediaCreated}
+              />
+            )}
+
+            {/* ===============================
+                URL
+            =============================== */}
+
+            {activeTab === "url" && (
+              <ImportUrlPanel
+                companyId={companyId}
+                onImported={handleMediaCreated}
+              />
+            )}
+          </div>
+
+          {/* =================================
+              FOOTER
+          ================================= */}
+
+          <div
+            className="
+              flex
+              shrink-0
+
+              flex-col
+              gap-3
+
+              border-t
+              border-[var(--admin-border)]
+
+              bg-[var(--admin-surface)]
+
+              px-5
+              py-4
+
+              sm:flex-row
+              sm:items-center
+              sm:justify-between
+
+              sm:px-6
+            "
+          >
+            <div
               className="
-                inline-flex
-                h-10
+                admin-text-11
 
-                items-center
-                justify-center
-                gap-2
-
-                rounded-xl
-
-                bg-[var(--company-primary)]
-
-                px-4
-
-                admin-text-12
-                font-medium
-
-                text-[var(--company-primary-foreground)]
-
-                transition
-
-                hover:bg-[var(--company-primary-hover)]
-
-                disabled:cursor-not-allowed
-                disabled:opacity-40
+                text-[var(--admin-muted)]
               "
             >
-              <Check size={15} />
+              {selection.length > 0
+                ? t("media.picker.selectedCount", {
+                    count: selection.length,
+                  })
+                : t("media.picker.noneSelected")}
+            </div>
 
-              {multiple
-                ? t("media.picker.confirmMultiple")
-                : t("media.picker.confirmSingle")}
-            </button>
+            <div
+              className="
+                flex
+                items-center
+                justify-end
+                gap-2
+              "
+            >
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={cropLoading}
+                className="
+                  h-10
+
+                  rounded-xl
+
+                  border
+                  border-[var(--admin-border)]
+
+                  px-4
+
+                  admin-text-12
+                  font-medium
+
+                  text-[var(--admin-muted)]
+
+                  transition
+
+                  hover:bg-[var(--admin-hover)]
+
+                  hover:text-[var(--admin-foreground)]
+
+                  disabled:opacity-50
+                "
+              >
+                {t("common.cancel")}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleConfirm}
+                disabled={selection.length === 0 || cropLoading}
+                className="
+                  inline-flex
+                  h-10
+                  min-w-28
+
+                  items-center
+                  justify-center
+                  gap-2
+
+                  rounded-xl
+
+                  bg-[var(--company-primary)]
+
+                  px-4
+
+                  admin-text-12
+                  font-medium
+
+                  text-[var(--company-primary-foreground)]
+
+                  transition
+
+                  hover:bg-[var(--company-primary-hover)]
+
+                  disabled:cursor-not-allowed
+                  disabled:opacity-40
+                "
+              >
+                {cropLoading ? (
+                  <LoaderCircle size={15} className="animate-spin" />
+                ) : (
+                  <Check size={15} />
+                )}
+
+                {cropLoading
+                  ? t("media.picker.crop.preparing")
+                  : cropEnabled
+                    ? t("media.picker.crop.continue")
+                    : multiple
+                      ? t("media.picker.confirmMultiple")
+                      : t("media.picker.confirmSingle")}
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* =====================================
+          CROP DIALOG
+      ===================================== */}
+
+      <ImageCropDialog
+        open={cropDialogOpen}
+        imageUrl={cropImageUrl}
+        media={cropMedia}
+        preset={cropPreset || "cover"}
+        initialCrop={initialCrop}
+        title={cropTitle}
+        description={cropDescription}
+        onClose={closeCropDialog}
+        onConfirm={handleCropConfirm}
+      />
+    </>
   );
 }

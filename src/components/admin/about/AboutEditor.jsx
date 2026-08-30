@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Eye,
-  Image as ImageIcon,
-  LoaderCircle,
-  Save,
-  Trash2,
-  X,
-} from "lucide-react";
+import { Eye, LoaderCircle, Save, X } from "lucide-react";
 
 import { useEffect, useState } from "react";
 
@@ -15,7 +8,7 @@ import { toast } from "sonner";
 
 import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
 
-import MediaPicker from "@/components/admin/media/MediaPicker";
+import CoverImageField from "@/components/admin/media/CoverImageField";
 
 import LocalizedFormField from "@/components/admin/localization/LocalizedFormField";
 
@@ -24,6 +17,8 @@ import LocalizedRichTextEditor from "@/components/admin/localization/LocalizedRi
 import { PAGE_TYPE } from "@/constants/page";
 
 import AboutPreviewDialog from "./AboutPreviewDialog";
+
+import AboutSectionsEditor from "./AboutSectionsEditor";
 
 /*
  * =========================================================
@@ -96,6 +91,16 @@ function normalizePage(page) {
       th: page.content?.th || "",
     },
 
+    /*
+     * Keep the entire featuredImage object.
+     *
+     * This is important because the new Media Core
+     * stores crop metadata inside:
+     *
+     * featuredImage.crop
+     */
+    featuredImage: page.featuredImage || null,
+
     sections: Array.isArray(page.sections) ? page.sections : [],
 
     navigation: {
@@ -120,9 +125,13 @@ function normalizePage(page) {
 
 export default function AboutEditor({
   open,
+
   companyId,
+
   page,
+
   onClose,
+
   onSaved,
 }) {
   const { t, errorMessage } = useAdminTranslation();
@@ -131,9 +140,13 @@ export default function AboutEditor({
 
   const [saving, setSaving] = useState(false);
 
-  const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
-
   const [previewOpen, setPreviewOpen] = useState(false);
+
+  /*
+   * =======================================================
+   * RESET FORM
+   * =======================================================
+   */
 
   useEffect(() => {
     if (!open) {
@@ -142,6 +155,8 @@ export default function AboutEditor({
 
     const timeoutId = window.setTimeout(() => {
       setForm(normalizePage(page));
+
+      setPreviewOpen(false);
     }, 0);
 
     return () => {
@@ -152,6 +167,12 @@ export default function AboutEditor({
   if (!open) {
     return null;
   }
+
+  /*
+   * =======================================================
+   * LOCALIZED FIELD
+   * =======================================================
+   */
 
   function updateLocalized(field, locale, value) {
     setForm((current) => ({
@@ -167,46 +188,15 @@ export default function AboutEditor({
 
   /*
    * =======================================================
-   * MEDIA
+   * FEATURED IMAGE
    * =======================================================
    */
 
-  function selectCover(media) {
-    if (!media?.id) {
-      return;
-    }
-
+  function updateFeaturedImage(featuredImage) {
     setForm((current) => ({
       ...current,
 
-      featuredImage: {
-        mediaId: media.id,
-
-        alt: {
-          en: media.alt?.en || "",
-
-          th: media.alt?.th || "",
-        },
-
-        caption: {
-          en: media.caption?.en || "",
-
-          th: media.caption?.th || "",
-        },
-
-        presentation: {
-          objectFit: "cover",
-
-          aspectRatio: "16:8",
-
-          focalPoint: {
-            x: 0.5,
-            y: 0.5,
-          },
-
-          zoom: 1,
-        },
-      },
+      featuredImage,
     }));
   }
 
@@ -232,6 +222,32 @@ export default function AboutEditor({
     try {
       const editing = Boolean(page?.id);
 
+      /*
+       * Keep About payload aligned with the
+       * existing Page API.
+       *
+       * Do not introduce SEO/status/etc here yet.
+       * Those should be added only when Page Schema
+       * and Page Service support them.
+       */
+      const body = {
+        slug: form.slug,
+
+        pageType: PAGE_TYPE.ABOUT,
+
+        title: form.title,
+
+        excerpt: form.excerpt,
+
+        content: form.content,
+
+        featuredImage: form.featuredImage,
+
+        sections: form.sections || [],
+
+        navigation: form.navigation,
+      };
+
       const response = await fetch(
         editing
           ? `/api/v1/companies/${companyId}/pages/${page.id}`
@@ -245,32 +261,23 @@ export default function AboutEditor({
 
           credentials: "include",
 
-          body: JSON.stringify({
-            slug: form.slug,
-
-            pageType: PAGE_TYPE.ABOUT,
-
-            title: form.title,
-
-            excerpt: form.excerpt,
-
-            content: form.content,
-
-            featuredImage: form.featuredImage,
-
-            sections: form.sections || [],
-
-            navigation: form.navigation,
-          }),
+          body: JSON.stringify(body),
         },
       );
 
-      const payload = await response.json();
+      let payload = null;
+
+      try {
+        payload = await response.json();
+      } catch {
+        payload = null;
+      }
 
       if (!response.ok || payload?.success === false) {
         throw new Error(
           errorMessage(
             payload?.code,
+
             payload?.message || t("about.messages.saveFailed"),
           ),
         );
@@ -280,7 +287,7 @@ export default function AboutEditor({
         editing ? t("about.messages.updated") : t("about.messages.created"),
       );
 
-      await onSaved?.(payload.data);
+      await onSaved?.(payload?.data);
     } catch (error) {
       console.error("Save About error:", error);
 
@@ -289,6 +296,12 @@ export default function AboutEditor({
       setSaving(false);
     }
   }
+
+  /*
+   * =======================================================
+   * RENDER
+   * =======================================================
+   */
 
   return (
     <>
@@ -302,6 +315,10 @@ export default function AboutEditor({
           justify-end
         "
       >
+        {/* =================================
+            BACKDROP
+        ================================= */}
+
         <button
           type="button"
           aria-label={t("common.close")}
@@ -315,6 +332,10 @@ export default function AboutEditor({
             backdrop-blur-[1px]
           "
         />
+
+        {/* =================================
+            PANEL
+        ================================= */}
 
         <div
           className="
@@ -332,7 +353,9 @@ export default function AboutEditor({
             shadow-2xl
           "
         >
-          {/* HEADER */}
+          {/* =================================
+              HEADER
+          ================================= */}
 
           <header
             className="
@@ -380,10 +403,19 @@ export default function AboutEditor({
               </p>
             </div>
 
-            <div className="flex shrink-0 items-center gap-1">
+            <div
+              className="
+                flex
+                shrink-0
+
+                items-center
+                gap-1
+              "
+            >
               <button
                 type="button"
                 onClick={() => setPreviewOpen(true)}
+                disabled={saving}
                 className="
                   inline-flex
                   h-9
@@ -403,7 +435,11 @@ export default function AboutEditor({
                   transition
 
                   hover:bg-[var(--admin-hover)]
+
                   hover:text-[var(--company-primary)]
+
+                  disabled:cursor-not-allowed
+                  disabled:opacity-50
                 "
               >
                 <Eye size={15} />
@@ -431,7 +467,11 @@ export default function AboutEditor({
                   transition
 
                   hover:bg-[var(--admin-hover)]
+
                   hover:text-[var(--admin-foreground)]
+
+                  disabled:cursor-not-allowed
+                  disabled:opacity-50
                 "
               >
                 <X size={18} />
@@ -439,10 +479,14 @@ export default function AboutEditor({
             </div>
           </header>
 
-          {/* BODY */}
+          {/* =================================
+              BODY
+          ================================= */}
 
           <div
             className="
+              admin-sidebar-scrollbar-hide
+
               min-h-0
               flex-1
 
@@ -455,7 +499,9 @@ export default function AboutEditor({
               sm:py-8
             "
           >
-            {/* PAGE INFORMATION */}
+            {/* ===============================
+                PAGE INFORMATION
+            =============================== */}
 
             <section>
               <h3
@@ -492,9 +538,13 @@ export default function AboutEditor({
 
                     admin-text-14
 
+                    text-[var(--admin-foreground)]
+
                     outline-none
 
                     transition
+
+                    placeholder:text-[var(--admin-muted-light)]
 
                     focus:border-[var(--company-primary)]
 
@@ -505,185 +555,30 @@ export default function AboutEditor({
               </div>
             </section>
 
-            {/* COVER */}
+            {/* ===============================
+                COVER
+            =============================== */}
 
             <section className="mt-10">
-              <h3
-                className="
-                  admin-text-14
-                  font-semibold
-
-                  text-[var(--admin-foreground)]
-                "
-              >
-                {t("about.cover.title")}
-              </h3>
-
-              <p
-                className="
-                  mt-1
-
-                  admin-text-12
-                  leading-[1.65]
-
-                  text-[var(--admin-muted)]
-                "
-              >
-                {t("about.cover.description")}
-              </p>
-
-              <div
-                className="
-                  mt-4
-
-                  rounded-2xl
-
-                  border
-                  border-[var(--admin-border)]
-
-                  p-4
-                "
-              >
-                {form.featuredImage?.mediaId ? (
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="
-                        flex
-                        h-12
-                        w-12
-
-                        shrink-0
-
-                        items-center
-                        justify-center
-
-                        rounded-xl
-
-                        bg-[var(--company-primary-soft)]
-
-                        text-[var(--company-primary)]
-                      "
-                    >
-                      <ImageIcon size={18} />
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <div
-                        className="
-                          admin-text-12
-                          font-medium
-
-                          text-[var(--admin-foreground)]
-                        "
-                      >
-                        {t("about.cover.selected")}
-                      </div>
-
-                      <div
-                        className="
-                          mt-1
-                          truncate
-
-                          admin-text-10
-
-                          text-[var(--admin-muted)]
-                        "
-                      >
-                        {form.featuredImage.mediaId}
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      aria-label={t("common.remove")}
-                      title={t("common.remove")}
-                      onClick={() =>
-                        setForm((current) => ({
-                          ...current,
-                          featuredImage: null,
-                        }))
-                      }
-                      className="
-                        flex
-                        h-9
-                        w-9
-
-                        items-center
-                        justify-center
-
-                        rounded-xl
-
-                        text-red-500
-
-                        transition
-
-                        hover:bg-red-50
-                      "
-                    >
-                      <Trash2 size={15} />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-3">
-                    <ImageIcon
-                      size={18}
-                      className="text-[var(--admin-muted)]"
-                    />
-
-                    <span
-                      className="
-                        admin-text-12
-                        text-[var(--admin-muted)]
-                      "
-                    >
-                      {t("about.cover.none")}
-                    </span>
-                  </div>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => setMediaPickerOpen(true)}
-                  className="
-                    mt-4
-
-                    inline-flex
-                    h-10
-
-                    items-center
-                    gap-2
-
-                    rounded-xl
-
-                    border
-                    border-[var(--admin-border)]
-
-                    px-4
-
-                    admin-text-12
-                    font-medium
-
-                    text-[var(--admin-foreground)]
-
-                    transition
-
-                    hover:border-[var(--company-primary-border)]
-
-                    hover:bg-[var(--company-primary-soft)]
-
-                    hover:text-[var(--company-primary)]
-                  "
-                >
-                  <ImageIcon size={15} />
-
-                  {form.featuredImage?.mediaId
-                    ? t("about.cover.change")
-                    : t("about.cover.select")}
-                </button>
-              </div>
+              <CoverImageField
+                companyId={companyId}
+                value={form.featuredImage}
+                cropPreset="about-cover"
+                previewClassName="aspect-[4/1]"
+                title={t("about.cover.title")}
+                description={t("about.cover.description")}
+                emptyTitle={t("about.cover.none")}
+                emptyDescription={t("about.cover.emptyDescription")}
+                selectLabel={t("about.cover.select")}
+                pickerTitle={t("about.cover.dialogTitle")}
+                disabled={saving}
+                onChange={updateFeaturedImage}
+              />
             </section>
 
-            {/* CONTENT */}
+            {/* ===============================
+                CONTENT
+            =============================== */}
 
             <section className="mt-10">
               <h3
@@ -719,11 +614,24 @@ export default function AboutEditor({
                     updateLocalized("content", locale, value)
                   }
                 />
+
+                <AboutSectionsEditor
+                  companyId={companyId}
+                  value={form.sections}
+                  onChange={(sections) =>
+                    setForm((current) => ({
+                      ...current,
+                      sections,
+                    }))
+                  }
+                />
               </div>
             </section>
           </div>
 
-          {/* FOOTER */}
+          {/* =================================
+              FOOTER
+          ================================= */}
 
           <footer
             className="
@@ -735,6 +643,8 @@ export default function AboutEditor({
 
               border-t
               border-[var(--admin-border)]
+
+              bg-[var(--admin-surface)]
 
               px-5
               py-4
@@ -756,7 +666,15 @@ export default function AboutEditor({
               {t("about.actions.saveHint")}
             </span>
 
-            <div className="flex shrink-0 items-center gap-2">
+            <div
+              className="
+                flex
+                shrink-0
+
+                items-center
+                gap-2
+              "
+            >
               <button
                 type="button"
                 onClick={onClose}
@@ -776,6 +694,9 @@ export default function AboutEditor({
                   transition
 
                   hover:bg-[var(--admin-hover)]
+
+                  disabled:cursor-not-allowed
+                  disabled:opacity-50
                 "
               >
                 {t("common.cancel")}
@@ -824,17 +745,9 @@ export default function AboutEditor({
         </div>
       </div>
 
-      <MediaPicker
-        open={mediaPickerOpen}
-        companyId={companyId}
-        multiple={false}
-        selectedIds={
-          form.featuredImage?.mediaId ? [form.featuredImage.mediaId] : []
-        }
-        title={t("about.cover.dialogTitle")}
-        onClose={() => setMediaPickerOpen(false)}
-        onConfirm={selectCover}
-      />
+      {/* =====================================
+          PREVIEW
+      ===================================== */}
 
       <AboutPreviewDialog
         open={previewOpen}

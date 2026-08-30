@@ -48,6 +48,78 @@ export const localizedStringSchema = z.object({
 
 /*
  * =========================================================
+ * CROP AREA
+ * =========================================================
+ *
+ * Shared with Media Crop Core.
+ *
+ * Percent-based area:
+ * croppedArea
+ *
+ * Pixel-based area:
+ * croppedAreaPixels
+ * =========================================================
+ */
+
+const cropAreaSchema = z
+  .object({
+    x: z.number(),
+
+    y: z.number(),
+
+    width: z.number(),
+
+    height: z.number(),
+  })
+  .nullable();
+
+/*
+ * =========================================================
+ * MEDIA CROP
+ * =========================================================
+ *
+ * Stored on the image reference, not on the
+ * physical Media document.
+ *
+ * This allows one Media item to be used with
+ * different crops in different locations.
+ * =========================================================
+ */
+
+export const mediaCropSchema = z
+  .object({
+    mode: z.enum(["cover", "square", "avatar", "free"]).default("cover"),
+
+    shape: z.enum(["rectangle", "circle"]).default("rectangle"),
+
+    aspect: z
+      .number()
+      .positive()
+      .default(16 / 9),
+
+    crop: z
+      .object({
+        x: z.number().default(0),
+
+        y: z.number().default(0),
+      })
+      .default({
+        x: 0,
+        y: 0,
+      }),
+
+    zoom: z.number().min(1).max(5).default(1),
+
+    rotation: z.number().default(0),
+
+    croppedArea: cropAreaSchema.optional(),
+
+    croppedAreaPixels: cropAreaSchema.optional(),
+  })
+  .optional();
+
+/*
+ * =========================================================
  * IMAGE
  * =========================================================
  */
@@ -60,11 +132,25 @@ export const pageBuilderImageSchema = z.object({
   caption: localizedStringSchema.optional(),
 
   /*
-   * Future shared crop / focal point.
-   *
-   * We add the schema now so we do not
-   * need to redesign stored blocks later.
+   * =======================================================
+   * NEW MEDIA CROP CORE
+   * =======================================================
    */
+
+  crop: mediaCropSchema,
+
+  /*
+   * =======================================================
+   * LEGACY PRESENTATION
+   * =======================================================
+   *
+   * Keep this for old Page data.
+   *
+   * New Admin components should prefer `crop`.
+   * We can migrate presentation → crop later.
+   * =======================================================
+   */
+
   presentation: z
     .object({
       objectFit: z.enum(["cover", "contain"]).default("cover"),
@@ -141,13 +227,20 @@ export const imageBlockSchema = blockBaseSchema.extend({
  * =========================================================
  * IMAGE + TEXT
  * =========================================================
+ *
+ * Image is nullable so a Draft About page
+ * can temporarily contain an unfinished block.
+ *
+ * Public renderer should simply skip the image
+ * when it is null.
+ * =========================================================
  */
 
 export const imageTextBlockSchema = blockBaseSchema.extend({
   type: z.literal("imageText"),
 
   data: z.object({
-    image: pageBuilderImageSchema,
+    image: z.union([pageBuilderImageSchema, z.null()]).default(null),
 
     content: localizedRichTextSchema,
 
@@ -199,9 +292,13 @@ export const spacerBlockSchema = blockBaseSchema.extend({
 
 export const pageBlockSchema = z.discriminatedUnion("type", [
   richTextBlockSchema,
+
   imageBlockSchema,
+
   imageTextBlockSchema,
+
   galleryBlockSchema,
+
   spacerBlockSchema,
 ]);
 

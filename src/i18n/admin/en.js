@@ -36,6 +36,7 @@ export const adminEn = {
     creating: "Creating...",
     changeImage: "Change Image",
     selectImage: "Select Image",
+    reset: "Reset",
   },
 
   navigation: {
@@ -212,6 +213,9 @@ export const adminEn = {
       change: "Change Cover",
 
       dialogTitle: "Select About cover",
+
+      emptyDescription:
+        "Choose an image from the Media Library and adjust the visible area.",
     },
 
     content: {
@@ -278,6 +282,64 @@ export const adminEn = {
       deleteFailed: "Unable to delete About.",
 
       deletePublished: "Unpublish this About version before deleting it.",
+    },
+
+    sections: {
+      title: "Content Sections",
+
+      description:
+        "Build additional About content using text-only or image-and-text sections. Sections are optional.",
+
+      section: "Section {number}",
+
+      layout: "Section Layout",
+
+      layouts: {
+        "text-only": "Text Only",
+
+        "image-left": "Image Left",
+
+        "image-right": "Image Right",
+      },
+
+      content: "Section Content",
+
+      addText: "Add Text",
+
+      addImageLeft: "Add Image Left",
+
+      addImageRight: "Add Image Right",
+
+      moveUp: "Move Up",
+
+      moveDown: "Move Down",
+
+      duplicate: "Duplicate Section",
+
+      delete: "Delete Section",
+
+      deleteConfirm: "Delete this About section?",
+
+      imageWidth: "Image Width",
+
+      image: {
+        title: "Section Image",
+
+        description: "Select and crop the image used alongside this section.",
+
+        emptyTitle: "No image selected",
+
+        emptyDescription: "Choose an image from the company Media Library.",
+
+        select: "Select Image",
+      },
+
+      empty: {
+        title: "No additional sections",
+
+        description:
+          "Sections are optional. Add one only when this About page needs additional content.",
+      },
     },
   },
 
@@ -866,6 +928,24 @@ export const adminEn = {
       errors: {
         loadFailed: "Unable to load media.",
       },
+
+      crop: {
+        selectDescription:
+          "Select an image, then continue to adjust its visible area.",
+
+        noteTitle: "Crop enabled",
+
+        noteDescription:
+          "After selecting the image, you can move, zoom and adjust its visible area before applying it.",
+
+        continue: "Adjust Image",
+
+        preparing: "Preparing...",
+
+        errors: {
+          previewFailed: "Unable to prepare this image for cropping.",
+        },
+      },
     },
 
     importUrl: {
@@ -946,6 +1026,30 @@ export const adminEn = {
       loadingPreview: "Loading...",
 
       statusUnknown: "Unknown",
+    },
+
+    crop: {
+      sectionLabel: "Image Position",
+
+      coverTitle: "Adjust Cover Image",
+
+      coverDescription:
+        "Move and zoom the image to choose the area that should remain visible in the cover.",
+
+      avatarTitle: "Adjust Avatar",
+
+      avatarDescription: "Position the photo inside the circular avatar area.",
+
+      zoom: "Zoom",
+      zoomIn: "Zoom in",
+      zoomOut: "Zoom out",
+
+      aspect: "Aspect Ratio",
+
+      rotateLeft: "Rotate left",
+      rotateRight: "Rotate right",
+
+      apply: "Apply Crop",
     },
   },
 
@@ -2018,6 +2122,177 @@ export const adminEn = {
       unpublishFailed: "Unable to unpublish News.",
 
       deleteFailed: "Unable to delete News.",
+    },
+  },
+
+  coverImage: {
+    title: "Cover Image",
+
+    description:
+      "Select an image and control which area remains visible in the layout.",
+
+    emptyTitle: "No cover image selected",
+
+    emptyDescription: "Choose an image from the company Media Library.",
+
+    select: "Select Image",
+
+    pickerTitle: "Select Cover Image",
+
+    selected: "Selected image",
+
+    adjust: "Adjust",
+
+    cropped: "Custom crop",
+
+    remove: "Remove image",
+
+    mediaId: "Media ID: {id}",
+
+    errors: {
+      previewFailed: "Unable to load image preview.",
+    },
+  },
+
+  homeSlideshow: {
+    editor: {
+      sectionLabel: "Home Slideshow",
+
+      newTitle: "New Slideshow",
+
+      editTitle: "Edit Slideshow",
+
+      description: "Manage images and ordering for the homepage slideshow.",
+
+      createAction: "Create Slideshow",
+
+      information: {
+        title: "Information",
+
+        description: "Internal slideshow name and description.",
+      },
+
+      fields: {
+        name: "Name",
+
+        description: "Description",
+
+        alt: "Alternative Text",
+
+        caption: "Caption",
+
+        url: "Link URL",
+      },
+
+      slides: {
+        title: "Slides",
+
+        count: "{count} images",
+
+        slide: "Slide {number}",
+
+        add: "Add Media",
+
+        emptyTitle: "No slideshow images",
+
+        emptyDescription:
+          "Select images from the Media Library to build this slideshow.",
+
+        active: "Active",
+
+        enableLink: "Enable link",
+
+        newTab: "Open in new tab",
+
+        moveUp: "Move Up",
+
+        moveDown: "Move Down",
+
+        remove: "Remove Slide",
+
+        pickerTitle: "Select Slideshow Images",
+      },
+
+      validation: {
+        nameRequired: "English slideshow name is required.",
+
+        slideRequired: "Add at least one image to the slideshow.",
+      },
+
+      messages: {
+        created: "Slideshow created successfully.",
+
+        updated: "Slideshow updated successfully.",
+      },
+
+      errors: {
+        saveFailed: "Unable to save slideshow.",
+      },
+    },
+
+    manager: {
+      sectionLabel: "Content Management",
+
+      title: "Home",
+
+      description:
+        "Manage homepage slideshow sets for {company}. Only one slideshow can be published at a time.",
+
+      newSlideshow: "New Slideshow",
+
+      createSlideshow: "Create Slideshow",
+
+      thisCompany: "this company",
+
+      publishConfirm:
+        'Publish "{name}" as the homepage slideshow?\n\nThe currently published slideshow will automatically return to Draft.',
+
+      deleteConfirm:
+        'Delete "{name}"?\n\nThis action will remove the slideshow from the CMS.',
+
+      messages: {
+        published: "Homepage slideshow published.",
+
+        deleted: "Slideshow deleted.",
+      },
+
+      errors: {
+        loadTitle: "Unable to load homepage content",
+
+        loadFailed: "Unable to retrieve home slideshows.",
+
+        publishFailed: "Unable to publish slideshow.",
+
+        deleteFailed: "Unable to delete slideshow.",
+
+        publishedDelete:
+          "Published slideshow cannot be deleted. Publish another slideshow first.",
+      },
+
+      noCompany: {
+        title: "No company selected",
+
+        description: "Select a workspace before managing homepage content.",
+      },
+
+      empty: {
+        title: "No homepage slideshow yet",
+
+        description:
+          "Create the first slideshow and select images from the company's Media Library.",
+      },
+    },
+
+    card: {
+      untitled: "Untitled Slideshow",
+
+      totalImages: "Total images",
+
+      activeImages: "Active images",
+
+      currentHomepage: "Current homepage slideshow",
+
+      updated: "Updated {date}",
     },
   },
 };
