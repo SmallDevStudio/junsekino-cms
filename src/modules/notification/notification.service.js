@@ -6,6 +6,8 @@ import {
   markNotificationReadRecord,
 } from "./notification.repository";
 
+import { getCommunicationSettings } from "@/modules/settings/communication-settings.service";
+
 import { serializeFirestoreDocument } from "@/utils/firestore";
 
 /*
@@ -19,9 +21,58 @@ export async function createFormSubmissionNotification({
   form,
   submission,
 }) {
+  /*
+   * Legacy per-form switch.
+   *
+   * Keep this for backward compatibility with
+   * existing Form Core.
+   */
   if (form.settings?.notifyEmployees === false) {
-    return null;
+    return {
+      created: false,
+      skipped: "FORM_NOTIFICATION_DISABLED",
+    };
   }
+
+  /*
+   * Company communication settings.
+   */
+
+  const communication = await getCommunicationSettings({
+    companyId,
+  });
+
+  const notifications = communication?.notifications || {};
+
+  const formSubmission = notifications?.events?.formSubmission || {};
+
+  /*
+   * Global In-App channel must be enabled.
+   */
+
+  if (notifications.inApp === false) {
+    return {
+      created: false,
+      skipped: "IN_APP_DISABLED",
+    };
+  }
+
+  /*
+   * Event-specific In-App switch.
+   */
+
+  if (formSubmission.inApp === false) {
+    return {
+      created: false,
+      skipped: "FORM_SUBMISSION_IN_APP_DISABLED",
+    };
+  }
+
+  /*
+   * =======================================================
+   * TITLE
+   * =======================================================
+   */
 
   const title = {
     th:
@@ -42,6 +93,12 @@ export async function createFormSubmissionNotification({
             ? "New survey response"
             : "New form submission",
   };
+
+  /*
+   * =======================================================
+   * CREATE
+   * =======================================================
+   */
 
   const record = await createNotificationRecord({
     companyId,
@@ -72,6 +129,7 @@ export async function createFormSubmissionNotification({
           "TENANT_OWNER",
           "TENANT_ADMIN",
           "TENANT_USER",
+
           "SUPERADMIN",
           "ADMIN",
           "EDITOR",
@@ -80,7 +138,11 @@ export async function createFormSubmissionNotification({
     },
   });
 
-  return record;
+  return {
+    created: true,
+
+    notification: record,
+  };
 }
 
 /*
@@ -96,6 +158,7 @@ export async function listCompanyNotifications({
 }) {
   const items = await listNotificationRecords({
     companyId,
+
     limit,
   });
 

@@ -2578,4 +2578,103 @@ export const adminTh = {
       deleteFailed: "ไม่สามารถลบ Contact ได้",
     },
   },
+
+  email: {
+    title: "การตั้งค่าอีเมล",
+
+    description: "ตั้งค่าผู้ให้บริการอีเมล ข้อมูลผู้ส่ง และผู้รับการแจ้งเตือน",
+
+    enabled: {
+      title: "การแจ้งเตือนทางอีเมล",
+
+      description: "อนุญาตให้บริษัทนี้ส่งอีเมลแจ้งเตือนจากระบบ",
+    },
+
+    provider: {
+      title: "ผู้ให้บริการอีเมล",
+
+      description: "เลือกวิธีที่บริษัทใช้สำหรับส่งอีเมลออกจากระบบ",
+
+      resendDescription: "ใช้บริการ Resend ที่ตั้งค่าไว้บนเซิร์ฟเวอร์",
+
+      smtpDescription: "เชื่อมต่อกับ SMTP Server ของบริษัทหรือองค์กร",
+    },
+
+    smtp: {
+      title: "SMTP Server",
+
+      description: "ตั้งค่า Mail Server ที่บริษัทนี้ใช้สำหรับส่งอีเมล",
+
+      host: "SMTP Server",
+
+      port: "พอร์ต",
+
+      security: "ความปลอดภัย",
+
+      username: "ชื่อผู้ใช้",
+
+      password: "รหัสผ่าน",
+
+      passwordConfigured: "ตั้งค่ารหัสผ่านแล้ว",
+
+      notConfigured: "ยังไม่ได้ตั้งค่า",
+
+      passwordPlaceholder: "กรอกรหัสผ่าน SMTP",
+
+      passwordKeepPlaceholder: "เว้นว่างเพื่อใช้รหัสผ่านเดิม",
+
+      testConnection: "ทดสอบการเชื่อมต่อ",
+
+      sendTestEmail: "ส่งอีเมลทดสอบ",
+    },
+
+    sender: {
+      title: "ข้อมูลผู้ส่ง",
+
+      name: "ชื่อผู้ส่ง",
+
+      email: "อีเมลผู้ส่ง",
+
+      replyTo: "อีเมลสำหรับตอบกลับ",
+    },
+
+    recipients: {
+      title: "ผู้รับการแจ้งเตือน",
+
+      description: "บุคคลที่ต้องการรับอีเมลแจ้งเตือนจากเว็บไซต์",
+    },
+
+    securityNote:
+      "รหัสผ่าน SMTP จะถูกเข้ารหัสและจัดเก็บแยกจากข้อมูลบริษัท ระบบจะไม่ส่งรหัสผ่านกลับมายัง Browser หลังจากบันทึกแล้ว",
+
+    save: "บันทึกการตั้งค่าอีเมล",
+
+    messages: {
+      loadFailed: "ไม่สามารถโหลดการตั้งค่าอีเมลได้",
+
+      saveFailed: "ไม่สามารถบันทึกการตั้งค่าอีเมลได้",
+
+      saved: "บันทึกการตั้งค่าอีเมลเรียบร้อยแล้ว",
+
+      passwordSaveFailed: "ไม่สามารถบันทึกรหัสผ่าน SMTP ได้",
+
+      invalidRecipient: "กรุณากรอกอีเมลที่ถูกต้อง",
+
+      duplicateRecipient: "อีเมลนี้ถูกเพิ่มไว้แล้ว",
+
+      invalidSender: "อีเมลผู้ส่งไม่ถูกต้อง",
+
+      invalidReplyTo: "อีเมลสำหรับตอบกลับไม่ถูกต้อง",
+
+      smtpHostRequired: "กรุณาระบุ SMTP Server",
+
+      smtpPortInvalid: "พอร์ต SMTP ไม่ถูกต้อง",
+
+      testConnectionSuccess: "เชื่อมต่อ SMTP สำเร็จ",
+
+      testConnectionFailed: "ไม่สามารถเชื่อมต่อ SMTP Server ได้",
+
+      testEmailPending: "ระบบส่งอีเมลทดสอบจะเปิดใช้งานในขั้นตอนถัดไป",
+    },
+  },
 };

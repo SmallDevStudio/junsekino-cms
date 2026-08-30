@@ -2612,4 +2612,105 @@ export const adminEn = {
       deleteFailed: "Unable to delete Contact.",
     },
   },
+
+  email: {
+    title: "Email Settings",
+
+    description:
+      "Configure the email provider, sender identity and notification recipients.",
+
+    enabled: {
+      title: "Email Notifications",
+
+      description: "Allow this company to send notification emails.",
+    },
+
+    provider: {
+      title: "Email Provider",
+
+      description: "Choose how this company sends outgoing email.",
+
+      resendDescription:
+        "Managed email delivery using the server Resend integration.",
+
+      smtpDescription: "Connect to your organization's own SMTP mail server.",
+    },
+
+    smtp: {
+      title: "SMTP Server",
+
+      description: "Configure the mail server used by this company.",
+
+      host: "SMTP Server",
+
+      port: "Port",
+
+      security: "Security",
+
+      username: "Username",
+
+      password: "Password",
+
+      passwordConfigured: "Password configured",
+
+      notConfigured: "Not configured",
+
+      passwordPlaceholder: "Enter SMTP password",
+
+      passwordKeepPlaceholder: "Leave empty to keep current password",
+
+      testConnection: "Test Connection",
+
+      sendTestEmail: "Send Test Email",
+    },
+
+    sender: {
+      title: "Sender Identity",
+
+      name: "Sender Name",
+
+      email: "Sender Email",
+
+      replyTo: "Reply-To",
+    },
+
+    recipients: {
+      title: "Notification Recipients",
+
+      description: "People who should receive website notification emails.",
+    },
+
+    securityNote:
+      "SMTP passwords are encrypted and stored separately from company settings. Passwords are never returned to the browser after saving.",
+
+    save: "Save Email Settings",
+
+    messages: {
+      loadFailed: "Unable to retrieve email settings.",
+
+      saveFailed: "Unable to save email settings.",
+
+      saved: "Email settings saved.",
+
+      passwordSaveFailed: "Unable to save SMTP password.",
+
+      invalidRecipient: "Enter a valid email address.",
+
+      duplicateRecipient: "This email is already added.",
+
+      invalidSender: "Sender email is invalid.",
+
+      invalidReplyTo: "Reply-to email is invalid.",
+
+      smtpHostRequired: "SMTP server is required.",
+
+      smtpPortInvalid: "SMTP port is invalid.",
+
+      testConnectionSuccess: "SMTP connection successful.",
+
+      testConnectionFailed: "Unable to connect to the SMTP server.",
+
+      testEmailPending: "Send Test Email will be enabled in the next step.",
+    },
+  },
 };

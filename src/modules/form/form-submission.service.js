@@ -365,6 +365,8 @@ export async function submitPublicForm({
 
   try {
     email = await sendFormSubmissionEmail({
+      companyId,
+
       form,
 
       submission: serialized,
