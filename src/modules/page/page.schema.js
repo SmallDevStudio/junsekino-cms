@@ -85,6 +85,46 @@ const navigationSchema = z.object({
 
 /*
  * =========================================================
+ * CONTACT
+ * =========================================================
+ */
+
+const contactConfigSchema = z.object({
+  coverCaption: localizedStringSchema.optional(),
+
+  establishedYear: z.string().trim().max(20).default(""),
+
+  companyDisplayName: localizedStringSchema.optional(),
+
+  address: z.object({
+    en: z.string().max(3000).default(""),
+
+    th: z.string().max(3000).default(""),
+  }),
+
+  telephone: z.string().trim().max(200).default(""),
+
+  email: z.string().trim().max(320).default(""),
+
+  form: z
+    .object({
+      enabled: z.boolean().default(true),
+
+      formId: z.union([z.string().trim().max(200), z.null()]).default(null),
+
+      formSlug: z.string().trim().max(150).default("contact"),
+    })
+    .default({
+      enabled: true,
+
+      formId: null,
+
+      formSlug: "contact",
+    }),
+});
+
+/*
+ * =========================================================
  * PAGE
  * =========================================================
  */
@@ -136,6 +176,14 @@ const basePageSchema = z.object({
   navigation: navigationSchema.optional(),
 
   featuredImage: z.union([pageBuilderImageSchema, z.null()]).optional(),
+
+  /*
+   * Contact-specific page configuration.
+   *
+   * Used only when pageType === "contact".
+   * Other page types may simply omit this field.
+   */
+  contact: contactConfigSchema.optional(),
 
   status: z.enum(PAGE_STATUSES).default("draft"),
 

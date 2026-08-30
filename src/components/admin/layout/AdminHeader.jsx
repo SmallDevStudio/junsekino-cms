@@ -1,8 +1,10 @@
 "use client";
 
-import { Bell, Search } from "lucide-react";
+import { Search } from "lucide-react";
 
 import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
+
+import AdminNotificationCenter from "@/components/admin/notification/AdminNotificationCenter";
 
 import AdminDisplaySettings from "./AdminDisplaySettings";
 import AdminMobileNav from "./AdminMobileNav";
@@ -51,9 +53,7 @@ export default function AdminHeader({ user }) {
           xl:px-8
         "
       >
-        {/* =====================================
-            LEFT
-        ===================================== */}
+        {/* LEFT */}
 
         <div
           className="
@@ -66,10 +66,6 @@ export default function AdminHeader({ user }) {
           "
         >
           <AdminMobileNav />
-
-          {/* =================================
-              GLOBAL SEARCH
-          ================================= */}
 
           <button
             type="button"
@@ -145,9 +141,7 @@ export default function AdminHeader({ user }) {
           </button>
         </div>
 
-        {/* =====================================
-            RIGHT
-        ===================================== */}
+        {/* RIGHT */}
 
         <div
           className="
@@ -158,65 +152,9 @@ export default function AdminHeader({ user }) {
             gap-1
           "
         >
-          {/* =================================
-              NOTIFICATIONS
-          ================================= */}
-
-          <button
-            type="button"
-            aria-label={t("header.notifications")}
-            title={t("header.notifications")}
-            className="
-              relative
-
-              flex
-              h-10
-              w-10
-
-              items-center
-              justify-center
-
-              rounded-xl
-
-              text-[var(--admin-muted)]
-
-              transition
-
-              hover:bg-[var(--admin-hover)]
-
-              hover:text-[var(--company-primary)]
-            "
-          >
-            <Bell size={18} strokeWidth={1.7} />
-
-            <span
-              className="
-                absolute
-                right-2.5
-                top-2.5
-
-                h-1.5
-                w-1.5
-
-                rounded-full
-
-                border
-                border-[var(--admin-surface)]
-
-                bg-[var(--company-primary)]
-              "
-            />
-          </button>
-
-          {/* =================================
-              USER
-          ================================= */}
+          <AdminNotificationCenter label={t("header.notifications")} />
 
           <AdminUserMenu user={user} />
-
-          {/* =================================
-              DISPLAY SETTINGS
-          ================================= */}
 
           <AdminDisplaySettings />
         </div>

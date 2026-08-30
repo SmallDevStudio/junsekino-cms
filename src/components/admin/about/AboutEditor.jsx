@@ -563,8 +563,8 @@ export default function AboutEditor({
               <CoverImageField
                 companyId={companyId}
                 value={form.featuredImage}
-                cropPreset="about-cover"
-                previewClassName="aspect-[4/1]"
+                cropPreset="landscape"
+                previewClassName="aspect-[17/10]"
                 title={t("about.cover.title")}
                 description={t("about.cover.description")}
                 emptyTitle={t("about.cover.none")}

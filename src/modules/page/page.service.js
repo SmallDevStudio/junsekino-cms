@@ -140,6 +140,42 @@ function normalizeSections(sections = []) {
 
 /*
  * =========================================================
+ * CONTACT
+ * =========================================================
+ */
+
+function mergeContactConfig(defaults = {}, value = {}) {
+  return {
+    ...defaults,
+    ...value,
+
+    coverCaption: mergeLocalized(defaults.coverCaption, value.coverCaption),
+
+    companyDisplayName: mergeLocalized(
+      defaults.companyDisplayName,
+      value.companyDisplayName,
+    ),
+
+    address: mergeLocalized(defaults.address, value.address),
+
+    establishedYear: value.establishedYear ?? defaults.establishedYear ?? "",
+
+    telephone: value.telephone ?? defaults.telephone ?? "",
+
+    email: value.email ?? defaults.email ?? "",
+
+    form: {
+      enabled: value.form?.enabled ?? defaults.form?.enabled ?? true,
+
+      formId: value.form?.formId ?? defaults.form?.formId ?? null,
+
+      formSlug: value.form?.formSlug ?? defaults.form?.formSlug ?? "contact",
+    },
+  };
+}
+
+/*
+ * =========================================================
  * NORMALIZE INPUT
  * =========================================================
  */
@@ -178,6 +214,11 @@ function normalizePageInput(input) {
 
     featuredImage: input.featuredImage ?? null,
 
+    contact:
+      input.pageType === "contact"
+        ? mergeContactConfig({}, input.contact)
+        : input.contact,
+
     /*
      * New page always starts draft.
      */
@@ -213,6 +254,29 @@ function validatePageTitle(page) {
 
 function validatePublishablePage(page) {
   validatePageTitle(page);
+
+  /*
+   * Contact uses structured contact data
+   * instead of the normal Page body.
+   */
+  if (page.pageType === "contact") {
+    const contact = page.contact || {};
+
+    const hasContactData =
+      Boolean(contact.companyDisplayName?.en?.trim()) ||
+      Boolean(contact.companyDisplayName?.th?.trim()) ||
+      Boolean(contact.address?.en?.trim()) ||
+      Boolean(contact.address?.th?.trim()) ||
+      Boolean(contact.telephone?.trim()) ||
+      Boolean(contact.email?.trim()) ||
+      Boolean(page.featuredImage?.mediaId);
+
+    if (!hasContactData) {
+      throw new Error("PAGE_CONTENT_REQUIRED");
+    }
+
+    return;
+  }
 
   const hasContent = hasLocalizedRichText(page.content);
 
@@ -390,6 +454,10 @@ export async function updatePage({ companyId, pageId, input, currentUser }) {
       ...existing.hero,
       ...input.hero,
     };
+  }
+
+  if (input.contact) {
+    updateData.contact = mergeContactConfig(existing.contact, input.contact);
   }
 
   if (input.seo) {

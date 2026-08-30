@@ -2455,4 +2455,127 @@ export const adminTh = {
       updated: "แก้ไขล่าสุด {date}",
     },
   },
+
+  contact: {
+    sectionLabel: "จัดการเนื้อหา",
+
+    title: "Contact",
+
+    description: "จัดการหน้าติดต่อ ข้อมูลบริษัท และแบบฟอร์มติดต่อบนเว็บไซต์",
+
+    newVersion: "สร้างเวอร์ชันใหม่",
+
+    newVersionTitle: "สร้าง Contact เวอร์ชันใหม่",
+
+    editTitle: "แก้ไข Contact",
+
+    editorDescription: "จัดการข้อมูลที่จะแสดงบนหน้า Contact ของเว็บไซต์",
+
+    pageInformation: "ข้อมูลหน้า",
+
+    companyInformation: "ข้อมูลบริษัท",
+
+    companyInformationDescription:
+      "ข้อมูลการติดต่อที่จะแสดงต่อผู้เข้าชมเว็บไซต์ของบริษัท",
+
+    fields: {
+      coverCaption: "คำบรรยาย Cover",
+
+      companyDisplayName: "ชื่อบริษัทที่แสดง",
+
+      establishedYear: "ปีที่ก่อตั้ง",
+
+      address: "ที่อยู่",
+
+      telephone: "เบอร์โทรศัพท์",
+
+      email: "อีเมล",
+    },
+
+    cover: {
+      title: "Contact Cover",
+
+      description:
+        "รูปหลักสำหรับหน้า Contact โดย About และ Contact จะใช้สัดส่วน Page Cover เดียวกัน",
+
+      none: "ยังไม่ได้เลือกรูป Cover",
+
+      emptyDescription: "เลือกรูปจาก Media Library เพื่อใช้ในหน้า Contact",
+
+      select: "เลือก Cover",
+
+      dialogTitle: "เลือก Contact Cover",
+    },
+
+    form: {
+      title: "แบบฟอร์มติดต่อ",
+
+      defaultName: "ติดต่อเรา",
+
+      preparing: "กำลังเตรียมแบบฟอร์ม Contact...",
+
+      systemForm: "System Form",
+
+      enabled: "แสดงแบบฟอร์มติดต่อ",
+    },
+
+    versions: {
+      emptyTitle: "ยังไม่มีหน้า Contact",
+
+      emptyDescription: "สร้าง Contact เวอร์ชันแรกเพื่อเริ่มต้นใช้งาน",
+
+      coverSelected: "เลือกรูป Cover แล้ว",
+
+      noCover: "ยังไม่มีรูป Cover",
+    },
+
+    preview: {
+      title: "ตัวอย่าง Contact",
+
+      description:
+        "โหมด Preview โดย Layout Public แบบสมบูรณ์จะทำในขั้นตอนถัดไป",
+    },
+
+    actions: {
+      saveHint: "บันทึกเป็น Draft ก่อน และ Publish เมื่อข้อมูลพร้อมใช้งาน",
+    },
+
+    confirm: {
+      publish: 'Publish "{title}" หรือไม่',
+
+      unpublish: "ยกเลิกการ Publish หน้า Contact นี้หรือไม่",
+
+      delete: "ลบ Contact Draft นี้หรือไม่",
+    },
+
+    messages: {
+      loadFailed: "ไม่สามารถโหลด Contact ได้",
+
+      setupFailed: "ไม่สามารถเตรียม Contact Form ได้",
+
+      titleRequired: "กรุณาระบุชื่อหน้า Contact ภาษาอังกฤษ",
+
+      emailInvalid: "กรุณาระบุอีเมลที่ถูกต้อง",
+
+      saveFailed: "ไม่สามารถบันทึก Contact ได้",
+
+      created: "สร้าง Contact Draft เรียบร้อยแล้ว",
+
+      updated: "อัปเดต Contact เรียบร้อยแล้ว",
+
+      published: "Publish Contact เรียบร้อยแล้ว",
+
+      publishFailed: "ไม่สามารถ Publish Contact ได้",
+
+      unpublished: "ยกเลิกการ Publish Contact เรียบร้อยแล้ว",
+
+      unpublishFailed: "ไม่สามารถยกเลิกการ Publish Contact ได้",
+
+      deletePublished: "กรุณา Unpublish Contact ก่อนลบ",
+
+      deleted: "ลบ Contact เรียบร้อยแล้ว",
+
+      deleteFailed: "ไม่สามารถลบ Contact ได้",
+    },
+  },
 };

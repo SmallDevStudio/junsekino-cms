@@ -2486,4 +2486,130 @@ export const adminEn = {
       updated: "Updated {date}",
     },
   },
+
+  contact: {
+    sectionLabel: "Content Management",
+
+    title: "Contact",
+
+    description:
+      "Manage the public contact page, company information and website enquiry form.",
+
+    newVersion: "New Version",
+
+    newVersionTitle: "New Contact Version",
+
+    editTitle: "Edit Contact",
+
+    editorDescription:
+      "Manage the information displayed on the public Contact page.",
+
+    pageInformation: "Page Information",
+
+    companyInformation: "Company Information",
+
+    companyInformationDescription:
+      "Contact information displayed publicly on this company website.",
+
+    fields: {
+      coverCaption: "Cover Caption",
+
+      companyDisplayName: "Company Display Name",
+
+      establishedYear: "Established Year",
+
+      address: "Address",
+
+      telephone: "Telephone",
+
+      email: "Email",
+    },
+
+    cover: {
+      title: "Contact Cover",
+
+      description:
+        "Main image displayed on the Contact page. About and Contact will use this same page-cover proportion.",
+
+      none: "No cover image selected",
+
+      emptyDescription:
+        "Select an image from Media Library for the Contact page.",
+
+      select: "Select Cover",
+
+      dialogTitle: "Select Contact Cover",
+    },
+
+    form: {
+      title: "Contact Form",
+
+      defaultName: "Contact Us",
+
+      preparing: "Preparing contact form...",
+
+      systemForm: "System Form",
+
+      enabled: "Show contact form",
+    },
+
+    versions: {
+      emptyTitle: "No Contact page yet",
+
+      emptyDescription: "Create the first Contact page version to get started.",
+
+      coverSelected: "Cover selected",
+
+      noCover: "No cover image",
+    },
+
+    preview: {
+      title: "Contact Preview",
+
+      description:
+        "Preview mode. The exact public website layout will be added next.",
+    },
+
+    actions: {
+      saveHint: "Save changes as a draft, then publish when the page is ready.",
+    },
+
+    confirm: {
+      publish: 'Publish "{title}"?',
+
+      unpublish: "Unpublish this Contact page?",
+
+      delete: "Delete this Contact draft?",
+    },
+
+    messages: {
+      loadFailed: "Unable to load Contact.",
+
+      setupFailed: "Unable to prepare Contact form.",
+
+      titleRequired: "English page title is required.",
+
+      emailInvalid: "Enter a valid contact email address.",
+
+      saveFailed: "Unable to save Contact.",
+
+      created: "Contact draft created.",
+
+      updated: "Contact updated.",
+
+      published: "Contact published.",
+
+      publishFailed: "Unable to publish Contact.",
+
+      unpublished: "Contact unpublished.",
+
+      unpublishFailed: "Unable to unpublish Contact.",
+
+      deletePublished: "Unpublish this Contact page before deleting it.",
+
+      deleted: "Contact deleted.",
+
+      deleteFailed: "Unable to delete Contact.",
+    },
+  },
 };

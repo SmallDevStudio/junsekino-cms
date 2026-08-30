@@ -6,26 +6,41 @@ import { companyIdSchema } from "@/modules/company/company.schema";
 
 import { getCompanyPermission } from "@/lib/auth/company-guards";
 
-import { listCompanyNotifications } from "@/modules/notification/notification.service";
+import { isTrustedOrigin } from "@/lib/auth/origin";
+
+import { markCompanyNotificationRead } from "@/modules/notification/notification.service";
 
 /*
  * =========================================================
- * GET
+ * POST
  * =========================================================
  */
 
-export async function GET(request, context) {
+export async function POST(request, context) {
   try {
-    const params = await context.params;
-
-    const company = companyIdSchema.safeParse(params.companyId);
-
-    if (!company.success) {
+    if (!isTrustedOrigin(request)) {
       return NextResponse.json(
         {
           success: false,
 
-          message: "Invalid company.",
+          message: "Invalid request origin.",
+        },
+        {
+          status: 403,
+        },
+      );
+    }
+
+    const params = await context.params;
+
+    const company = companyIdSchema.safeParse(params.companyId);
+
+    if (!company.success || !params.notificationId) {
+      return NextResponse.json(
+        {
+          success: false,
+
+          message: "Invalid notification.",
         },
         {
           status: 400,
@@ -52,40 +67,40 @@ export async function GET(request, context) {
       );
     }
 
-    const { searchParams } = new URL(request.url);
-
-    const rawLimit = Number(searchParams.get("limit"));
-
-    const limit =
-      Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 100) : 50;
-
-    const data = await listCompanyNotifications({
+    const data = await markCompanyNotificationRead({
       companyId: company.data,
 
-      userId: access.user.uid,
+      notificationId: params.notificationId,
 
-      limit,
+      currentUser: access.user,
     });
-
-    const unreadCount = data.filter((item) => item.read !== true).length;
 
     return NextResponse.json({
       success: true,
 
       data,
-
-      meta: {
-        unreadCount,
-      },
     });
   } catch (error) {
-    console.error("List notifications error:", error);
+    console.error("Mark notification read error:", error);
+
+    if (error.message === "NOTIFICATION_NOT_FOUND") {
+      return NextResponse.json(
+        {
+          success: false,
+
+          message: "Notification not found.",
+        },
+        {
+          status: 404,
+        },
+      );
+    }
 
     return NextResponse.json(
       {
         success: false,
 
-        message: "Unable to retrieve notifications.",
+        message: "Unable to update notification.",
       },
       {
         status: 500,
