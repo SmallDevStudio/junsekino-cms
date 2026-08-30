@@ -437,7 +437,7 @@ export default function MessageDetailDrawer({
                   mt-1
                   truncate
 
-                  admin-text-17
+                  admin-text-18
                   font-semibold
                   tracking-[-0.02em]
 
