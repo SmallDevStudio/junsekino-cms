@@ -61,7 +61,15 @@ export async function GET(request, context) {
       );
     }
 
-    const members = await getCompanyMembers(companyId);
+    const members = await getCompanyMembers({
+      companyId,
+
+      includePlatformUsers: access.user.isSuperAdmin === true,
+
+      currentUser: access.user,
+
+      currentMembership: access.membership,
+    });
 
     return NextResponse.json({
       success: true,

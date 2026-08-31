@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 
 import { getCurrentUser } from "@/lib/auth/current-user";
 
+import { isTrustedOrigin } from "@/lib/auth/origin";
+
 import {
   getUserPreferences,
   updateUserPreferences,
@@ -11,27 +13,51 @@ import { updateUserPreferenceSchema } from "@/modules/user/user-preference.schem
 
 export const dynamic = "force-dynamic";
 
-/*
- * =========================================================
- * GET
- * =========================================================
- */
+function unauthorizedResponse() {
+  return NextResponse.json(
+    {
+      success: false,
+
+      message: "Unauthorized.",
+    },
+    {
+      status: 401,
+    },
+  );
+}
+
+function preferenceErrorResponse(error) {
+  if (error.message === "USER_NOT_FOUND") {
+    return NextResponse.json(
+      {
+        success: false,
+
+        message: "User account not found.",
+      },
+      {
+        status: 404,
+      },
+    );
+  }
+
+  return NextResponse.json(
+    {
+      success: false,
+
+      message: "Unable to process user preferences.",
+    },
+    {
+      status: 500,
+    },
+  );
+}
 
 export async function GET() {
   try {
     const currentUser = await getCurrentUser();
 
     if (!currentUser) {
-      return NextResponse.json(
-        {
-          success: false,
-
-          message: "Unauthorized.",
-        },
-        {
-          status: 401,
-        },
-      );
+      return unauthorizedResponse();
     }
 
     const preferences = await getUserPreferences({
@@ -46,40 +72,29 @@ export async function GET() {
   } catch (error) {
     console.error("Get user preferences error:", error);
 
-    return NextResponse.json(
-      {
-        success: false,
-
-        message: "Unable to load user preferences.",
-      },
-      {
-        status: 500,
-      },
-    );
+    return preferenceErrorResponse(error);
   }
 }
 
-/*
- * =========================================================
- * PATCH
- * =========================================================
- */
-
 export async function PATCH(request) {
   try {
-    const currentUser = await getCurrentUser();
-
-    if (!currentUser) {
+    if (!isTrustedOrigin(request)) {
       return NextResponse.json(
         {
           success: false,
 
-          message: "Unauthorized.",
+          message: "Invalid request origin.",
         },
         {
-          status: 401,
+          status: 403,
         },
       );
+    }
+
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+      return unauthorizedResponse();
     }
 
     let body;
@@ -130,15 +145,6 @@ export async function PATCH(request) {
   } catch (error) {
     console.error("Update user preferences error:", error);
 
-    return NextResponse.json(
-      {
-        success: false,
-
-        message: "Unable to update user preferences.",
-      },
-      {
-        status: 500,
-      },
-    );
+    return preferenceErrorResponse(error);
   }
 }

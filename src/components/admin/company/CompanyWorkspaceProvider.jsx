@@ -37,12 +37,50 @@ function normalizeCompanies(payload) {
   return [];
 }
 
-export function CompanyWorkspaceProvider({ children }) {
+function resolveSuperAdmin(user) {
+  return Boolean(
+    user?.isSuperAdmin ||
+    user?.userType === "SUPERADMIN" ||
+    user?.role === "SUPERADMIN",
+  );
+}
+
+function resolveUserId(user) {
+  return user?.uid || user?.id || user?.userId || null;
+}
+
+function resolvePreferredCompany({ companies, user }) {
+  if (!companies.length) {
+    return null;
+  }
+
+  const preferredCompanyId = user?.defaultCompanyId || user?.companyId || null;
+
+  if (preferredCompanyId) {
+    const preferredCompany = companies.find(
+      (company) => company.id === preferredCompanyId,
+    );
+
+    if (preferredCompany) {
+      return preferredCompany;
+    }
+  }
+
+  return companies[0] || null;
+}
+
+export function CompanyWorkspaceProvider({ user, children }) {
   const [companies, setCompanies] = useState([]);
+
   const [activeCompanyId, setActiveCompanyId] = useState(null);
 
   const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState(null);
+
+  const isSuperAdmin = resolveSuperAdmin(user);
+
+  const currentUserId = resolveUserId(user);
 
   const loadCompanies = useCallback(async () => {
     try {
@@ -51,7 +89,9 @@ export function CompanyWorkspaceProvider({ children }) {
 
       const response = await fetch("/api/v1/auth/companies", {
         method: "GET",
+
         cache: "no-store",
+
         credentials: "include",
       });
 
@@ -61,14 +101,30 @@ export function CompanyWorkspaceProvider({ children }) {
         throw new Error(payload?.message || "Unable to load companies.");
       }
 
-      const companyList = normalizeCompanies(payload);
+      const loadedCompanies = normalizeCompanies(payload);
 
-      setCompanies(companyList);
+      const preferredCompany = resolvePreferredCompany({
+        companies: loadedCompanies,
+
+        user,
+      });
+
+      const scopedCompanies = isSuperAdmin
+        ? loadedCompanies
+        : preferredCompany
+          ? [preferredCompany]
+          : [];
+
+      setCompanies(scopedCompanies);
 
       setActiveCompanyId((currentId) => {
+        if (!isSuperAdmin) {
+          return preferredCompany?.id || null;
+        }
+
         if (
           currentId &&
-          companyList.some((company) => company.id === currentId)
+          scopedCompanies.some((company) => company.id === currentId)
         ) {
           return currentId;
         }
@@ -83,12 +139,12 @@ export function CompanyWorkspaceProvider({ children }) {
 
         if (
           storedId &&
-          companyList.some((company) => company.id === storedId)
+          scopedCompanies.some((company) => company.id === storedId)
         ) {
           return storedId;
         }
 
-        return companyList[0]?.id || null;
+        return preferredCompany?.id || scopedCompanies[0]?.id || null;
       });
     } catch (loadError) {
       console.error("Load companies error:", loadError);
@@ -100,7 +156,7 @@ export function CompanyWorkspaceProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isSuperAdmin, user]);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -113,17 +169,20 @@ export function CompanyWorkspaceProvider({ children }) {
   }, [loadCompanies]);
 
   useEffect(() => {
-    if (!activeCompanyId) {
+    if (!activeCompanyId || !isSuperAdmin) {
       return;
     }
 
     try {
-      window.localStorage.setItem(STORAGE_KEY, activeCompanyId);
+      window.localStorage.setItem(
+        STORAGE_KEY,
+
+        activeCompanyId,
+      );
     } catch {
-      // localStorage can be unavailable
-      // in restricted browser environments.
+      // localStorage may be unavailable.
     }
-  }, [activeCompanyId]);
+  }, [activeCompanyId, isSuperAdmin]);
 
   const activeCompany = useMemo(() => {
     if (!activeCompanyId) {
@@ -135,27 +194,45 @@ export function CompanyWorkspaceProvider({ children }) {
 
   const selectCompany = useCallback(
     (companyId) => {
+      if (!isSuperAdmin) {
+        return false;
+      }
+
       const exists = companies.some((company) => company.id === companyId);
 
       if (!exists) {
-        return;
+        return false;
       }
 
       setActiveCompanyId(companyId);
+
+      return true;
     },
-    [companies],
+    [companies, isSuperAdmin],
   );
 
   const value = useMemo(
     () => ({
       companies,
+
       activeCompany,
+
       activeCompanyId,
 
       loading,
+
       error,
 
+      isSuperAdmin,
+
+      currentUser: user,
+
+      currentUserId,
+
+      canSwitchCompany: isSuperAdmin && companies.length > 1,
+
       selectCompany,
+
       refreshCompanies: loadCompanies,
     }),
     [
@@ -164,6 +241,9 @@ export function CompanyWorkspaceProvider({ children }) {
       activeCompanyId,
       loading,
       error,
+      isSuperAdmin,
+      user,
+      currentUserId,
       selectCompany,
       loadCompanies,
     ],

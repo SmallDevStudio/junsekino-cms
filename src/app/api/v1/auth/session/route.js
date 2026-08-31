@@ -14,6 +14,7 @@ export async function POST(request) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Invalid request origin.",
         },
         {
@@ -30,6 +31,7 @@ export async function POST(request) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Invalid authentication request.",
         },
         {
@@ -47,10 +49,14 @@ export async function POST(request) {
 
       user: {
         id: user.id,
+
         email: user.email,
+
         displayName: user.displayName || null,
 
         isSuperAdmin: user.isSuperAdmin === true,
+
+        mustChangePassword: user.mustChangePassword === true,
 
         defaultCompanyId: user.defaultCompanyId || null,
       },
@@ -95,6 +101,7 @@ export async function POST(request) {
     return NextResponse.json(
       {
         success: false,
+
         message,
       },
       {

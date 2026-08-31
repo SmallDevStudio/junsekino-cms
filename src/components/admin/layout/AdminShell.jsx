@@ -1,7 +1,6 @@
 "use client";
 
 import { CompanyWorkspaceProvider } from "@/components/admin/company/CompanyWorkspaceProvider";
-
 import CompanyTheme from "@/components/admin/company/CompanyTheme";
 
 import { CompanyLocalizationProvider } from "@/components/admin/localization/CompanyLocalizationProvider";
@@ -13,17 +12,12 @@ import {
 
 import { AdminI18nProvider } from "@/components/admin/i18n/AdminI18nProvider";
 
+import AdminTypography from "@/components/admin/ui/AdminTypography";
+
 import { cn } from "@/utils/cn";
 
 import AdminHeader from "./AdminHeader";
 import AdminSidebar from "./AdminSidebar";
-import AdminTypography from "@/components/admin/ui/AdminTypography";
-
-/*
- * =========================================================
- * SHELL CONTENT
- * =========================================================
- */
 
 function AdminShellContent({ user, children }) {
   const { sidebarCollapsed } = useAdminUiPreferences();
@@ -31,17 +25,10 @@ function AdminShellContent({ user, children }) {
   return (
     <>
       <CompanyTheme />
+
       <AdminTypography />
 
-      <div
-        className="
-          min-h-screen
-
-          bg-[var(--admin-background)]
-
-          text-[var(--admin-foreground)]
-        "
-      >
+      <div className="min-h-screen bg-[var(--admin-background)] text-[var(--admin-foreground)]">
         <AdminSidebar />
 
         <div
@@ -55,23 +42,7 @@ function AdminShellContent({ user, children }) {
         >
           <AdminHeader user={user} />
 
-          <main
-            className="
-              mx-auto
-
-              w-full
-              max-w-[1680px]
-
-              px-4
-              py-6
-
-              sm:px-6
-              sm:py-8
-
-              xl:px-8
-              xl:py-10
-            "
-          >
+          <main className="mx-auto w-full max-w-[1680px] px-4 py-6 sm:px-6 sm:py-8 xl:px-8 xl:py-10">
             {children}
           </main>
         </div>
@@ -80,31 +51,9 @@ function AdminShellContent({ user, children }) {
   );
 }
 
-/*
- * =========================================================
- * ROOT
- * =========================================================
- *
- * Provider dependency order:
- *
- * CompanyWorkspace
- *       ↓
- * CompanyLocalization
- *
- * AdminUiPreferences
- *       ↓
- * AdminI18n
- *
- * AdminI18n MUST be inside
- * AdminUiPreferences because locale
- * comes from the current user's
- * preferences.
- * =========================================================
- */
-
 export default function AdminShell({ user, children }) {
   return (
-    <CompanyWorkspaceProvider>
+    <CompanyWorkspaceProvider user={user}>
       <CompanyLocalizationProvider>
         <AdminUiPreferencesProvider user={user}>
           <AdminI18nProvider>

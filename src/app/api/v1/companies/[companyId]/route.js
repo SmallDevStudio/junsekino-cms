@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 
 import { getCurrentUser } from "@/lib/auth/current-user";
 
+import { getCompanyPermission } from "@/lib/auth/company-guards";
+
+import { PERMISSIONS } from "@/constants/permissions";
+
 import { isTrustedOrigin } from "@/lib/auth/origin";
 
 import {
@@ -29,32 +33,6 @@ async function resolveCompanyId(context) {
 
 export async function GET(request, context) {
   try {
-    const currentUser = await getCurrentUser();
-
-    if (!currentUser) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Authentication required.",
-        },
-        {
-          status: 401,
-        },
-      );
-    }
-
-    if (!currentUser.isSuperAdmin) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Permission denied.",
-        },
-        {
-          status: 403,
-        },
-      );
-    }
-
     const companyId = await resolveCompanyId(context);
 
     if (!companyId) {
@@ -66,6 +44,18 @@ export async function GET(request, context) {
         {
           status: 400,
         },
+      );
+    }
+
+    const access = await getCompanyPermission({
+      companyId,
+      permission: PERMISSIONS.COMPANY_VIEW,
+    });
+
+    if (!access.authorized) {
+      return NextResponse.json(
+        { success: false, message: access.reason },
+        { status: access.user ? 403 : 401 },
       );
     }
 
@@ -116,32 +106,6 @@ export async function PATCH(request, context) {
       );
     }
 
-    const currentUser = await getCurrentUser();
-
-    if (!currentUser) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Authentication required.",
-        },
-        {
-          status: 401,
-        },
-      );
-    }
-
-    if (!currentUser.isSuperAdmin) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Super administrator permission required.",
-        },
-        {
-          status: 403,
-        },
-      );
-    }
-
     const companyId = await resolveCompanyId(context);
 
     if (!companyId) {
@@ -153,6 +117,18 @@ export async function PATCH(request, context) {
         {
           status: 400,
         },
+      );
+    }
+
+    const access = await getCompanyPermission({
+      companyId,
+      permission: PERMISSIONS.COMPANY_UPDATE,
+    });
+
+    if (!access.authorized) {
+      return NextResponse.json(
+        { success: false, message: access.reason },
+        { status: access.user ? 403 : 401 },
       );
     }
 
@@ -192,7 +168,7 @@ export async function PATCH(request, context) {
 
       input: validation.data,
 
-      currentUser,
+      currentUser: access.user,
     });
 
     return NextResponse.json({

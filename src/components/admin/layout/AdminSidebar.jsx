@@ -20,6 +20,8 @@ import { ADMIN_NAVIGATION } from "@/constants/admin-navigation";
 
 import { cn } from "@/utils/cn";
 
+import { useCompanyWorkspace } from "@/components/admin/company/CompanyWorkspaceProvider";
+
 /*
  * =========================================================
  * ACTIVE PATH
@@ -407,6 +409,12 @@ export default function AdminSidebar() {
 
   const { t } = useAdminTranslation();
 
+  const { activeCompany, isSuperAdmin } = useCompanyWorkspace();
+
+  const activeRole = activeCompany?.membership?.role || null;
+
+  const canAccessAdminItems = isSuperAdmin || activeRole === "ADMIN";
+
   const toggleLabel = sidebarCollapsed
     ? t("navigation.expandSidebar")
     : t("navigation.collapseSidebar");
@@ -474,44 +482,28 @@ export default function AdminSidebar() {
       >
         <div className={cn(sidebarCollapsed ? "space-y-4" : "space-y-7")}>
           {ADMIN_NAVIGATION.map((section) => {
+            const visibleItems = section.items.filter(
+              (item) => !item.adminOnly || canAccessAdminItems,
+            );
+
+            if (!visibleItems.length) {
+              return null;
+            }
+
             const sectionLabel = t(section.labelKey);
 
             return (
               <div key={section.id}>
-                {!sidebarCollapsed && (
-                  <div
-                    className="
-                        mb-2
-                        px-3
-
-                        admin-text-10
-                        font-semibold
-                        uppercase
-                        tracking-[0.16em]
-
-                        text-[var(--admin-muted-light)]
-                      "
-                  >
+                {!sidebarCollapsed ? (
+                  <div className="mb-2 px-3 admin-text-10 font-semibold uppercase tracking-[0.16em] text-[var(--admin-muted-light)]">
                     {sectionLabel}
                   </div>
-                )}
-
-                {sidebarCollapsed && (
-                  <div
-                    className="
-                        mx-auto
-                        mb-2
-
-                        h-px
-                        w-6
-
-                        bg-[var(--admin-border)]
-                      "
-                  />
+                ) : (
+                  <div className="mx-auto mb-2 h-px w-6 bg-[var(--admin-border)]" />
                 )}
 
                 <div className="space-y-1">
-                  {section.items.map((item) => {
+                  {visibleItems.map((item) => {
                     const active = isActivePath(pathname, item.href);
 
                     const label = t(item.labelKey);

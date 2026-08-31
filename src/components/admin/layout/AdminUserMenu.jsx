@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import {
   Check,
+  KeyRound,
   Languages,
   LoaderCircle,
   LogOut,
@@ -22,12 +23,6 @@ import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
 import { ADMIN_LOCALE } from "@/constants/admin-ui";
 
 import { cn } from "@/utils/cn";
-
-/*
- * =========================================================
- * USER HELPERS
- * =========================================================
- */
 
 function getDisplayName(user) {
   return user?.displayName || user?.name || user?.email || "Administrator";
@@ -63,12 +58,6 @@ function getInitial(user) {
   return name.charAt(0).toUpperCase();
 }
 
-/*
- * =========================================================
- * AVATAR
- * =========================================================
- */
-
 function UserAvatar({ user, size = 36 }) {
   const avatar = getUserAvatar(user);
 
@@ -76,29 +65,7 @@ function UserAvatar({ user, size = 36 }) {
 
   return (
     <span
-      className="
-        relative
-
-        flex
-        shrink-0
-
-        items-center
-        justify-center
-
-        overflow-hidden
-
-        rounded-full
-
-        border
-        border-[var(--admin-border)]
-
-        bg-[var(--admin-surface)]
-
-        admin-text-12
-        font-semibold
-
-        text-[var(--admin-foreground)]
-      "
+      className="relative flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-[var(--admin-border)] bg-[var(--admin-surface)] admin-text-12 font-semibold text-[var(--admin-foreground)]"
       style={{
         width: size,
         height: size,
@@ -120,12 +87,6 @@ function UserAvatar({ user, size = 36 }) {
   );
 }
 
-/*
- * =========================================================
- * MENU ITEM
- * =========================================================
- */
-
 function MenuItem({
   href,
   icon: Icon,
@@ -139,11 +100,7 @@ function MenuItem({
     <>
       <span
         className={cn(
-          "flex h-8 w-8 shrink-0",
-
-          "items-center justify-center",
-
-          "rounded-lg",
+          "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
 
           danger ? "text-red-600" : "text-[var(--admin-muted)]",
         )}
@@ -158,9 +115,7 @@ function MenuItem({
       <span className="min-w-0 flex-1">
         <span
           className={cn(
-            "block",
-
-            "admin-text-12 font-medium",
+            "block admin-text-12 font-medium",
 
             danger ? "text-red-600" : "text-[var(--admin-foreground)]",
           )}
@@ -168,33 +123,17 @@ function MenuItem({
           {label}
         </span>
 
-        {description && (
-          <span
-            className="
-              mt-0.5
-              block
-
-              admin-text-10
-              leading-[1.5]
-
-              text-[var(--admin-muted)]
-            "
-          >
+        {description ? (
+          <span className="mt-0.5 block admin-text-10 leading-[1.5] text-[var(--admin-muted)]">
             {description}
           </span>
-        )}
+        ) : null}
       </span>
     </>
   );
 
   const className = cn(
-    "flex w-full items-center gap-2.5",
-
-    "rounded-xl p-2",
-
-    "text-left",
-
-    "transition",
+    "flex w-full items-center gap-2.5 rounded-xl p-2 text-left transition",
 
     danger ? "hover:bg-red-50" : "hover:bg-[var(--admin-hover)]",
   );
@@ -223,29 +162,13 @@ function MenuItem({
   );
 }
 
-/*
- * =========================================================
- * LANGUAGE OPTION
- * =========================================================
- */
-
 function LanguageOption({ active, code, label, onClick }) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        "flex min-h-9 w-full items-center",
-
-        "gap-2.5",
-
-        "rounded-lg",
-
-        "px-2.5 py-1.5",
-
-        "text-left",
-
-        "transition",
+        "flex min-h-9 w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition",
 
         active
           ? "bg-[var(--company-primary-soft)]"
@@ -254,15 +177,7 @@ function LanguageOption({ active, code, label, onClick }) {
     >
       <span
         className={cn(
-          "flex h-6 w-8 shrink-0",
-
-          "items-center justify-center",
-
-          "rounded-md",
-
-          "border",
-
-          "admin-text-9 font-semibold uppercase",
+          "flex h-6 w-8 shrink-0 items-center justify-center rounded-md border admin-text-9 font-semibold uppercase",
 
           active
             ? "border-[var(--company-primary-border)] text-[var(--company-primary)]"
@@ -274,9 +189,7 @@ function LanguageOption({ active, code, label, onClick }) {
 
       <span
         className={cn(
-          "min-w-0 flex-1",
-
-          "admin-text-11 font-medium",
+          "min-w-0 flex-1 admin-text-11 font-medium",
 
           active
             ? "text-[var(--company-primary)]"
@@ -286,26 +199,16 @@ function LanguageOption({ active, code, label, onClick }) {
         {label}
       </span>
 
-      {active && (
+      {active ? (
         <Check
           size={14}
           strokeWidth={2}
-          className="
-            shrink-0
-
-            text-[var(--company-primary)]
-          "
+          className="shrink-0 text-[var(--company-primary)]"
         />
-      )}
+      ) : null}
     </button>
   );
 }
-
-/*
- * =========================================================
- * USER MENU
- * =========================================================
- */
 
 export default function AdminUserMenu({ user }) {
   const router = useRouter();
@@ -313,9 +216,7 @@ export default function AdminUserMenu({ user }) {
   const { t, locale, setLocale } = useAdminTranslation();
 
   const [open, setOpen] = useState(false);
-
   const [languageOpen, setLanguageOpen] = useState(false);
-
   const [loggingOut, setLoggingOut] = useState(false);
 
   const containerRef = useRef(null);
@@ -326,12 +227,6 @@ export default function AdminUserMenu({ user }) {
 
   const role = getRole(user);
 
-  /*
-   * =======================================================
-   * ROLE LABEL
-   * =======================================================
-   */
-
   const roleLabel =
     role === "SUPERADMIN"
       ? t("user.roles.superAdministrator")
@@ -340,12 +235,6 @@ export default function AdminUserMenu({ user }) {
         : role === "EDITOR"
           ? t("user.roles.editor")
           : t("user.roles.staff");
-
-  /*
-   * =======================================================
-   * CLOSE
-   * =======================================================
-   */
 
   useEffect(() => {
     function handlePointerDown(event) {
@@ -366,21 +255,13 @@ export default function AdminUserMenu({ user }) {
     }
 
     document.addEventListener("pointerdown", handlePointerDown);
-
     document.addEventListener("keydown", handleKeyDown);
 
     return () => {
       document.removeEventListener("pointerdown", handlePointerDown);
-
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
-
-  /*
-   * =======================================================
-   * LANGUAGE
-   * =======================================================
-   */
 
   function handleLanguageChange(nextLocale) {
     if (nextLocale === locale) {
@@ -389,12 +270,6 @@ export default function AdminUserMenu({ user }) {
 
     setLocale(nextLocale);
   }
-
-  /*
-   * =======================================================
-   * LOGOUT
-   * =======================================================
-   */
 
   async function handleLogout() {
     if (loggingOut) {
@@ -420,161 +295,38 @@ export default function AdminUserMenu({ user }) {
     }
   }
 
-  /*
-   * =======================================================
-   * RENDER
-   * =======================================================
-   */
-
   return (
     <div ref={containerRef} className="relative">
-      {/* =====================================
-          AVATAR BUTTON
-      ===================================== */}
-
       <button
         type="button"
         aria-label={t("user.account")}
         title={t("user.account")}
         aria-expanded={open}
         onClick={() => setOpen((current) => !current)}
-        className="
-          group
-          relative
-
-          flex
-          h-10
-          w-10
-
-          items-center
-          justify-center
-
-          rounded-xl
-
-          transition
-
-          hover:bg-[var(--admin-hover)]
-        "
+        className="group relative flex h-10 w-10 items-center justify-center rounded-xl transition hover:bg-[var(--admin-hover)]"
       >
         <UserAvatar user={user} size={34} />
 
-        <span
-          className="
-            absolute
-            bottom-0.5
-            right-0.5
-
-            h-2
-            w-2
-
-            rounded-full
-
-            border-2
-            border-[var(--admin-surface)]
-
-            bg-[var(--company-primary)]
-          "
-        />
+        <span className="absolute bottom-0.5 right-0.5 h-2 w-2 rounded-full border-2 border-[var(--admin-surface)] bg-[var(--company-primary)]" />
       </button>
 
-      {/* =====================================
-          DROPDOWN
-      ===================================== */}
-
-      {open && (
-        <div
-          className="
-            absolute
-            right-0
-            top-[calc(100%+10px)]
-            z-[100]
-
-            w-[310px]
-            max-w-[calc(100vw-24px)]
-
-            overflow-hidden
-
-            rounded-2xl
-
-            border
-            border-[var(--admin-border)]
-
-            bg-[var(--admin-surface)]
-
-            shadow-[0_18px_55px_rgba(0,0,0,0.12)]
-          "
-        >
-          {/* =================================
-              USER INFO
-          ================================= */}
-
-          <div
-            className="
-              flex
-              items-start
-              gap-3
-
-              border-b
-              border-[var(--admin-border)]
-
-              px-4
-              py-4
-            "
-          >
+      {open ? (
+        <div className="absolute right-0 top-[calc(100%+10px)] z-[100] w-[310px] max-w-[calc(100vw-24px)] overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] shadow-[0_18px_55px_rgba(0,0,0,0.12)]">
+          <div className="flex items-start gap-3 border-b border-[var(--admin-border)] px-4 py-4">
             <UserAvatar user={user} size={42} />
 
             <div className="min-w-0 flex-1">
-              <div
-                className="
-                  truncate
-
-                  admin-text-13
-                  font-semibold
-
-                  text-[var(--admin-foreground)]
-                "
-              >
+              <div className="truncate admin-text-13 font-semibold text-[var(--admin-foreground)]">
                 {displayName}
               </div>
 
-              {email && (
-                <div
-                  className="
-                    mt-0.5
-                    truncate
-
-                    admin-text-10
-
-                    text-[var(--admin-muted)]
-                  "
-                >
+              {email ? (
+                <div className="mt-0.5 truncate admin-text-10 text-[var(--admin-muted)]">
                   {email}
                 </div>
-              )}
+              ) : null}
 
-              <div
-                className="
-                  mt-2
-                  inline-flex
-
-                  rounded-full
-
-                  border
-                  border-[var(--company-primary-border)]
-
-                  bg-[var(--company-primary-soft)]
-
-                  px-2
-                  py-0.5
-
-                  admin-text-8
-                  font-semibold
-                  uppercase
-                  tracking-[0.08em]
-
-                  text-[var(--company-primary)]
-                "
-              >
+              <div className="mt-2 inline-flex rounded-full border border-[var(--company-primary-border)] bg-[var(--company-primary-soft)] px-2 py-0.5 admin-text-8 font-semibold uppercase tracking-[0.08em] text-[var(--company-primary)]">
                 {roleLabel}
               </div>
             </div>
@@ -585,37 +337,13 @@ export default function AdminUserMenu({ user }) {
               title={t("common.close")}
               onClick={() => {
                 setOpen(false);
-
                 setLanguageOpen(false);
               }}
-              className="
-                flex
-                h-7
-                w-7
-
-                shrink-0
-
-                items-center
-                justify-center
-
-                rounded-lg
-
-                text-[var(--admin-muted-light)]
-
-                transition
-
-                hover:bg-[var(--admin-hover)]
-
-                hover:text-[var(--admin-foreground)]
-              "
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[var(--admin-muted-light)] transition hover:bg-[var(--admin-hover)] hover:text-[var(--admin-foreground)]"
             >
               <X size={13} strokeWidth={1.7} />
             </button>
           </div>
-
-          {/* =================================
-              ACCOUNT
-          ================================= */}
 
           <div className="p-2">
             <MenuItem
@@ -626,6 +354,13 @@ export default function AdminUserMenu({ user }) {
             />
 
             <MenuItem
+              href="/admin/change-password"
+              icon={KeyRound}
+              label={t("header.changePassword")}
+              description={t("user.changePasswordDescription")}
+            />
+
+            <MenuItem
               href="/admin/preferences"
               icon={Settings2}
               label={t("header.preferences")}
@@ -633,124 +368,36 @@ export default function AdminUserMenu({ user }) {
             />
           </div>
 
-          {/* =================================
-              LANGUAGE
-          ================================= */}
-
-          <div
-            className="
-              border-t
-              border-[var(--admin-border)]
-
-              p-2
-            "
-          >
+          <div className="border-t border-[var(--admin-border)] p-2">
             <button
               type="button"
               aria-expanded={languageOpen}
               onClick={() => setLanguageOpen((current) => !current)}
-              className="
-                flex
-                w-full
-
-                items-center
-                gap-2.5
-
-                rounded-xl
-
-                p-2
-
-                text-left
-
-                transition
-
-                hover:bg-[var(--admin-hover)]
-              "
+              className="flex w-full items-center gap-2.5 rounded-xl p-2 text-left transition hover:bg-[var(--admin-hover)]"
             >
-              <span
-                className="
-                  flex
-                  h-8
-                  w-8
-                  shrink-0
-
-                  items-center
-                  justify-center
-
-                  rounded-lg
-
-                  text-[var(--admin-muted)]
-                "
-              >
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[var(--admin-muted)]">
                 <Languages size={16} strokeWidth={1.7} />
               </span>
 
               <span className="min-w-0 flex-1">
-                <span
-                  className="
-                    block
-
-                    admin-text-12
-                    font-medium
-
-                    text-[var(--admin-foreground)]
-                  "
-                >
+                <span className="block admin-text-12 font-medium text-[var(--admin-foreground)]">
                   {t("preferences.language.title")}
                 </span>
 
-                <span
-                  className="
-                    mt-0.5
-                    block
-
-                    admin-text-10
-
-                    text-[var(--admin-muted)]
-                  "
-                >
+                <span className="mt-0.5 block admin-text-10 text-[var(--admin-muted)]">
                   {locale === ADMIN_LOCALE.TH
                     ? t("preferences.language.thai")
                     : t("preferences.language.english")}
                 </span>
               </span>
 
-              <span
-                className="
-                  rounded-md
-
-                  border
-                  border-[var(--company-primary-border)]
-
-                  bg-[var(--company-primary-soft)]
-
-                  px-1.5
-                  py-0.5
-
-                  admin-text-8
-                  font-semibold
-                  uppercase
-
-                  text-[var(--company-primary)]
-                "
-              >
+              <span className="rounded-md border border-[var(--company-primary-border)] bg-[var(--company-primary-soft)] px-1.5 py-0.5 admin-text-8 font-semibold uppercase text-[var(--company-primary)]">
                 {locale}
               </span>
             </button>
 
-            {languageOpen && (
-              <div
-                className="
-                  mt-1
-                  space-y-1
-
-                  rounded-xl
-
-                  bg-[var(--admin-background)]
-
-                  p-1.5
-                "
-              >
+            {languageOpen ? (
+              <div className="mt-1 space-y-1 rounded-xl bg-[var(--admin-background)] p-1.5">
                 <LanguageOption
                   code="EN"
                   label={t("preferences.language.english")}
@@ -765,21 +412,10 @@ export default function AdminUserMenu({ user }) {
                   onClick={() => handleLanguageChange(ADMIN_LOCALE.TH)}
                 />
               </div>
-            )}
+            ) : null}
           </div>
 
-          {/* =================================
-              LOGOUT
-          ================================= */}
-
-          <div
-            className="
-              border-t
-              border-[var(--admin-border)]
-
-              p-2
-            "
-          >
+          <div className="border-t border-[var(--admin-border)] p-2">
             <MenuItem
               icon={LogOut}
               label={loggingOut ? t("user.loggingOut") : t("header.logout")}
@@ -794,7 +430,7 @@ export default function AdminUserMenu({ user }) {
             />
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

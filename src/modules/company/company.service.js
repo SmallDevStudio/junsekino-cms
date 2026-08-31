@@ -15,6 +15,8 @@ import {
   updateCompanyRecord,
 } from "./company.repository";
 
+import { getMembership } from "@/modules/user/membership.repository";
+
 import { AUDIT_ACTIONS, createAuditLog } from "@/modules/audit/audit.service";
 
 import { serializeFirestoreDocument } from "@/utils/firestore";
@@ -69,10 +71,64 @@ function mergeSeo(seo = {}) {
   };
 }
 
+function isAvailableCompany(company) {
+  return company && !company.deletedAt && company.status !== "archived";
+}
+
+function isActiveMembership(membership) {
+  return Boolean(
+    membership && !membership.deletedAt && membership.status === "active",
+  );
+}
+
 export async function getCompanies() {
   const companies = await listCompanies();
 
   return companies.map(serializeFirestoreDocument);
+}
+
+export async function getCompaniesForUser({ currentUser }) {
+  const companies = await listCompanies();
+
+  const availableCompanies = companies.filter(isAvailableCompany);
+
+  if (currentUser.isSuperAdmin) {
+    return availableCompanies.map((company) => ({
+      ...serializeFirestoreDocument(company),
+
+      membership: {
+        role: "SUPERADMIN",
+
+        status: "active",
+
+        permissions: ["*"],
+      },
+    }));
+  }
+
+  const scopedCompanies = (
+    await Promise.all(
+      availableCompanies.map(async (company) => {
+        const membership = await getMembership({
+          companyId: company.id,
+
+          uid: currentUser.uid,
+        });
+
+        if (!isActiveMembership(membership)) {
+          return null;
+        }
+
+        return {
+          ...serializeFirestoreDocument(company),
+
+          membership: serializeFirestoreDocument(membership),
+        };
+      }),
+    )
+  ).filter(Boolean);
+
+  return scopedCompanies;
 }
 
 export async function getCompany(companyId) {
@@ -169,7 +225,6 @@ export async function updateCompany({ companyId, input, currentUser }) {
 
       colors: {
         ...existing.branding?.colors,
-
         ...input.branding?.colors,
       },
     });
@@ -253,6 +308,7 @@ export async function deleteCompany({ companyId, currentUser }) {
 
   return {
     id: companyId,
+
     deleted: true,
   };
 }

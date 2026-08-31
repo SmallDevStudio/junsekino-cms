@@ -28,7 +28,7 @@ export async function getUserByUid(uid) {
 export async function validatePlatformUser(uid) {
   const user = await getUserByUid(uid);
 
-  if (!user) {
+  if (!user || user.deletedAt || user.status === "deleted") {
     throw new Error("USER_NOT_FOUND");
   }
 
@@ -62,6 +62,7 @@ export async function createPlatformSession(idToken) {
 
   return {
     sessionCookie,
+
     user,
   };
 }
@@ -86,11 +87,17 @@ export async function verifyPlatformSession(sessionCookie) {
 
       displayName: user.displayName || null,
 
+      avatar: user.avatar || null,
+
+      phone: user.phone || null,
+
       userType: user.userType || null,
 
       status: user.status,
 
       isSuperAdmin: user.isSuperAdmin === true,
+
+      mustChangePassword: user.mustChangePassword === true,
 
       defaultCompanyId: user.defaultCompanyId || null,
 

@@ -1,8 +1,8 @@
 "use client";
 
-import { Check, ChevronDown, LoaderCircle } from "lucide-react";
-
 import { useEffect, useRef, useState } from "react";
+
+import { Check, ChevronDown, LoaderCircle } from "lucide-react";
 
 import { cn } from "@/utils/cn";
 
@@ -44,9 +44,7 @@ function getCompanyCode(company) {
     }
   }
 
-  const name = getCompanyName(company);
-
-  return name.trim().charAt(0).toUpperCase();
+  return getCompanyName(company).trim().charAt(0).toUpperCase();
 }
 
 function getCompanyPrimary(company) {
@@ -59,27 +57,50 @@ function getCompanyPrimary(company) {
 }
 
 function CompanyBadge({ company, compact = false }) {
-  const code = getCompanyCode(company);
-
-  const primary = getCompanyPrimary(company);
-
   return (
     <span
       className={cn(
-        "flex shrink-0",
-        "items-center justify-center",
-        "rounded-xl",
-        "font-semibold",
+        "flex shrink-0 items-center justify-center rounded-xl font-semibold",
+
         compact ? "h-9 w-9 text-[9px]" : "h-10 w-10 text-[10px]",
       )}
       style={{
-        backgroundColor: primary,
+        backgroundColor: getCompanyPrimary(company),
 
         color: "#ffffff",
       }}
     >
-      {code}
+      {getCompanyCode(company)}
     </span>
+  );
+}
+
+function CurrentCompany({ company, compact }) {
+  const name = getCompanyName(company);
+
+  return (
+    <div
+      className={cn(
+        "flex w-full min-w-0 items-center rounded-xl",
+
+        compact ? "justify-center p-1.5" : "gap-3 p-2",
+      )}
+      title={compact ? name : undefined}
+    >
+      <CompanyBadge company={company} compact={compact} />
+
+      {!compact ? (
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-[13px] font-medium text-[var(--admin-foreground)]">
+            {name}
+          </span>
+
+          <span className="mt-0.5 block text-[9px] uppercase tracking-[0.13em] text-[var(--admin-muted)]">
+            Current workspace
+          </span>
+        </span>
+      ) : null}
+    </div>
   );
 }
 
@@ -87,8 +108,18 @@ export default function CompanySwitcher({
   compact = false,
   placement = "bottom",
 }) {
-  const { companies, activeCompany, loading, error, selectCompany } =
-    useCompanyWorkspace();
+  const {
+    companies,
+
+    activeCompany,
+
+    loading,
+    error,
+
+    selectCompany,
+
+    canSwitchCompany,
+  } = useCompanyWorkspace();
 
   const [open, setOpen] = useState(false);
 
@@ -125,21 +156,27 @@ export default function CompanySwitcher({
     return (
       <div
         className={cn(
-          "flex h-11 items-center",
-          "text-xs text-[var(--admin-muted)]",
+          "flex h-11 items-center text-xs text-[var(--admin-muted)]",
+
           compact ? "justify-center" : "gap-2 px-2",
         )}
       >
         <LoaderCircle size={15} className="animate-spin" />
 
-        {!compact && <span>Loading workspace</span>}
+        {!compact ? <span>Loading workspace</span> : null}
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={cn("text-xs text-red-600", compact && "text-center")}>
+      <div
+        className={cn(
+          "text-xs text-red-600",
+
+          compact && "text-center",
+        )}
+      >
         {compact ? "!" : "Company unavailable"}
       </div>
     );
@@ -151,6 +188,10 @@ export default function CompanySwitcher({
         {compact ? "—" : "No company"}
       </div>
     );
+  }
+
+  if (!canSwitchCompany) {
+    return <CurrentCompany company={activeCompany} compact={compact} />;
   }
 
   const activeName = getCompanyName(activeCompany);
@@ -167,17 +208,14 @@ export default function CompanySwitcher({
         aria-label={`Current company: ${activeName}`}
         title={compact ? activeName : undefined}
         className={cn(
-          "flex w-full min-w-0 items-center",
-          "rounded-xl",
-          "text-left transition",
-          "hover:bg-[var(--admin-hover)]",
+          "flex w-full min-w-0 items-center rounded-xl text-left transition hover:bg-[var(--admin-hover)]",
 
           compact ? "justify-center p-1.5" : "gap-3 p-2",
         )}
       >
         <CompanyBadge company={activeCompany} compact={compact} />
 
-        {!compact && (
+        {!compact ? (
           <>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-[13px] font-medium text-[var(--admin-foreground)]">
@@ -192,30 +230,23 @@ export default function CompanySwitcher({
             <ChevronDown
               size={14}
               className={cn(
-                "shrink-0 text-[var(--admin-muted)]",
-                "transition-transform",
+                "shrink-0 text-[var(--admin-muted)] transition-transform",
+
                 open && "rotate-180",
               )}
             />
           </>
-        )}
+        ) : null}
       </button>
 
-      {open && (
+      {open ? (
         <div
           className={cn(
-            "absolute z-[80]",
+            "absolute z-[80] overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] shadow-[0_18px_50px_rgba(0,0,0,0.12)]",
+
             popoverPosition,
 
             compact ? "left-[calc(100%+10px)] w-[280px]" : "left-0 w-[280px]",
-
-            "overflow-hidden rounded-2xl",
-
-            "border border-[var(--admin-border)]",
-
-            "bg-[var(--admin-surface)]",
-
-            "shadow-[0_18px_50px_rgba(0,0,0,0.12)]",
           )}
         >
           <div className="border-b border-[var(--admin-border)] px-4 py-3">
@@ -232,8 +263,6 @@ export default function CompanySwitcher({
             {companies.map((company) => {
               const selected = company.id === activeCompany.id;
 
-              const companyPrimary = getCompanyPrimary(company);
-
               return (
                 <button
                   key={company.id}
@@ -244,64 +273,39 @@ export default function CompanySwitcher({
                     setOpen(false);
                   }}
                   className={cn(
-                    "flex w-full items-center gap-3",
-
-                    "rounded-xl p-2.5",
-
-                    "text-left transition",
+                    "flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition",
 
                     selected
                       ? "bg-[var(--company-primary-soft)]"
                       : "hover:bg-[var(--admin-hover)]",
                   )}
                 >
-                  <span
-                    className="
-                        flex
-                        h-9
-                        w-9
-                        shrink-0
-
-                        items-center
-                        justify-center
-
-                        rounded-lg
-
-                        text-[9px]
-                        font-semibold
-                        text-white
-                      "
-                    style={{
-                      backgroundColor: companyPrimary,
-                    }}
-                  >
-                    {getCompanyCode(company)}
-                  </span>
+                  <CompanyBadge company={company} compact />
 
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[13px] font-medium text-[var(--admin-foreground)]">
                       {getCompanyName(company)}
                     </span>
 
-                    {company.slug && (
+                    {company.slug ? (
                       <span className="mt-0.5 block truncate text-[11px] text-[var(--admin-muted)]">
                         {company.slug}
                       </span>
-                    )}
+                    ) : null}
                   </span>
 
-                  {selected && (
+                  {selected ? (
                     <Check
                       size={16}
                       className="shrink-0 text-[var(--company-primary)]"
                     />
-                  )}
+                  ) : null}
                 </button>
               );
             })}
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

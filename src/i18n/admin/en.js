@@ -81,6 +81,8 @@ export const adminEn = {
     profile: "Profile",
 
     searchPlaceholder: "Search settings, pages, content...",
+
+    changePassword: "Change password",
   },
 
   user: {
@@ -104,6 +106,8 @@ export const adminEn = {
       editor: "Editor",
 
       staff: "Staff",
+
+      changePasswordDescription: "Change the password for your account",
     },
   },
 
@@ -2872,7 +2876,8 @@ export const adminEn = {
 
       trashTitle: "Trash is empty",
 
-      trashDescription: "Deleted messages will appear here until permanently removed.",
+      trashDescription:
+        "Deleted messages will appear here until permanently removed.",
     },
 
     noCompany: {
@@ -2883,6 +2888,408 @@ export const adminEn = {
 
     window: {
       back: "Close Window",
+    },
+  },
+
+  members: {
+    company: "Company",
+    title: "Members",
+    description: "Manage user accounts, roles, and company access",
+    loading: "Loading members...",
+    empty: "No members found",
+    total: "{count} members",
+
+    columns: {
+      user: "User",
+      globalRole: "Global role",
+      companyAccess: "Company access",
+      status: "Account status",
+      actions: "Actions",
+    },
+
+    avatar: {
+      title: "Profile image",
+      description:
+        "Select an image and adjust its position for the circular profile display.",
+      emptyTitle: "No profile image",
+      emptyDescription:
+        "Select an image from the media library or upload a new image for your account.",
+      select: "Select profile image",
+      pickerTitle: "Select profile image",
+    },
+
+    actions: {
+      add: "Add member",
+      view: "View details",
+      edit: "Edit",
+      refresh: "Refresh",
+      delete: "Delete",
+      deleteAccount: "Delete account",
+      revokeAccess: "Revoke company access",
+      resetPassword: "Reset password",
+    },
+
+    filters: {
+      search: "Search name, email, or phone",
+      allGlobalRoles: "All global roles",
+      allAccess: "All company access",
+      allStatuses: "All statuses",
+    },
+
+    globalRoles: {
+      superadmin: "Superadmin",
+      user: "User",
+    },
+
+    access: {
+      admin: "Company admin",
+      editor: "Editor",
+      noAccess: "No access",
+    },
+
+    accessDescriptions: {
+      admin: "Can manage company information and members.",
+      editor: "Can manage company content according to assigned permissions.",
+      noAccess:
+        "The user cannot enter this company. Their account and access to other companies remain unchanged.",
+    },
+
+    groups: {
+      admin: "Company admin",
+      editor: "Editor",
+      unassigned: "Unassigned",
+    },
+
+    status: {
+      active: "Active",
+      inactive: "Inactive",
+      suspended: "Suspended",
+      unassigned: "No access",
+    },
+
+    sections: {
+      account: "Account information",
+      companyAccess: "Company access",
+    },
+
+    fields: {
+      name: "Display name",
+      email: "Email",
+      phone: "Phone",
+      password: "Initial password",
+      globalRole: "Global role",
+      accountStatus: "Account status",
+      companyAccess: "Company access",
+      membershipStatus: "Membership status",
+      group: "User group",
+      status: "Status",
+    },
+
+    detail: {
+      title: "Member details",
+    },
+
+    editor: {
+      createTitle: "Add member",
+      editTitle: "Edit member",
+    },
+
+    permission: {
+      title: "Access denied",
+      description:
+        "Your account does not have permission to manage company members.",
+    },
+
+    confirmDeleteGlobal:
+      'Delete the account "{name}" from the entire platform? The user will no longer be able to sign in.',
+    confirmRevoke: 'Revoke "{name}" access to this company?',
+
+    errors: {
+      load: "Unable to load members.",
+      save: "Unable to save member information.",
+      delete: "Unable to delete or revoke this member.",
+      createAccessRequired:
+        "A new member must have Company admin or Editor access.",
+      cannotDeleteSelf: "You cannot delete your own account.",
+    },
+
+    passwordReset: {
+      title: "Reset password",
+      description:
+        "Set a temporary password for this user. All existing sessions will be revoked immediately.",
+      temporaryPassword: "Temporary password",
+      securityNotice:
+        "This password is shown only in this dialog. Send it to the user through a secure channel.",
+
+      fields: {
+        password: "Temporary password",
+        confirmPassword: "Confirm temporary password",
+        mustChangePassword: "Require password change at next sign-in",
+        mustChangePasswordDescription:
+          "The user cannot access the Dashboard or other modules until a new password is set.",
+      },
+
+      requirements: {
+        title: "The password must contain",
+        length: "At least 8 characters",
+        uppercase: "At least one uppercase letter",
+        lowercase: "At least one lowercase letter",
+        number: "At least one number",
+      },
+
+      validation: {
+        length: "Password must contain at least 8 characters.",
+        uppercase: "Password must contain at least one uppercase letter.",
+        lowercase: "Password must contain at least one lowercase letter.",
+        number: "Password must contain at least one number.",
+        mismatch: "The password and confirmation do not match.",
+      },
+
+      actions: {
+        generate: "Generate password",
+        copy: "Copy",
+        copied: "Copied",
+        reset: "Reset password",
+        resetting: "Resetting...",
+      },
+
+      success: {
+        title: "Password reset",
+        description: "The user can sign in with this temporary password.",
+        forcedDescription:
+          "The user must sign in with this temporary password and choose a new password before using the system.",
+      },
+
+      errors: {
+        reset: "Unable to reset password.",
+        copy: "Unable to copy the password.",
+      },
+    },
+  },
+
+  companyAdmin: {
+    eyebrow: "Company Workspace",
+
+    title: "Company",
+
+    description: "Manage company information, languages and brand colors.",
+
+    saved: "Company settings saved successfully.",
+
+    fields: {
+      name: "Company name",
+
+      legalName: "Legal name",
+
+      shortName: "Short name",
+
+      slug: "Company slug",
+
+      status: "Status",
+
+      defaultLocale: "Default language",
+
+      enableThai: "Enable Thai content",
+    },
+
+    colors: {
+      title: "Brand Colors",
+
+      primary: "Primary",
+
+      secondary: "Secondary",
+
+      accent: "Accent",
+
+      background: "Background",
+
+      surface: "Surface",
+
+      text: "Text",
+    },
+
+    errors: {
+      load: "Unable to load company settings.",
+
+      save: "Unable to save company settings.",
+    },
+
+    create: {
+      title: "Create Company",
+
+      description: "Create a new company workspace.",
+
+      action: "Add Company",
+
+      saved: "Company created successfully.",
+
+      errors: {
+        save: "Unable to create company.",
+      },
+    },
+  },
+
+  password: {
+    title: "Change password",
+    forcedTitle: "Password change required",
+    description:
+      "Enter your current password and choose a new password for your account.",
+    forcedDescription:
+      "For security, you must change your temporary password before accessing the system.",
+
+    fields: {
+      current: "Current password",
+      new: "New password",
+      confirm: "Confirm new password",
+    },
+
+    requirements: {
+      title: "Your password must contain",
+      length: "At least 8 characters",
+      uppercase: "At least one uppercase letter",
+      lowercase: "At least one lowercase letter",
+      number: "At least one number",
+    },
+
+    validation: {
+      length: "Password must contain at least 8 characters.",
+      uppercase: "Password must contain at least one uppercase letter.",
+      lowercase: "Password must contain at least one lowercase letter.",
+      number: "Password must contain at least one number.",
+      mismatch: "The new password and confirmation do not match.",
+      samePassword:
+        "The new password must be different from the current password.",
+    },
+
+    actions: {
+      change: "Change password",
+      changing: "Changing password...",
+    },
+
+    success: {
+      title: "Password changed",
+      description: "Redirecting you to the dashboard.",
+    },
+
+    errors: {
+      change: "Unable to change password.",
+      currentIncorrect: "The current password is incorrect.",
+      tooManyRequests: "Too many attempts. Please try again later.",
+      recentLogin: "Please verify your current password again.",
+    },
+  },
+
+  profile: {
+    eyebrow: "User account",
+    title: "My profile",
+    description:
+      "Manage your personal information, profile image, and work information.",
+    loading: "Loading profile...",
+    success: "Your profile has been saved.",
+
+    sections: {
+      avatar: "Profile image",
+      personal: "Personal information",
+      work: "Work information",
+    },
+
+    fields: {
+      name: "Display name",
+      email: "Email",
+      phone: "Phone",
+      employeeCode: "Employee code",
+      position: "Position",
+      department: "Department",
+      bio: "Bio",
+    },
+
+    errors: {
+      load: "Unable to load profile.",
+      save: "Unable to save profile.",
+    },
+  },
+
+  privacy: {
+    eyebrow: "User account",
+    title: "Privacy and notifications",
+    description:
+      "Control personal information visibility, notifications, and account security.",
+    loading: "Loading preferences...",
+    success: "Your preferences have been saved.",
+
+    sections: {
+      visibility: "Personal information visibility",
+      notifications: "Notifications",
+      security: "Security",
+    },
+
+    options: {
+      company: "Company members",
+      admins: "Company administrators",
+      private: "Only me",
+    },
+
+    fields: {
+      avatar: {
+        label: "Profile image",
+        description: "Choose who can see your profile image.",
+      },
+
+      phone: {
+        label: "Phone number",
+        description: "Choose who can see your phone number.",
+      },
+
+      bio: {
+        label: "Bio",
+        description: "Choose who can see your bio.",
+      },
+
+      lastActive: {
+        label: "Last active time",
+        description: "Choose who can see your last active time.",
+      },
+    },
+
+    notifications: {
+      email: {
+        label: "Email notifications",
+        description: "Receive important notifications by email.",
+      },
+
+      browser: {
+        label: "Browser notifications",
+        description: "Display notifications while using the CMS.",
+      },
+
+      forms: {
+        label: "New messages and forms",
+        description: "Notify me when a new form or message is submitted.",
+      },
+
+      members: {
+        label: "Member changes",
+        description: "Notify me when member roles or statuses change.",
+      },
+
+      security: {
+        label: "Security notifications",
+        description:
+          "Password resets and important account activity. This notification cannot be disabled.",
+      },
+    },
+
+    security: {
+      password: {
+        title: "Password",
+        description: "Change the password for your account.",
+        action: "Change password",
+      },
+    },
+
+    errors: {
+      load: "Unable to load preferences.",
+      save: "Unable to save preferences.",
     },
   },
 };

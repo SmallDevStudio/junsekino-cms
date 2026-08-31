@@ -9,6 +9,7 @@ import { isTrustedOrigin } from "@/lib/auth/origin";
 import { companyIdSchema } from "@/modules/company/company.schema";
 
 import {
+  setCompanyAccessSchema,
   uidSchema,
   updateMemberSchema,
 } from "@/modules/user/membership.schema";
@@ -17,6 +18,7 @@ import {
   editCompanyMember,
   getCompanyMember,
   removeCompanyMember,
+  setCompanyMemberAccess,
 } from "@/modules/user/membership.service";
 
 async function resolveParams(context) {
@@ -37,21 +39,88 @@ async function resolveParams(context) {
   };
 }
 
+function invalidParamsResponse() {
+  return NextResponse.json(
+    {
+      success: false,
+
+      message: "Invalid request parameters.",
+    },
+    {
+      status: 400,
+    },
+  );
+}
+
+function accessDeniedResponse(access) {
+  return NextResponse.json(
+    {
+      success: false,
+
+      message: access.reason,
+    },
+    {
+      status: access.user ? 403 : 401,
+    },
+  );
+}
+
+function errorResponse(error, fallbackMessage) {
+  const errors = {
+    MEMBERSHIP_NOT_FOUND: [404, "Company member not found."],
+
+    USER_NOT_FOUND: [404, "User not found."],
+
+    USER_DELETED: [409, "This user account has been deleted."],
+
+    MEMBERSHIP_EXISTS: [409, "This user already has access to the company."],
+
+    INVALID_CUSTOM_PERMISSION: [
+      400,
+      "One or more custom permissions are invalid for this role.",
+    ],
+
+    CANNOT_REMOVE_SELF: [409, "You cannot remove your own company membership."],
+
+    CANNOT_MANAGE_SUPERADMIN: [
+      403,
+      "A company administrator cannot manage a Superadmin account.",
+    ],
+  };
+
+  const mapped = errors[error.message];
+
+  if (mapped) {
+    return NextResponse.json(
+      {
+        success: false,
+
+        message: mapped[1],
+      },
+      {
+        status: mapped[0],
+      },
+    );
+  }
+
+  return NextResponse.json(
+    {
+      success: false,
+
+      message: fallbackMessage,
+    },
+    {
+      status: 500,
+    },
+  );
+}
+
 export async function GET(request, context) {
   try {
     const params = await resolveParams(context);
 
     if (!params) {
-      return NextResponse.json(
-        {
-          success: false,
-
-          message: "Invalid request parameters.",
-        },
-        {
-          status: 400,
-        },
-      );
+      return invalidParamsResponse();
     }
 
     const access = await getCompanyPermission({
@@ -61,22 +130,17 @@ export async function GET(request, context) {
     });
 
     if (!access.authorized) {
-      return NextResponse.json(
-        {
-          success: false,
-
-          message: access.reason,
-        },
-        {
-          status: access.user ? 403 : 401,
-        },
-      );
+      return accessDeniedResponse(access);
     }
 
     const member = await getCompanyMember({
       companyId: params.companyId,
 
       uid: params.uid,
+
+      currentUser: access.user,
+
+      currentMembership: access.membership,
     });
 
     return NextResponse.json({
@@ -87,29 +151,79 @@ export async function GET(request, context) {
   } catch (error) {
     console.error("Get member error:", error);
 
-    if (error.message === "MEMBERSHIP_NOT_FOUND") {
+    return errorResponse(error, "Unable to retrieve company member.");
+  }
+}
+
+export async function PUT(request, context) {
+  try {
+    if (!isTrustedOrigin(request)) {
       return NextResponse.json(
         {
           success: false,
 
-          message: "Company member not found.",
+          message: "Invalid request origin.",
         },
         {
-          status: 404,
+          status: 403,
         },
       );
     }
 
-    return NextResponse.json(
-      {
-        success: false,
+    const params = await resolveParams(context);
 
-        message: "Unable to retrieve company member.",
-      },
-      {
-        status: 500,
-      },
-    );
+    if (!params) {
+      return invalidParamsResponse();
+    }
+
+    const access = await getCompanyPermission({
+      companyId: params.companyId,
+
+      permission: PERMISSIONS.USER_UPDATE,
+    });
+
+    if (!access.authorized) {
+      return accessDeniedResponse(access);
+    }
+
+    const body = await request.json();
+
+    const validation = setCompanyAccessSchema.safeParse(body);
+
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          success: false,
+
+          message: "Invalid company access data.",
+
+          errors: validation.error.flatten().fieldErrors,
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    const member = await setCompanyMemberAccess({
+      companyId: params.companyId,
+
+      uid: params.uid,
+
+      input: validation.data,
+
+      currentUser: access.user,
+    });
+
+    return NextResponse.json({
+      success: true,
+
+      data: member,
+    });
+  } catch (error) {
+    console.error("Set company member access error:", error);
+
+    return errorResponse(error, "Unable to update company access.");
   }
 }
 
@@ -131,16 +245,7 @@ export async function PATCH(request, context) {
     const params = await resolveParams(context);
 
     if (!params) {
-      return NextResponse.json(
-        {
-          success: false,
-
-          message: "Invalid request parameters.",
-        },
-        {
-          status: 400,
-        },
-      );
+      return invalidParamsResponse();
     }
 
     const access = await getCompanyPermission({
@@ -150,16 +255,7 @@ export async function PATCH(request, context) {
     });
 
     if (!access.authorized) {
-      return NextResponse.json(
-        {
-          success: false,
-
-          message: access.reason,
-        },
-        {
-          status: access.user ? 403 : 401,
-        },
-      );
+      return accessDeniedResponse(access);
     }
 
     const body = await request.json();
@@ -212,42 +308,7 @@ export async function PATCH(request, context) {
   } catch (error) {
     console.error("Update member error:", error);
 
-    if (error.message === "MEMBERSHIP_NOT_FOUND") {
-      return NextResponse.json(
-        {
-          success: false,
-
-          message: "Company member not found.",
-        },
-        {
-          status: 404,
-        },
-      );
-    }
-
-    if (error.message === "INVALID_CUSTOM_PERMISSION") {
-      return NextResponse.json(
-        {
-          success: false,
-
-          message: "One or more custom permissions are invalid for this role.",
-        },
-        {
-          status: 400,
-        },
-      );
-    }
-
-    return NextResponse.json(
-      {
-        success: false,
-
-        message: "Unable to update company member.",
-      },
-      {
-        status: 500,
-      },
-    );
+    return errorResponse(error, "Unable to update company member.");
   }
 }
 
@@ -269,16 +330,7 @@ export async function DELETE(request, context) {
     const params = await resolveParams(context);
 
     if (!params) {
-      return NextResponse.json(
-        {
-          success: false,
-
-          message: "Invalid request parameters.",
-        },
-        {
-          status: 400,
-        },
-      );
+      return invalidParamsResponse();
     }
 
     const access = await getCompanyPermission({
@@ -288,16 +340,7 @@ export async function DELETE(request, context) {
     });
 
     if (!access.authorized) {
-      return NextResponse.json(
-        {
-          success: false,
-
-          message: access.reason,
-        },
-        {
-          status: access.user ? 403 : 401,
-        },
-      );
+      return accessDeniedResponse(access);
     }
 
     const result = await removeCompanyMember({
@@ -316,41 +359,6 @@ export async function DELETE(request, context) {
   } catch (error) {
     console.error("Delete member error:", error);
 
-    if (error.message === "MEMBERSHIP_NOT_FOUND") {
-      return NextResponse.json(
-        {
-          success: false,
-
-          message: "Company member not found.",
-        },
-        {
-          status: 404,
-        },
-      );
-    }
-
-    if (error.message === "CANNOT_REMOVE_SELF") {
-      return NextResponse.json(
-        {
-          success: false,
-
-          message: "You cannot remove your own company membership.",
-        },
-        {
-          status: 409,
-        },
-      );
-    }
-
-    return NextResponse.json(
-      {
-        success: false,
-
-        message: "Unable to remove company member.",
-      },
-      {
-        status: 500,
-      },
-    );
+    return errorResponse(error, "Unable to remove company member.");
   }
 }

@@ -6,7 +6,10 @@ import { isTrustedOrigin } from "@/lib/auth/origin";
 
 import { createCompanySchema } from "@/modules/company/company.schema";
 
-import { createCompany, getCompanies } from "@/modules/company/company.service";
+import {
+  createCompany,
+  getCompaniesForUser,
+} from "@/modules/company/company.service";
 
 export async function GET() {
   try {
@@ -16,6 +19,7 @@ export async function GET() {
       return NextResponse.json(
         {
           success: false,
+
           message: "Authentication required.",
         },
         {
@@ -24,31 +28,23 @@ export async function GET() {
       );
     }
 
-    if (!currentUser.isSuperAdmin) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "You do not have permission to view all companies.",
-        },
-        {
-          status: 403,
-        },
-      );
-    }
-
-    const companies = await getCompanies();
+    const companies = await getCompaniesForUser({
+      currentUser,
+    });
 
     return NextResponse.json({
       success: true,
+
       data: companies,
     });
   } catch (error) {
-    console.error("List companies error:", error);
+    console.error("List user companies error:", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: "Unable to retrieve companies.",
+
+        message: "Unable to retrieve available companies.",
       },
       {
         status: 500,
@@ -63,6 +59,7 @@ export async function POST(request) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Invalid request origin.",
         },
         {
@@ -77,6 +74,7 @@ export async function POST(request) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Authentication required.",
         },
         {
@@ -89,6 +87,7 @@ export async function POST(request) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Super administrator permission required.",
         },
         {
@@ -125,6 +124,7 @@ export async function POST(request) {
     return NextResponse.json(
       {
         success: true,
+
         data: company,
       },
       {
@@ -138,6 +138,7 @@ export async function POST(request) {
       return NextResponse.json(
         {
           success: false,
+
           message: "This company slug is already in use.",
         },
         {
@@ -150,6 +151,7 @@ export async function POST(request) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Default locale must be included in supported locales.",
         },
         {
@@ -161,6 +163,7 @@ export async function POST(request) {
     return NextResponse.json(
       {
         success: false,
+
         message: "Unable to create company.",
       },
       {

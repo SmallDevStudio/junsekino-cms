@@ -35,6 +35,7 @@ export async function createMembership({
   uid,
   role,
   permissions = [],
+  groupIds = [],
   userId,
 }) {
   const ref = getMembersCollection(companyId).doc(uid);
@@ -56,6 +57,8 @@ export async function createMembership({
       role,
 
       permissions,
+
+      groupIds,
 
       status: "active",
 
