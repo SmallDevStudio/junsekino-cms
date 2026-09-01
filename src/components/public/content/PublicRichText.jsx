@@ -1,13 +1,8 @@
 import React from "react";
 
 import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 
-/*
- * =========================================================
- * RICH TEXT TYPES
- * =========================================================
- */
+import remarkGfm from "remark-gfm";
 
 function isTiptapDocument(value) {
   return value && typeof value === "object" && value.type === "doc";
@@ -16,17 +11,6 @@ function isTiptapDocument(value) {
 function isLegacyString(value) {
   return typeof value === "string";
 }
-
-/*
- * =========================================================
- * SAFE URL
- * =========================================================
- *
- * Rich Text content is CMS-authored, but we still should
- * not render javascript:, data: or other unexpected
- * protocols into public anchor elements.
- * =========================================================
- */
 
 function getSafeHref(value) {
   if (typeof value !== "string") {
@@ -50,12 +34,6 @@ function getSafeHref(value) {
   return null;
 }
 
-/*
- * =========================================================
- * SAFE COLOR
- * =========================================================
- */
-
 function getSafeColor(value) {
   if (typeof value !== "string") {
     return null;
@@ -70,12 +48,6 @@ function getSafeColor(value) {
   return null;
 }
 
-/*
- * =========================================================
- * SAFE ALIGNMENT
- * =========================================================
- */
-
 function getSafeTextAlign(value) {
   if (["left", "center", "right", "justify"].includes(value)) {
     return value;
@@ -84,13 +56,13 @@ function getSafeTextAlign(value) {
   return undefined;
 }
 
-/*
- * =========================================================
- * MARKS
- * =========================================================
- */
+function applyMarks(
+  content,
 
-function applyMarks(content, marks = [], key) {
+  marks = [],
+
+  key,
+) {
   if (!Array.isArray(marks) || marks.length === 0) {
     return content;
   }
@@ -160,55 +132,49 @@ function applyMarks(content, marks = [], key) {
   }, content);
 }
 
-/*
- * =========================================================
- * NODE CHILDREN
- * =========================================================
- */
+function renderChildren(
+  node,
 
-function renderChildren(node, path) {
+  path,
+) {
   if (!Array.isArray(node?.content)) {
     return null;
   }
 
   return node.content.map((child, index) =>
-    renderNode(child, `${path}-${index}`),
+    renderNode(
+      child,
+
+      `${path}-${index}`,
+    ),
   );
 }
 
-/*
- * =========================================================
- * TIPTAP NODE
- * =========================================================
- */
+function renderNode(
+  node,
 
-function renderNode(node, path) {
+  path,
+) {
   if (!node || typeof node !== "object") {
     return null;
   }
 
   switch (node.type) {
-    /*
-     * =====================================
-     * TEXT
-     * =====================================
-     */
-
     case "text": {
       const text = typeof node.text === "string" ? node.text : "";
 
       return (
         <React.Fragment key={path}>
-          {applyMarks(text, node.marks, path)}
+          {applyMarks(
+            text,
+
+            node.marks,
+
+            path,
+          )}
         </React.Fragment>
       );
     }
-
-    /*
-     * =====================================
-     * PARAGRAPH
-     * =====================================
-     */
 
     case "paragraph":
       return (
@@ -218,15 +184,13 @@ function renderNode(node, path) {
             textAlign: getSafeTextAlign(node.attrs?.textAlign),
           }}
         >
-          {renderChildren(node, path)}
+          {renderChildren(
+            node,
+
+            path,
+          )}
         </p>
       );
-
-    /*
-     * =====================================
-     * HEADING
-     * =====================================
-     */
 
     case "heading": {
       const level = Number(node.attrs?.level);
@@ -241,18 +205,15 @@ function renderNode(node, path) {
               textAlign,
             }}
           >
-            {renderChildren(node, path)}
+            {renderChildren(
+              node,
+
+              path,
+            )}
           </h3>
         );
       }
 
-      /*
-       * We intentionally normalize all
-       * other heading levels to H2.
-       *
-       * The shared editor currently only
-       * exposes H2/H3.
-       */
       return (
         <h2
           key={path}
@@ -260,19 +221,25 @@ function renderNode(node, path) {
             textAlign,
           }}
         >
-          {renderChildren(node, path)}
+          {renderChildren(
+            node,
+
+            path,
+          )}
         </h2>
       );
     }
 
-    /*
-     * =====================================
-     * LISTS
-     * =====================================
-     */
-
     case "bulletList":
-      return <ul key={path}>{renderChildren(node, path)}</ul>;
+      return (
+        <ul key={path}>
+          {renderChildren(
+            node,
+
+            path,
+          )}
+        </ul>
+      );
 
     case "orderedList":
       return (
@@ -282,94 +249,83 @@ function renderNode(node, path) {
             Number.isInteger(node.attrs?.start) ? node.attrs.start : undefined
           }
         >
-          {renderChildren(node, path)}
+          {renderChildren(
+            node,
+
+            path,
+          )}
         </ol>
       );
 
     case "listItem":
-      return <li key={path}>{renderChildren(node, path)}</li>;
+      return (
+        <li key={path}>
+          {renderChildren(
+            node,
 
-    /*
-     * =====================================
-     * BLOCKQUOTE
-     * =====================================
-     */
+            path,
+          )}
+        </li>
+      );
 
     case "blockquote":
-      return <blockquote key={path}>{renderChildren(node, path)}</blockquote>;
+      return (
+        <blockquote key={path}>
+          {renderChildren(
+            node,
 
-    /*
-     * =====================================
-     * HARD BREAK
-     * =====================================
-     */
+            path,
+          )}
+        </blockquote>
+      );
 
     case "hardBreak":
       return <br key={path} />;
 
-    /*
-     * =====================================
-     * HORIZONTAL RULE
-     * =====================================
-     */
-
     case "horizontalRule":
       return <hr key={path} />;
-
-    /*
-     * =====================================
-     * CODE BLOCK
-     * =====================================
-     */
 
     case "codeBlock":
       return (
         <pre key={path}>
-          <code>{renderChildren(node, path)}</code>
+          <code>
+            {renderChildren(
+              node,
+
+              path,
+            )}
+          </code>
         </pre>
       );
 
-    /*
-     * =====================================
-     * DOCUMENT
-     * =====================================
-     */
-
     case "doc":
       return (
-        <React.Fragment key={path}>{renderChildren(node, path)}</React.Fragment>
-      );
+        <React.Fragment key={path}>
+          {renderChildren(
+            node,
 
-    /*
-     * =====================================
-     * UNKNOWN NODE
-     * =====================================
-     *
-     * Future TipTap extensions should not
-     * crash Public pages.
-     *
-     * We render known children but ignore
-     * the unsupported wrapper.
-     * =====================================
-     */
+            path,
+          )}
+        </React.Fragment>
+      );
 
     default:
       return (
-        <React.Fragment key={path}>{renderChildren(node, path)}</React.Fragment>
+        <React.Fragment key={path}>
+          {renderChildren(
+            node,
+
+            path,
+          )}
+        </React.Fragment>
       );
   }
 }
 
-/*
- * =========================================================
- * SHARED PUBLIC STYLES
- * =========================================================
- */
-
 const CONTENT_CLASS_NAME = `
   text-[12px]
   leading-[1.65]
-  text-black/80
+  text-[var(--public-foreground)]
 
   sm:text-[13px]
 
@@ -384,10 +340,10 @@ const CONTENT_CLASS_NAME = `
   [&_blockquote]:border-l
   [&_blockquote]:border-[var(--public-primary)]
   [&_blockquote]:pl-4
-  [&_blockquote]:text-black/55
+  [&_blockquote]:text-[var(--public-muted-foreground)]
 
   [&_code]:rounded
-  [&_code]:bg-black/[0.04]
+  [&_code]:bg-[var(--public-surface)]
   [&_code]:px-1
   [&_code]:py-0.5
   [&_code]:text-[0.92em]
@@ -397,17 +353,19 @@ const CONTENT_CLASS_NAME = `
   [&_h2]:text-[16px]
   [&_h2]:font-semibold
   [&_h2]:leading-[1.4]
+  [&_h2]:text-[var(--public-foreground)]
 
   [&_h3]:mb-3
   [&_h3]:mt-6
   [&_h3]:text-[14px]
   [&_h3]:font-semibold
   [&_h3]:leading-[1.45]
+  [&_h3]:text-[var(--public-foreground)]
 
   [&_hr]:my-7
   [&_hr]:border-0
   [&_hr]:border-t
-  [&_hr]:border-black/[0.08]
+  [&_hr]:border-[var(--public-border)]
 
   [&_li]:mb-1
 
@@ -420,8 +378,9 @@ const CONTENT_CLASS_NAME = `
   [&_pre]:my-5
   [&_pre]:overflow-x-auto
   [&_pre]:rounded-xl
-  [&_pre]:bg-black/[0.035]
+  [&_pre]:bg-[var(--public-surface)]
   [&_pre]:p-4
+  [&_pre]:text-[var(--public-foreground)]
 
   [&_strong]:font-semibold
 
@@ -433,30 +392,14 @@ const CONTENT_CLASS_NAME = `
   [&_u]:underline-offset-2
 `;
 
-/*
- * =========================================================
- * PUBLIC RICH TEXT
- * =========================================================
- *
- * Supported inputs:
- *
- * 1. Legacy Markdown / plain string
- * 2. TipTap JSON document
- *
- * No raw HTML is enabled.
- * =========================================================
- */
+export default function PublicRichText({
+  value,
 
-export default function PublicRichText({ value, className = "" }) {
+  className = "",
+}) {
   if (!value) {
     return null;
   }
-
-  /*
-   * =====================================
-   * LEGACY
-   * =====================================
-   */
 
   if (isLegacyString(value)) {
     if (!value.trim()) {
@@ -470,25 +413,17 @@ export default function PublicRichText({ value, className = "" }) {
     );
   }
 
-  /*
-   * =====================================
-   * TIPTAP
-   * =====================================
-   */
-
   if (isTiptapDocument(value)) {
     return (
       <div className={`${CONTENT_CLASS_NAME} ${className}`}>
-        {renderNode(value, "root")}
+        {renderNode(
+          value,
+
+          "root",
+        )}
       </div>
     );
   }
 
-  /*
-   * Unsupported / malformed content.
-   *
-   * Fail quietly on Public instead of
-   * breaking the entire page.
-   */
   return null;
 }

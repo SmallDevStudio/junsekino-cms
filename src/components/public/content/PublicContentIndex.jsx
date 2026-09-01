@@ -8,13 +8,11 @@ import { useMemo, useState } from "react";
 
 import PublicContentCard from "./PublicContentCard";
 
-/*
- * =========================================================
- * HELPERS
- * =========================================================
- */
+function matchesSearch(
+  item,
 
-function matchesSearch(item, keyword) {
+  keyword,
+) {
   const search = String(keyword || "")
     .trim()
     .toLowerCase();
@@ -25,9 +23,11 @@ function matchesSearch(item, keyword) {
 
   const values = [
     item.title?.en,
+
     item.title?.th,
 
     item.excerpt?.en,
+
     item.excerpt?.th,
 
     item.source?.metadata?.title,
@@ -44,12 +44,6 @@ function matchesSearch(item, keyword) {
 
   return values.includes(search);
 }
-
-/*
- * =========================================================
- * INDEX
- * =========================================================
- */
 
 export default function PublicContentIndex({
   companySlug,
@@ -74,13 +68,6 @@ export default function PublicContentIndex({
 
   const hasFilters = Boolean(keyword || section || provider || tag);
 
-  /*
-   * Items already arrive from the
-   * server sorted by createdAt DESC.
-   *
-   * Client filtering therefore
-   * preserves the same order.
-   */
   const filteredItems = useMemo(
     () =>
       items.filter((item) => {
@@ -96,31 +83,52 @@ export default function PublicContentIndex({
           return false;
         }
 
-        return matchesSearch(item, keyword);
+        return matchesSearch(
+          item,
+
+          keyword,
+        );
       }),
     [items, keyword, section, provider, tag],
   );
 
   function clearFilters() {
     setKeyword("");
+
     setSection("");
+
     setProvider("");
+
     setTag("");
   }
+
+  const selectClassName = `
+    cursor-pointer
+    border-0
+    border-b
+    border-[var(--public-border)]
+    bg-[var(--public-background)]
+    pb-2
+    text-[10px]
+    uppercase
+    tracking-[0.05em]
+    text-[var(--public-foreground)]
+    outline-none
+    transition-colors
+    focus:border-[var(--public-primary)]
+  `;
 
   return (
     <div
       className="
         w-full
-
+        bg-[var(--public-background)]
         px-6
         pb-16
-
+        text-[var(--public-foreground)]
         sm:px-8
-
         lg:px-12
         lg:pb-24
-
         xl:px-16
       "
     >
@@ -131,19 +139,13 @@ export default function PublicContentIndex({
           max-w-[1100px]
         "
       >
-        {/* =====================================
-            BREADCRUMB + FILTER
-        ===================================== */}
-
         <div
           className="
             flex
             items-center
             justify-between
             gap-6
-
             pt-2
-
             lg:pt-4
           "
         >
@@ -154,22 +156,18 @@ export default function PublicContentIndex({
               min-w-0
               items-center
               gap-2
-
               text-[10px]
               uppercase
               tracking-[0.06em]
-
               sm:text-[11px]
             "
           >
             <Link
               href={`/${companySlug}`}
               className="
-                text-black/25
-
+                text-[var(--public-muted-foreground)]
                 transition-colors
-
-                hover:text-black/55
+                hover:text-[var(--public-foreground)]
               "
             >
               Home
@@ -177,7 +175,7 @@ export default function PublicContentIndex({
 
             <span
               className="
-                text-black/15
+                text-[var(--public-border)]
               "
             >
               /
@@ -186,7 +184,6 @@ export default function PublicContentIndex({
             <span
               className="
                 font-medium
-
                 text-[var(--public-primary)]
               "
             >
@@ -201,20 +198,14 @@ export default function PublicContentIndex({
             onClick={() => setFilterOpen((current) => !current)}
             className="
               group
-
               flex
               h-8
               w-8
-
               shrink-0
-
               items-center
               justify-center
-
-              text-black/25
-
+              text-[var(--public-muted-foreground)]
               transition-colors
-
               hover:text-[var(--public-primary)]
             "
           >
@@ -227,7 +218,6 @@ export default function PublicContentIndex({
                 className="
                   transition-transform
                   duration-200
-
                   group-hover:scale-110
                 "
               />
@@ -235,47 +225,31 @@ export default function PublicContentIndex({
           </button>
         </div>
 
-        {/* =====================================
-            FILTER
-        ===================================== */}
-
         {filterOpen && (
           <div
             className="
               mt-8
-
               grid
               grid-cols-1
-
               gap-5
-
               border-b
-              border-black/[0.08]
-
+              border-[var(--public-border)]
               pb-5
-
               md:grid-cols-[minmax(220px,1fr)_160px_160px_160px_auto]
               md:items-end
               md:gap-6
             "
           >
-            {/* SEARCH */}
-
             <label
               className="
                 group
-
                 flex
                 items-center
                 gap-2
-
                 border-b
-                border-black/10
-
+                border-[var(--public-border)]
                 pb-2
-
                 transition-colors
-
                 focus-within:border-[var(--public-primary)]
               "
             >
@@ -284,9 +258,7 @@ export default function PublicContentIndex({
                 strokeWidth={1.1}
                 className="
                   shrink-0
-
-                  text-black/25
-
+                  text-[var(--public-muted-foreground)]
                   group-focus-within:text-[var(--public-primary)]
                 "
               />
@@ -302,17 +274,12 @@ export default function PublicContentIndex({
                 className="
                   min-w-0
                   flex-1
-
                   bg-transparent
-
                   text-[11px]
                   tracking-[0.02em]
-                  text-black/70
-
+                  text-[var(--public-foreground)]
                   outline-none
-
-                  placeholder:text-black/25
-
+                  placeholder:text-[var(--public-muted-foreground)]
                   sm:text-[12px]
                 "
               />
@@ -326,12 +293,9 @@ export default function PublicContentIndex({
                     flex
                     h-5
                     w-5
-
                     items-center
                     justify-center
-
-                    text-black/20
-
+                    text-[var(--public-muted-foreground)]
                     hover:text-[var(--public-primary)]
                   "
                 >
@@ -339,8 +303,6 @@ export default function PublicContentIndex({
                 </button>
               )}
             </label>
-
-            {/* TYPE */}
 
             <label
               className="
@@ -354,8 +316,7 @@ export default function PublicContentIndex({
                   text-[8px]
                   uppercase
                   tracking-[0.09em]
-
-                  text-black/25
+                  text-[var(--public-muted-foreground)]
                 "
               >
                 Type
@@ -364,27 +325,7 @@ export default function PublicContentIndex({
               <select
                 value={section}
                 onChange={(event) => setSection(event.target.value)}
-                className="
-                  cursor-pointer
-
-                  border-0
-                  border-b
-                  border-black/10
-
-                  bg-transparent
-
-                  pb-2
-
-                  text-[10px]
-                  uppercase
-                  tracking-[0.05em]
-
-                  text-black/50
-
-                  outline-none
-
-                  focus:border-[var(--public-primary)]
-                "
+                className={selectClassName}
               >
                 <option value="">All</option>
 
@@ -394,8 +335,6 @@ export default function PublicContentIndex({
               </select>
             </label>
 
-            {/* PROVIDER */}
-
             <label
               className="
                 flex
@@ -408,8 +347,7 @@ export default function PublicContentIndex({
                   text-[8px]
                   uppercase
                   tracking-[0.09em]
-
-                  text-black/25
+                  text-[var(--public-muted-foreground)]
                 "
               >
                 Provider
@@ -418,27 +356,7 @@ export default function PublicContentIndex({
               <select
                 value={provider}
                 onChange={(event) => setProvider(event.target.value)}
-                className="
-                  cursor-pointer
-
-                  border-0
-                  border-b
-                  border-black/10
-
-                  bg-transparent
-
-                  pb-2
-
-                  text-[10px]
-                  uppercase
-                  tracking-[0.05em]
-
-                  text-black/50
-
-                  outline-none
-
-                  focus:border-[var(--public-primary)]
-                "
+                className={selectClassName}
               >
                 <option value="">All Providers</option>
 
@@ -450,8 +368,6 @@ export default function PublicContentIndex({
               </select>
             </label>
 
-            {/* TAG */}
-
             <label
               className="
                 flex
@@ -464,8 +380,7 @@ export default function PublicContentIndex({
                   text-[8px]
                   uppercase
                   tracking-[0.09em]
-
-                  text-black/25
+                  text-[var(--public-muted-foreground)]
                 "
               >
                 Tag
@@ -474,27 +389,7 @@ export default function PublicContentIndex({
               <select
                 value={tag}
                 onChange={(event) => setTag(event.target.value)}
-                className="
-                  cursor-pointer
-
-                  border-0
-                  border-b
-                  border-black/10
-
-                  bg-transparent
-
-                  pb-2
-
-                  text-[10px]
-                  uppercase
-                  tracking-[0.05em]
-
-                  text-black/50
-
-                  outline-none
-
-                  focus:border-[var(--public-primary)]
-                "
+                className={selectClassName}
               >
                 <option value="">All Tags</option>
 
@@ -506,27 +401,20 @@ export default function PublicContentIndex({
               </select>
             </label>
 
-            {/* CLEAR */}
-
             <button
               type="button"
               disabled={!hasFilters}
               onClick={clearFilters}
               className="
                 pb-2
-
                 text-left
                 text-[9px]
                 uppercase
                 tracking-[0.08em]
-
-                text-black/25
-
+                text-[var(--public-muted-foreground)]
                 enabled:hover:text-[var(--public-primary)]
-
                 disabled:cursor-default
                 disabled:opacity-0
-
                 md:text-right
               "
             >
@@ -535,15 +423,10 @@ export default function PublicContentIndex({
           </div>
         )}
 
-        {/* =====================================
-            FILTER SUMMARY
-        ===================================== */}
-
         {hasFilters && (
           <div
             className="
               mt-7
-
               flex
               items-center
               gap-4
@@ -552,11 +435,9 @@ export default function PublicContentIndex({
             <span
               className="
                 shrink-0
-
                 text-[9px]
                 uppercase
                 tracking-[0.07em]
-
                 text-[var(--public-primary)]
               "
             >
@@ -568,20 +449,17 @@ export default function PublicContentIndex({
                 h-px
                 min-w-0
                 flex-1
-
-                bg-black/10
+                bg-[var(--public-border)]
               "
             />
 
             <span
               className="
                 shrink-0
-
                 text-[9px]
                 uppercase
                 tracking-[0.07em]
-
-                text-black/25
+                text-[var(--public-muted-foreground)]
               "
             >
               {filteredItems.length}{" "}
@@ -596,12 +474,9 @@ export default function PublicContentIndex({
                 flex
                 h-6
                 w-6
-
                 items-center
                 justify-center
-
-                text-black/20
-
+                text-[var(--public-muted-foreground)]
                 hover:text-[var(--public-primary)]
               "
             >
@@ -610,24 +485,17 @@ export default function PublicContentIndex({
           </div>
         )}
 
-        {/* =====================================
-            CONTENT
-        ===================================== */}
-
         {!items.length ? (
           <div
             className="
               flex
               min-h-[50vh]
-
               items-center
               justify-center
-
               text-[11px]
               uppercase
               tracking-[0.08em]
-
-              text-black/25
+              text-[var(--public-muted-foreground)]
             "
           >
             No public content available
@@ -637,12 +505,9 @@ export default function PublicContentIndex({
             className="
               flex
               min-h-[360px]
-
               flex-col
-
               items-center
               justify-center
-
               text-center
             "
           >
@@ -651,8 +516,7 @@ export default function PublicContentIndex({
                 text-[10px]
                 uppercase
                 tracking-[0.08em]
-
-                text-black/25
+                text-[var(--public-muted-foreground)]
               "
             >
               No content found
@@ -663,13 +527,10 @@ export default function PublicContentIndex({
               onClick={clearFilters}
               className="
                 mt-4
-
                 text-[9px]
                 uppercase
                 tracking-[0.08em]
-
                 text-[var(--public-primary)]
-
                 hover:opacity-60
               "
             >
@@ -680,12 +541,9 @@ export default function PublicContentIndex({
           <div
             className="
               mt-10
-
               space-y-12
-
               sm:mt-12
               sm:space-y-14
-
               lg:mt-14
               lg:space-y-16
             "

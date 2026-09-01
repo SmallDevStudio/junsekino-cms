@@ -1,8 +1,10 @@
 import { z } from "zod";
 
 import {
-  COMPANY_STATUS,
   COMPANY_LOCALES,
+  COMPANY_LOGO_MODE,
+  COMPANY_STATUS,
+  COMPANY_THEME_MODE,
   DEFAULT_COMPANY_LOCALE,
   DEFAULT_COMPANY_LOCALES,
 } from "@/constants/company";
@@ -13,15 +15,134 @@ import {
  * =========================================================
  */
 
-const nullableUrlSchema = z
-  .union([z.string().url(), z.literal(""), z.null()])
+const nullableStringSchema = z
+  .union([z.string().trim().max(1000), z.null()])
   .optional();
 
-const nullableStringSchema = z.union([z.string(), z.null()]).optional();
+const nullableUrlSchema = z
+  .union([z.string().trim().url(), z.literal(""), z.null()])
+  .optional();
+
+const nullableEmailSchema = z
+  .union([z.string().trim().email(), z.literal(""), z.null()])
+  .optional();
+
+const nullableNumberSchema = z.union([z.number(), z.null()]).optional();
 
 const colorSchema = z
   .string()
+  .trim()
   .regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/, "Invalid HEX color.");
+
+const localizedPlainTextSchema = z
+  .object({
+    en: z.string().max(3000).optional(),
+
+    th: z.string().max(3000).optional(),
+  })
+  .optional();
+
+/*
+ * =========================================================
+ * COMPANY MEDIA REFERENCE
+ * =========================================================
+ *
+ * Uses the same structure returned by CoverImageField.
+ *
+ * Legacy string values remain supported during migration.
+ *
+ * IMPORTANT:
+ * These schemas must be declared before brandingSchema.
+ * =========================================================
+ */
+
+const localizedMediaTextSchema = z.object({
+  en: z.string().max(500).optional(),
+
+  th: z.string().max(500).optional(),
+});
+
+const mediaCropSchema = z
+  .object({
+    x: z.number().optional(),
+
+    y: z.number().optional(),
+
+    zoom: z.number().optional(),
+
+    rotation: z.number().optional(),
+
+    aspect: z.number().optional(),
+
+    objectPosition: z.string().max(100).optional(),
+  })
+  .passthrough()
+  .nullable()
+  .optional();
+
+const companyMediaReferenceSchema = z.object({
+  mediaId: z.string().trim().min(1).max(200),
+
+  alt: localizedMediaTextSchema.optional(),
+
+  caption: localizedMediaTextSchema.optional(),
+
+  crop: mediaCropSchema,
+});
+
+/*
+ * Existing records may contain only the Media ID.
+ *
+ * New records use:
+ *
+ * {
+ *   mediaId,
+ *   alt,
+ *   caption,
+ *   crop
+ * }
+ */
+const companyLogoReferenceSchema = z
+  .union([
+    companyMediaReferenceSchema,
+
+    z.string().trim().min(1).max(200),
+
+    z.null(),
+  ])
+  .optional();
+
+/*
+ * =========================================================
+ * COMPANY PROFILE
+ * =========================================================
+ */
+
+const companyProfileSchema = z
+  .object({
+    taxId: nullableStringSchema,
+
+    registrationNumber: nullableStringSchema,
+
+    email: nullableEmailSchema,
+
+    phone: nullableStringSchema,
+
+    secondaryPhone: nullableStringSchema,
+
+    website: nullableUrlSchema,
+
+    address: localizedPlainTextSchema,
+
+    mapUrl: nullableUrlSchema,
+
+    latitude: nullableNumberSchema,
+
+    longitude: nullableNumberSchema,
+
+    businessHours: localizedPlainTextSchema,
+  })
+  .optional();
 
 /*
  * =========================================================
@@ -30,28 +151,30 @@ const colorSchema = z
  */
 
 const localizedSeoSchema = z.object({
-  title: z.string().max(70).default(""),
+  title: z.string().max(70).optional(),
 
-  description: z.string().max(180).default(""),
+  description: z.string().max(180).optional(),
 
-  keywords: z.array(z.string().max(100)).default([]),
+  keywords: z.array(z.string().trim().max(100)).max(100).optional(),
 
-  ogTitle: z.string().max(100).default(""),
+  ogTitle: z.string().max(100).optional(),
 
-  ogDescription: z.string().max(200).default(""),
+  ogDescription: z.string().max(200).optional(),
 
-  ogImage: nullableStringSchema,
+  ogImage: companyLogoReferenceSchema,
 });
 
-const seoSchema = z.object({
-  th: localizedSeoSchema,
+const seoSchema = z
+  .object({
+    th: localizedSeoSchema.optional(),
 
-  en: localizedSeoSchema,
+    en: localizedSeoSchema.optional(),
 
-  index: z.boolean(),
+    index: z.boolean().optional(),
 
-  follow: z.boolean(),
-});
+    follow: z.boolean().optional(),
+  })
+  .optional();
 
 /*
  * =========================================================
@@ -59,27 +182,152 @@ const seoSchema = z.object({
  * =========================================================
  */
 
-const brandingSchema = z.object({
-  logoLight: nullableStringSchema,
+const brandingColorsSchema = z.object({
+  /*
+   * Main brand color.
+   *
+   * Used for buttons, links, active menus
+   * and important highlights.
+   */
+  primary: colorSchema.optional(),
 
-  logoDark: nullableStringSchema,
+  /*
+   * Secondary brand color.
+   */
+  secondary: colorSchema.optional(),
 
-  favicon: nullableStringSchema,
+  /*
+   * Decorative/highlight color.
+   */
+  accent: colorSchema.optional(),
 
-  colors: z.object({
-    primary: colorSchema,
+  /*
+   * Backward-compatible public colors.
+   *
+   * Existing public pages may still read
+   * these values directly.
+   *
+   * Company Settings UI will display them
+   * under the Light Theme section.
+   */
+  background: colorSchema.optional(),
 
-    secondary: colorSchema,
+  surface: colorSchema.optional(),
 
-    accent: colorSchema,
-
-    background: colorSchema,
-
-    surface: colorSchema,
-
-    text: colorSchema,
-  }),
+  text: colorSchema.optional(),
 });
+
+const textLogoSchema = z.object({
+  /*
+   * Main wordmark.
+   *
+   * Example: JUNSEKINO
+   */
+  text: z.string().trim().max(100).optional(),
+
+  /*
+   * Highlighted suffix.
+   *
+   * Example: I+D or A+D
+   */
+  highlight: z.string().trim().max(50).optional(),
+
+  /*
+   * Optional separator between text
+   * and highlighted suffix.
+   */
+  separator: z.string().max(10).optional(),
+});
+
+const brandingSchema = z
+  .object({
+    /*
+     * auto:
+     * Use an image when available, otherwise text.
+     *
+     * image:
+     * Prefer the image, with text fallback.
+     *
+     * text:
+     * Always use the text wordmark.
+     */
+    logoMode: z
+      .enum([
+        COMPANY_LOGO_MODE.AUTO,
+        COMPANY_LOGO_MODE.IMAGE,
+        COMPANY_LOGO_MODE.TEXT,
+      ])
+      .optional(),
+
+    /*
+     * Logo displayed on a light background.
+     */
+    logoLight: companyLogoReferenceSchema,
+
+    /*
+     * Logo displayed on a dark background.
+     */
+    logoDark: companyLogoReferenceSchema,
+
+    /*
+     * Square browser/site icon.
+     */
+    favicon: companyLogoReferenceSchema,
+
+    /*
+     * Text logo and image fallback.
+     */
+    textLogo: textLogoSchema.optional(),
+
+    colors: brandingColorsSchema.optional(),
+  })
+  .optional();
+
+/*
+ * =========================================================
+ * PUBLIC THEME
+ * =========================================================
+ */
+
+const themeColorSetSchema = z.object({
+  background: colorSchema.optional(),
+
+  surface: colorSchema.optional(),
+
+  text: colorSchema.optional(),
+
+  mutedText: colorSchema.optional(),
+
+  border: colorSchema.optional(),
+});
+
+const themeSchema = z
+  .object({
+    /*
+     * Default mode of the public website.
+     *
+     * Admin theme remains a user preference
+     * and is not controlled here.
+     */
+    defaultMode: z
+      .enum([
+        COMPANY_THEME_MODE.LIGHT,
+        COMPANY_THEME_MODE.DARK,
+        COMPANY_THEME_MODE.SYSTEM,
+      ])
+      .optional(),
+
+    /*
+     * Whether public visitors may select
+     * their own Light/Dark preference.
+     */
+    allowVisitorPreference: z.boolean().optional(),
+
+    light: themeColorSetSchema.optional(),
+
+    dark: themeColorSetSchema.optional(),
+  })
+  .optional();
 
 /*
  * =========================================================
@@ -87,31 +335,53 @@ const brandingSchema = z.object({
  * =========================================================
  */
 
-const socialSchema = z.object({
-  facebook: nullableUrlSchema,
+const socialSchema = z
+  .object({
+    facebook: nullableUrlSchema,
 
-  instagram: nullableUrlSchema,
+    instagram: nullableUrlSchema,
 
-  linkedin: nullableUrlSchema,
+    linkedin: nullableUrlSchema,
 
-  youtube: nullableUrlSchema,
+    youtube: nullableUrlSchema,
 
-  x: nullableUrlSchema,
+    x: nullableUrlSchema,
 
-  tiktok: nullableUrlSchema,
+    tiktok: nullableUrlSchema,
 
-  pinterest: nullableUrlSchema,
-});
+    pinterest: nullableUrlSchema,
+
+    line: nullableUrlSchema,
+  })
+  .optional();
+
+/*
+ * =========================================================
+ * SETUP
+ * =========================================================
+ */
+
+const setupSchema = z
+  .object({
+    completed: z.boolean().optional(),
+
+    completedSteps: z
+      .object({
+        profile: z.boolean().optional(),
+
+        branding: z.boolean().optional(),
+
+        contact: z.boolean().optional(),
+
+        seo: z.boolean().optional(),
+      })
+      .optional(),
+  })
+  .optional();
 
 /*
  * =========================================================
  * LOCALIZATION
- * =========================================================
- *
- * English is mandatory.
- *
- * Thai is optional and can be enabled
- * from Company Settings.
  * =========================================================
  */
 
@@ -127,14 +397,6 @@ const supportedLocalesSchema = z
 /*
  * =========================================================
  * BASE OBJECT
- * =========================================================
- *
- * IMPORTANT
- *
- * Keep this as a plain z.object().
- *
- * Do NOT put superRefine here because
- * updateCompanySchema needs .partial().
  * =========================================================
  */
 
@@ -163,26 +425,46 @@ const companyObjectSchema = z.object({
     ])
     .default(COMPANY_STATUS.ACTIVE),
 
-  /*
-   * Public website default locale.
-   *
-   * English remains platform default.
-   */
   defaultLocale: z
     .enum([COMPANY_LOCALES.EN, COMPANY_LOCALES.TH])
     .default(DEFAULT_COMPANY_LOCALE),
 
-  /*
-   * Public website enabled languages.
-   */
   supportedLocales: supportedLocalesSchema,
 
-  branding: brandingSchema.optional(),
+  profile: companyProfileSchema,
 
-  social: socialSchema.optional(),
+  branding: brandingSchema,
 
-  seo: seoSchema.optional(),
+  theme: themeSchema,
+
+  social: socialSchema,
+
+  seo: seoSchema,
+
+  setup: setupSchema,
 });
+
+/*
+ * =========================================================
+ * LOCALIZATION VALIDATION
+ * =========================================================
+ */
+
+function validateLocalization(company, context) {
+  if (
+    company.defaultLocale === COMPANY_LOCALES.TH &&
+    Array.isArray(company.supportedLocales) &&
+    !company.supportedLocales.includes(COMPANY_LOCALES.TH)
+  ) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+
+      path: ["defaultLocale"],
+
+      message: "Thai cannot be the default language unless Thai is enabled.",
+    });
+  }
+}
 
 /*
  * =========================================================
@@ -190,87 +472,18 @@ const companyObjectSchema = z.object({
  * =========================================================
  */
 
-export const createCompanySchema = companyObjectSchema.superRefine(
-  (company, context) => {
-    /*
-     * Thai may only be the default
-     * language when Thai is enabled.
-     */
-
-    if (
-      company.defaultLocale === COMPANY_LOCALES.TH &&
-      !company.supportedLocales.includes(COMPANY_LOCALES.TH)
-    ) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-
-        path: ["defaultLocale"],
-
-        message: "Thai cannot be the default language unless Thai is enabled.",
-      });
-    }
-  },
-);
+export const createCompanySchema =
+  companyObjectSchema.superRefine(validateLocalization);
 
 /*
  * =========================================================
  * UPDATE
  * =========================================================
- *
- * partial() MUST be applied before
- * superRefine().
- *
- * During PATCH, either localization
- * field may be omitted.
- *
- * Full merged-record validation will
- * remain a service-layer responsibility.
- * =========================================================
  */
 
 export const updateCompanySchema = companyObjectSchema
   .partial()
-  .superRefine((company, context) => {
-    /*
-     * We can validate this relation
-     * here only when both values are
-     * included in the request.
-     */
-
-    if (
-      company.defaultLocale === COMPANY_LOCALES.TH &&
-      Array.isArray(company.supportedLocales) &&
-      !company.supportedLocales.includes(COMPANY_LOCALES.TH)
-    ) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-
-        path: ["defaultLocale"],
-
-        message: "Thai cannot be the default language unless Thai is enabled.",
-      });
-    }
-
-    /*
-     * If caller explicitly removes TH
-     * while also explicitly declaring
-     * TH as default, reject the request.
-     */
-
-    if (
-      Array.isArray(company.supportedLocales) &&
-      company.defaultLocale === COMPANY_LOCALES.TH &&
-      !company.supportedLocales.includes(COMPANY_LOCALES.TH)
-    ) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-
-        path: ["supportedLocales"],
-
-        message: "Thai must remain enabled while it is the default language.",
-      });
-    }
-  });
+  .superRefine(validateLocalization);
 
 /*
  * =========================================================

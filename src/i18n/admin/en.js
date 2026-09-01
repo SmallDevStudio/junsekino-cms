@@ -37,6 +37,8 @@ export const adminEn = {
     changeImage: "Change Image",
     selectImage: "Select Image",
     reset: "Reset",
+    back: "Back",
+    next: "Next",
   },
 
   navigation: {
@@ -862,15 +864,15 @@ export const adminEn = {
   },
 
   companySwitcher: {
+    workspace: "Workspace",
+    current: "Current workspace",
+    select: "Select a company to manage",
+    singleCompany: "Manage the current company or create a new one",
+    create: "Create company",
+    createDescription: "Add a new independent workspace",
     loading: "Loading workspace",
     unavailable: "Company unavailable",
-    noCompany: "No company",
-
-    currentCompany: "Current company: {company}",
-
-    workspace: "Workspace",
-
-    selectDescription: "Select company to manage",
+    noCompany: "No company available",
   },
 
   media: {
@@ -2615,6 +2617,32 @@ export const adminEn = {
 
       deleteFailed: "Unable to delete Contact.",
     },
+
+    companyProfile: {
+      title: "Company Profile information",
+
+      description:
+        "Address, telephone, email, website and business hours are managed centrally in Company Settings.",
+
+      edit: "Edit Company Profile",
+
+      address: "Address",
+
+      phone: "Telephone",
+
+      secondaryPhone: "Secondary telephone",
+
+      email: "Email",
+
+      website: "Website",
+
+      businessHours: "Business hours",
+
+      emptyTitle: "Company Profile is incomplete",
+
+      emptyDescription:
+        "Add contact information in Company Settings before publishing this Contact page.",
+    },
   },
 
   email: {
@@ -3123,9 +3151,232 @@ export const adminEn = {
 
       saved: "Company created successfully.",
 
+      errors: {},
+
+      success: "Company created successfully.",
+
+      creating: "Creating company...",
+
+      steps: {
+        identity: "Identity",
+        profile: "Contact",
+        branding: "Branding",
+      },
+
+      identity: {
+        title: "Company identity",
+        description:
+          "Enter the information required to create an independent company workspace.",
+      },
+
+      profile: {
+        title: "Company contact information",
+        description:
+          "This information is used by the public Contact page. You can complete it later.",
+      },
+
+      branding: {
+        title: "Initial branding",
+        description:
+          "Set the initial text logo and brand colors. Image logos can be uploaded after creation.",
+
+        preview: "Preview",
+        button: "Primary action",
+
+        logoLater:
+          "Image logos and favicon can be uploaded from Company Settings after the workspace is created.",
+      },
+
       errors: {
         save: "Unable to create company.",
+
+        bootstrap:
+          "The company was created, but some default content could not be prepared. You can run setup again later.",
+
+        nameRequired: "Company name is required.",
+
+        slugRequired: "Company slug is required.",
+
+        emailInvalid: "Contact email is invalid.",
+
+        websiteInvalid: "Website must be a valid URL including https://",
+
+        colorInvalid: "Brand colors must use a valid HEX format.",
+
+        save: "Unable to create company.",
       },
+    },
+
+    sections: {
+      basic: {
+        title: "Company information",
+        description: "Basic company identity and public website access.",
+      },
+
+      profile: {
+        title: "Company profile and contact",
+        description:
+          "This information is the primary source used by the public Contact page.",
+      },
+
+      logo: {
+        title: "Company logo",
+        description:
+          "Upload image logos or use a text logo as an automatic fallback.",
+      },
+
+      branding: {
+        title: "Brand colors",
+        description:
+          "Use primary for important actions, secondary for contrast, and accent for decorative highlights.",
+      },
+
+      theme: {
+        title: "Public website theme",
+        description:
+          "Configure the background, surface, text and border colors of the public website.",
+      },
+
+      social: {
+        title: "Social media",
+        description:
+          "Links displayed on the public website and company header.",
+      },
+
+      seo: {
+        title: "Search and social sharing",
+        description:
+          "Default SEO metadata used when an individual page does not provide its own values.",
+      },
+    },
+
+    social: {
+      facebook: "Facebook",
+      instagram: "Instagram",
+      youtube: "YouTube",
+      linkedin: "LinkedIn",
+      tiktok: "TikTok",
+      x: "X",
+      pinterest: "Pinterest",
+      line: "LINE",
+    },
+
+    seo: {
+      title: "SEO title",
+      description: "SEO description",
+      keywords: "Keywords",
+      keywordsHelp: "Separate keywords with commas.",
+      ogTitle: "Social sharing title",
+      ogDescription: "Social sharing description",
+      ogImage: "Social sharing image",
+      ogImageDescription:
+        "Recommended aspect ratio 1.91:1 for Facebook, LINE and other social platforms.",
+      emptyImage: "No sharing image selected",
+      emptyImageDescription: "Select an image from the company media library.",
+      selectImage: "Select image",
+      pickerTitle: "Select social sharing image",
+      allowIndex: "Allow search engines to index this company site",
+      allowFollow: "Allow search engines to follow links",
+      thDisabledTitle: "Thai SEO is disabled",
+      thDisabledDescription:
+        "Enable Thai in Company Information to configure Thai SEO metadata.",
+    },
+
+    help: {
+      slug: "Changing the slug changes the public website URL.",
+
+      superadminOnly: "This field can only be changed by a Superadmin.",
+    },
+
+    status: {
+      active: "Active",
+      inactive: "Inactive",
+      archived: "Archived",
+    },
+
+    profile: {
+      taxId: "Tax ID",
+      registrationNumber: "Registration number",
+      email: "Contact email",
+      phone: "Telephone",
+      secondaryPhone: "Secondary telephone",
+      website: "Website",
+      addressEn: "Address — English",
+      addressTh: "Address — Thai",
+      mapUrl: "Google Maps URL",
+      latitude: "Latitude",
+      longitude: "Longitude",
+      businessHoursEn: "Business hours — English",
+      businessHoursTh: "Business hours — Thai",
+    },
+
+    logo: {
+      mode: "Logo display",
+      text: "Main text",
+      highlight: "Highlighted text",
+
+      modes: {
+        auto: "Automatic",
+        image: "Image logo",
+        text: "Text logo",
+      },
+
+      lightTitle: "Logo for light background",
+      lightDescription: "Used when the website background is light.",
+
+      darkTitle: "Logo for dark background",
+      darkDescription: "Used when the website background is dark.",
+
+      faviconTitle: "Favicon",
+      faviconDescription: "Square icon used by browsers and shortcuts.",
+
+      emptyTitle: "No logo selected",
+      emptyDescription: "Select an image from the company media library.",
+
+      emptyFavicon: "No favicon selected",
+      emptyFaviconDescription: "Select a square image from the media library.",
+
+      select: "Select image",
+      pickerTitle: "Select company logo",
+      faviconPickerTitle: "Select favicon",
+    },
+
+    colorHelp: {
+      primary: "Buttons, active menus, links and important highlights.",
+
+      secondary: "Secondary brand color and primary button contrast.",
+
+      accent: "Badges, decorative elements and small highlights.",
+    },
+
+    theme: {
+      defaultMode: "Default website mode",
+
+      allowVisitorPreference: "Allow visitors to choose Light or Dark mode",
+
+      modes: {
+        light: "Light",
+        dark: "Dark",
+        system: "System",
+      },
+
+      lightTitle: "Light theme",
+      darkTitle: "Dark theme",
+
+      colors: {
+        background: "Page background",
+        surface: "Card and section surface",
+        text: "Primary text",
+        mutedText: "Secondary text",
+        border: "Border",
+      },
+
+      previewTitle: "Theme preview",
+
+      previewDescription:
+        "Preview the relationship between the company brand and website theme colors.",
+
+      previewAction: "Primary action",
     },
   },
 

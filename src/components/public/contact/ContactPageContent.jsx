@@ -2,13 +2,11 @@ import Image from "next/image";
 
 import ContactForm from "./ContactForm";
 
-/*
- * =========================================================
- * HELPERS
- * =========================================================
- */
+function localized(
+  value,
 
-function localized(value, locale) {
+  locale,
+) {
   if (!value) {
     return "";
   }
@@ -64,11 +62,61 @@ function uniqueNames(...values) {
   return names;
 }
 
-/*
- * =========================================================
- * CONTENT
- * =========================================================
- */
+function resolveCompanyProfile(company = {}) {
+  const profile = company.profile || {};
+
+  return {
+    address: profile.address || company.address || null,
+
+    telephone: profile.phone || company.phone || "",
+
+    secondaryTelephone: profile.secondaryPhone || "",
+
+    email: profile.email || company.email || "",
+
+    website: profile.website || company.website || "",
+
+    mapUrl: profile.mapUrl || company.mapUrl || "",
+
+    businessHours: profile.businessHours || null,
+  };
+}
+
+function getContactLabels(locale) {
+  if (locale === "th") {
+    return {
+      address: "ที่อยู่",
+
+      telephone: "โทรศัพท์",
+
+      secondaryTelephone: "โทรศัพท์สำรอง",
+
+      email: "อีเมล",
+
+      website: "เว็บไซต์",
+
+      businessHours: "เวลาทำการ",
+
+      established: "ก่อตั้ง",
+    };
+  }
+
+  return {
+    address: "Address",
+
+    telephone: "Tel",
+
+    secondaryTelephone: "Secondary tel",
+
+    email: "Email",
+
+    website: "Website",
+
+    businessHours: "Business hours",
+
+    established: "Established",
+  };
+}
 
 export default function ContactPageContent({
   company,
@@ -85,15 +133,28 @@ export default function ContactPageContent({
 }) {
   const contact = page?.contact || {};
 
-  const displayNameEn = normalizeDisplayName(contact.companyDisplayName?.en);
+  const profile = resolveCompanyProfile(company);
+
+  const labels = getContactLabels(locale);
+
+  const displayNameEn =
+    normalizeDisplayName(contact.companyDisplayName?.en) ||
+    normalizeDisplayName(company?.legalName) ||
+    normalizeDisplayName(company?.name);
 
   const displayNameTh = normalizeDisplayName(contact.companyDisplayName?.th);
 
-  const fallbackDisplayName = localized(contact.companyDisplayName, locale);
+  const fallbackDisplayName = localized(
+    contact.companyDisplayName,
+
+    locale,
+  );
 
   const displayNames = uniqueNames(
     displayNameEn,
+
     displayNameTh,
+
     fallbackDisplayName,
   );
 
@@ -103,22 +164,58 @@ export default function ContactPageContent({
 
   const companyLabel = resolveCompanyLabel(company);
 
-  const caption = localized(contact.coverCaption, locale);
+  const caption = localized(
+    contact.coverCaption,
 
-  const address = localized(contact.address, locale);
+    locale,
+  );
+
+  const address =
+    localized(
+      contact.address,
+
+      locale,
+    ) ||
+    localized(
+      profile.address,
+
+      locale,
+    );
 
   const year = String(contact.establishedYear || "").trim();
 
-  const telephone = String(contact.telephone || "").trim();
+  const telephone = String(contact.telephone || profile.telephone || "").trim();
 
-  const email = String(contact.email || "").trim();
+  const secondaryTelephone = String(
+    contact.secondaryTelephone || profile.secondaryTelephone || "",
+  ).trim();
+
+  const email = String(contact.email || profile.email || "").trim();
+
+  const website = String(contact.website || profile.website || "").trim();
+
+  const businessHours =
+    localized(
+      contact.businessHours,
+
+      locale,
+    ) ||
+    localized(
+      profile.businessHours,
+
+      locale,
+    );
 
   const form = page?.form || null;
 
   const resolvedCoverUrl = coverUrl || page?.featuredImage?.largeUrl || null;
 
   const coverAlt =
-    localized(page?.featuredImage?.alt, locale) ||
+    localized(
+      page?.featuredImage?.alt,
+
+      locale,
+    ) ||
     primaryDisplayName ||
     "Contact";
 
@@ -126,39 +223,63 @@ export default function ContactPageContent({
     displayNames.length > 0 || hasText(companyLabel) || hasText(year);
 
   const hasContactDetails =
-    hasText(address) || hasText(telephone) || hasText(email);
+    hasText(address) ||
+    hasText(telephone) ||
+    hasText(secondaryTelephone) ||
+    hasText(email) ||
+    hasText(website) ||
+    hasText(businessHours);
 
   const showForm = contact.form?.enabled !== false && Boolean(form);
 
   return (
-    <div className="w-full flex-1">
+    <div
+      className="
+        w-full
+        flex-1
+        bg-[var(--public-background)]
+        text-[var(--public-foreground)]
+      "
+    >
       <div
         className="
           mx-auto
           w-full
           max-w-[968px]
-
           px-5
           pb-16
           pt-2
-
           sm:px-6
           sm:pb-20
         "
       >
-        <div className="mx-auto w-full max-w-[920px]">
-          {/* =================================
-              COVER
-          ================================= */}
-
+        <div
+          className="
+            mx-auto
+            w-full
+            max-w-[920px]
+          "
+        >
           {resolvedCoverUrl && (
             <section>
-              <div className="relative aspect-[17/10] w-full overflow-hidden bg-black/[0.04]">
+              <div
+                className="
+                  relative
+                  aspect-[17/10]
+                  w-full
+                  overflow-hidden
+                  bg-[var(--public-surface)]
+                "
+              >
                 <Image
                   src={resolvedCoverUrl}
                   alt={coverAlt}
                   fill
-                  sizes="(max-width: 968px) 100vw, 920px"
+                  sizes="
+                    (max-width: 968px)
+                    100vw,
+                    920px
+                  "
                   className="object-cover"
                   unoptimized
                   priority={!preview}
@@ -172,7 +293,7 @@ export default function ContactPageContent({
                     text-right
                     text-[10px]
                     leading-[1.5]
-                    text-black/45
+                    text-[var(--public-muted-foreground)]
                   "
                 >
                   {caption}
@@ -181,31 +302,16 @@ export default function ContactPageContent({
             </section>
           )}
 
-          {/* =================================
-              COMPANY INTRODUCTION
-          ================================= */}
-
           {hasCompanyIntroduction && (
             <section className={resolvedCoverUrl ? "mt-5" : "mt-8"}>
               <div className="space-y-0.5">
-                <p
-                  className="
-                    text-[16px]
-                    font-semibold
-                    leading-[1.35]
-                    tracking-[-0.025em]
-                    sm:text-[17px]
-                  "
-                >
-                  JUNSEKINO ARCHITECT AND DESIGN CO.,LTD
-                </p>
                 {displayNames.map((name, index) => (
                   <p
                     key={`${name}-${index}`}
                     className={
                       index === 0
-                        ? "text-[16px] font-semibold leading-[1.35] tracking-[-0.025em] sm:text-[17px]"
-                        : "text-[13px] font-medium leading-[1.5] sm:text-[14px]"
+                        ? "text-[16px] font-semibold leading-[1.35] tracking-[-0.025em] text-[var(--public-foreground)] sm:text-[17px]"
+                        : "text-[13px] font-medium leading-[1.5] text-[var(--public-foreground)] sm:text-[14px]"
                     }
                   >
                     {index === 0 ? name.toUpperCase() : name}
@@ -220,7 +326,6 @@ export default function ContactPageContent({
                       font-medium
                       leading-[1.5]
                       text-[var(--public-primary)]
-
                       sm:text-[14px]
                     "
                   >
@@ -229,21 +334,31 @@ export default function ContactPageContent({
                 )}
 
                 {hasText(year) && (
-                  <p className="pt-1 text-[11px] leading-[1.6] text-black/55">
-                    (Established {year})
+                  <p
+                    className="
+                      pt-1
+                      text-[11px]
+                      leading-[1.6]
+                      text-[var(--public-muted-foreground)]
+                    "
+                  >
+                    ({labels.established} {year})
                   </p>
                 )}
               </div>
             </section>
           )}
 
-          {/* =================================
-              CONTACT INFORMATION
-          ================================= */}
-
           {hasContactDetails && (
             <>
-              <div className="my-6 border-t border-black/15 sm:my-7" />
+              <div
+                className="
+                  my-6
+                  border-t
+                  border-[var(--public-border)]
+                  sm:my-7
+                "
+              />
 
               <section>
                 {hasText(contactHeading) && (
@@ -253,7 +368,7 @@ export default function ContactPageContent({
                       text-[14px]
                       font-semibold
                       leading-[1.55]
-
+                      text-[var(--public-foreground)]
                       sm:text-[15px]
                     "
                   >
@@ -268,27 +383,42 @@ export default function ContactPageContent({
                     gap-y-3.5
                     text-[13px]
                     leading-[1.65]
-
+                    text-[var(--public-foreground)]
                     sm:grid-cols-[166px_minmax(0,1fr)]
                     sm:text-[14px]
                   "
                 >
                   {hasText(address) && (
                     <>
-                      <dt className="font-semibold">Address</dt>
+                      <dt className="font-semibold">{labels.address}</dt>
 
-                      <dd className="whitespace-pre-line">{address}</dd>
+                      <dd
+                        className="
+                          whitespace-pre-line
+                          text-[var(--public-muted-foreground)]
+                        "
+                      >
+                        {address}
+                      </dd>
                     </>
                   )}
 
                   {hasText(telephone) && (
                     <>
-                      <dt className="font-semibold">Tel</dt>
+                      <dt className="font-semibold">{labels.telephone}</dt>
 
                       <dd>
                         <a
-                          href={`tel:${telephone.replace(/[^+\d]/g, "")}`}
-                          className="transition-colors hover:text-[var(--public-primary)]"
+                          href={`tel:${telephone.replace(
+                            /[^+\d]/g,
+
+                            "",
+                          )}`}
+                          className="
+                            text-[var(--public-muted-foreground)]
+                            transition-colors
+                            hover:text-[var(--public-primary)]
+                          "
                         >
                           {telephone}
                         </a>
@@ -296,17 +426,84 @@ export default function ContactPageContent({
                     </>
                   )}
 
+                  {hasText(secondaryTelephone) && (
+                    <>
+                      <dt className="font-semibold">
+                        {labels.secondaryTelephone}
+                      </dt>
+
+                      <dd>
+                        <a
+                          href={`tel:${secondaryTelephone.replace(
+                            /[^+\d]/g,
+
+                            "",
+                          )}`}
+                          className="
+                            text-[var(--public-muted-foreground)]
+                            transition-colors
+                            hover:text-[var(--public-primary)]
+                          "
+                        >
+                          {secondaryTelephone}
+                        </a>
+                      </dd>
+                    </>
+                  )}
+
                   {hasText(email) && (
                     <>
-                      <dt className="font-semibold">Email</dt>
+                      <dt className="font-semibold">{labels.email}</dt>
 
                       <dd>
                         <a
                           href={`mailto:${email}`}
-                          className="break-all transition-colors hover:text-[var(--public-primary)]"
+                          className="
+                            break-all
+                            text-[var(--public-muted-foreground)]
+                            transition-colors
+                            hover:text-[var(--public-primary)]
+                          "
                         >
                           {email}
                         </a>
+                      </dd>
+                    </>
+                  )}
+
+                  {hasText(website) && (
+                    <>
+                      <dt className="font-semibold">{labels.website}</dt>
+
+                      <dd>
+                        <a
+                          href={website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="
+                            break-all
+                            text-[var(--public-muted-foreground)]
+                            transition-colors
+                            hover:text-[var(--public-primary)]
+                          "
+                        >
+                          {website}
+                        </a>
+                      </dd>
+                    </>
+                  )}
+
+                  {hasText(businessHours) && (
+                    <>
+                      <dt className="font-semibold">{labels.businessHours}</dt>
+
+                      <dd
+                        className="
+                          whitespace-pre-line
+                          text-[var(--public-muted-foreground)]
+                        "
+                      >
+                        {businessHours}
                       </dd>
                     </>
                   )}
@@ -315,13 +512,16 @@ export default function ContactPageContent({
             </>
           )}
 
-          {/* =================================
-              FORM
-          ================================= */}
-
           {showForm && (
             <>
-              <div className="my-6 border-t border-black/15 sm:my-7" />
+              <div
+                className="
+                  my-6
+                  border-t
+                  border-[var(--public-border)]
+                  sm:my-7
+                "
+              />
 
               <section aria-labelledby="contact-form-title">
                 <h2
@@ -332,25 +532,26 @@ export default function ContactPageContent({
                     text-[15px]
                     font-semibold
                     leading-[1.5]
-
+                    text-[var(--public-foreground)]
                     sm:text-[16px]
                   "
                 >
-                  {localized(form.name, locale) || "Contact Us"}
+                  {localized(
+                    form.name,
+
+                    locale,
+                  ) || "Contact Us"}
                 </h2>
 
                 <div
                   className="
                     rounded-xl
                     border
-                    border-black/[0.08]
-                    bg-white
-
+                    border-[var(--public-border)]
+                    bg-[var(--public-surface)]
                     px-3.5
                     py-4
-
-                    shadow-[0_1px_3px_rgba(0,0,0,0.08)]
-
+                    shadow-sm
                     sm:px-4
                     sm:py-4
                   "

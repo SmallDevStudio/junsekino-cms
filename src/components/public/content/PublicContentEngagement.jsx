@@ -30,13 +30,17 @@ function formatNumber(value) {
 
 export default function PublicContentEngagement({
   companySlug,
+
   slug,
+
   title,
 
   initialViews = 0,
+
   initialLikes = 0,
 
   trackView = false,
+
   interactiveLike = false,
 
   showShare = true,
@@ -72,12 +76,6 @@ export default function PublicContentEngagement({
       companySlug,
     )}/public-contents/${encodeURIComponent(slug)}/engagement`;
   }
-
-  /*
-   * =======================================================
-   * VIEW TRACKING
-   * =======================================================
-   */
 
   useEffect(() => {
     if (!trackView || viewRequestedRef.current) {
@@ -138,20 +136,18 @@ export default function PublicContentEngagement({
 
         setLiked(data.liked === true);
       })
-      .catch((error) => {
-        console.error("Public content view error:", error);
+      .catch((viewError) => {
+        console.error(
+          "Public content view error:",
+
+          viewError,
+        );
       });
 
     return () => {
       active = false;
     };
   }, [companySlug, slug, trackView]);
-
-  /*
-   * =======================================================
-   * LIKE
-   * =======================================================
-   */
 
   async function handleLike() {
     if (!interactiveLike || likeLoading) {
@@ -202,12 +198,32 @@ export default function PublicContentEngagement({
       });
 
       setLiked(data.liked === true);
-    } catch (error) {
-      console.error("Public content like error:", error);
+    } catch (likeError) {
+      console.error(
+        "Public content like error:",
+
+        likeError,
+      );
     } finally {
       setLikeLoading(false);
     }
   }
+
+  const metricClassName = `
+    inline-flex
+    h-8
+    items-center
+    gap-1.5
+    rounded-full
+    border
+    border-[var(--public-border)]
+    bg-[var(--public-surface)]
+    px-3
+    text-[10px]
+    font-medium
+    text-[var(--public-muted-foreground)]
+    shadow-sm
+  `;
 
   return (
     <div
@@ -218,8 +234,6 @@ export default function PublicContentEngagement({
         gap-2
       "
     >
-      {/* LIKE */}
-
       {interactiveLike ? (
         <button
           type="button"
@@ -227,39 +241,19 @@ export default function PublicContentEngagement({
           aria-pressed={liked}
           disabled={likeLoading}
           onClick={handleLike}
-          className="
+          className={`
             group
-            inline-flex
-            h-8
-            items-center
-            gap-1.5
-
-            rounded-full
-            border
-            border-black/10
-            bg-white
-
-            px-3
-
-            text-[10px]
-            font-medium
-            text-black/55
-
-            shadow-[0_1px_2px_rgba(0,0,0,0.04)]
-
+            ${metricClassName}
             transition-all
             duration-200
-
             hover:border-[var(--public-primary)]
             hover:text-[var(--public-primary)]
-
             focus-visible:outline-2
             focus-visible:outline-offset-2
             focus-visible:outline-[var(--public-primary)]
-
             disabled:cursor-wait
             disabled:opacity-50
-          "
+          `}
         >
           <Heart
             size={15}
@@ -267,10 +261,8 @@ export default function PublicContentEngagement({
             fill={liked ? "currentColor" : "none"}
             className="
               text-[var(--public-primary)]
-
               transition-transform
               duration-200
-
               group-hover:scale-110
             "
           />
@@ -278,70 +270,30 @@ export default function PublicContentEngagement({
           <span>{formatNumber(engagement.likes)}</span>
         </button>
       ) : (
-        <div
-          className="
-            inline-flex
-            h-8
-            items-center
-            gap-1.5
-
-            rounded-full
-            border
-            border-black/10
-            bg-white
-
-            px-3
-
-            text-[10px]
-            font-medium
-            text-black/55
-
-            shadow-[0_1px_2px_rgba(0,0,0,0.04)]
-          "
-        >
+        <div className={metricClassName}>
           <Heart
             size={15}
             strokeWidth={1.25}
-            className="text-[var(--public-primary)]"
+            className="
+              text-[var(--public-primary)]
+            "
           />
 
           <span>{formatNumber(engagement.likes)}</span>
         </div>
       )}
 
-      {/* VIEW */}
-
-      <div
-        className="
-          inline-flex
-          h-8
-          items-center
-          gap-1.5
-
-          rounded-full
-          border
-          border-black/10
-          bg-white
-
-          px-3
-
-          text-[10px]
-          font-medium
-          text-black/55
-
-          shadow-[0_1px_2px_rgba(0,0,0,0.04)]
-        "
-      >
+      <div className={metricClassName}>
         <Eye
           size={15}
           strokeWidth={1.25}
-          className="text-[var(--public-primary)]"
+          className="
+            text-[var(--public-primary)]
+          "
         />
 
         <span>{formatNumber(engagement.views)} views</span>
       </div>
-
-      {/* SHARE */}
 
       {showShare && (
         <PublicContentShare

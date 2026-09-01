@@ -14,6 +14,8 @@ import LocalizedFormField from "@/components/admin/localization/LocalizedFormFie
 
 import { PAGE_TYPE } from "@/constants/page";
 
+import CompanyContactProfileSummary from "./CompanyContactProfileSummary";
+
 /*
  * =========================================================
  * HELPERS
@@ -31,7 +33,17 @@ function createVersionSlug() {
   return `contact-${Date.now().toString(36)}`;
 }
 
-function normalizeContact(contact, company, contactForm) {
+function normalizeContact(
+  contact,
+
+  company,
+
+  contactForm,
+) {
+  const profile = company?.profile || {};
+
+  const profileAddress = profile.address || company?.address || {};
+
   return {
     coverCaption: {
       en: contact?.coverCaption?.en || "",
@@ -39,23 +51,37 @@ function normalizeContact(contact, company, contactForm) {
       th: contact?.coverCaption?.th || "",
     },
 
+    /*
+     * Display name and established year remain
+     * page presentation data.
+     */
     companyDisplayName: {
-      en: contact?.companyDisplayName?.en || company?.name || "",
+      en:
+        contact?.companyDisplayName?.en ||
+        company?.legalName ||
+        company?.name ||
+        "",
 
       th: contact?.companyDisplayName?.th || "",
     },
 
     establishedYear: contact?.establishedYear || "",
 
+    /*
+     * Company Profile is the canonical source.
+     *
+     * Contact Page data remains fallback for
+     * existing records and migration safety.
+     */
     address: {
-      en: contact?.address?.en || "",
+      en: profileAddress?.en || contact?.address?.en || "",
 
-      th: contact?.address?.th || "",
+      th: profileAddress?.th || contact?.address?.th || "",
     },
 
-    telephone: contact?.telephone || company?.phone || "",
+    telephone: profile.phone || company?.phone || contact?.telephone || "",
 
-    email: contact?.email || company?.email || "",
+    email: profile.email || company?.email || contact?.email || "",
 
     form: {
       enabled: contact?.form?.enabled !== false,
@@ -673,30 +699,38 @@ export default function ContactEditor({
 
           {/* COMPANY INFO */}
 
+          {/* COMPANY INFORMATION */}
+
           <section className="mt-10">
             <h3
               className="
-                admin-text-14
-                font-semibold
+      admin-text-14
+      font-semibold
 
-                text-[var(--admin-foreground)]
-              "
+      text-[var(--admin-foreground)]
+    "
             >
               {t("contact.companyInformation")}
             </h3>
 
             <p
               className="
-                mt-1
+      mt-1
 
-                admin-text-12
-                leading-[1.65]
+      admin-text-12
+      leading-[1.65]
 
-                text-[var(--admin-muted)]
-              "
+      text-[var(--admin-muted)]
+    "
             >
               {t("contact.companyInformationDescription")}
             </p>
+
+            {/*
+             * Display name and established year are
+             * presentation fields belonging to the
+             * Contact Page version.
+             */}
 
             <div className="mt-5">
               <LocalizedFormField
@@ -715,24 +749,15 @@ export default function ContactEditor({
               />
             </div>
 
-            <div
-              className="
-                mt-5
-
-                grid
-                gap-4
-
-                lg:grid-cols-3
-              "
-            >
+            <div className="mt-5 max-w-sm">
               <label className="block">
                 <span
                   className="
-                    admin-text-11
-                    font-medium
+          admin-text-11
+          font-medium
 
-                    text-[var(--admin-muted)]
-                  "
+          text-[var(--admin-muted)]
+        "
                 >
                   {t("contact.fields.establishedYear")}
                 </span>
@@ -749,147 +774,43 @@ export default function ContactEditor({
                     )
                   }
                   className="
-                    mt-2
-                    h-11
-                    w-full
+          mt-2
+          h-11
+          w-full
 
-                    rounded-xl
+          rounded-xl
 
-                    border
-                    border-[var(--admin-border)]
+          border
+          border-[var(--admin-border)]
 
-                    bg-[var(--admin-surface)]
+          bg-[var(--admin-surface)]
 
-                    px-3
+          px-3
 
-                    admin-text-13
+          admin-text-13
 
-                    outline-none
+          outline-none
 
-                    focus:border-[var(--company-primary)]
+          transition
 
-                    focus:ring-2
-                    focus:ring-[var(--company-primary-soft)]
-                  "
-                />
-              </label>
+          focus:border-[var(--company-primary)]
 
-              <label className="block">
-                <span
-                  className="
-                    admin-text-11
-                    font-medium
+          focus:ring-2
+          focus:ring-[var(--company-primary-soft)]
 
-                    text-[var(--admin-muted)]
-                  "
-                >
-                  {t("contact.fields.telephone")}
-                </span>
-
-                <input
-                  type="text"
-                  disabled={readOnly}
-                  value={form.contact?.telephone || ""}
-                  onChange={(event) =>
-                    updateContact(
-                      "telephone",
-
-                      event.target.value,
-                    )
-                  }
-                  className="
-                    mt-2
-                    h-11
-                    w-full
-
-                    rounded-xl
-
-                    border
-                    border-[var(--admin-border)]
-
-                    bg-[var(--admin-surface)]
-
-                    px-3
-
-                    admin-text-13
-
-                    outline-none
-
-                    focus:border-[var(--company-primary)]
-
-                    focus:ring-2
-                    focus:ring-[var(--company-primary-soft)]
-                  "
-                />
-              </label>
-
-              <label className="block">
-                <span
-                  className="
-                    admin-text-11
-                    font-medium
-
-                    text-[var(--admin-muted)]
-                  "
-                >
-                  {t("contact.fields.email")}
-                </span>
-
-                <input
-                  type="email"
-                  disabled={readOnly}
-                  value={form.contact?.email || ""}
-                  onChange={(event) =>
-                    updateContact(
-                      "email",
-
-                      event.target.value,
-                    )
-                  }
-                  className="
-                    mt-2
-                    h-11
-                    w-full
-
-                    rounded-xl
-
-                    border
-                    border-[var(--admin-border)]
-
-                    bg-[var(--admin-surface)]
-
-                    px-3
-
-                    admin-text-13
-
-                    outline-none
-
-                    focus:border-[var(--company-primary)]
-
-                    focus:ring-2
-                    focus:ring-[var(--company-primary-soft)]
-                  "
+          disabled:bg-[var(--admin-background)]
+          disabled:opacity-70
+        "
                 />
               </label>
             </div>
 
-            <div className="mt-5">
-              <LocalizedTextarea
-                label={t("contact.fields.address")}
-                value={form.contact?.address}
-                disabled={readOnly}
-                rows={5}
-                onChange={(locale, value) =>
-                  updateContactLocalized(
-                    "address",
+            {/*
+             * Address, telephone, email, website and
+             * business hours come from Company Profile.
+             */}
 
-                    locale,
-
-                    value,
-                  )
-                }
-              />
-            </div>
+            <CompanyContactProfileSummary company={company} locale="en" />
           </section>
 
           {/* FORM */}

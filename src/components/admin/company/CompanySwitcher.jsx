@@ -2,11 +2,21 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { Check, ChevronDown, LoaderCircle } from "lucide-react";
+import {
+  Building2,
+  Check,
+  ChevronDown,
+  LoaderCircle,
+  Plus,
+} from "lucide-react";
 
-import { cn } from "@/utils/cn";
+import CompanyCreateDialog from "./CompanyCreateDialog";
 
 import { useCompanyWorkspace } from "./CompanyWorkspaceProvider";
+
+import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
+
+import { cn } from "@/utils/cn";
 
 function getCompanyName(company) {
   return (
@@ -67,7 +77,7 @@ function CompanyBadge({ company, compact = false }) {
       style={{
         backgroundColor: getCompanyPrimary(company),
 
-        color: "#ffffff",
+        color: "var(--company-primary-foreground, #ffffff)",
       }}
     >
       {getCompanyCode(company)}
@@ -104,10 +114,46 @@ function CurrentCompany({ company, compact }) {
   );
 }
 
+function CreateCompanyButton({ compact, onClick, t }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={compact ? t("companySwitcher.create") : undefined}
+      className={cn(
+        "flex items-center rounded-xl text-[var(--company-primary)] transition",
+        "hover:bg-[var(--company-primary-soft)]",
+
+        compact
+          ? "h-10 w-10 justify-center"
+          : "w-full gap-3 px-3 py-2.5 text-left",
+      )}
+    >
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[var(--company-primary-border)] bg-[var(--company-primary-soft)]">
+        <Plus size={16} />
+      </span>
+
+      {!compact ? (
+        <span className="min-w-0">
+          <span className="block text-[13px] font-semibold">
+            {t("companySwitcher.create")}
+          </span>
+
+          <span className="mt-0.5 block text-[10px] text-[var(--admin-muted)]">
+            {t("companySwitcher.createDescription")}
+          </span>
+        </span>
+      ) : null}
+    </button>
+  );
+}
+
 export default function CompanySwitcher({
   compact = false,
   placement = "bottom",
 }) {
+  const { t } = useAdminTranslation();
+
   const {
     companies,
 
@@ -116,12 +162,18 @@ export default function CompanySwitcher({
     loading,
     error,
 
+    isSuperAdmin,
+
     selectCompany,
+
+    refreshCompanies,
 
     canSwitchCompany,
   } = useCompanyWorkspace();
 
   const [open, setOpen] = useState(false);
+
+  const [createOpen, setCreateOpen] = useState(false);
 
   const containerRef = useRef(null);
 
@@ -152,6 +204,28 @@ export default function CompanySwitcher({
     };
   }, []);
 
+  async function handleCompanyCreated(company) {
+    if (!company?.id) {
+      await refreshCompanies();
+
+      return;
+    }
+
+    await refreshCompanies({
+      selectCompanyId: company.id,
+
+      silent: true,
+    });
+
+    setOpen(false);
+  }
+
+  function openCreateDialog() {
+    setOpen(false);
+
+    setCreateOpen(true);
+  }
+
   if (loading) {
     return (
       <div
@@ -163,7 +237,7 @@ export default function CompanySwitcher({
       >
         <LoaderCircle size={15} className="animate-spin" />
 
-        {!compact ? <span>Loading workspace</span> : null}
+        {!compact ? <span>{t("companySwitcher.loading")}</span> : null}
       </div>
     );
   }
@@ -177,135 +251,192 @@ export default function CompanySwitcher({
           compact && "text-center",
         )}
       >
-        {compact ? "!" : "Company unavailable"}
+        {compact ? "!" : t("companySwitcher.unavailable")}
       </div>
     );
   }
 
+  /*
+   * A new installation may not have a company yet.
+   * Superadmin must still be able to create the first company.
+   */
   if (!activeCompany) {
     return (
-      <div className="text-xs text-[var(--admin-muted)]">
-        {compact ? "—" : "No company"}
-      </div>
+      <>
+        {isSuperAdmin ? (
+          <CreateCompanyButton
+            compact={compact}
+            onClick={openCreateDialog}
+            t={t}
+          />
+        ) : (
+          <div className="text-xs text-[var(--admin-muted)]">
+            {compact ? "—" : t("companySwitcher.noCompany")}
+          </div>
+        )}
+
+        {isSuperAdmin ? (
+          <CompanyCreateDialog
+            open={createOpen}
+            onClose={() => setCreateOpen(false)}
+            onCreated={handleCompanyCreated}
+          />
+        ) : null}
+      </>
     );
   }
 
-  if (!canSwitchCompany) {
+  /*
+   * Company users cannot switch company and cannot create one.
+   */
+  if (!isSuperAdmin) {
     return <CurrentCompany company={activeCompany} compact={compact} />;
   }
 
+  /*
+   * Superadmin with only one company still needs the popover
+   * because the Create Company action lives inside it.
+   */
   const activeName = getCompanyName(activeCompany);
 
   const popoverPosition =
     placement === "top" ? "bottom-[calc(100%+8px)]" : "top-[calc(100%+8px)]";
 
   return (
-    <div ref={containerRef} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((current) => !current)}
-        aria-expanded={open}
-        aria-label={`Current company: ${activeName}`}
-        title={compact ? activeName : undefined}
-        className={cn(
-          "flex w-full min-w-0 items-center rounded-xl text-left transition hover:bg-[var(--admin-hover)]",
-
-          compact ? "justify-center p-1.5" : "gap-3 p-2",
-        )}
-      >
-        <CompanyBadge company={activeCompany} compact={compact} />
-
-        {!compact ? (
-          <>
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-[13px] font-medium text-[var(--admin-foreground)]">
-                {activeName}
-              </span>
-
-              <span className="mt-0.5 block text-[9px] uppercase tracking-[0.13em] text-[var(--admin-muted)]">
-                Current workspace
-              </span>
-            </span>
-
-            <ChevronDown
-              size={14}
-              className={cn(
-                "shrink-0 text-[var(--admin-muted)] transition-transform",
-
-                open && "rotate-180",
-              )}
-            />
-          </>
-        ) : null}
-      </button>
-
-      {open ? (
-        <div
+    <>
+      <div ref={containerRef} className="relative">
+        <button
+          type="button"
+          onClick={() => setOpen((current) => !current)}
+          aria-expanded={open}
+          aria-label={`${t("companySwitcher.current")}: ${activeName}`}
+          title={compact ? activeName : undefined}
           className={cn(
-            "absolute z-[80] overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] shadow-[0_18px_50px_rgba(0,0,0,0.12)]",
+            "flex w-full min-w-0 items-center rounded-xl text-left transition",
+            "hover:bg-[var(--admin-hover)]",
 
-            popoverPosition,
-
-            compact ? "left-[calc(100%+10px)] w-[280px]" : "left-0 w-[280px]",
+            compact ? "justify-center p-1.5" : "gap-3 p-2",
           )}
         >
-          <div className="border-b border-[var(--admin-border)] px-4 py-3">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--admin-muted-light)]">
-              Workspace
+          <CompanyBadge company={activeCompany} compact={compact} />
+
+          {!compact ? (
+            <>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[13px] font-medium text-[var(--admin-foreground)]">
+                  {activeName}
+                </span>
+
+                <span className="mt-0.5 block text-[9px] uppercase tracking-[0.13em] text-[var(--admin-muted)]">
+                  {t("companySwitcher.current")}
+                </span>
+              </span>
+
+              <ChevronDown
+                size={14}
+                className={cn(
+                  "shrink-0 text-[var(--admin-muted)] transition-transform",
+
+                  open && "rotate-180",
+                )}
+              />
+            </>
+          ) : null}
+        </button>
+
+        {open ? (
+          <div
+            className={cn(
+              "absolute z-[80] overflow-hidden rounded-2xl border",
+              "border-[var(--admin-border)] bg-[var(--admin-surface)]",
+              "shadow-[0_18px_50px_rgba(0,0,0,0.12)]",
+
+              popoverPosition,
+
+              compact ? "left-[calc(100%+10px)] w-[280px]" : "left-0 w-[280px]",
+            )}
+          >
+            <div className="border-b border-[var(--admin-border)] px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Building2
+                  size={14}
+                  className="text-[var(--company-primary)]"
+                />
+
+                <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--admin-muted-light)]">
+                  {t("companySwitcher.workspace")}
+                </div>
+              </div>
+
+              <div className="mt-1 text-xs text-[var(--admin-muted)]">
+                {canSwitchCompany
+                  ? t("companySwitcher.select")
+                  : t("companySwitcher.singleCompany")}
+              </div>
             </div>
 
-            <div className="mt-1 text-xs text-[var(--admin-muted)]">
-              Select company to manage
-            </div>
-          </div>
+            <div className="max-h-[360px] overflow-y-auto p-2">
+              {companies.map((company) => {
+                const selected = company.id === activeCompany.id;
 
-          <div className="max-h-[360px] overflow-y-auto p-2">
-            {companies.map((company) => {
-              const selected = company.id === activeCompany.id;
+                return (
+                  <button
+                    key={company.id}
+                    type="button"
+                    onClick={() => {
+                      selectCompany(company.id);
 
-              return (
-                <button
-                  key={company.id}
-                  type="button"
-                  onClick={() => {
-                    selectCompany(company.id);
+                      setOpen(false);
+                    }}
+                    className={cn(
+                      "flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition",
 
-                    setOpen(false);
-                  }}
-                  className={cn(
-                    "flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition",
+                      selected
+                        ? "bg-[var(--company-primary-soft)]"
+                        : "hover:bg-[var(--admin-hover)]",
+                    )}
+                  >
+                    <CompanyBadge company={company} compact />
 
-                    selected
-                      ? "bg-[var(--company-primary-soft)]"
-                      : "hover:bg-[var(--admin-hover)]",
-                  )}
-                >
-                  <CompanyBadge company={company} compact />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[13px] font-medium text-[var(--admin-foreground)]">
+                        {getCompanyName(company)}
+                      </span>
 
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[13px] font-medium text-[var(--admin-foreground)]">
-                      {getCompanyName(company)}
+                      {company.slug ? (
+                        <span className="mt-0.5 block truncate text-[11px] text-[var(--admin-muted)]">
+                          {company.slug}
+                        </span>
+                      ) : null}
                     </span>
 
-                    {company.slug ? (
-                      <span className="mt-0.5 block truncate text-[11px] text-[var(--admin-muted)]">
-                        {company.slug}
-                      </span>
+                    {selected ? (
+                      <Check
+                        size={16}
+                        className="shrink-0 text-[var(--company-primary)]"
+                      />
                     ) : null}
-                  </span>
+                  </button>
+                );
+              })}
+            </div>
 
-                  {selected ? (
-                    <Check
-                      size={16}
-                      className="shrink-0 text-[var(--company-primary)]"
-                    />
-                  ) : null}
-                </button>
-              );
-            })}
+            <div className="border-t border-[var(--admin-border)] p-2">
+              <CreateCompanyButton
+                compact={false}
+                onClick={openCreateDialog}
+                t={t}
+              />
+            </div>
           </div>
-        </div>
-      ) : null}
-    </div>
+        ) : null}
+      </div>
+
+      <CompanyCreateDialog
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onCreated={handleCompanyCreated}
+      />
+    </>
   );
 }

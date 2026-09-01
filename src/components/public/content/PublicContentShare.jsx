@@ -12,12 +12,6 @@ import { Check, Share2, X } from "lucide-react";
 
 import { getPublicVisitorId } from "@/utils/public-visitor";
 
-/*
- * =========================================================
- * TOOLTIP
- * =========================================================
- */
-
 function Tooltip({ label }) {
   return (
     <span
@@ -27,31 +21,20 @@ function Tooltip({ label }) {
         bottom-full
         left-1/2
         z-[200]
-
         mb-2.5
-
         -translate-x-1/2
-
+        translate-y-1
         whitespace-nowrap
-
         bg-black/80
-
         px-2.5
         py-1.5
-
         text-[9px]
         tracking-[0.04em]
         text-white
-
         opacity-0
-
         shadow-[0_5px_16px_rgba(0,0,0,0.10)]
-
         transition-all
         duration-200
-
-        translate-y-1
-
         group-hover:translate-y-0
         group-hover:opacity-100
       "
@@ -63,12 +46,9 @@ function Tooltip({ label }) {
           absolute
           left-1/2
           top-full
-
           -translate-x-1/2
-
           border-x-[4px]
           border-t-[4px]
-
           border-x-transparent
           border-t-black/80
         "
@@ -77,18 +57,17 @@ function Tooltip({ label }) {
   );
 }
 
-/*
- * =========================================================
- * SOCIAL BUTTON
- * =========================================================
- */
-
 function SocialButton({
   label,
+
   onClick,
+
   outlineIcon,
+
   filledIcon,
+
   hoverColor,
+
   active = false,
 }) {
   return (
@@ -99,23 +78,20 @@ function SocialButton({
       className="
         group
         relative
-
         flex
         h-9
         w-9
-
         items-center
         justify-center
+        focus-visible:outline-none
       "
     >
       <span
         className="
           relative
-
           flex
           h-6
           w-6
-
           items-center
           justify-center
         "
@@ -124,13 +100,10 @@ function SocialButton({
           className={`
             absolute
             inset-0
-
             flex
             items-center
             justify-center
-
-            text-black/25
-
+            text-[var(--public-muted-foreground)]
             transition-all
             duration-200
 
@@ -148,11 +121,9 @@ function SocialButton({
           className={`
             absolute
             inset-0
-
             flex
             items-center
             justify-center
-
             transition-all
             duration-200
 
@@ -175,13 +146,13 @@ function SocialButton({
   );
 }
 
-/*
- * =========================================================
- * COMPONENT
- * =========================================================
- */
+export default function PublicContentShare({
+  companySlug,
 
-export default function PublicContentShare({ companySlug, slug, title }) {
+  slug,
+
+  title,
+}) {
   const [open, setOpen] = useState(false);
 
   const [copied, setCopied] = useState(false);
@@ -206,14 +177,30 @@ export default function PublicContentShare({ companySlug, slug, title }) {
       }
     }
 
-    document.addEventListener("pointerdown", handleOutside);
+    document.addEventListener(
+      "pointerdown",
 
-    document.addEventListener("keydown", handleEscape);
+      handleOutside,
+    );
+
+    document.addEventListener(
+      "keydown",
+
+      handleEscape,
+    );
 
     return () => {
-      document.removeEventListener("pointerdown", handleOutside);
+      document.removeEventListener(
+        "pointerdown",
 
-      document.removeEventListener("keydown", handleEscape);
+        handleOutside,
+      );
+
+      document.removeEventListener(
+        "keydown",
+
+        handleEscape,
+      );
 
       if (timeoutRef.current) {
         window.clearTimeout(timeoutRef.current);
@@ -231,10 +218,6 @@ export default function PublicContentShare({ companySlug, slug, title }) {
     )}/public-contents/${encodeURIComponent(slug)}/engagement`;
   }
 
-  /*
-   * Share analytics must never block
-   * the actual share action.
-   */
   function recordShare(channel) {
     const visitorId = getPublicVisitorId();
 
@@ -260,13 +243,27 @@ export default function PublicContentShare({ companySlug, slug, title }) {
       cache: "no-store",
 
       keepalive: true,
-    }).catch((error) => {
-      console.error("Public content share metric error:", error);
+    }).catch((shareError) => {
+      console.error(
+        "Public content share metric error:",
+
+        shareError,
+      );
     });
   }
 
-  function openShare(url, channel) {
-    window.open(url, "_blank", "noopener,noreferrer,width=680,height=620");
+  function openShare(
+    url,
+
+    channel,
+  ) {
+    window.open(
+      url,
+
+      "_blank",
+
+      "noopener,noreferrer,width=680,height=620",
+    );
 
     recordShare(channel);
   }
@@ -316,15 +313,17 @@ export default function PublicContentShare({ companySlug, slug, title }) {
       timeoutRef.current = window.setTimeout(() => {
         setCopied(false);
       }, 1800);
-    } catch (error) {
-      console.error("Copy link error:", error);
+    } catch (copyError) {
+      console.error(
+        "Copy link error:",
+
+        copyError,
+      );
     }
   }
 
   return (
     <div ref={containerRef} className="relative">
-      {/* SHARE BUTTON */}
-
       <button
         type="button"
         aria-label="Share content"
@@ -333,31 +332,20 @@ export default function PublicContentShare({ companySlug, slug, title }) {
         className="
           group
           relative
-
           flex
           h-8
           w-8
-
           items-center
           justify-center
-
           rounded-full
-
           border
-          border-black/10
-
-          bg-white
-
+          border-[var(--public-border)]
+          bg-[var(--public-surface)]
           text-[var(--public-primary)]
-
-          shadow-[0_1px_2px_rgba(0,0,0,0.04)]
-
+          shadow-sm
           transition-all
           duration-200
-
           hover:border-[var(--public-primary)]
-          hover:bg-black/[0.025]
-
           focus-visible:outline-2
           focus-visible:outline-offset-2
           focus-visible:outline-[var(--public-primary)]
@@ -368,8 +356,6 @@ export default function PublicContentShare({ companySlug, slug, title }) {
         {!open && <Tooltip label="Share" />}
       </button>
 
-      {/* POPOVER */}
-
       {open && (
         <div
           className="
@@ -377,30 +363,22 @@ export default function PublicContentShare({ companySlug, slug, title }) {
             right-0
             top-full
             z-[160]
-
             mt-2
-
             min-w-[205px]
-
             overflow-hidden
-
             rounded-xl
-
             border
-            border-black/[0.08]
-
-            bg-[var(--public-background)]
-
+            border-[var(--public-border)]
+            bg-[var(--public-surface)]
             px-3
             py-3
-
+            text-[var(--public-foreground)]
             shadow-[0_16px_45px_rgba(0,0,0,0.12)]
           "
         >
           <div
             className="
               mb-2
-
               flex
               items-center
               justify-between
@@ -411,8 +389,7 @@ export default function PublicContentShare({ companySlug, slug, title }) {
                 text-[9px]
                 uppercase
                 tracking-[0.12em]
-
-                text-black/30
+                text-[var(--public-muted-foreground)]
               "
             >
               Share
@@ -423,11 +400,9 @@ export default function PublicContentShare({ companySlug, slug, title }) {
               aria-label="Close share"
               onClick={() => setOpen(false)}
               className="
-                text-black/20
-
+                text-[var(--public-muted-foreground)]
                 transition-colors
-
-                hover:text-black/60
+                hover:text-[var(--public-foreground)]
               "
             >
               <X size={12} strokeWidth={1.2} />
@@ -439,10 +414,8 @@ export default function PublicContentShare({ companySlug, slug, title }) {
               flex
               items-center
               justify-center
-
               border-t
-              border-black/[0.05]
-
+              border-[var(--public-border)]
               pt-2
             "
           >
@@ -459,7 +432,7 @@ export default function PublicContentShare({ companySlug, slug, title }) {
               onClick={twitter}
               outlineIcon={<RiTwitterXLine size={18} />}
               filledIcon={<RiTwitterXFill size={17} />}
-              hoverColor="#000000"
+              hoverColor="var(--public-foreground)"
             />
 
             <SocialButton
@@ -490,18 +463,13 @@ export default function PublicContentShare({ companySlug, slug, title }) {
             <div
               className="
                 mt-2
-
                 border-t
-                border-black/[0.05]
-
+                border-[var(--public-border)]
                 pt-2
-
                 text-center
-
                 text-[9px]
                 uppercase
                 tracking-[0.08em]
-
                 text-[var(--public-primary)]
               "
             >

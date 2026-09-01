@@ -5,18 +5,18 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { CiSearch } from "react-icons/ci";
+
 import { IoCloseOutline } from "react-icons/io5";
 
 import PublicProjectBreadcrumbs from "./PublicProjectBreadcrumbs";
+
 import PublicProjectCard from "./PublicProjectCard";
 
-/*
- * =========================================================
- * SEARCH
- * =========================================================
- */
+function matchesSearch(
+  project,
 
-function matchesSearch(project, keyword) {
+  keyword,
+) {
   const normalizedKeyword = String(keyword || "")
     .trim()
     .toLowerCase();
@@ -27,20 +27,25 @@ function matchesSearch(project, keyword) {
 
   const searchable = [
     project.title?.en,
+
     project.title?.th,
 
     project.excerpt?.en,
+
     project.excerpt?.th,
 
     project.slug,
 
     project.projectInfo?.location?.en,
+
     project.projectInfo?.location?.th,
 
     project.projectInfo?.client?.en,
+
     project.projectInfo?.client?.th,
 
     project.projectInfo?.designYear,
+
     project.projectInfo?.completionYear,
 
     ...(Array.isArray(project.tags) ? project.tags : []),
@@ -61,25 +66,17 @@ function SearchTooltip() {
         right-0
         top-full
         z-[120]
-
         mt-2
-
         whitespace-nowrap
-
         bg-black/80
-
         px-2
         py-1
-
         text-[9px]
         tracking-[0.04em]
         text-white
-
         opacity-0
-
         transition-opacity
         duration-150
-
         group-hover:opacity-100
       "
     >
@@ -88,15 +85,11 @@ function SearchTooltip() {
   );
 }
 
-/*
- * =========================================================
- * PROJECT INDEX
- * =========================================================
- */
-
 export default function PublicProjectIndex({
   companySlug,
+
   projects = [],
+
   locale = "en",
 }) {
   const router = useRouter();
@@ -113,9 +106,6 @@ export default function PublicProjectIndex({
 
   const [searchValue, setSearchValue] = useState(currentQuery);
 
-  /*
-   * DOM focus only.
-   */
   useEffect(() => {
     if (searchOpen && searchInputRef.current) {
       searchInputRef.current.focus();
@@ -124,16 +114,18 @@ export default function PublicProjectIndex({
     }
   }, [searchOpen]);
 
-  /*
-   * Projects already arrive from the server
-   * sorted by publishedAt descending.
-   */
   const visibleProjects = useMemo(() => {
     if (!currentQuery) {
       return projects;
     }
 
-    return projects.filter((project) => matchesSearch(project, currentQuery));
+    return projects.filter((project) =>
+      matchesSearch(
+        project,
+
+        currentQuery,
+      ),
+    );
   }, [currentQuery, projects]);
 
   function openSearch() {
@@ -202,32 +194,30 @@ export default function PublicProjectIndex({
     <div
       className="
         w-full
-
+        bg-[var(--public-background)]
         px-6
         pb-16
-
+        text-[var(--public-foreground)]
         sm:px-8
-
         lg:px-12
         lg:pb-24
-
         xl:px-16
       "
     >
-      <div className="mx-auto w-full max-w-[1440px]">
-        {/* =====================================
-            BREADCRUMB + SEARCH
-        ===================================== */}
-
+      <div
+        className="
+          mx-auto
+          w-full
+          max-w-[1440px]
+        "
+      >
         <div
           className="
             flex
             items-center
             justify-between
             gap-6
-
             pt-2
-
             lg:pt-4
           "
         >
@@ -256,21 +246,22 @@ export default function PublicProjectIndex({
                   max-w-[52vw]
                   items-center
                   gap-2
-
                   border-b
-                  border-black/15
-
+                  border-[var(--public-border)]
                   pb-1.5
-
                   transition-colors
                   duration-200
-
                   focus-within:border-[var(--public-primary)]
-
                   sm:w-[260px]
                 "
               >
-                <CiSearch size={18} className="shrink-0 text-black/25" />
+                <CiSearch
+                  size={18}
+                  className="
+                    shrink-0
+                    text-[var(--public-muted-foreground)]
+                  "
+                />
 
                 <input
                   ref={searchInputRef}
@@ -285,15 +276,11 @@ export default function PublicProjectIndex({
                     min-w-0
                     flex-1
                     bg-transparent
-
                     text-[11px]
                     tracking-[0.02em]
-                    text-black/70
-
+                    text-[var(--public-foreground)]
                     outline-none
-
-                    placeholder:text-black/25
-
+                    placeholder:text-[var(--public-muted-foreground)]
                     sm:text-[12px]
                   "
                 />
@@ -307,11 +294,9 @@ export default function PublicProjectIndex({
                     shrink-0
                     items-center
                     justify-center
-                    text-black/25
-
+                    text-[var(--public-muted-foreground)]
                     transition-colors
                     duration-200
-
                     hover:text-[var(--public-primary)]
                   "
                 >
@@ -331,11 +316,9 @@ export default function PublicProjectIndex({
                   w-8
                   items-center
                   justify-center
-                  text-black/25
-
+                  text-[var(--public-muted-foreground)]
                   transition-colors
                   duration-200
-
                   hover:text-[var(--public-primary)]
                 "
               >
@@ -354,10 +337,6 @@ export default function PublicProjectIndex({
           </div>
         </div>
 
-        {/* =====================================
-            SEARCH INFORMATION
-        ===================================== */}
-
         {hasSearch && (
           <div
             className="
@@ -365,21 +344,26 @@ export default function PublicProjectIndex({
               flex
               items-center
               gap-4
-
               sm:mt-12
               sm:gap-5
-
               lg:mt-14
             "
           >
-            <div className="flex min-w-0 items-center gap-2">
+            <div
+              className="
+                flex
+                min-w-0
+                items-center
+                gap-2
+              "
+            >
               <span
                 className="
                   shrink-0
                   text-[10px]
                   uppercase
                   tracking-[0.07em]
-                  text-black/30
+                  text-[var(--public-muted-foreground)]
                 "
               >
                 Search:
@@ -389,13 +373,11 @@ export default function PublicProjectIndex({
                 className="
                   max-w-[180px]
                   truncate
-
                   text-[11px]
                   font-medium
                   uppercase
                   tracking-[0.06em]
                   text-[var(--public-primary)]
-
                   sm:max-w-[420px]
                   sm:text-[12px]
                 "
@@ -415,11 +397,9 @@ export default function PublicProjectIndex({
                   shrink-0
                   items-center
                   justify-center
-                  text-black/20
-
+                  text-[var(--public-muted-foreground)]
                   transition-colors
                   duration-200
-
                   hover:text-[var(--public-primary)]
                 "
               >
@@ -427,7 +407,14 @@ export default function PublicProjectIndex({
               </button>
             </div>
 
-            <div className="h-px min-w-0 flex-1 bg-black/10" />
+            <div
+              className="
+                h-px
+                min-w-0
+                flex-1
+                bg-[var(--public-border)]
+              "
+            />
 
             <span
               className="
@@ -435,8 +422,7 @@ export default function PublicProjectIndex({
                 text-[9px]
                 uppercase
                 tracking-[0.07em]
-                text-black/25
-
+                text-[var(--public-muted-foreground)]
                 sm:text-[10px]
               "
             >
@@ -446,22 +432,15 @@ export default function PublicProjectIndex({
           </div>
         )}
 
-        {/* =====================================
-            PROJECTS BY PUBLISHED DATE
-        ===================================== */}
-
         {visibleProjects.length ? (
           <div className={hasSearch ? "mt-8 lg:mt-10" : "mt-12 lg:mt-14"}>
             <div
               className="
                 grid
                 grid-cols-1
-
                 gap-x-[clamp(2rem,6vw,6.5rem)]
                 gap-y-12
-
                 sm:grid-cols-2
-
                 lg:grid-cols-3
                 lg:gap-y-16
               "
@@ -492,7 +471,7 @@ export default function PublicProjectIndex({
                 text-[10px]
                 uppercase
                 tracking-[0.08em]
-                text-black/25
+                text-[var(--public-muted-foreground)]
               "
             >
               {hasSearch ? "No projects found" : "No projects available"}
@@ -508,10 +487,8 @@ export default function PublicProjectIndex({
                   uppercase
                   tracking-[0.08em]
                   text-[var(--public-primary)]
-
                   transition-opacity
                   duration-200
-
                   hover:opacity-60
                 "
               >

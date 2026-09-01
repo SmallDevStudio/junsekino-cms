@@ -2,11 +2,43 @@ import "server-only";
 
 import { PAGE_STATUS, PAGE_TYPE } from "@/constants/page";
 
+import { getCompanyById } from "@/modules/company/company.repository";
+
 import { listPageRecords } from "@/modules/page/page.repository";
 
 import { getPublishedFormBySlug } from "@/modules/form/form.service";
 
 import { serializeFirestoreDocument } from "@/utils/firestore";
+
+/*
+ * =========================================================
+ * TEXT
+ * =========================================================
+ */
+
+function normalizeText(value) {
+  return String(value || "").trim();
+}
+
+function localizedValue(value, locale) {
+  if (!value) {
+    return "";
+  }
+
+  if (typeof value === "string") {
+    return value;
+  }
+
+  return normalizeText(value?.[locale] || value?.en || value?.th || "");
+}
+
+function mergeLocalizedContactValue(companyValue, pageValue) {
+  return {
+    en: localizedValue(companyValue, "en") || localizedValue(pageValue, "en"),
+
+    th: localizedValue(companyValue, "th") || localizedValue(pageValue, "th"),
+  };
+}
 
 /*
  * =========================================================
@@ -38,7 +70,11 @@ function getTimestampMillis(value) {
  * =========================================================
  */
 
-function createMediaUrls({ companySlug, mediaId }) {
+function createMediaUrls({
+  companySlug,
+
+  mediaId,
+}) {
   if (!companySlug || !mediaId) {
     return null;
   }
@@ -58,7 +94,11 @@ function createMediaUrls({ companySlug, mediaId }) {
   };
 }
 
-function mapImage({ companySlug, image }) {
+function mapImage({
+  companySlug,
+
+  image,
+}) {
   if (!image?.mediaId) {
     return null;
   }
@@ -78,10 +118,6 @@ function mapImage({ companySlug, image }) {
       th: image.caption?.th || "",
     },
 
-    /*
-     * Current Media Core stores
-     * crop data on the usage reference.
-     */
     crop: image.crop || null,
 
     ...createMediaUrls({
@@ -130,14 +166,156 @@ function sanitizeForm(form) {
 
 /*
  * =========================================================
+ * COMPANY PROFILE
+ * =========================================================
+ */
+
+function normalizeCompanyProfile(company = {}) {
+  const profile = company.profile || {};
+
+  return {
+    email: normalizeText(profile.email) || normalizeText(company.email),
+
+    phone: normalizeText(profile.phone) || normalizeText(company.phone),
+
+    secondaryPhone: normalizeText(profile.secondaryPhone),
+
+    website: normalizeText(profile.website) || normalizeText(company.website),
+
+    address: {
+      en:
+        localizedValue(profile.address, "en") ||
+        localizedValue(company.address, "en"),
+
+      th:
+        localizedValue(profile.address, "th") ||
+        localizedValue(company.address, "th"),
+    },
+
+    mapUrl: normalizeText(profile.mapUrl) || normalizeText(company.mapUrl),
+
+    latitude: profile.latitude ?? company.latitude ?? null,
+
+    longitude: profile.longitude ?? company.longitude ?? null,
+
+    businessHours: {
+      en: localizedValue(profile.businessHours, "en"),
+
+      th: localizedValue(profile.businessHours, "th"),
+    },
+  };
+}
+
+/*
+ * =========================================================
+ * CONTACT RESOLUTION
+ * =========================================================
+ *
+ * Company Profile is the canonical source for:
+ *
+ * - Address
+ * - Phone
+ * - Email
+ * - Website
+ * - Map
+ * - Business hours
+ *
+ * Contact Page remains the fallback for old records.
+ * =========================================================
+ */
+
+function resolveContact({
+  company,
+
+  pageContact,
+}) {
+  const profile = normalizeCompanyProfile(company);
+
+  const legacyContact = pageContact || {};
+
+  const companyDisplayName = {
+    en:
+      normalizeText(legacyContact.companyDisplayName?.en) ||
+      normalizeText(company.legalName) ||
+      normalizeText(company.name),
+
+    th: normalizeText(legacyContact.companyDisplayName?.th),
+  };
+
+  return {
+    coverCaption: {
+      en: legacyContact.coverCaption?.en || "",
+
+      th: legacyContact.coverCaption?.th || "",
+    },
+
+    companyDisplayName,
+
+    establishedYear: legacyContact.establishedYear || "",
+
+    /*
+     * Company Profile takes priority.
+     *
+     * Old Contact Page data is retained as fallback.
+     */
+    address: mergeLocalizedContactValue(
+      profile.address,
+
+      legacyContact.address,
+    ),
+
+    telephone: profile.phone || normalizeText(legacyContact.telephone),
+
+    secondaryTelephone: profile.secondaryPhone || "",
+
+    email: profile.email || normalizeText(legacyContact.email),
+
+    website: profile.website || "",
+
+    mapUrl: profile.mapUrl || "",
+
+    latitude: profile.latitude,
+
+    longitude: profile.longitude,
+
+    businessHours: {
+      en: profile.businessHours.en,
+
+      th: profile.businessHours.th,
+    },
+
+    form: {
+      enabled: legacyContact.form?.enabled !== false,
+
+      formId: legacyContact.form?.formId || null,
+
+      formSlug: legacyContact.form?.formSlug || "contact",
+    },
+  };
+}
+
+/*
+ * =========================================================
  * PUBLIC CONTACT
  * =========================================================
  */
 
-export async function getPublicContactPage({ companyId, companySlug }) {
-  const records = await listPageRecords({
-    companyId,
-  });
+export async function getPublicContactPage({
+  companyId,
+
+  companySlug,
+}) {
+  const [company, records] = await Promise.all([
+    getCompanyById(companyId),
+
+    listPageRecords({
+      companyId,
+    }),
+  ]);
+
+  if (!company || company.deletedAt) {
+    return null;
+  }
 
   const published = records
     .filter(
@@ -160,12 +338,16 @@ export async function getPublicContactPage({ companyId, companySlug }) {
 
   const serialized = serializeFirestoreDocument(page);
 
-  const contact = serialized.contact || {};
+  const contact = resolveContact({
+    company,
+
+    pageContact: serialized.contact,
+  });
 
   let form = null;
 
-  if (contact.form?.enabled !== false) {
-    const formSlug = contact.form?.formSlug || "contact";
+  if (contact.form.enabled !== false) {
+    const formSlug = contact.form.formSlug || "contact";
 
     try {
       form = await getPublishedFormBySlug({
@@ -205,39 +387,7 @@ export async function getPublicContactPage({ companyId, companySlug }) {
       image: serialized.featuredImage,
     }),
 
-    contact: {
-      coverCaption: {
-        en: contact.coverCaption?.en || "",
-
-        th: contact.coverCaption?.th || "",
-      },
-
-      companyDisplayName: {
-        en: contact.companyDisplayName?.en || "",
-
-        th: contact.companyDisplayName?.th || "",
-      },
-
-      establishedYear: contact.establishedYear || "",
-
-      address: {
-        en: contact.address?.en || "",
-
-        th: contact.address?.th || "",
-      },
-
-      telephone: contact.telephone || "",
-
-      email: contact.email || "",
-
-      form: {
-        enabled: contact.form?.enabled !== false,
-
-        formId: contact.form?.formId || null,
-
-        formSlug: contact.form?.formSlug || "contact",
-      },
-    },
+    contact,
 
     form: sanitizeForm(form),
 

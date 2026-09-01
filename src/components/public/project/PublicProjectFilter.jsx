@@ -4,22 +4,36 @@ import { Search, X } from "lucide-react";
 
 export default function PublicProjectFilter({
   search,
+
   category,
+
   year,
 
   categories = [],
+
   years = [],
 
   locale = "en",
 
   onSearchChange,
+
   onCategoryChange,
+
   onYearChange,
+
   onClear,
 }) {
   const hasFilters = Boolean(search) || Boolean(category) || Boolean(year);
 
   function localized(value) {
+    if (!value) {
+      return "";
+    }
+
+    if (typeof value === "string") {
+      return value;
+    }
+
     return (
       value?.[locale]?.trim() || value?.en?.trim() || value?.th?.trim() || ""
     );
@@ -29,9 +43,9 @@ export default function PublicProjectFilter({
     <div
       className="
         border-b
-        border-black/[0.08]
-
+        border-[var(--public-border)]
         pb-4
+        text-[var(--public-foreground)]
       "
     >
       <div
@@ -39,31 +53,23 @@ export default function PublicProjectFilter({
           flex
           flex-col
           gap-4
-
           md:flex-row
           md:items-end
           md:gap-6
         "
       >
-        {/* SEARCH */}
-
         <label
           className="
             group
             flex
             min-w-0
             flex-1
-
             items-center
             gap-2
-
             border-b
-            border-black/10
-
+            border-[var(--public-border)]
             pb-2
-
             transition-colors
-
             focus-within:border-[var(--public-primary)]
           "
         >
@@ -72,10 +78,8 @@ export default function PublicProjectFilter({
             strokeWidth={1.2}
             className="
               shrink-0
-              text-black/25
-
+              text-[var(--public-muted-foreground)]
               transition-colors
-
               group-focus-within:text-[var(--public-primary)]
             "
           />
@@ -88,17 +92,12 @@ export default function PublicProjectFilter({
             className="
               min-w-0
               flex-1
-
               bg-transparent
-
               text-[11px]
               tracking-[0.02em]
-              text-black/75
-
+              text-[var(--public-foreground)]
               outline-none
-
-              placeholder:text-black/25
-
+              placeholder:text-[var(--public-muted-foreground)]
               sm:text-[12px]
             "
           />
@@ -109,17 +108,15 @@ export default function PublicProjectFilter({
               aria-label="Clear search"
               onClick={() => onSearchChange("")}
               className="
-                text-black/20
+                text-[var(--public-muted-foreground)]
                 transition-colors
-                hover:text-black/60
+                hover:text-[var(--public-primary)]
               "
             >
               <X size={13} strokeWidth={1.2} />
             </button>
           )}
         </label>
-
-        {/* CATEGORY */}
 
         <label
           className="
@@ -134,7 +131,7 @@ export default function PublicProjectFilter({
               text-[8px]
               uppercase
               tracking-[0.09em]
-              text-black/25
+              text-[var(--public-muted-foreground)]
             "
           >
             Category
@@ -146,26 +143,18 @@ export default function PublicProjectFilter({
             className="
               cursor-pointer
               appearance-none
-
               border-0
               border-b
-              border-black/10
-
-              bg-transparent
-
+              border-[var(--public-border)]
+              bg-[var(--public-background)]
               pb-2
-
               text-[10px]
               uppercase
               tracking-[0.05em]
-              text-black/55
-
+              text-[var(--public-foreground)]
               outline-none
-
               transition-colors
-
               focus:border-[var(--public-primary)]
-
               sm:text-[11px]
             "
           >
@@ -178,8 +167,6 @@ export default function PublicProjectFilter({
             ))}
           </select>
         </label>
-
-        {/* YEAR */}
 
         <label
           className="
@@ -194,7 +181,7 @@ export default function PublicProjectFilter({
               text-[8px]
               uppercase
               tracking-[0.09em]
-              text-black/25
+              text-[var(--public-muted-foreground)]
             "
           >
             Year
@@ -206,26 +193,18 @@ export default function PublicProjectFilter({
             className="
               cursor-pointer
               appearance-none
-
               border-0
               border-b
-              border-black/10
-
-              bg-transparent
-
+              border-[var(--public-border)]
+              bg-[var(--public-background)]
               pb-2
-
               text-[10px]
               uppercase
               tracking-[0.05em]
-              text-black/55
-
+              text-[var(--public-foreground)]
               outline-none
-
               transition-colors
-
               focus:border-[var(--public-primary)]
-
               sm:text-[11px]
             "
           >
@@ -238,8 +217,6 @@ export default function PublicProjectFilter({
             ))}
           </select>
         </label>
-
-        {/* CLEAR */}
 
         <div
           className="
@@ -254,20 +231,14 @@ export default function PublicProjectFilter({
             onClick={onClear}
             className="
               pb-2
-
               text-[9px]
               uppercase
               tracking-[0.08em]
-
-              text-black/25
-
+              text-[var(--public-muted-foreground)]
               transition-colors
-
               enabled:hover:text-[var(--public-primary)]
-
               disabled:cursor-default
               disabled:opacity-0
-
               sm:text-[10px]
             "
           >

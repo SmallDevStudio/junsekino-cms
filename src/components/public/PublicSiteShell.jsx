@@ -1,5 +1,7 @@
 import PublicHeader from "@/components/public/PublicHeader";
 
+import PublicThemeProvider from "@/components/public/PublicThemeProvider";
+
 import { DEFAULT_COMPANY_NAVIGATION } from "@/constants/company-defaults";
 
 function resolveBrandSuffix(company) {
@@ -25,100 +27,6 @@ function getBrandFallback(company) {
   return "#000000";
 }
 
-/*
- * =========================================================
- * BRANDING
- * =========================================================
- *
- * Source priority:
- *
- * 1. company.colors
- * 2. company.branding.colors
- * 3. company.branding legacy fields
- * 4. settings.branding.colors
- * 5. settings legacy fields
- * 6. company suffix fallback
- *
- * Firestore current structure:
- *
- * company.colors.primary
- *
- * therefore company.colors MUST be
- * treated as the primary source.
- * =========================================================
- */
-
-function resolveBranding(company, settings) {
-  const companyColors = company?.colors || {};
-
-  const companyBranding = company?.branding || {};
-
-  const companyBrandingColors = companyBranding?.colors || {};
-
-  const settingsBranding = settings?.branding || {};
-
-  const settingsColors = settingsBranding?.colors || {};
-
-  const fallbackPrimary = getBrandFallback(company);
-
-  const primaryColor =
-    companyColors.primary ||
-    companyBrandingColors.primary ||
-    companyBranding.primaryColor ||
-    settingsColors.primary ||
-    settingsBranding.primaryColor ||
-    fallbackPrimary;
-
-  const secondaryColor =
-    companyColors.secondary ||
-    companyBrandingColors.secondary ||
-    settingsColors.secondary ||
-    "#ffffff";
-
-  const accentColor =
-    companyColors.accent ||
-    companyBrandingColors.accent ||
-    settingsColors.accent ||
-    primaryColor;
-
-  const backgroundColor =
-    companyColors.background ||
-    companyBrandingColors.background ||
-    companyBranding.backgroundColor ||
-    settingsColors.background ||
-    settingsBranding.backgroundColor ||
-    "#ffffff";
-
-  const surfaceColor =
-    companyColors.surface ||
-    companyBrandingColors.surface ||
-    settingsColors.surface ||
-    "#f7f7f7";
-
-  /*
-   * Normal copy stays neutral.
-   *
-   * Brand color is reserved for:
-   *
-   * active navigation
-   * breadcrumb
-   * title
-   * like
-   * filter
-   * interaction accents
-   */
-  const textColor = "#111111";
-
-  return {
-    primaryColor,
-    secondaryColor,
-    accentColor,
-    backgroundColor,
-    surfaceColor,
-    textColor,
-  };
-}
-
 function resolveNavigation(settings) {
   const navigation = settings?.navigation;
 
@@ -135,8 +43,123 @@ function resolveNavigation(settings) {
 
 function resolveSocial(company, settings) {
   return {
-    ...(company?.social || {}),
     ...(settings?.social || {}),
+
+    ...(company?.social || {}),
+  };
+}
+
+function resolvePublicTheme(company, settings) {
+  const companyColors = company?.colors || {};
+
+  const companyBranding = company?.branding || {};
+
+  const companyBrandingColors = companyBranding.colors || {};
+
+  const settingsBranding = settings?.branding || {};
+
+  const settingsColors = settingsBranding.colors || {};
+
+  const companyTheme = company?.theme || {};
+
+  const settingsTheme = settings?.theme || {};
+
+  const theme = {
+    ...settingsTheme,
+
+    ...companyTheme,
+
+    light: {
+      ...(settingsTheme.light || {}),
+
+      ...(companyTheme.light || {}),
+    },
+
+    dark: {
+      ...(settingsTheme.dark || {}),
+
+      ...(companyTheme.dark || {}),
+    },
+  };
+
+  const fallbackPrimary = getBrandFallback(company);
+
+  const primary =
+    companyColors.primary ||
+    companyBrandingColors.primary ||
+    companyBranding.primaryColor ||
+    settingsColors.primary ||
+    settingsBranding.primaryColor ||
+    fallbackPrimary;
+
+  const secondary =
+    companyColors.secondary ||
+    companyBrandingColors.secondary ||
+    settingsColors.secondary ||
+    "#ffffff";
+
+  const accent =
+    companyColors.accent ||
+    companyBrandingColors.accent ||
+    settingsColors.accent ||
+    primary;
+
+  const legacyBackground =
+    companyColors.background ||
+    companyBrandingColors.background ||
+    companyBranding.backgroundColor ||
+    settingsColors.background ||
+    settingsBranding.backgroundColor ||
+    "#ffffff";
+
+  const legacySurface =
+    companyColors.surface ||
+    companyBrandingColors.surface ||
+    settingsColors.surface ||
+    "#f7f7f7";
+
+  const legacyText =
+    companyColors.text ||
+    companyBrandingColors.text ||
+    settingsColors.text ||
+    "#111111";
+
+  return {
+    primary,
+
+    secondary,
+
+    accent,
+
+    defaultMode: ["light", "dark", "system"].includes(theme.defaultMode)
+      ? theme.defaultMode
+      : "light",
+
+    allowVisitorPreference: theme.allowVisitorPreference === true,
+
+    light: {
+      background: theme.light?.background || legacyBackground,
+
+      surface: theme.light?.surface || legacySurface,
+
+      text: theme.light?.text || legacyText,
+
+      mutedText: theme.light?.mutedText || "#737373",
+
+      border: theme.light?.border || "#e5e5e5",
+    },
+
+    dark: {
+      background: theme.dark?.background || "#111111",
+
+      surface: theme.dark?.surface || "#1a1a1a",
+
+      text: theme.dark?.text || "#f5f5f5",
+
+      mutedText: theme.dark?.mutedText || "#a3a3a3",
+
+      border: theme.dark?.border || "#333333",
+    },
   };
 }
 
@@ -153,42 +176,22 @@ export default function PublicSiteShell({
 
   children,
 }) {
-  const branding = resolveBranding(company, settings);
+  const theme = resolvePublicTheme(company, settings);
 
   const navigation = resolveNavigation(settings);
 
   const social = resolveSocial(company, settings);
 
   return (
-    <div
-      className="
-        flex
-        min-h-svh
-        flex-col
-      "
-      style={{
-        /*
-         * =================================================
-         * PUBLIC DESIGN TOKENS
-         * =================================================
-         */
-
-        "--public-primary": branding.primaryColor,
-
-        "--public-secondary": branding.secondaryColor,
-
-        "--public-accent": branding.accentColor,
-
-        "--public-background": branding.backgroundColor,
-
-        "--public-surface": branding.surfaceColor,
-
-        "--public-foreground": branding.textColor,
-
-        backgroundColor: "var(--public-background)",
-
-        color: "var(--public-foreground)",
-      }}
+    <PublicThemeProvider
+      companySlug={companySlug}
+      defaultMode={theme.defaultMode}
+      allowVisitorPreference={theme.allowVisitorPreference}
+      primary={theme.primary}
+      secondary={theme.secondary}
+      accent={theme.accent}
+      light={theme.light}
+      dark={theme.dark}
     >
       <PublicHeader
         company={company}
@@ -197,19 +200,10 @@ export default function PublicSiteShell({
         navigation={navigation}
         projectCategories={projectCategories}
         social={social}
-        primaryColor={branding.primaryColor}
+        primaryColor={theme.primary}
       />
 
-      <main
-        className="
-          flex
-          min-h-0
-          flex-1
-          flex-col
-        "
-      >
-        {children}
-      </main>
-    </div>
+      <main className="flex min-h-0 flex-1 flex-col">{children}</main>
+    </PublicThemeProvider>
   );
 }

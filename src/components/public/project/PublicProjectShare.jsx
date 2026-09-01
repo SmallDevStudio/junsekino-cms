@@ -10,49 +10,32 @@ import { RiTwitterXFill, RiTwitterXLine } from "react-icons/ri";
 
 import { Check, Share2, X } from "lucide-react";
 
-/* =========================================
-   TOOLTIP
-========================================= */
-
 function Tooltip({ label }) {
   return (
     <span
       className="
         pointer-events-none
-
         absolute
         bottom-full
         left-1/2
         z-[200]
-
         mb-2.5
-
         -translate-x-1/2
-
+        translate-y-1
         whitespace-nowrap
-
         bg-black/80
-
         px-2.5
         py-1.5
-
         text-[9px]
         font-normal
         tracking-[0.04em]
         text-white
-
         opacity-0
-
         shadow-[0_5px_16px_rgba(0,0,0,0.10)]
-
         transition-all
         duration-200
-
-        translate-y-1
-
         group-hover:translate-y-0
         group-hover:opacity-100
-
         group-focus-visible:translate-y-0
         group-focus-visible:opacity-100
       "
@@ -64,9 +47,7 @@ function Tooltip({ label }) {
           absolute
           left-1/2
           top-full
-
           -translate-x-1/2
-
           border-x-[4px]
           border-t-[4px]
           border-x-transparent
@@ -77,16 +58,17 @@ function Tooltip({ label }) {
   );
 }
 
-/* =========================================
-   SOCIAL ICON BUTTON
-========================================= */
-
 function SocialButton({
   label,
+
   onClick,
+
   outlineIcon,
+
   filledIcon,
+
   hoverColor,
+
   active = false,
 }) {
   return (
@@ -97,42 +79,32 @@ function SocialButton({
       className="
         group
         relative
-
         flex
         h-10
         w-10
-
         items-center
         justify-center
-
         focus-visible:outline-none
       "
     >
       <span
         className="
           relative
-
           flex
           h-6
           w-6
-
           items-center
           justify-center
         "
       >
-        {/* Outline / normal state */}
-
         <span
           className={`
             absolute
             inset-0
-
             flex
             items-center
             justify-center
-
-            text-black/30
-
+            text-[var(--public-muted-foreground)]
             transition-all
             duration-200
 
@@ -146,17 +118,13 @@ function SocialButton({
           {outlineIcon}
         </span>
 
-        {/* Filled / hover state */}
-
         <span
           className={`
             absolute
             inset-0
-
             flex
             items-center
             justify-center
-
             transition-all
             duration-200
 
@@ -179,10 +147,6 @@ function SocialButton({
   );
 }
 
-/* =========================================
-   COMPONENT
-========================================= */
-
 export default function PublicProjectShare({ title }) {
   const [open, setOpen] = useState(false);
 
@@ -191,10 +155,6 @@ export default function PublicProjectShare({ title }) {
   const containerRef = useRef(null);
 
   const copyTimeoutRef = useRef(null);
-
-  /* =========================================
-     CLOSE POPOVER
-  ========================================= */
 
   useEffect(() => {
     function handlePointerDown(event) {
@@ -212,14 +172,30 @@ export default function PublicProjectShare({ title }) {
       }
     }
 
-    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener(
+      "pointerdown",
 
-    document.addEventListener("keydown", handleKeyDown);
+      handlePointerDown,
+    );
+
+    document.addEventListener(
+      "keydown",
+
+      handleKeyDown,
+    );
 
     return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener(
+        "pointerdown",
 
-      document.removeEventListener("keydown", handleKeyDown);
+        handlePointerDown,
+      );
+
+      document.removeEventListener(
+        "keydown",
+
+        handleKeyDown,
+      );
 
       if (copyTimeoutRef.current) {
         window.clearTimeout(copyTimeoutRef.current);
@@ -227,31 +203,25 @@ export default function PublicProjectShare({ title }) {
     };
   }, []);
 
-  /* =========================================
-     HELPERS
-  ========================================= */
-
   function getPageUrl() {
     return window.location.href;
   }
 
   function openShareUrl(url) {
-    window.open(url, "_blank", "noopener,noreferrer,width=680,height=620");
-  }
+    window.open(
+      url,
 
-  /* =========================================
-     FACEBOOK
-  ========================================= */
+      "_blank",
+
+      "noopener,noreferrer,width=680,height=620",
+    );
+  }
 
   function handleFacebook() {
     const url = encodeURIComponent(getPageUrl());
 
     openShareUrl(`https://www.facebook.com/sharer/sharer.php?u=${url}`);
   }
-
-  /* =========================================
-     X
-  ========================================= */
 
   function handleX() {
     const url = encodeURIComponent(getPageUrl());
@@ -261,19 +231,11 @@ export default function PublicProjectShare({ title }) {
     openShareUrl(`https://twitter.com/intent/tweet?url=${url}&text=${text}`);
   }
 
-  /* =========================================
-     LINKEDIN
-  ========================================= */
-
   function handleLinkedIn() {
     const url = encodeURIComponent(getPageUrl());
 
     openShareUrl(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`);
   }
-
-  /* =========================================
-     COPY
-  ========================================= */
 
   async function handleCopy() {
     try {
@@ -288,21 +250,17 @@ export default function PublicProjectShare({ title }) {
       copyTimeoutRef.current = window.setTimeout(() => {
         setCopied(false);
       }, 1800);
-    } catch (error) {
-      console.error("Copy link error:", error);
+    } catch (copyError) {
+      console.error(
+        "Copy link error:",
+
+        copyError,
+      );
     }
   }
 
-  /* =========================================
-     RENDER
-  ========================================= */
-
   return (
     <div ref={containerRef} className="relative">
-      {/* =====================================
-          MAIN SHARE ICON
-      ===================================== */}
-
       <button
         type="button"
         aria-label="Share project"
@@ -310,21 +268,15 @@ export default function PublicProjectShare({ title }) {
         onClick={() => setOpen((current) => !current)}
         className="
           group
-
           flex
           h-9
           w-9
-
           items-center
           justify-center
-
-          text-black/25
-
+          text-[var(--public-muted-foreground)]
           transition-all
           duration-200
-
           hover:text-[var(--public-primary)]
-
           focus-visible:outline-none
         "
       >
@@ -334,15 +286,10 @@ export default function PublicProjectShare({ title }) {
           className="
             transition-transform
             duration-200
-
             group-hover:scale-110
           "
         />
       </button>
-
-      {/* =====================================
-          POPOVER
-      ===================================== */}
 
       {open && (
         <div
@@ -351,32 +298,23 @@ export default function PublicProjectShare({ title }) {
             right-0
             top-full
             z-[160]
-
             mt-2
-
             min-w-[210px]
-
             border
-            border-black/[0.06]
-
-            bg-[var(--public-background)]
-
+            border-[var(--public-border)]
+            bg-[var(--public-surface)]
             px-3
             py-3
-
-            shadow-[0_14px_40px_rgba(0,0,0,0.08)]
+            text-[var(--public-foreground)]
+            shadow-[0_14px_40px_rgba(0,0,0,0.12)]
           "
         >
-          {/* Header */}
-
           <div
             className="
               mb-2
-
               flex
               items-center
               justify-between
-
               px-1
             "
           >
@@ -385,7 +323,7 @@ export default function PublicProjectShare({ title }) {
                 text-[9px]
                 uppercase
                 tracking-[0.12em]
-                text-black/30
+                text-[var(--public-muted-foreground)]
               "
             >
               Share
@@ -399,17 +337,12 @@ export default function PublicProjectShare({ title }) {
                 flex
                 h-5
                 w-5
-
                 items-center
                 justify-center
-
-                text-black/20
-
+                text-[var(--public-muted-foreground)]
                 transition-colors
                 duration-200
-
-                hover:text-black/60
-
+                hover:text-[var(--public-foreground)]
                 focus-visible:outline-none
               "
             >
@@ -417,26 +350,17 @@ export default function PublicProjectShare({ title }) {
             </button>
           </div>
 
-          {/* =================================
-              SOCIAL ICONS
-          ================================= */}
-
           <div
             className="
               flex
               items-center
               justify-center
-
               gap-1
-
               border-t
-              border-black/[0.05]
-
+              border-[var(--public-border)]
               pt-2
             "
           >
-            {/* Facebook */}
-
             <SocialButton
               label="Facebook"
               onClick={handleFacebook}
@@ -445,17 +369,13 @@ export default function PublicProjectShare({ title }) {
               hoverColor="#1877F2"
             />
 
-            {/* X */}
-
             <SocialButton
               label="Share on X"
               onClick={handleX}
               outlineIcon={<RiTwitterXLine size={19} />}
               filledIcon={<RiTwitterXFill size={18} />}
-              hoverColor="#000000"
+              hoverColor="var(--public-foreground)"
             />
-
-            {/* LinkedIn */}
 
             <SocialButton
               label="LinkedIn"
@@ -464,8 +384,6 @@ export default function PublicProjectShare({ title }) {
               filledIcon={<FaLinkedin size={20} />}
               hoverColor="#0A66C2"
             />
-
-            {/* Copy Link */}
 
             <SocialButton
               label={copied ? "Copied!" : "Copy link"}
@@ -483,16 +401,10 @@ export default function PublicProjectShare({ title }) {
             />
           </div>
 
-          {/* =================================
-              COPY FEEDBACK
-          ================================= */}
-
           <div
             className={`
               overflow-hidden
-
               text-center
-
               transition-all
               duration-300
 
@@ -502,14 +414,11 @@ export default function PublicProjectShare({ title }) {
             <div
               className="
                 border-t
-                border-black/[0.05]
-
+                border-[var(--public-border)]
                 pt-2
-
                 text-[9px]
                 uppercase
                 tracking-[0.08em]
-
                 text-[var(--public-primary)]
               "
             >

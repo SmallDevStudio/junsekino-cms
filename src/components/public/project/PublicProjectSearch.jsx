@@ -1,18 +1,24 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+
 import { useRouter } from "next/navigation";
+
 import { CiSearch } from "react-icons/ci";
+
 import { IoCloseOutline } from "react-icons/io5";
 
 export default function PublicProjectSearch({
   companySlug,
+
   initialQuery = "",
 }) {
   const router = useRouter();
+
   const inputRef = useRef(null);
 
   const [open, setOpen] = useState(false);
+
   const [value, setValue] = useState(initialQuery);
 
   useEffect(() => {
@@ -22,6 +28,7 @@ export default function PublicProjectSearch({
 
     const timer = window.setTimeout(() => {
       inputRef.current?.focus();
+
       inputRef.current?.select();
     }, 0);
 
@@ -30,6 +37,7 @@ export default function PublicProjectSearch({
 
   function closeSearch() {
     setValue(initialQuery);
+
     setOpen(false);
   }
 
@@ -42,17 +50,18 @@ export default function PublicProjectSearch({
 
     if (!query) {
       router.push(`/${companySlug}/project`);
+
       return;
     }
 
-    router.push(
-      `/${companySlug}/project?q=${encodeURIComponent(query)}`,
-    );
+    router.push(`/${companySlug}/project?q=${encodeURIComponent(query)}`);
   }
 
   function clearSearch() {
     setValue("");
+
     setOpen(false);
+
     router.push(`/${companySlug}/project`);
   }
 
@@ -64,7 +73,13 @@ export default function PublicProjectSearch({
 
   if (!open) {
     return (
-      <div className="flex shrink-0 items-center">
+      <div
+        className="
+          flex
+          shrink-0
+          items-center
+        "
+      >
         <button
           type="button"
           aria-label="Search projects"
@@ -76,12 +91,9 @@ export default function PublicProjectSearch({
             w-8
             items-center
             justify-center
-
-            text-black/30
-
+            text-[var(--public-muted-foreground)]
             transition-colors
             duration-300
-
             hover:text-[var(--public-primary)]
             focus-visible:text-[var(--public-primary)]
             focus-visible:outline-none
@@ -89,7 +101,10 @@ export default function PublicProjectSearch({
         >
           <CiSearch
             aria-hidden="true"
-            className="h-[22px] w-[22px]"
+            className="
+              h-[22px]
+              w-[22px]
+            "
           />
         </button>
       </div>
@@ -105,7 +120,6 @@ export default function PublicProjectSearch({
         flex-1
         items-center
         justify-end
-
         sm:flex-none
       "
     >
@@ -116,15 +130,11 @@ export default function PublicProjectSearch({
           max-w-[250px]
           items-center
           gap-2
-
           border-b
-          border-black/15
-
+          border-[var(--public-border)]
           transition-colors
           duration-300
-
           focus-within:border-[var(--public-primary)]
-
           sm:w-[250px]
           lg:w-[290px]
           lg:max-w-[290px]
@@ -132,7 +142,12 @@ export default function PublicProjectSearch({
       >
         <CiSearch
           aria-hidden="true"
-          className="h-[19px] w-[19px] shrink-0 text-black/25"
+          className="
+            h-[19px]
+            w-[19px]
+            shrink-0
+            text-[var(--public-muted-foreground)]
+          "
         />
 
         <input
@@ -148,16 +163,12 @@ export default function PublicProjectSearch({
             flex-1
             bg-transparent
             py-1.5
-
             text-[10px]
             font-normal
             tracking-[0.04em]
-            text-black/70
-
+            text-[var(--public-foreground)]
             outline-none
-
-            placeholder:text-black/25
-
+            placeholder:text-[var(--public-muted-foreground)]
             sm:text-[11px]
           "
         />
@@ -174,12 +185,9 @@ export default function PublicProjectSearch({
             shrink-0
             items-center
             justify-center
-
-            text-black/25
-
+            text-[var(--public-muted-foreground)]
             transition-colors
             duration-300
-
             hover:text-[var(--public-primary)]
             focus-visible:text-[var(--public-primary)]
             focus-visible:outline-none
@@ -187,17 +195,16 @@ export default function PublicProjectSearch({
         >
           <IoCloseOutline
             aria-hidden="true"
-            className="h-[18px] w-[18px]"
+            className="
+              h-[18px]
+              w-[18px]
+            "
           />
         </button>
       </div>
 
       {initialQuery ? (
-        <button
-          type="button"
-          onClick={clearSearch}
-          className="sr-only"
-        >
+        <button type="button" onClick={clearSearch} className="sr-only">
           Clear current search
         </button>
       ) : null}

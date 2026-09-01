@@ -1,6 +1,10 @@
 import Link from "next/link";
 
-function getLocalizedValue(value, locale = "en") {
+function getLocalizedValue(
+  value,
+
+  locale = "en",
+) {
   if (!value) {
     return "";
   }
@@ -16,13 +20,30 @@ function getLocalizedValue(value, locale = "en") {
 
 export default function PublicProjectBreadcrumbs({
   companySlug,
+
   category = null,
+
   project = null,
+
   locale = "en",
 }) {
-  const categoryName = getLocalizedValue(category?.name, locale);
+  const categoryName = getLocalizedValue(
+    category?.name,
 
-  const projectTitle = getLocalizedValue(project?.title, locale);
+    locale,
+  );
+
+  const projectTitle = getLocalizedValue(
+    project?.title,
+
+    locale,
+  );
+
+  const inactiveClassName = `
+    text-[var(--public-muted-foreground)]
+    transition-colors
+    hover:text-[var(--public-foreground)]
+  `;
 
   return (
     <nav
@@ -32,44 +53,34 @@ export default function PublicProjectBreadcrumbs({
         flex-wrap
         items-center
         gap-2
-
         text-[10px]
         uppercase
         tracking-[0.06em]
-
         sm:text-[11px]
       "
     >
-      <Link
-        href={`/${companySlug}`}
-        className="
-          text-black/25
-          transition-colors
-          hover:text-black/55
-        "
-      >
+      <Link href={`/${companySlug}`} className={inactiveClassName}>
         Home
       </Link>
 
-      <span className="text-black/15">/</span>
+      <span
+        className="
+          text-[var(--public-border)]
+        "
+      >
+        /
+      </span>
 
       {category || project ? (
-        <Link
-          href={`/${companySlug}/project`}
-          className="
-            text-black/25
-            transition-colors
-            hover:text-black/55
-          "
-        >
+        <Link href={`/${companySlug}/project`} className={inactiveClassName}>
           Project
         </Link>
       ) : (
         <span
-          className="font-medium"
-          style={{
-            color: "var(--public-primary)",
-          }}
+          className="
+            font-medium
+            text-[var(--public-primary)]
+          "
         >
           Project
         </span>
@@ -77,25 +88,27 @@ export default function PublicProjectBreadcrumbs({
 
       {category && (
         <>
-          <span className="text-black/15">/</span>
+          <span
+            className="
+              text-[var(--public-border)]
+            "
+          >
+            /
+          </span>
 
           {project ? (
             <Link
               href={`/${companySlug}/project/${category.slug}`}
-              className="
-                text-black/25
-                transition-colors
-                hover:text-black/55
-              "
+              className={inactiveClassName}
             >
               {categoryName}
             </Link>
           ) : (
             <span
-              className="font-medium"
-              style={{
-                color: "var(--public-primary)",
-              }}
+              className="
+                font-medium
+                text-[var(--public-primary)]
+              "
             >
               {categoryName}
             </span>
@@ -105,17 +118,21 @@ export default function PublicProjectBreadcrumbs({
 
       {project && (
         <>
-          <span className="text-black/15">/</span>
+          <span
+            className="
+              text-[var(--public-border)]
+            "
+          >
+            /
+          </span>
 
           <span
             className="
               max-w-[260px]
               truncate
               font-medium
+              text-[var(--public-primary)]
             "
-            style={{
-              color: "var(--public-primary)",
-            }}
           >
             {projectTitle}
           </span>

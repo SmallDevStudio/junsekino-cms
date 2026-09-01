@@ -4,13 +4,13 @@ import { Check, LoaderCircle } from "lucide-react";
 
 import { useState } from "react";
 
-/*
- * =========================================================
- * HELPERS
- * =========================================================
- */
+function localized(
+  value,
 
-function localized(value, locale, fallback = "") {
+  locale,
+
+  fallback = "",
+) {
   if (!value) {
     return fallback;
   }
@@ -61,14 +61,23 @@ function getFieldWidthClass(width) {
   return "col-span-12";
 }
 
-function createControlId(form, field) {
+function createControlId(
+  form,
+
+  field,
+) {
   return `contact-${form?.id || form?.slug || "form"}-${field.id}`.replace(
     /[^a-zA-Z0-9_-]/g,
+
     "-",
   );
 }
 
-function isMissingRequiredValue(field, value) {
+function isMissingRequiredValue(
+  field,
+
+  value,
+) {
   if (field.type === "consent") {
     return value !== true;
   }
@@ -100,7 +109,11 @@ function inputType(fieldType) {
   return "text";
 }
 
-function autoComplete(field, label) {
+function autoComplete(
+  field,
+
+  label,
+) {
   if (field.type === "email") {
     return "email";
   }
@@ -115,12 +128,6 @@ function autoComplete(field, label) {
 
   return "off";
 }
-
-/*
- * =========================================================
- * CONTACT FORM
- * =========================================================
- */
 
 export default function ContactForm({
   companySlug,
@@ -149,7 +156,11 @@ export default function ContactForm({
     return null;
   }
 
-  function updateValue(fieldId, value) {
+  function updateValue(
+    fieldId,
+
+    value,
+  ) {
     setValues((current) => ({
       ...current,
 
@@ -171,7 +182,13 @@ export default function ContactForm({
     });
   }
 
-  function toggleCheckboxOption(fieldId, optionValue, checked) {
+  function toggleCheckboxOption(
+    fieldId,
+
+    optionValue,
+
+    checked,
+  ) {
     const current = Array.isArray(values[fieldId]) ? values[fieldId] : [];
 
     const next = checked
@@ -195,7 +212,14 @@ export default function ContactForm({
 
       const value = values[field.id];
 
-      if (field.required && isMissingRequiredValue(field, value)) {
+      if (
+        field.required &&
+        isMissingRequiredValue(
+          field,
+
+          value,
+        )
+      ) {
         const booleanField = ["checkbox", "consent"].includes(field.type);
 
         nextErrors[field.id] =
@@ -315,7 +339,14 @@ export default function ContactForm({
 
   if (success) {
     return (
-      <div className="py-9 text-center" role="status">
+      <div
+        className="
+          py-9
+          text-center
+          text-[var(--public-foreground)]
+        "
+        role="status"
+      >
         <div
           className="
             mx-auto
@@ -332,14 +363,38 @@ export default function ContactForm({
           <Check size={17} strokeWidth={1.7} />
         </div>
 
-        <h3 className="mt-4 text-[15px] font-semibold text-black">
-          {localized(form.settings?.successTitle, locale, "Thank you")}
+        <h3
+          className="
+            mt-4
+            text-[15px]
+            font-semibold
+            text-[var(--public-foreground)]
+          "
+        >
+          {localized(
+            form.settings?.successTitle,
+
+            locale,
+
+            "Thank you",
+          )}
         </h3>
 
-        <p className="mx-auto mt-2 max-w-[440px] text-[12px] leading-[1.7] text-black/55">
+        <p
+          className="
+            mx-auto
+            mt-2
+            max-w-[440px]
+            text-[12px]
+            leading-[1.7]
+            text-[var(--public-muted-foreground)]
+          "
+        >
           {localized(
             form.settings?.successMessage,
+
             locale,
+
             "Thank you. We have received your message.",
           )}
         </p>
@@ -352,23 +407,39 @@ export default function ContactForm({
     w-full
     rounded-md
     border
-    border-transparent
-    bg-[#f4f4f6]
+    border-[var(--public-border)]
+    bg-[var(--public-background)]
     px-2.5
     text-[13px]
-    text-black
+    text-[var(--public-foreground)]
     outline-none
     transition
-    placeholder:text-black/40
-    hover:border-black/10
+    placeholder:text-[var(--public-muted-foreground)]
+    hover:border-[var(--public-muted-foreground)]
     focus:border-[var(--public-primary)]
     disabled:cursor-not-allowed
     disabled:opacity-60
   `;
 
   return (
-    <form onSubmit={handleSubmit} noValidate>
-      <div className="pointer-events-none absolute -left-[10000px] top-auto h-px w-px overflow-hidden">
+    <form
+      onSubmit={handleSubmit}
+      noValidate
+      className="
+        text-[var(--public-foreground)]
+      "
+    >
+      <div
+        className="
+          pointer-events-none
+          absolute
+          -left-[10000px]
+          top-auto
+          h-px
+          w-px
+          overflow-hidden
+        "
+      >
         <label htmlFor="contact-website">Website</label>
 
         <input
@@ -382,7 +453,14 @@ export default function ContactForm({
         />
       </div>
 
-      <div className="grid grid-cols-12 gap-x-4 gap-y-3">
+      <div
+        className="
+          grid
+          grid-cols-12
+          gap-x-4
+          gap-y-3
+        "
+      >
         {fields.map((field) => {
           if (field.enabled === false) {
             return null;
@@ -394,9 +472,20 @@ export default function ContactForm({
             return (
               <h3
                 key={field.id}
-                className={`${widthClass} pt-1 text-[14px] font-semibold leading-[1.5]`}
+                className={`
+                  ${widthClass}
+                  pt-1
+                  text-[14px]
+                  font-semibold
+                  leading-[1.5]
+                  text-[var(--public-foreground)]
+                `}
               >
-                {localized(field.label, locale)}
+                {localized(
+                  field.label,
+
+                  locale,
+                )}
               </h3>
             );
           }
@@ -405,22 +494,47 @@ export default function ContactForm({
             return (
               <p
                 key={field.id}
-                className={`${widthClass} text-[12px] leading-[1.7] text-black/60`}
+                className={`
+                  ${widthClass}
+                  text-[12px]
+                  leading-[1.7]
+                  text-[var(--public-muted-foreground)]
+                `}
               >
-                {localized(field.label, locale)}
+                {localized(
+                  field.label,
+
+                  locale,
+                )}
               </p>
             );
           }
 
-          const label = localized(field.label, locale);
+          const label = localized(
+            field.label,
 
-          const placeholder = localized(field.placeholder, locale);
+            locale,
+          );
 
-          const helpText = localized(field.helpText, locale);
+          const placeholder = localized(
+            field.placeholder,
+
+            locale,
+          );
+
+          const helpText = localized(
+            field.helpText,
+
+            locale,
+          );
 
           const hasError = Boolean(fieldErrors[field.id]);
 
-          const controlId = createControlId(form, field);
+          const controlId = createControlId(
+            form,
+
+            field,
+          );
 
           const errorId = `${controlId}-error`;
 
@@ -437,7 +551,13 @@ export default function ContactForm({
               <div key={field.id} className={widthClass}>
                 <label
                   htmlFor={controlId}
-                  className="flex cursor-pointer items-start gap-2.5 pt-1"
+                  className="
+                    flex
+                    cursor-pointer
+                    items-start
+                    gap-2.5
+                    pt-1
+                  "
                 >
                   <input
                     id={controlId}
@@ -447,16 +567,37 @@ export default function ContactForm({
                     aria-invalid={hasError}
                     aria-describedby={describedBy}
                     onChange={(event) =>
-                      updateValue(field.id, event.target.checked)
+                      updateValue(
+                        field.id,
+
+                        event.target.checked,
+                      )
                     }
-                    className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--public-primary)]"
+                    className="
+                      mt-0.5
+                      h-4
+                      w-4
+                      shrink-0
+                      accent-[var(--public-primary)]
+                    "
                   />
 
-                  <span className="text-[12px] leading-[1.6] text-black/65">
+                  <span
+                    className="
+                      text-[12px]
+                      leading-[1.6]
+                      text-[var(--public-foreground)]
+                    "
+                  >
                     {label}
 
                     {field.required && (
-                      <span className="ml-1 text-[var(--public-primary)]">
+                      <span
+                        className="
+                          ml-1
+                          text-[var(--public-primary)]
+                        "
+                      >
                         *
                       </span>
                     )}
@@ -466,7 +607,12 @@ export default function ContactForm({
                 {helpText && !hasError && (
                   <p
                     id={helpId}
-                    className="mt-1 text-[10px] leading-[1.6] text-black/45"
+                    className="
+                        mt-1
+                        text-[10px]
+                        leading-[1.6]
+                        text-[var(--public-muted-foreground)]
+                      "
                   >
                     {helpText}
                   </p>
@@ -476,7 +622,11 @@ export default function ContactForm({
                   <p
                     id={errorId}
                     role="alert"
-                    className="mt-1 text-[10px] text-red-600"
+                    className="
+                      mt-1
+                      text-[10px]
+                      text-red-500
+                    "
                   >
                     {fieldErrors[field.id]}
                   </p>
@@ -488,19 +638,47 @@ export default function ContactForm({
           if (field.type === "radio") {
             return (
               <fieldset key={field.id} className={widthClass}>
-                <legend className="text-[13px] leading-[1.4] text-black">
+                <legend
+                  className="
+                    text-[13px]
+                    leading-[1.4]
+                    text-[var(--public-foreground)]
+                  "
+                >
                   {label}
 
                   {field.required && (
-                    <span className="ml-1 text-[var(--public-primary)]">*</span>
+                    <span
+                      className="
+                        ml-1
+                        text-[var(--public-primary)]
+                      "
+                    >
+                      *
+                    </span>
                   )}
                 </legend>
 
-                <div className="mt-2 flex flex-wrap gap-x-5 gap-y-2">
+                <div
+                  className="
+                    mt-2
+                    flex
+                    flex-wrap
+                    gap-x-5
+                    gap-y-2
+                  "
+                >
                   {(field.options || []).map((option) => (
                     <label
                       key={option.value}
-                      className="flex cursor-pointer items-center gap-2 text-[12px] text-black/70"
+                      className="
+                        flex
+                        cursor-pointer
+                        items-center
+                        gap-2
+                        text-[12px]
+                        text-[var(--public-foreground)]
+                      "
                     >
                       <input
                         type="radio"
@@ -509,12 +687,26 @@ export default function ContactForm({
                         checked={values[field.id] === option.value}
                         disabled={preview || submitting}
                         onChange={(event) =>
-                          updateValue(field.id, event.target.value)
+                          updateValue(
+                            field.id,
+
+                            event.target.value,
+                          )
                         }
-                        className="h-4 w-4 accent-[var(--public-primary)]"
+                        className="
+                          h-4
+                          w-4
+                          accent-[var(--public-primary)]
+                        "
                       />
 
-                      {localized(option.label, locale, option.value)}
+                      {localized(
+                        option.label,
+
+                        locale,
+
+                        option.value,
+                      )}
                     </label>
                   ))}
                 </div>
@@ -523,7 +715,11 @@ export default function ContactForm({
                   <p
                     id={errorId}
                     role="alert"
-                    className="mt-1 text-[10px] text-red-600"
+                    className="
+                      mt-1
+                      text-[10px]
+                      text-red-500
+                    "
                   >
                     {fieldErrors[field.id]}
                   </p>
@@ -538,21 +734,47 @@ export default function ContactForm({
             if (options.length) {
               return (
                 <fieldset key={field.id} className={widthClass}>
-                  <legend className="text-[13px] leading-[1.4] text-black">
+                  <legend
+                    className="
+                      text-[13px]
+                      leading-[1.4]
+                      text-[var(--public-foreground)]
+                    "
+                  >
                     {label}
 
                     {field.required && (
-                      <span className="ml-1 text-[var(--public-primary)]">
+                      <span
+                        className="
+                          ml-1
+                          text-[var(--public-primary)]
+                        "
+                      >
                         *
                       </span>
                     )}
                   </legend>
 
-                  <div className="mt-2 flex flex-wrap gap-x-5 gap-y-2">
+                  <div
+                    className="
+                      mt-2
+                      flex
+                      flex-wrap
+                      gap-x-5
+                      gap-y-2
+                    "
+                  >
                     {options.map((option) => (
                       <label
                         key={option.value}
-                        className="flex cursor-pointer items-center gap-2 text-[12px] text-black/70"
+                        className="
+                            flex
+                            cursor-pointer
+                            items-center
+                            gap-2
+                            text-[12px]
+                            text-[var(--public-foreground)]
+                          "
                       >
                         <input
                           type="checkbox"
@@ -565,14 +787,26 @@ export default function ContactForm({
                           onChange={(event) =>
                             toggleCheckboxOption(
                               field.id,
+
                               option.value,
+
                               event.target.checked,
                             )
                           }
-                          className="h-4 w-4 accent-[var(--public-primary)]"
+                          className="
+                              h-4
+                              w-4
+                              accent-[var(--public-primary)]
+                            "
                         />
 
-                        {localized(option.label, locale, option.value)}
+                        {localized(
+                          option.label,
+
+                          locale,
+
+                          option.value,
+                        )}
                       </label>
                     ))}
                   </div>
@@ -581,7 +815,11 @@ export default function ContactForm({
                     <p
                       id={errorId}
                       role="alert"
-                      className="mt-1 text-[10px] text-red-600"
+                      className="
+                        mt-1
+                        text-[10px]
+                        text-red-500
+                      "
                     >
                       {fieldErrors[field.id]}
                     </p>
@@ -594,7 +832,13 @@ export default function ContactForm({
               <div key={field.id} className={widthClass}>
                 <label
                   htmlFor={controlId}
-                  className="flex cursor-pointer items-center gap-2.5 pt-1"
+                  className="
+                    flex
+                    cursor-pointer
+                    items-center
+                    gap-2.5
+                    pt-1
+                  "
                 >
                   <input
                     id={controlId}
@@ -602,16 +846,35 @@ export default function ContactForm({
                     checked={values[field.id] === true}
                     disabled={preview || submitting}
                     onChange={(event) =>
-                      updateValue(field.id, event.target.checked)
+                      updateValue(
+                        field.id,
+
+                        event.target.checked,
+                      )
                     }
-                    className="h-4 w-4 accent-[var(--public-primary)]"
+                    className="
+                      h-4
+                      w-4
+                      accent-[var(--public-primary)]
+                    "
                   />
 
-                  <span className="text-[12px] leading-[1.6] text-black/65">
+                  <span
+                    className="
+                      text-[12px]
+                      leading-[1.6]
+                      text-[var(--public-foreground)]
+                    "
+                  >
                     {label}
 
                     {field.required && (
-                      <span className="ml-1 text-[var(--public-primary)]">
+                      <span
+                        className="
+                          ml-1
+                          text-[var(--public-primary)]
+                        "
+                      >
                         *
                       </span>
                     )}
@@ -622,7 +885,11 @@ export default function ContactForm({
                   <p
                     id={errorId}
                     role="alert"
-                    className="mt-1 text-[10px] text-red-600"
+                    className="
+                      mt-1
+                      text-[10px]
+                      text-red-500
+                    "
                   >
                     {fieldErrors[field.id]}
                   </p>
@@ -635,12 +902,24 @@ export default function ContactForm({
             <div key={field.id} className={widthClass}>
               <label
                 htmlFor={controlId}
-                className="block text-[13px] leading-[1.4] text-black"
+                className="
+                  block
+                  text-[13px]
+                  leading-[1.4]
+                  text-[var(--public-foreground)]
+                "
               >
                 {label}
 
                 {field.required && (
-                  <span className="ml-1 text-[var(--public-primary)]">*</span>
+                  <span
+                    className="
+                      ml-1
+                      text-[var(--public-primary)]
+                    "
+                  >
+                    *
+                  </span>
                 )}
               </label>
 
@@ -655,9 +934,18 @@ export default function ContactForm({
                   aria-invalid={hasError}
                   aria-describedby={describedBy}
                   onChange={(event) =>
-                    updateValue(field.id, event.target.value)
+                    updateValue(
+                      field.id,
+
+                      event.target.value,
+                    )
                   }
-                  className={`${controlClass} min-h-[124px] resize-y py-2.5`}
+                  className={`
+                    ${controlClass}
+                    min-h-[124px]
+                    resize-y
+                    py-2.5
+                  `}
                 />
               ) : field.type === "select" ? (
                 <select
@@ -668,15 +956,28 @@ export default function ContactForm({
                   aria-invalid={hasError}
                   aria-describedby={describedBy}
                   onChange={(event) =>
-                    updateValue(field.id, event.target.value)
+                    updateValue(
+                      field.id,
+
+                      event.target.value,
+                    )
                   }
-                  className={`${controlClass} h-[38px]`}
+                  className={`
+                    ${controlClass}
+                    h-[38px]
+                  `}
                 >
                   <option value="">{placeholder || "—"}</option>
 
                   {(field.options || []).map((option) => (
                     <option key={option.value} value={option.value}>
-                      {localized(option.label, locale, option.value)}
+                      {localized(
+                        option.label,
+
+                        locale,
+
+                        option.value,
+                      )}
                     </option>
                   ))}
                 </select>
@@ -688,7 +989,11 @@ export default function ContactForm({
                   placeholder={placeholder}
                   disabled={preview || submitting}
                   required={field.required}
-                  autoComplete={autoComplete(field, label)}
+                  autoComplete={autoComplete(
+                    field,
+
+                    label,
+                  )}
                   min={field.validation?.min ?? undefined}
                   max={field.validation?.max ?? undefined}
                   minLength={field.validation?.minLength ?? undefined}
@@ -699,19 +1004,28 @@ export default function ContactForm({
                   onChange={(event) =>
                     updateValue(
                       field.id,
+
                       field.type === "number" && event.target.value !== ""
                         ? Number(event.target.value)
                         : event.target.value,
                     )
                   }
-                  className={`${controlClass} h-[38px]`}
+                  className={`
+                    ${controlClass}
+                    h-[38px]
+                  `}
                 />
               )}
 
               {helpText && !hasError && (
                 <p
                   id={helpId}
-                  className="mt-1 text-[10px] leading-[1.6] text-black/45"
+                  className="
+                      mt-1
+                      text-[10px]
+                      leading-[1.6]
+                      text-[var(--public-muted-foreground)]
+                    "
                 >
                   {helpText}
                 </p>
@@ -721,7 +1035,11 @@ export default function ContactForm({
                 <p
                   id={errorId}
                   role="alert"
-                  className="mt-1 text-[10px] text-red-600"
+                  className="
+                    mt-1
+                    text-[10px]
+                    text-red-500
+                  "
                 >
                   {fieldErrors[field.id]}
                 </p>
@@ -732,12 +1050,26 @@ export default function ContactForm({
       </div>
 
       {error && (
-        <p role="alert" className="mt-4 text-center text-[11px] text-red-600">
+        <p
+          role="alert"
+          className="
+            mt-4
+            text-center
+            text-[11px]
+            text-red-500
+          "
+        >
           {error}
         </p>
       )}
 
-      <div className="mt-5 flex justify-center">
+      <div
+        className="
+          mt-5
+          flex
+          justify-center
+        "
+      >
         <button
           type="submit"
           disabled={preview || submitting}
@@ -768,7 +1100,9 @@ export default function ContactForm({
 
           {localized(
             form.settings?.submitLabel,
+
             locale,
+
             locale === "th" ? "ส่ง" : "Send",
           )}
         </button>

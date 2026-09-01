@@ -4,12 +4,6 @@ import PublicRichText from "@/components/public/content/PublicRichText";
 
 import { cn } from "@/utils/cn";
 
-/*
- * =========================================================
- * LOCALIZATION
- * =========================================================
- */
-
 function getLocalizedValue(value, locale = "en") {
   if (!value) {
     return "";
@@ -36,13 +30,11 @@ function getLocalizedValue(value, locale = "en") {
   return "";
 }
 
-/*
- * =========================================================
- * RICH TEXT
- * =========================================================
- */
+function getLocalizedRichText(
+  value,
 
-function getLocalizedRichText(value, locale = "en") {
+  locale = "en",
+) {
   if (!value) {
     return null;
   }
@@ -71,33 +63,45 @@ function getLocalizedRichText(value, locale = "en") {
   return null;
 }
 
-/*
- * =========================================================
- * PUBLIC IMAGE
- * =========================================================
- */
-
 function PublicAboutImage({
   image,
+
   locale,
+
   className,
+
   sizes,
+
   priority = false,
 }) {
   if (!image?.largeUrl) {
     return null;
   }
 
-  const alt = getLocalizedValue(image.alt, locale);
+  const alt = getLocalizedValue(
+    image.alt,
+
+    locale,
+  );
 
   const focalX = Math.max(
     0,
-    Math.min(1, image.presentation?.focalPoint?.x ?? 0.5),
+
+    Math.min(
+      1,
+
+      image.presentation?.focalPoint?.x ?? 0.5,
+    ),
   );
 
   const focalY = Math.max(
     0,
-    Math.min(1, image.presentation?.focalPoint?.y ?? 0.5),
+
+    Math.min(
+      1,
+
+      image.presentation?.focalPoint?.y ?? 0.5,
+    ),
   );
 
   const objectFit =
@@ -113,7 +117,11 @@ function PublicAboutImage({
       unoptimized
       priority={priority}
       sizes={sizes || "(max-width: 968px) 100vw, 920px"}
-      className={cn(objectFit, className)}
+      className={cn(
+        objectFit,
+
+        className,
+      )}
       style={{
         objectPosition: `${focalX * 100}% ${focalY * 100}%`,
       }}
@@ -121,14 +129,16 @@ function PublicAboutImage({
   );
 }
 
-/*
- * =========================================================
- * RICH TEXT SECTION
- * =========================================================
- */
+function RichTextSection({
+  section,
 
-function RichTextSection({ section, locale }) {
-  const content = getLocalizedRichText(section.data?.content, locale);
+  locale,
+}) {
+  const content = getLocalizedRichText(
+    section.data?.content,
+
+    locale,
+  );
 
   if (!content) {
     return null;
@@ -167,8 +177,7 @@ function RichTextSection({ section, locale }) {
         className="
           text-[12px]
           leading-[1.7]
-          text-black/80
-
+          text-[var(--public-foreground)]
           sm:text-[13px]
         "
       />
@@ -176,13 +185,11 @@ function RichTextSection({ section, locale }) {
   );
 }
 
-/*
- * =========================================================
- * IMAGE SECTION
- * =========================================================
- */
+function ImageSection({
+  section,
 
-function ImageSection({ section, locale }) {
+  locale,
+}) {
   const image = section.data?.image;
 
   if (!image?.largeUrl) {
@@ -199,24 +206,41 @@ function ImageSection({ section, locale }) {
     full: "max-w-[920px]",
   }[width];
 
-  const caption = getLocalizedValue(image.caption, locale);
+  const caption = getLocalizedValue(
+    image.caption,
+
+    locale,
+  );
 
   return (
-    <section className={cn("mx-auto w-full", widthClass)}>
+    <section
+      className={cn(
+        "mx-auto w-full",
+
+        widthClass,
+      )}
+    >
       <div
         className="
           relative
           aspect-[2/1]
           w-full
           overflow-hidden
-          bg-black/[0.04]
+          bg-[var(--public-surface)]
         "
       >
         <PublicAboutImage image={image} locale={locale} />
       </div>
 
       {section.data?.showCaption && caption && (
-        <p className="mt-1.5 text-[10px] leading-[1.5] text-black/45">
+        <p
+          className="
+              mt-1.5
+              text-[10px]
+              leading-[1.5]
+              text-[var(--public-muted-foreground)]
+            "
+        >
           {caption}
         </p>
       )}
@@ -224,16 +248,18 @@ function ImageSection({ section, locale }) {
   );
 }
 
-/*
- * =========================================================
- * IMAGE + TEXT SECTION
- * =========================================================
- */
+function ImageTextSection({
+  section,
 
-function ImageTextSection({ section, locale }) {
+  locale,
+}) {
   const image = section.data?.image;
 
-  const content = getLocalizedRichText(section.data?.content, locale);
+  const content = getLocalizedRichText(
+    section.data?.content,
+
+    locale,
+  );
 
   if (!image?.largeUrl && !content) {
     return null;
@@ -283,11 +309,23 @@ function ImageTextSection({ section, locale }) {
   }
 
   const imageElement = (
-    <div className="relative aspect-[2/1] w-full overflow-hidden bg-black/[0.04]">
+    <div
+      className="
+        relative
+        aspect-[2/1]
+        w-full
+        overflow-hidden
+        bg-[var(--public-surface)]
+      "
+    >
       <PublicAboutImage
         image={image}
         locale={locale}
-        sizes="(max-width: 767px) 100vw, 50vw"
+        sizes="
+          (max-width: 767px)
+          100vw,
+          50vw
+        "
       />
     </div>
   );
@@ -311,8 +349,7 @@ function ImageTextSection({ section, locale }) {
           text-right
           text-[12px]
           leading-[1.7]
-          text-black/80
-
+          text-[var(--public-foreground)]
           sm:text-[13px]
         "
       />
@@ -322,7 +359,13 @@ function ImageTextSection({ section, locale }) {
   );
 
   return (
-    <section className="mx-auto w-full max-w-[920px]">
+    <section
+      className="
+        mx-auto
+        w-full
+        max-w-[920px]
+      "
+    >
       <div className="grid gap-5 md:hidden">
         {imageElement}
 
@@ -353,20 +396,26 @@ function ImageTextSection({ section, locale }) {
   );
 }
 
-/*
- * =========================================================
- * GALLERY
- * =========================================================
- */
+function GallerySection({
+  section,
 
-function GallerySection({ section, locale }) {
+  locale,
+}) {
   const images = Array.isArray(section.data?.images) ? section.data.images : [];
 
   if (images.length === 0) {
     return null;
   }
 
-  const columns = Math.max(1, Math.min(4, Number(section.data?.columns || 3)));
+  const columns = Math.max(
+    1,
+
+    Math.min(
+      4,
+
+      Number(section.data?.columns || 3),
+    ),
+  );
 
   const gridClass = {
     1: "md:grid-cols-1",
@@ -387,17 +436,40 @@ function GallerySection({ section, locale }) {
   }[section.data?.gap || "medium"];
 
   return (
-    <section className="mx-auto w-full max-w-[920px]">
-      <div className={cn("grid grid-cols-1", gridClass, gapClass)}>
+    <section
+      className="
+        mx-auto
+        w-full
+        max-w-[920px]
+      "
+    >
+      <div
+        className={cn(
+          "grid grid-cols-1",
+
+          gridClass,
+
+          gapClass,
+        )}
+      >
         {images.map((image, index) => (
           <div
             key={image.mediaId || index}
-            className="relative aspect-[4/3] overflow-hidden bg-black/[0.04]"
+            className="
+                relative
+                aspect-[4/3]
+                overflow-hidden
+                bg-[var(--public-surface)]
+              "
           >
             <PublicAboutImage
               image={image}
               locale={locale}
-              sizes="(max-width: 767px) 100vw, 33vw"
+              sizes="
+                  (max-width: 767px)
+                  100vw,
+                  33vw
+                "
             />
           </div>
         ))}
@@ -405,12 +477,6 @@ function GallerySection({ section, locale }) {
     </section>
   );
 }
-
-/*
- * =========================================================
- * SPACER
- * =========================================================
- */
 
 function SpacerSection({ section }) {
   const size = section.data?.size || "medium";
@@ -428,13 +494,11 @@ function SpacerSection({ section }) {
   return <div aria-hidden="true" className={className} />;
 }
 
-/*
- * =========================================================
- * SECTION
- * =========================================================
- */
+function AboutSection({
+  section,
 
-function AboutSection({ section, locale }) {
+  locale,
+}) {
   switch (section.type) {
     case "richText":
       return <RichTextSection section={section} locale={locale} />;
@@ -456,54 +520,71 @@ function AboutSection({ section, locale }) {
   }
 }
 
-/*
- * =========================================================
- * PUBLIC ABOUT PAGE
- * =========================================================
- */
+export default function PublicAboutPage({
+  page,
 
-export default function PublicAboutPage({ page, locale = "en" }) {
-  const content = getLocalizedRichText(page.content, locale);
+  locale = "en",
+}) {
+  const content = getLocalizedRichText(
+    page.content,
+
+    locale,
+  );
 
   const sections = Array.isArray(page.sections) ? page.sections : [];
 
   const hasCover = Boolean(page.featuredImage?.largeUrl);
 
   return (
-    <div className="w-full flex-1 text-black">
+    <div
+      className="
+        w-full
+        flex-1
+        bg-[var(--public-background)]
+        text-[var(--public-foreground)]
+      "
+    >
       <div
         className="
           mx-auto
           w-full
           max-w-[968px]
-
           px-5
           pb-16
           pt-2
-
           sm:px-6
           sm:pb-20
         "
       >
-        <div className="mx-auto w-full max-w-[920px]">
-          {/* =================================
-              COVER
-          ================================= */}
-
+        <div
+          className="
+            mx-auto
+            w-full
+            max-w-[920px]
+          "
+        >
           {hasCover && (
-            <div className="relative aspect-[17/10] w-full overflow-hidden bg-black/[0.04]">
+            <div
+              className="
+                relative
+                aspect-[17/10]
+                w-full
+                overflow-hidden
+                bg-[var(--public-surface)]
+              "
+            >
               <PublicAboutImage
                 image={page.featuredImage}
                 locale={locale}
-                sizes="(max-width: 968px) 100vw, 920px"
+                sizes="
+                  (max-width: 968px)
+                  100vw,
+                  920px
+                "
                 priority
               />
             </div>
           )}
-
-          {/* =================================
-              PRIMARY CONTENT
-          ================================= */}
 
           {content && (
             <section
@@ -518,17 +599,12 @@ export default function PublicAboutPage({ page, locale = "en" }) {
                 className="
                   text-[12px]
                   leading-[1.7]
-                  text-black/80
-
+                  text-[var(--public-foreground)]
                   sm:text-[13px]
                 "
               />
             </section>
           )}
-
-          {/* =================================
-              PAGE BUILDER SECTIONS
-          ================================= */}
 
           {sections.length > 0 && (
             <div

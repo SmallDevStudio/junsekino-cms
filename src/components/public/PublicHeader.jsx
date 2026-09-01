@@ -12,6 +12,10 @@ import PublicNavigation from "@/components/public/PublicNavigation";
 
 import PublicSocialLinks from "@/components/public/PublicSocialLinks";
 
+import PublicThemeToggle from "@/components/public/PublicThemeToggle";
+
+import { usePublicTheme } from "@/components/public/PublicThemeProvider";
+
 export default function PublicHeader({
   company,
 
@@ -28,6 +32,8 @@ export default function PublicHeader({
   primaryColor = "#000000",
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const { resolvedTheme } = usePublicTheme();
 
   useEffect(() => {
     if (!mobileOpen) {
@@ -49,25 +55,24 @@ export default function PublicHeader({
         className="
           relative
           z-[90]
-
           h-[92px]
           w-full
           shrink-0
-
+          border-b
+          border-transparent
           bg-[var(--public-background)]
-
+          text-[var(--public-foreground)]
           lg:h-[104px]
+          mb-5
         "
       >
         <div
           className="
             relative
-
             flex
             h-full
             w-full
             items-center
-
             px-6
             sm:px-8
             lg:px-10
@@ -75,50 +80,53 @@ export default function PublicHeader({
             2xl:px-14
           "
         >
-          {/* =========================
-              LEFT — BRAND
-          ========================= */}
+          {/* =================================================
+              LEFT — COMPANY LOGO
+          ================================================= */}
 
           <div
             className="
               relative
               z-20
-
               flex
+              h-9
               min-w-0
-              items-center
+              items-end
             "
           >
             <PublicBrandWordmark
               company={company}
               primaryColor={primaryColor}
               href={`/${companySlug}`}
+              themeVariant={resolvedTheme}
             />
           </div>
 
-          {/* =========================
-              TRUE VIEWPORT CENTER
-          ========================= */}
+          {/* =================================================
+              CENTER — DESKTOP NAVIGATION
+          ================================================= */}
 
           <div
             className="
               pointer-events-none
-
               absolute
               left-1/2
               top-1/2
-
               z-10
-
               hidden
-
               -translate-x-1/2
               -translate-y-1/2
-
               lg:block
             "
           >
-            <div className="pointer-events-auto">
+            <div
+              className="
+                pointer-events-auto
+                flex
+                h-9
+                items-end
+              "
+            >
               <PublicNavigation
                 companySlug={companySlug}
                 navigation={navigation}
@@ -129,9 +137,9 @@ export default function PublicHeader({
             </div>
           </div>
 
-          {/* =========================
-              RIGHT — SOCIAL / COMPANY
-          ========================= */}
+          {/* =================================================
+              RIGHT — SOCIAL / THEME / COMPANY
+          ================================================= */}
 
           <div
             className="
@@ -143,13 +151,14 @@ export default function PublicHeader({
               hidden
               items-center
 
-              gap-3
+              gap-2
 
               lg:flex
-              xl:gap-4
             "
           >
             <PublicSocialLinks social={social} />
+
+            <PublicThemeToggle />
 
             <PublicCompanySwitcher
               companies={companies}
@@ -157,51 +166,64 @@ export default function PublicHeader({
             />
           </div>
 
-          {/* =========================
-              MOBILE MENU BUTTON
-          ========================= */}
+          {/* =================================================
+              MOBILE ACTIONS
+          ================================================= */}
 
-          <button
-            type="button"
-            aria-label="Open menu"
-            onClick={() => setMobileOpen(true)}
+          <div
             className="
+              relative
+              z-20
               ml-auto
-
               flex
               h-11
-              w-11
-
-              items-center
-              justify-center
-
-              text-black
-
+              items-end
+              gap-2
               lg:hidden
             "
           >
-            <Menu size={27} strokeWidth={1.25} />
-          </button>
+            <PublicThemeToggle />
+
+            <button
+              type="button"
+              aria-label="Open menu"
+              onClick={() => setMobileOpen(true)}
+              className="
+                flex
+                h-11
+                w-11
+                items-center
+                justify-center
+                rounded-full
+                text-[var(--public-foreground)]
+                transition
+                hover:bg-[var(--public-surface)]
+                hover:text-[var(--public-primary)]
+                focus-visible:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-[var(--public-primary)]
+              "
+            >
+              <Menu size={27} strokeWidth={1.25} aria-hidden="true" />
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* =============================
+      {/* =====================================================
           MOBILE FULLSCREEN NAVIGATION
-      ============================= */}
+      ===================================================== */}
 
       <div
         className={`
           fixed
           inset-0
-
           z-[120]
-
           bg-[var(--public-background)]
-
+          text-[var(--public-foreground)]
           transition-all
           duration-300
           ease-out
-
           lg:hidden
 
           ${
@@ -210,57 +232,72 @@ export default function PublicHeader({
               : "invisible pointer-events-none opacity-0"
           }
         `}
+        aria-hidden={!mobileOpen}
       >
         <div
           className="
             flex
             h-[92px]
-
             items-center
             justify-between
-
+            border-b
+            border-[var(--public-border)]
             px-6
             sm:px-8
           "
         >
-          <PublicBrandWordmark
-            company={company}
-            primaryColor={primaryColor}
-            href={`/${companySlug}`}
-          />
+          <div className="flex h-9 items-end">
+            <PublicBrandWordmark
+              company={company}
+              primaryColor={primaryColor}
+              href={`/${companySlug}`}
+              themeVariant={resolvedTheme}
+            />
+          </div>
 
-          <button
-            type="button"
-            aria-label="Close menu"
-            onClick={() => setMobileOpen(false)}
+          <div
             className="
               flex
               h-11
-              w-11
-
-              items-center
-              justify-center
-
-              text-black
+              items-end
+              gap-2
             "
           >
-            <X size={27} strokeWidth={1.25} />
-          </button>
+            <PublicThemeToggle />
+
+            <button
+              type="button"
+              aria-label="Close menu"
+              onClick={() => setMobileOpen(false)}
+              className="
+                flex
+                h-11
+                w-11
+                items-center
+                justify-center
+                rounded-full
+                text-[var(--public-foreground)]
+                transition
+                hover:bg-[var(--public-surface)]
+                hover:text-[var(--public-primary)]
+                focus-visible:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-[var(--public-primary)]
+              "
+            >
+              <X size={27} strokeWidth={1.25} aria-hidden="true" />
+            </button>
+          </div>
         </div>
 
         <div
           className="
             flex
-
             h-[calc(100svh-92px)]
-
             flex-col
-
             items-center
             justify-center
-
             overflow-y-auto
-
             px-6
             py-10
           "
@@ -278,12 +315,9 @@ export default function PublicHeader({
           <div
             className="
               mt-12
-
               flex
               flex-col
-
               items-center
-
               gap-8
             "
           >

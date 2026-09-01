@@ -37,6 +37,8 @@ export const adminTh = {
     changeImage: "เปลี่ยนรูปภาพ",
     selectImage: "เลือกรูปภาพ",
     reset: "รีเซ็ต",
+    back: "ย้อนกลับ",
+    next: "ถัดไป",
   },
 
   navigation: {
@@ -864,15 +866,15 @@ export const adminTh = {
   },
 
   companySwitcher: {
+    workspace: "พื้นที่ทำงาน",
+    current: "บริษัทปัจจุบัน",
+    select: "เลือกบริษัทที่ต้องการจัดการ",
+    singleCompany: "จัดการบริษัทปัจจุบันหรือสร้างบริษัทใหม่",
+    create: "สร้างบริษัท",
+    createDescription: "เพิ่มพื้นที่ทำงานใหม่ที่แยกข้อมูลอิสระ",
     loading: "กำลังโหลดบริษัท",
-    unavailable: "ไม่สามารถใช้งานบริษัทนี้ได้",
-    noCompany: "ยังไม่ได้เลือกบริษัท",
-
-    currentCompany: "บริษัทปัจจุบัน: {company}",
-
-    workspace: "บริษัท",
-
-    selectDescription: "เลือกบริษัทที่ต้องการจัดการ",
+    unavailable: "ไม่สามารถโหลดข้อมูลบริษัทได้",
+    noCompany: "ยังไม่มีบริษัทในระบบ",
   },
 
   media: {
@@ -2582,6 +2584,32 @@ export const adminTh = {
 
       deleteFailed: "ไม่สามารถลบ Contact ได้",
     },
+
+    companyProfile: {
+      title: "ข้อมูลจากโปรไฟล์บริษัท",
+
+      description:
+        "ที่อยู่ โทรศัพท์ อีเมล เว็บไซต์ และเวลาทำการ จัดการจากหน้าข้อมูลบริษัทเพียงแห่งเดียว",
+
+      edit: "แก้ไขโปรไฟล์บริษัท",
+
+      address: "ที่อยู่",
+
+      phone: "โทรศัพท์",
+
+      secondaryPhone: "โทรศัพท์สำรอง",
+
+      email: "อีเมล",
+
+      website: "เว็บไซต์",
+
+      businessHours: "เวลาทำการ",
+
+      emptyTitle: "ข้อมูลบริษัทไม่ครบ",
+
+      emptyDescription:
+        "เพิ่มข้อมูลติดต่อในหน้าข้อมูลบริษัทก่อนเผยแพร่หน้า Contact",
+    },
   },
 
   email: {
@@ -3082,9 +3110,228 @@ export const adminTh = {
 
       saved: "สร้างบริษัทเรียบร้อยแล้ว",
 
+      success: "สร้างบริษัทเรียบร้อยแล้ว",
+
+      creating: "กำลังสร้างบริษัท...",
+
+      steps: {
+        identity: "ข้อมูลบริษัท",
+        profile: "ข้อมูลติดต่อ",
+        branding: "แบรนด์",
+      },
+
+      identity: {
+        title: "ข้อมูลระบุตัวตนของบริษัท",
+        description:
+          "กรอกข้อมูลที่จำเป็นสำหรับสร้างพื้นที่ทำงานของบริษัทแบบแยกอิสระ",
+      },
+
+      profile: {
+        title: "ข้อมูลติดต่อบริษัท",
+        description:
+          "ข้อมูลนี้ใช้ในหน้า Contact สาธารณะ และสามารถกรอกเพิ่มเติมภายหลังได้",
+      },
+
+      branding: {
+        title: "แบรนด์เริ่มต้น",
+        description:
+          "กำหนดโลโก้ตัวหนังสือและสีแบรนด์เบื้องต้น โดยสามารถอัปโหลดโลโก้รูปภาพภายหลังได้",
+
+        preview: "ตัวอย่าง",
+        button: "ปุ่มหลัก",
+
+        logoLater:
+          "สามารถอัปโหลดโลโก้รูปภาพและ Favicon จากหน้าข้อมูลบริษัทหลังสร้างพื้นที่ทำงานแล้ว",
+      },
+
       errors: {
         save: "ไม่สามารถสร้างบริษัทได้",
+
+        bootstrap:
+          "สร้างบริษัทแล้ว แต่ไม่สามารถเตรียมข้อมูลเริ่มต้นบางส่วนได้ สามารถเรียก Setup ใหม่ภายหลังได้",
+
+        nameRequired: "กรุณากรอกชื่อบริษัท",
+
+        slugRequired: "กรุณากรอก Slug ของบริษัท",
+
+        emailInvalid: "รูปแบบอีเมลติดต่อไม่ถูกต้อง",
+
+        websiteInvalid: "URL เว็บไซต์ต้องถูกต้องและควรขึ้นต้นด้วย https://",
+
+        colorInvalid: "สีแบรนด์ต้องเป็นรหัส HEX ที่ถูกต้อง",
+
+        save: "ไม่สามารถสร้างบริษัทได้",
       },
+    },
+
+    sections: {
+      basic: {
+        title: "ข้อมูลบริษัท",
+        description: "ข้อมูลพื้นฐานของบริษัทและที่อยู่เว็บไซต์สาธารณะ",
+      },
+
+      profile: {
+        title: "โปรไฟล์และข้อมูลติดต่อบริษัท",
+        description:
+          "ข้อมูลส่วนนี้เป็นแหล่งข้อมูลหลักที่นำไปแสดงในหน้า Contact",
+      },
+
+      logo: {
+        title: "โลโก้บริษัท",
+        description:
+          "อัปโหลดโลโก้รูปภาพ หรือใช้โลโก้ตัวหนังสือเป็นตัวสำรองอัตโนมัติ",
+      },
+
+      branding: {
+        title: "สีแบรนด์",
+        description:
+          "สีหลักใช้กับปุ่มและจุดสำคัญ สีรองใช้สร้างความแตกต่าง และสีเน้นใช้กับองค์ประกอบตกแต่ง",
+      },
+
+      theme: {
+        title: "ธีมเว็บไซต์สาธารณะ",
+        description:
+          "กำหนดสีพื้นหลัง พื้นผิว ตัวอักษร และเส้นขอบของเว็บไซต์สาธารณะ",
+      },
+
+      social: {
+        title: "โซเชียลมีเดีย",
+        description: "ลิงก์ที่แสดงบนเว็บไซต์สาธารณะและส่วนหัวของบริษัท",
+      },
+
+      seo: {
+        title: "การค้นหาและการแชร์",
+        description:
+          "ข้อมูล SEO เริ่มต้นที่ใช้เมื่อแต่ละหน้ายังไม่ได้กำหนดข้อมูลของตัวเอง",
+      },
+    },
+
+    social: {
+      facebook: "Facebook",
+      instagram: "Instagram",
+      youtube: "YouTube",
+      linkedin: "LinkedIn",
+      tiktok: "TikTok",
+      x: "X",
+      pinterest: "Pinterest",
+      line: "LINE",
+    },
+
+    seo: {
+      title: "ชื่อสำหรับ SEO",
+      description: "คำอธิบายสำหรับ SEO",
+      keywords: "คำค้นหา",
+      keywordsHelp: "แยกคำค้นหาด้วยเครื่องหมายจุลภาค",
+      ogTitle: "ชื่อสำหรับการแชร์",
+      ogDescription: "คำอธิบายสำหรับการแชร์",
+      ogImage: "รูปสำหรับการแชร์",
+      ogImageDescription:
+        "แนะนำอัตราส่วน 1.91:1 สำหรับ Facebook, LINE และแพลตฟอร์มอื่น",
+      emptyImage: "ยังไม่ได้เลือกรูปสำหรับแชร์",
+      emptyImageDescription: "เลือกรูปจากคลังสื่อของบริษัท",
+      selectImage: "เลือกรูป",
+      pickerTitle: "เลือกรูปสำหรับการแชร์",
+      allowIndex: "อนุญาตให้ Search Engine จัดทำดัชนีเว็บไซต์บริษัท",
+      allowFollow: "อนุญาตให้ Search Engine ติดตามลิงก์",
+      thDisabledTitle: "ยังไม่ได้เปิดใช้ SEO ภาษาไทย",
+      thDisabledDescription:
+        "เปิดใช้ภาษาไทยในข้อมูลบริษัทเพื่อกำหนด SEO ภาษาไทย",
+    },
+
+    help: {
+      slug: "การเปลี่ยน Slug จะเปลี่ยน URL ของเว็บไซต์สาธารณะ",
+
+      superadminOnly: "เฉพาะ Superadmin เท่านั้นที่สามารถแก้ไขข้อมูลนี้ได้",
+    },
+
+    status: {
+      active: "ใช้งาน",
+      inactive: "ไม่ใช้งาน",
+      archived: "เก็บถาวร",
+    },
+
+    profile: {
+      taxId: "เลขประจำตัวผู้เสียภาษี",
+      registrationNumber: "เลขทะเบียนนิติบุคคล",
+      email: "อีเมลติดต่อ",
+      phone: "โทรศัพท์",
+      secondaryPhone: "โทรศัพท์สำรอง",
+      website: "เว็บไซต์",
+      addressEn: "ที่อยู่ — ภาษาอังกฤษ",
+      addressTh: "ที่อยู่ — ภาษาไทย",
+      mapUrl: "URL Google Maps",
+      latitude: "ละติจูด",
+      longitude: "ลองจิจูด",
+      businessHoursEn: "เวลาทำการ — ภาษาอังกฤษ",
+      businessHoursTh: "เวลาทำการ — ภาษาไทย",
+    },
+
+    logo: {
+      mode: "รูปแบบการแสดงโลโก้",
+      text: "ข้อความหลัก",
+      highlight: "ข้อความเน้น",
+
+      modes: {
+        auto: "อัตโนมัติ",
+        image: "โลโก้รูปภาพ",
+        text: "โลโก้ตัวหนังสือ",
+      },
+
+      lightTitle: "โลโก้สำหรับพื้นหลังสว่าง",
+      lightDescription: "ใช้เมื่อพื้นหลังเว็บไซต์เป็นสีสว่าง",
+
+      darkTitle: "โลโก้สำหรับพื้นหลังมืด",
+      darkDescription: "ใช้เมื่อพื้นหลังเว็บไซต์เป็นสีมืด",
+
+      faviconTitle: "Favicon",
+      faviconDescription: "ไอคอนสี่เหลี่ยมสำหรับเบราว์เซอร์และ Shortcut",
+
+      emptyTitle: "ยังไม่ได้เลือกโลโก้",
+      emptyDescription: "เลือกรูปจากคลังสื่อของบริษัท",
+
+      emptyFavicon: "ยังไม่ได้เลือก Favicon",
+      emptyFaviconDescription: "เลือกรูปสี่เหลี่ยมจากคลังสื่อ",
+
+      select: "เลือกรูป",
+      pickerTitle: "เลือกโลโก้บริษัท",
+      faviconPickerTitle: "เลือก Favicon",
+    },
+
+    colorHelp: {
+      primary: "ปุ่ม เมนูที่กำลังใช้งาน ลิงก์ และจุดสำคัญ",
+
+      secondary: "สีแบรนด์รองและสีตัวอักษรบนปุ่มหลัก",
+
+      accent: "Badge องค์ประกอบตกแต่ง และจุดเน้นขนาดเล็ก",
+    },
+
+    theme: {
+      defaultMode: "ธีมเริ่มต้นของเว็บไซต์",
+
+      allowVisitorPreference: "อนุญาตให้ผู้เข้าชมเลือก Light หรือ Dark Mode",
+
+      modes: {
+        light: "สว่าง",
+        dark: "มืด",
+        system: "ตามระบบ",
+      },
+
+      lightTitle: "ธีมสว่าง",
+      darkTitle: "ธีมมืด",
+
+      colors: {
+        background: "พื้นหลังหน้า",
+        surface: "พื้นหลัง Card และ Section",
+        text: "ตัวอักษรหลัก",
+        mutedText: "ตัวอักษรรอง",
+        border: "เส้นขอบ",
+      },
+
+      previewTitle: "ตัวอย่างธีม",
+
+      previewDescription: "ตัวอย่างความสัมพันธ์ระหว่างสีแบรนด์กับสีของเว็บไซต์",
+
+      previewAction: "ปุ่มหลัก",
     },
   },
 

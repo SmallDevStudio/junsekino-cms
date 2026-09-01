@@ -1,9 +1,30 @@
+import {
+  DEFAULT_COMPANY_BRANDING as CORE_COMPANY_BRANDING,
+  DEFAULT_COMPANY_SEO as CORE_COMPANY_SEO,
+  DEFAULT_COMPANY_SOCIAL as CORE_COMPANY_SOCIAL,
+} from "@/constants/company";
+
+/*
+ * =========================================================
+ * SETTING KEYS
+ * =========================================================
+ */
+
 export const COMPANY_SETTING_KEYS = {
   NAVIGATION: "navigation",
+
   BRANDING: "branding",
+
   SEO: "seo",
+
   SOCIAL: "social",
 };
+
+/*
+ * =========================================================
+ * NAVIGATION
+ * =========================================================
+ */
 
 export const DEFAULT_COMPANY_NAVIGATION = [
   {
@@ -13,6 +34,7 @@ export const DEFAULT_COMPANY_NAVIGATION = [
 
     label: {
       th: "หน้าแรก",
+
       en: "Home",
     },
 
@@ -30,6 +52,7 @@ export const DEFAULT_COMPANY_NAVIGATION = [
 
     label: {
       th: "เกี่ยวกับเรา",
+
       en: "About",
     },
 
@@ -47,10 +70,15 @@ export const DEFAULT_COMPANY_NAVIGATION = [
 
     label: {
       th: "โครงการ",
+
       en: "Project",
     },
 
-    path: "projects",
+    /*
+     * Public route is /[companySlug]/project
+     * and not /projects.
+     */
+    path: "project",
 
     enabled: true,
 
@@ -64,6 +92,7 @@ export const DEFAULT_COMPANY_NAVIGATION = [
 
     label: {
       th: "รางวัล",
+
       en: "Award",
     },
 
@@ -80,7 +109,8 @@ export const DEFAULT_COMPANY_NAVIGATION = [
     type: "module",
 
     label: {
-      th: "สื่อและบทความ",
+      th: "สื่อเผยแพร่",
+
       en: "Public",
     },
 
@@ -98,6 +128,7 @@ export const DEFAULT_COMPANY_NAVIGATION = [
 
     label: {
       th: "ติดต่อ",
+
       en: "Contact",
     },
 
@@ -109,77 +140,100 @@ export const DEFAULT_COMPANY_NAVIGATION = [
   },
 ];
 
+/*
+ * =========================================================
+ * BRANDING SETTING
+ * =========================================================
+ *
+ * Company document is the canonical source.
+ *
+ * Compatibility fields remain because existing
+ * Settings/Public code may still read them.
+ * =========================================================
+ */
+
 export const DEFAULT_COMPANY_BRANDING = {
+  ...CORE_COMPANY_BRANDING,
+
   logoMediaId: null,
 
   logoDarkMediaId: null,
 
   faviconMediaId: null,
 
-  primaryColor: "#000000",
+  primaryColor: CORE_COMPANY_BRANDING.colors.primary,
 
-  secondaryColor: "#FFFFFF",
+  secondaryColor: CORE_COMPANY_BRANDING.colors.secondary,
 
-  accentColor: "#000000",
+  accentColor: CORE_COMPANY_BRANDING.colors.accent,
 
-  backgroundColor: "#FFFFFF",
+  backgroundColor: CORE_COMPANY_BRANDING.colors.background,
 
-  textColor: "#111111",
+  textColor: CORE_COMPANY_BRANDING.colors.text,
 
   font: {
     heading: null,
+
     body: null,
   },
 };
 
+/*
+ * =========================================================
+ * SEO SETTING
+ * =========================================================
+ */
+
 export const DEFAULT_COMPANY_SEO = {
+  ...CORE_COMPANY_SEO,
+
   th: {
+    ...CORE_COMPANY_SEO.th,
+
     siteName: "",
-
-    title: "",
-
-    description: "",
-
-    keywords: [],
 
     ogImageMediaId: null,
   },
 
   en: {
+    ...CORE_COMPANY_SEO.en,
+
     siteName: "",
-
-    title: "",
-
-    description: "",
-
-    keywords: [],
 
     ogImageMediaId: null,
   },
 
+  /*
+   * Legacy compatibility.
+   */
   robots: {
-    index: true,
-    follow: true,
+    index: CORE_COMPANY_SEO.index,
+
+    follow: CORE_COMPANY_SEO.follow,
   },
 };
 
+/*
+ * =========================================================
+ * SOCIAL SETTING
+ * =========================================================
+ */
+
 export const DEFAULT_COMPANY_SOCIAL = {
-  facebook: null,
-
-  instagram: null,
-
-  youtube: null,
-
-  linkedin: null,
-
-  tiktok: null,
-
-  x: null,
-
-  pinterest: null,
+  ...CORE_COMPANY_SOCIAL,
 
   line: null,
 };
+
+/*
+ * =========================================================
+ * SYSTEM PAGES
+ * =========================================================
+ *
+ * Project, Award and Public are modules,
+ * not generic Page documents.
+ * =========================================================
+ */
 
 export const DEFAULT_SYSTEM_PAGES = [
   {
@@ -191,6 +245,7 @@ export const DEFAULT_SYSTEM_PAGES = [
 
     title: {
       th: "หน้าแรก",
+
       en: "Home",
     },
 
@@ -199,6 +254,7 @@ export const DEFAULT_SYSTEM_PAGES = [
 
       label: {
         th: "หน้าแรก",
+
         en: "Home",
       },
 
@@ -215,6 +271,7 @@ export const DEFAULT_SYSTEM_PAGES = [
 
     title: {
       th: "เกี่ยวกับเรา",
+
       en: "About",
     },
 
@@ -223,6 +280,7 @@ export const DEFAULT_SYSTEM_PAGES = [
 
       label: {
         th: "เกี่ยวกับเรา",
+
         en: "About",
       },
 
@@ -239,6 +297,7 @@ export const DEFAULT_SYSTEM_PAGES = [
 
     title: {
       th: "ติดต่อ",
+
       en: "Contact",
     },
 
@@ -247,6 +306,7 @@ export const DEFAULT_SYSTEM_PAGES = [
 
       label: {
         th: "ติดต่อ",
+
         en: "Contact",
       },
 

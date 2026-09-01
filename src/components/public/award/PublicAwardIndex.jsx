@@ -8,7 +8,11 @@ import { Search, SlidersHorizontal, X } from "lucide-react";
 
 import PublicAwardCard from "./PublicAwardCard";
 
-function getLocalizedValue(value, locale = "en") {
+function getLocalizedValue(
+  value,
+
+  locale = "en",
+) {
   if (!value) {
     return "";
   }
@@ -22,7 +26,13 @@ function getLocalizedValue(value, locale = "en") {
   );
 }
 
-function matchesKeyword({ award, keyword, locale }) {
+function matchesKeyword({
+  award,
+
+  keyword,
+
+  locale,
+}) {
   const normalized = String(keyword || "")
     .trim()
     .toLowerCase();
@@ -33,28 +43,25 @@ function matchesKeyword({ award, keyword, locale }) {
 
   const searchable = [
     award.awardName?.en,
+
     award.awardName?.th,
 
     award.project?.title?.en,
+
     award.project?.title?.th,
 
     award.project?.slug,
 
     award.category?.name?.en,
+
     award.category?.name?.th,
 
-    ...award.tags,
+    ...(Array.isArray(award.tags) ? award.tags : []),
   ]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
 
-  /*
-   * locale is intentionally part of
-   * this function's signature so the
-   * search behavior remains ready for
-   * TH/EN UI expansion.
-   */
   void locale;
 
   return searchable.includes(normalized);
@@ -65,30 +72,21 @@ function FilterTooltip({ label }) {
     <span
       className="
         pointer-events-none
-
         absolute
         right-0
         top-full
         z-[120]
-
         mt-2
-
         whitespace-nowrap
-
         bg-black/80
-
         px-2
         py-1
-
         text-[9px]
         tracking-[0.04em]
         text-white
-
         opacity-0
-
         transition-opacity
         duration-150
-
         group-hover:opacity-100
       "
     >
@@ -101,7 +99,9 @@ export default function PublicAwardIndex({
   companySlug,
 
   awards = [],
+
   categories = [],
+
   tags = [],
 
   locale = "en",
@@ -116,29 +116,36 @@ export default function PublicAwardIndex({
 
   const hasFilters = Boolean(keyword.trim() || categoryId || selectedTag);
 
-  const filteredAwards = useMemo(() => {
-    return awards.filter((award) => {
-      if (categoryId && award.category?.id !== categoryId) {
-        return false;
-      }
+  const filteredAwards = useMemo(
+    () =>
+      awards.filter((award) => {
+        if (categoryId && award.category?.id !== categoryId) {
+          return false;
+        }
 
-      if (selectedTag && !award.tags.includes(selectedTag)) {
-        return false;
-      }
+        if (
+          selectedTag &&
+          !(Array.isArray(award.tags) && award.tags.includes(selectedTag))
+        ) {
+          return false;
+        }
 
-      return matchesKeyword({
-        award,
+        return matchesKeyword({
+          award,
 
-        keyword,
+          keyword,
 
-        locale,
-      });
-    });
-  }, [awards, keyword, categoryId, selectedTag, locale]);
+          locale,
+        });
+      }),
+    [awards, keyword, categoryId, selectedTag, locale],
+  );
 
   function clearFilters() {
     setKeyword("");
+
     setCategoryId("");
+
     setSelectedTag("");
   }
 
@@ -146,15 +153,13 @@ export default function PublicAwardIndex({
     <div
       className="
         w-full
-
+        bg-[var(--public-background)]
         px-6
         pb-16
-
+        text-[var(--public-foreground)]
         sm:px-8
-
         lg:px-12
         lg:pb-24
-
         xl:px-16
       "
     >
@@ -165,19 +170,13 @@ export default function PublicAwardIndex({
           max-w-[1100px]
         "
       >
-        {/* =====================================
-            BREADCRUMB + FILTER BUTTON
-        ===================================== */}
-
         <div
           className="
             flex
             items-center
             justify-between
             gap-6
-
             pt-2
-
             lg:pt-4
           "
         >
@@ -187,22 +186,18 @@ export default function PublicAwardIndex({
               flex
               items-center
               gap-2
-
               text-[10px]
               uppercase
               tracking-[0.06em]
-
               sm:text-[11px]
             "
           >
             <Link
               href={`/${companySlug}`}
               className="
-                text-black/25
-
+                text-[var(--public-muted-foreground)]
                 transition-colors
-
-                hover:text-black/55
+                hover:text-[var(--public-foreground)]
               "
             >
               Home
@@ -210,7 +205,7 @@ export default function PublicAwardIndex({
 
             <span
               className="
-                text-black/15
+                text-[var(--public-border)]
               "
             >
               /
@@ -219,7 +214,6 @@ export default function PublicAwardIndex({
             <span
               className="
                 font-medium
-
                 text-[var(--public-primary)]
               "
             >
@@ -235,19 +229,14 @@ export default function PublicAwardIndex({
             className="
               group
               relative
-
               flex
               h-8
               w-8
-
               items-center
               justify-center
-
-              text-black/25
-
+              text-[var(--public-muted-foreground)]
               transition-all
               duration-200
-
               hover:text-[var(--public-primary)]
             "
           >
@@ -260,7 +249,6 @@ export default function PublicAwardIndex({
                 className="
                   transition-transform
                   duration-200
-
                   group-hover:scale-110
                 "
               />
@@ -270,20 +258,13 @@ export default function PublicAwardIndex({
           </button>
         </div>
 
-        {/* =====================================
-            FILTER PANEL
-        ===================================== */}
-
         {filterOpen && (
           <div
             className="
               mt-7
-
               border-b
-              border-black/[0.08]
-
+              border-[var(--public-border)]
               pb-4
-
               sm:mt-8
             "
           >
@@ -291,31 +272,22 @@ export default function PublicAwardIndex({
               className="
                 grid
                 grid-cols-1
-
                 gap-4
-
                 md:grid-cols-[minmax(220px,1fr)_200px_180px_auto]
                 md:items-end
                 md:gap-6
               "
             >
-              {/* SEARCH */}
-
               <label
                 className="
                   group
-
                   flex
                   items-center
                   gap-2
-
                   border-b
-                  border-black/10
-
+                  border-[var(--public-border)]
                   pb-2
-
                   transition-colors
-
                   focus-within:border-[var(--public-primary)]
                 "
               >
@@ -324,11 +296,8 @@ export default function PublicAwardIndex({
                   strokeWidth={1.1}
                   className="
                     shrink-0
-
-                    text-black/25
-
+                    text-[var(--public-muted-foreground)]
                     transition-colors
-
                     group-focus-within:text-[var(--public-primary)]
                   "
                 />
@@ -344,17 +313,12 @@ export default function PublicAwardIndex({
                   className="
                     min-w-0
                     flex-1
-
                     bg-transparent
-
                     text-[11px]
                     tracking-[0.02em]
-                    text-black/70
-
+                    text-[var(--public-foreground)]
                     outline-none
-
-                    placeholder:text-black/25
-
+                    placeholder:text-[var(--public-muted-foreground)]
                     sm:text-[12px]
                   "
                 />
@@ -365,10 +329,8 @@ export default function PublicAwardIndex({
                     aria-label="Clear search"
                     onClick={() => setKeyword("")}
                     className="
-                      text-black/20
-
+                      text-[var(--public-muted-foreground)]
                       transition-colors
-
                       hover:text-[var(--public-primary)]
                     "
                   >
@@ -376,8 +338,6 @@ export default function PublicAwardIndex({
                   </button>
                 )}
               </label>
-
-              {/* CATEGORY */}
 
               <label
                 className="
@@ -391,7 +351,7 @@ export default function PublicAwardIndex({
                     text-[8px]
                     uppercase
                     tracking-[0.09em]
-                    text-black/25
+                    text-[var(--public-muted-foreground)]
                   "
                 >
                   Category
@@ -402,26 +362,18 @@ export default function PublicAwardIndex({
                   onChange={(event) => setCategoryId(event.target.value)}
                   className="
                     cursor-pointer
-
                     border-0
                     border-b
-                    border-black/10
-
-                    bg-transparent
-
+                    border-[var(--public-border)]
+                    bg-[var(--public-background)]
                     pb-2
-
                     text-[10px]
                     uppercase
                     tracking-[0.05em]
-                    text-black/55
-
+                    text-[var(--public-foreground)]
                     outline-none
-
                     transition-colors
-
                     focus:border-[var(--public-primary)]
-
                     sm:text-[11px]
                   "
                 >
@@ -429,13 +381,15 @@ export default function PublicAwardIndex({
 
                   {categories.map((category) => (
                     <option key={category.id} value={category.id}>
-                      {getLocalizedValue(category.name, locale)}
+                      {getLocalizedValue(
+                        category.name,
+
+                        locale,
+                      )}
                     </option>
                   ))}
                 </select>
               </label>
-
-              {/* TAG */}
 
               <label
                 className="
@@ -449,7 +403,7 @@ export default function PublicAwardIndex({
                     text-[8px]
                     uppercase
                     tracking-[0.09em]
-                    text-black/25
+                    text-[var(--public-muted-foreground)]
                   "
                 >
                   Tag
@@ -460,26 +414,18 @@ export default function PublicAwardIndex({
                   onChange={(event) => setSelectedTag(event.target.value)}
                   className="
                     cursor-pointer
-
                     border-0
                     border-b
-                    border-black/10
-
-                    bg-transparent
-
+                    border-[var(--public-border)]
+                    bg-[var(--public-background)]
                     pb-2
-
                     text-[10px]
                     uppercase
                     tracking-[0.05em]
-                    text-black/55
-
+                    text-[var(--public-foreground)]
                     outline-none
-
                     transition-colors
-
                     focus:border-[var(--public-primary)]
-
                     sm:text-[11px]
                   "
                 >
@@ -493,29 +439,21 @@ export default function PublicAwardIndex({
                 </select>
               </label>
 
-              {/* CLEAR */}
-
               <button
                 type="button"
                 disabled={!hasFilters}
                 onClick={clearFilters}
                 className="
                   pb-2
-
                   text-left
                   text-[9px]
                   uppercase
                   tracking-[0.08em]
-
-                  text-black/25
-
+                  text-[var(--public-muted-foreground)]
                   transition-colors
-
                   enabled:hover:text-[var(--public-primary)]
-
                   disabled:cursor-default
                   disabled:opacity-0
-
                   md:text-right
                 "
               >
@@ -525,32 +463,23 @@ export default function PublicAwardIndex({
           </div>
         )}
 
-        {/* =====================================
-            ACTIVE FILTER SUMMARY
-        ===================================== */}
-
         {hasFilters && (
           <div
             className="
               mt-7
-
               flex
               items-center
               gap-4
-
               sm:mt-8
             "
           >
             <span
               className="
                 shrink-0
-
                 text-[9px]
                 uppercase
                 tracking-[0.07em]
-
                 text-[var(--public-primary)]
-
                 sm:text-[10px]
               "
             >
@@ -561,19 +490,17 @@ export default function PublicAwardIndex({
               className="
                 h-px
                 flex-1
-
-                bg-black/10
+                bg-[var(--public-border)]
               "
             />
 
             <span
               className="
                 shrink-0
-
                 text-[9px]
                 uppercase
                 tracking-[0.07em]
-                text-black/25
+                text-[var(--public-muted-foreground)]
               "
             >
               {filteredAwards.length}{" "}
@@ -588,14 +515,10 @@ export default function PublicAwardIndex({
                 flex
                 h-6
                 w-6
-
                 items-center
                 justify-center
-
-                text-black/20
-
+                text-[var(--public-muted-foreground)]
                 transition-colors
-
                 hover:text-[var(--public-primary)]
               "
             >
@@ -604,24 +527,17 @@ export default function PublicAwardIndex({
           </div>
         )}
 
-        {/* =====================================
-            AWARD LIST
-        ===================================== */}
-
         {!awards.length ? (
           <div
             className="
               flex
               min-h-[50vh]
-
               items-center
               justify-center
-
               text-[11px]
               uppercase
               tracking-[0.08em]
-
-              text-black/25
+              text-[var(--public-muted-foreground)]
             "
           >
             No awards available
@@ -631,12 +547,9 @@ export default function PublicAwardIndex({
             className="
               flex
               min-h-[360px]
-
               flex-col
-
               items-center
               justify-center
-
               text-center
             "
           >
@@ -645,8 +558,7 @@ export default function PublicAwardIndex({
                 text-[10px]
                 uppercase
                 tracking-[0.08em]
-
-                text-black/25
+                text-[var(--public-muted-foreground)]
               "
             >
               No awards found
@@ -657,15 +569,11 @@ export default function PublicAwardIndex({
               onClick={clearFilters}
               className="
                 mt-4
-
                 text-[9px]
                 uppercase
                 tracking-[0.08em]
-
                 text-[var(--public-primary)]
-
                 transition-opacity
-
                 hover:opacity-60
               "
             >
@@ -676,12 +584,9 @@ export default function PublicAwardIndex({
           <div
             className="
               mt-10
-
               space-y-14
-
               sm:mt-12
               sm:space-y-16
-
               lg:mt-14
               lg:space-y-20
             "

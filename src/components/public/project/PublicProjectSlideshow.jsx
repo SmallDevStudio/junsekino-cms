@@ -8,7 +8,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 const AUTOPLAY_INTERVAL = 5000;
 
-function createMediaUrl({ companySlug, mediaId, variant = "large" }) {
+function createMediaUrl({
+  companySlug,
+
+  mediaId,
+
+  variant = "large",
+}) {
   if (!companySlug || !mediaId) {
     return null;
   }
@@ -20,7 +26,11 @@ function createMediaUrl({ companySlug, mediaId, variant = "large" }) {
   )}`;
 }
 
-function getLocalizedValue(value, locale = "en") {
+function getLocalizedValue(
+  value,
+
+  locale = "en",
+) {
   if (!value) {
     return "";
   }
@@ -34,7 +44,13 @@ function getLocalizedValue(value, locale = "en") {
   );
 }
 
-function normalizeSlides({ project, companySlug, locale }) {
+function normalizeSlides({
+  project,
+
+  companySlug,
+
+  locale,
+}) {
   const items = [];
 
   function addImage(image) {
@@ -50,15 +66,25 @@ function normalizeSlides({ project, companySlug, locale }) {
       mediaId: image.mediaId,
 
       alt:
-        getLocalizedValue(image.alt, locale) ||
-        getLocalizedValue(project?.title, locale) ||
+        getLocalizedValue(
+          image.alt,
+
+          locale,
+        ) ||
+        getLocalizedValue(
+          project?.title,
+
+          locale,
+        ) ||
         "Project image",
 
       largeUrl:
         image.url ||
         createMediaUrl({
           companySlug,
+
           mediaId: image.mediaId,
+
           variant: "large",
         }),
 
@@ -66,16 +92,14 @@ function normalizeSlides({ project, companySlug, locale }) {
         image.thumbnailUrl ||
         createMediaUrl({
           companySlug,
+
           mediaId: image.mediaId,
+
           variant: "thumbnail",
         }),
     });
   }
 
-  /*
-   * Detail API maps the featured image
-   * to project.cover.
-   */
   addImage(project?.cover);
 
   for (const image of project?.gallery || []) {
@@ -87,14 +111,18 @@ function normalizeSlides({ project, companySlug, locale }) {
 
 export default function PublicProjectSlideshow({
   companySlug,
+
   project,
+
   locale = "en",
 }) {
   const slides = useMemo(
     () =>
       normalizeSlides({
         project,
+
         companySlug,
+
         locale,
       }),
     [project, companySlug, locale],
@@ -107,7 +135,13 @@ export default function PublicProjectSlideshow({
   const slideCount = slides.length;
 
   const currentIndex =
-    slideCount > 0 ? Math.min(activeIndex, slideCount - 1) : 0;
+    slideCount > 0
+      ? Math.min(
+          activeIndex,
+
+          slideCount - 1,
+        )
+      : 0;
 
   const restartAutoplay = useCallback(() => {
     setInteractionKey((current) => current + 1);
@@ -119,7 +153,11 @@ export default function PublicProjectSlideshow({
     }
 
     setActiveIndex((current) => {
-      const safe = Math.min(current, slideCount - 1);
+      const safe = Math.min(
+        current,
+
+        slideCount - 1,
+      );
 
       return safe === 0 ? slideCount - 1 : safe - 1;
     });
@@ -131,7 +169,11 @@ export default function PublicProjectSlideshow({
     }
 
     setActiveIndex((current) => {
-      const safe = Math.min(current, slideCount - 1);
+      const safe = Math.min(
+        current,
+
+        slideCount - 1,
+      );
 
       return safe >= slideCount - 1 ? 0 : safe + 1;
     });
@@ -139,16 +181,19 @@ export default function PublicProjectSlideshow({
 
   function handlePrevious() {
     goPrevious();
+
     restartAutoplay();
   }
 
   function handleNext() {
     goNext();
+
     restartAutoplay();
   }
 
   function handleSelect(index) {
     setActiveIndex(index);
+
     restartAutoplay();
   }
 
@@ -169,20 +214,32 @@ export default function PublicProjectSlideshow({
   useEffect(() => {
     function handleKeyDown(event) {
       if (event.key === "ArrowLeft") {
-        handlePrevious();
+        goPrevious();
+
+        restartAutoplay();
       }
 
       if (event.key === "ArrowRight") {
-        handleNext();
+        goNext();
+
+        restartAutoplay();
       }
     }
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener(
+      "keydown",
+
+      handleKeyDown,
+    );
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener(
+        "keydown",
+
+        handleKeyDown,
+      );
     };
-  });
+  }, [goPrevious, goNext, restartAutoplay]);
 
   if (!slideCount) {
     return (
@@ -193,13 +250,11 @@ export default function PublicProjectSlideshow({
           w-full
           items-center
           justify-center
-
           bg-[var(--public-surface)]
-
           text-[10px]
           uppercase
           tracking-[0.08em]
-          text-black/20
+          text-[var(--public-muted-foreground)]
         "
       >
         No project images
@@ -209,8 +264,6 @@ export default function PublicProjectSlideshow({
 
   return (
     <div className="w-full">
-      {/* MAIN IMAGE */}
-
       <div
         className="
           relative
@@ -229,12 +282,10 @@ export default function PublicProjectSlideshow({
               className={`
                   col-start-1
                   row-start-1
-
                   flex
                   w-full
                   items-center
                   justify-center
-
                   transition-opacity
                   duration-700
                   ease-in-out
@@ -277,23 +328,16 @@ export default function PublicProjectSlideshow({
                 left-1
                 top-1/2
                 z-10
-
                 flex
                 h-12
                 w-10
-
                 -translate-y-1/2
-
                 items-center
                 justify-center
-
-                text-black/25
-
+                text-[var(--public-muted-foreground)]
                 transition-colors
                 duration-200
-
-                hover:text-black/55
-
+                hover:text-[var(--public-foreground)]
                 sm:left-2
                 lg:left-3
               "
@@ -310,23 +354,16 @@ export default function PublicProjectSlideshow({
                 right-1
                 top-1/2
                 z-10
-
                 flex
                 h-12
                 w-10
-
                 -translate-y-1/2
-
                 items-center
                 justify-center
-
-                text-black/25
-
+                text-[var(--public-muted-foreground)]
                 transition-colors
                 duration-200
-
-                hover:text-black/55
-
+                hover:text-[var(--public-foreground)]
                 sm:right-2
                 lg:right-3
               "
@@ -336,8 +373,6 @@ export default function PublicProjectSlideshow({
           </>
         )}
       </div>
-
-      {/* DOTS */}
 
       {slideCount > 1 && (
         <div
@@ -376,7 +411,7 @@ export default function PublicProjectSlideshow({
                       ${
                         active
                           ? "h-[7px] w-[7px] opacity-50"
-                          : "h-[6px] w-[6px] bg-black/10 hover:bg-black/20"
+                          : "h-[6px] w-[6px] bg-[var(--public-border)] hover:bg-[var(--public-muted-foreground)]"
                       }
                     `}
                   style={
@@ -393,15 +428,12 @@ export default function PublicProjectSlideshow({
         </div>
       )}
 
-      {/* THUMBNAILS */}
-
       {slideCount > 1 && (
         <div
           className="
             mt-6
             overflow-x-auto
             pb-1
-
             [scrollbar-width:none]
             [&::-webkit-scrollbar]:hidden
           "
@@ -413,7 +445,6 @@ export default function PublicProjectSlideshow({
               items-center
               justify-start
               gap-3
-
               sm:gap-4
             "
           >
@@ -424,27 +455,21 @@ export default function PublicProjectSlideshow({
                 <button
                   key={slide.mediaId}
                   type="button"
+                  aria-label={`Show image ${index + 1}`}
                   onClick={() => handleSelect(index)}
                   className="
                       relative
-
                       h-[54px]
                       w-[86px]
-
                       shrink-0
                       overflow-hidden
-
                       border-2
                       border-transparent
-
                       transition-opacity
                       duration-300
-
                       hover:opacity-75
-
                       sm:h-[62px]
                       sm:w-[100px]
-
                       lg:h-[72px]
                       lg:w-[116px]
                     "

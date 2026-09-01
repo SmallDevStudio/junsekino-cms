@@ -1,16 +1,16 @@
 import PublicRichText from "@/components/public/content/PublicRichText";
 
 import PublicProjectBreadcrumbs from "./PublicProjectBreadcrumbs";
+
 import PublicProjectShare from "./PublicProjectShare";
+
 import PublicProjectSlideshow from "./PublicProjectSlideshow";
 
-/*
- * =========================================================
- * LOCALIZED STRING
- * =========================================================
- */
+function getLocalizedValue(
+  value,
 
-function getLocalizedValue(value, locale = "en") {
+  locale = "en",
+) {
   if (!value) {
     return "";
   }
@@ -40,19 +40,6 @@ function getLocalizedValue(value, locale = "en") {
   return "";
 }
 
-/*
- * =========================================================
- * LOCALIZED RICH CONTENT
- * =========================================================
- *
- * Unlike normal localized text, Rich Text
- * can be either:
- *
- * - String
- * - TipTap JSON
- * =========================================================
- */
-
 function hasRichTextValue(value) {
   if (typeof value === "string") {
     return Boolean(value.trim());
@@ -61,15 +48,15 @@ function hasRichTextValue(value) {
   return value && typeof value === "object" && value.type === "doc";
 }
 
-function getLocalizedRichText(value, locale = "en") {
+function getLocalizedRichText(
+  value,
+
+  locale = "en",
+) {
   if (!value) {
     return null;
   }
 
-  /*
-   * Compatibility if Public service ever
-   * returns a direct string/document.
-   */
   if (typeof value === "string" || value?.type === "doc") {
     return value;
   }
@@ -91,28 +78,26 @@ function getLocalizedRichText(value, locale = "en") {
   return null;
 }
 
-/*
- * =========================================================
- * CREDITS
- * =========================================================
- */
+function formatCredit(
+  items,
 
-function formatCredit(items, locale) {
+  locale,
+) {
   if (!Array.isArray(items)) {
     return "";
   }
 
   return items
-    .map((item) => getLocalizedValue(item, locale))
+    .map((item) =>
+      getLocalizedValue(
+        item,
+
+        locale,
+      ),
+    )
     .filter(Boolean)
     .join(", ");
 }
-
-/*
- * =========================================================
- * AREA
- * =========================================================
- */
 
 function formatArea(area) {
   if (area?.value === null || area?.value === undefined) {
@@ -124,13 +109,11 @@ function formatArea(area) {
   return `${area.value.toLocaleString()} ${unit}`;
 }
 
-/*
- * =========================================================
- * INFORMATION ROW
- * =========================================================
- */
+function InfoRow({
+  label,
 
-function InfoRow({ label, value }) {
+  value,
+}) {
   if (value === null || value === undefined || value === "") {
     return null;
   }
@@ -141,82 +124,109 @@ function InfoRow({ label, value }) {
         grid
         grid-cols-[118px_1fr]
         gap-3
-
         text-[11px]
         leading-[1.3]
-
         sm:grid-cols-[126px_1fr]
         sm:text-[12px]
       "
     >
-      <dt className="text-black/60">{label}</dt>
+      <dt
+        className="
+          text-[var(--public-muted-foreground)]
+        "
+      >
+        {label}
+      </dt>
 
-      <dd className="text-black/80">{value}</dd>
+      <dd
+        className="
+          text-[var(--public-foreground)]
+        "
+      >
+        {value}
+      </dd>
     </div>
   );
 }
 
-/*
- * =========================================================
- * PROJECT DETAIL
- * =========================================================
- */
-
 export default function PublicProjectDetail({
   companySlug,
+
   project,
+
   locale = "en",
 }) {
-  const title = getLocalizedValue(project.title, locale);
+  const title = getLocalizedValue(
+    project.title,
 
-  const location = getLocalizedValue(project.projectInfo?.location, locale);
-
-  /*
-   * Important:
-   *
-   * Do NOT use getLocalizedValue() here.
-   *
-   * Project content may now contain
-   * TipTap JSON.
-   */
-  const content = getLocalizedRichText(project.content, locale);
-
-  const client = getLocalizedValue(project.projectInfo?.client, locale);
-
-  const architecture = formatCredit(
-    project.projectInfo?.credits?.architecture,
     locale,
   );
 
-  const interior = formatCredit(project.projectInfo?.credits?.interior, locale);
+  const location = getLocalizedValue(
+    project.projectInfo?.location,
+
+    locale,
+  );
+
+  const content = getLocalizedRichText(
+    project.content,
+
+    locale,
+  );
+
+  const client = getLocalizedValue(
+    project.projectInfo?.client,
+
+    locale,
+  );
+
+  const architecture = formatCredit(
+    project.projectInfo?.credits?.architecture,
+
+    locale,
+  );
+
+  const interior = formatCredit(
+    project.projectInfo?.credits?.interior,
+
+    locale,
+  );
 
   const landscape = formatCredit(
     project.projectInfo?.credits?.landscape,
+
     locale,
   );
 
   const consultant = formatCredit(
     project.projectInfo?.credits?.consultant,
+
     locale,
   );
 
   const projectType =
-    getLocalizedValue(project.subCategory?.name, locale) ||
-    getLocalizedValue(project.category?.name, locale);
+    getLocalizedValue(
+      project.subCategory?.name,
+
+      locale,
+    ) ||
+    getLocalizedValue(
+      project.category?.name,
+
+      locale,
+    );
 
   return (
     <div
       className="
         w-full
-
+        bg-[var(--public-background)]
         px-5
         pb-14
-
+        text-[var(--public-foreground)]
         sm:px-8
-
         lg:px-12
         lg:pb-20
-
         xl:px-16
       "
     >
@@ -227,10 +237,6 @@ export default function PublicProjectDetail({
           max-w-[1680px]
         "
       >
-        {/* =================================
-            BREADCRUMBS
-        ================================= */}
-
         <div className="pt-2 lg:pt-4">
           <PublicProjectBreadcrumbs
             companySlug={companySlug}
@@ -240,29 +246,18 @@ export default function PublicProjectDetail({
           />
         </div>
 
-        {/* =================================
-            CONTENT
-        ================================= */}
-
         <div
           className="
             mt-8
-
             grid
             grid-cols-1
             gap-10
-
             lg:mt-10
             lg:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.8fr)]
             lg:gap-[clamp(3rem,5vw,6rem)]
-
             xl:grid-cols-[minmax(0,1.75fr)_minmax(360px,0.75fr)]
           "
         >
-          {/* ===============================
-              LEFT — SLIDESHOW
-          =============================== */}
-
           <div className="min-w-0">
             <PublicProjectSlideshow
               companySlug={companySlug}
@@ -271,26 +266,16 @@ export default function PublicProjectDetail({
             />
           </div>
 
-          {/* ===============================
-              RIGHT — INFORMATION
-          =============================== */}
-
           <aside
             className="
               min-w-0
-
               lg:max-h-[calc(100svh-150px)]
               lg:overflow-y-auto
               lg:pr-2
-
               [scrollbar-width:none]
               [&::-webkit-scrollbar]:hidden
             "
           >
-            {/* =============================
-                TITLE + SHARE
-            ============================= */}
-
             <div
               className="
                 flex
@@ -312,7 +297,7 @@ export default function PublicProjectDetail({
                     font-normal
                     leading-none
                     tracking-[0.025em]
-
+                    text-[var(--public-foreground)]
                     sm:text-[26px]
                     lg:text-[28px]
                   "
@@ -324,11 +309,9 @@ export default function PublicProjectDetail({
                   <p
                     className="
                       mt-3
-
                       text-[13px]
                       leading-none
-                      text-black/45
-
+                      text-[var(--public-muted-foreground)]
                       sm:text-[14px]
                     "
                   >
@@ -340,30 +323,25 @@ export default function PublicProjectDetail({
               <PublicProjectShare title={title} />
             </div>
 
-            {/* =============================
-                RICH CONTENT
-            ============================= */}
-
             {content && (
-              <div className="mt-7 lg:mt-8">
+              <div
+                className="
+                  mt-7
+                  text-[var(--public-foreground)]
+                  lg:mt-8
+                "
+              >
                 <PublicRichText value={content} />
               </div>
             )}
-
-            {/* =============================
-                PROJECT INFORMATION
-            ============================= */}
 
             <dl
               className="
                 mt-10
                 space-y-1
-
                 border-t
-                border-black/[0.06]
-
+                border-[var(--public-border)]
                 pt-6
-
                 lg:mt-12
               "
             >

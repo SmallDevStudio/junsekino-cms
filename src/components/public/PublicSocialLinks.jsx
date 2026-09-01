@@ -1,107 +1,184 @@
-function FacebookIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M13.6 22v-8h2.7l.4-3.1h-3.1v-2c0-.9.3-1.5 1.6-1.5h1.7V4.6c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.1H7.4V14h2.8v8h3.4Z"
-      />
-    </svg>
-  );
-}
+import {
+  FaFacebookF,
+  FaInstagram,
+  FaLinkedinIn,
+  FaPinterestP,
+  FaYoutube,
+} from "react-icons/fa";
 
-function InstagramIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M7.1 2h9.8A5.1 5.1 0 0 1 22 7.1v9.8a5.1 5.1 0 0 1-5.1 5.1H7.1A5.1 5.1 0 0 1 2 16.9V7.1A5.1 5.1 0 0 1 7.1 2Zm-.2 2A2.9 2.9 0 0 0 4 6.9v10.2A2.9 2.9 0 0 0 6.9 20h10.2a2.9 2.9 0 0 0 2.9-2.9V6.9A2.9 2.9 0 0 0 17.1 4H6.9Zm10.7 1.5a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"
-      />
-    </svg>
-  );
-}
+import { FaTiktok, FaXTwitter } from "react-icons/fa6";
 
-function PinterestIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M12 2a10 10 0 0 0-3.6 19.3c-.1-1.6 0-3.5.4-5.2l1.3-5.4s-.3-.7-.3-1.8c0-1.7 1-3 2.2-3 1 0 1.6.8 1.6 1.8 0 1.1-.7 2.7-1 4.1-.6 1.8.9 3.3 2.7 3.3 3.2 0 5.4-4.1 5.4-8.9 0-3.7-3-6.5-7.6-6.5-5.5 0-8.9 4.1-8.9 8.6 0 1.6.5 3.2 1.3 4.1.1.2.2.4.1.7l-.4 1.6c-.1.5-.5.6-.9.4-2.4-1-3.5-3.7-3.5-6.7C.8 4.8 4.9 0 12.7 0 19 0 23.2 4.6 23.2 9.5c0 6.5-3.6 11.4-8.9 11.4-1.8 0-3.5-1-4-2.1l-1.1 4.4c-.4 1.5-1.2 3-1.9 4.1.9.3 2 .5 3.1.5A10 10 0 1 0 12 2Z"
-      />
-    </svg>
-  );
-}
+import { RiLineFill } from "react-icons/ri";
 
-function TikTokIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M15.6 2c.4 2.4 1.8 3.8 4.4 4v3.1a8 8 0 0 1-4.4-1.3v6.4A7 7 0 1 1 9.5 7.3v3.2a3.9 3.9 0 1 0 2.9 3.7V2h3.2Z"
-      />
-    </svg>
-  );
-}
+const DEFAULT_BACKGROUND = "#ADAEB3";
+const ICON_COLOR = "#ffffff";
 
 const SOCIALS = [
   {
     key: "facebook",
     label: "Facebook",
-    Icon: FacebookIcon,
+    Icon: FaFacebookF,
+    hoverColor: "#1877F2",
   },
   {
     key: "instagram",
     label: "Instagram",
-    Icon: InstagramIcon,
+    Icon: FaInstagram,
+    hoverColor: "#E4405F",
   },
   {
-    key: "pinterest",
-    label: "Pinterest",
-    Icon: PinterestIcon,
+    key: "youtube",
+    label: "YouTube",
+    Icon: FaYoutube,
+    hoverColor: "#FF0000",
+  },
+  {
+    key: "linkedin",
+    label: "LinkedIn",
+    Icon: FaLinkedinIn,
+    hoverColor: "#0A66C2",
   },
   {
     key: "tiktok",
     label: "TikTok",
-    Icon: TikTokIcon,
+    Icon: FaTiktok,
+    hoverColor: "#000000",
+  },
+  {
+    key: "x",
+    label: "X",
+    Icon: FaXTwitter,
+    hoverColor: "#000000",
+  },
+  {
+    key: "pinterest",
+    label: "Pinterest",
+    Icon: FaPinterestP,
+    hoverColor: "#E60023",
+  },
+  {
+    key: "line",
+    label: "LINE",
+    Icon: RiLineFill,
+    hoverColor: "#06C755",
   },
 ];
 
+function normalizeSocialUrl(value) {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const trimmedValue = value.trim();
+
+  if (!trimmedValue) {
+    return null;
+  }
+
+  try {
+    const url = new URL(trimmedValue);
+
+    if (!["http:", "https:"].includes(url.protocol)) {
+      return null;
+    }
+
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+function resolveSocialItems(social) {
+  return SOCIALS.map((item) => ({
+    ...item,
+    href: normalizeSocialUrl(social?.[item.key]),
+  })).filter((item) => Boolean(item.href));
+}
+
+function applyHoverStyle(event, backgroundColor) {
+  event.currentTarget.style.backgroundColor = backgroundColor;
+  event.currentTarget.style.color = ICON_COLOR;
+}
+
+function applyDefaultStyle(event) {
+  event.currentTarget.style.backgroundColor = DEFAULT_BACKGROUND;
+  event.currentTarget.style.color = ICON_COLOR;
+}
+
 export default function PublicSocialLinks({ social = {}, size = "default" }) {
-  const items = SOCIALS.filter((item) => Boolean(social?.[item.key]));
+  const items = resolveSocialItems(social);
 
   if (!items.length) {
     return null;
   }
 
-  const buttonSize = size === "large" ? "h-10 w-10" : "h-8 w-8";
+  const large = size === "large";
 
-  const iconSize = size === "large" ? "h-[19px] w-[19px]" : "h-[16px] w-[16px]";
+  const buttonSize = large
+    ? "h-[50px] w-[50px]"
+    : "h-[40px] w-[40px] xl:h-[44px] xl:w-[44px]";
+
+  const iconSize = large ? 24 : 20;
 
   return (
-    <div className="flex items-center gap-2">
-      {items.map(({ key, label, Icon }) => (
+    <div
+      className="
+        flex
+        flex-wrap
+        items-center
+        justify-center
+        gap-2
+      "
+      aria-label="Social media"
+    >
+      {items.map(({ key, label, Icon, href, hoverColor }) => (
         <a
           key={key}
-          href={social[key]}
+          href={href}
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
           aria-label={label}
+          title={label}
+          onMouseEnter={(event) => {
+            applyHoverStyle(event, hoverColor);
+          }}
+          onMouseLeave={applyDefaultStyle}
+          onFocus={(event) => {
+            applyHoverStyle(event, hoverColor);
+          }}
+          onBlur={applyDefaultStyle}
           className={`
-            flex
-            ${buttonSize}
-            items-center
-            justify-center
-            rounded-full
-            bg-[#3d403d]
-            text-white
-            transition-all
-            duration-200
-            hover:scale-105
-            hover:opacity-70
-          `}
+              inline-flex
+              ${buttonSize}
+
+              shrink-0
+              items-center
+              justify-center
+
+              rounded-full
+
+              transition-all
+              duration-200
+
+              hover:scale-105
+
+              focus-visible:outline-none
+              focus-visible:ring-2
+              focus-visible:ring-[var(--public-primary)]
+              focus-visible:ring-offset-2
+              focus-visible:ring-offset-[var(--public-background)]
+            `}
+          style={{
+            backgroundColor: DEFAULT_BACKGROUND,
+            color: ICON_COLOR,
+          }}
         >
-          <span className={iconSize}>
-            <Icon />
-          </span>
+          <Icon
+            size={iconSize}
+            color="currentColor"
+            aria-hidden="true"
+            focusable="false"
+          />
         </a>
       ))}
     </div>

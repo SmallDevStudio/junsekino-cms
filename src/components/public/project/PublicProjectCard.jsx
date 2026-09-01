@@ -1,13 +1,12 @@
 import Image from "next/image";
+
 import Link from "next/link";
 
-/*
- * =========================================================
- * LOCALIZATION
- * =========================================================
- */
+function getLocalizedValue(
+  value,
 
-function getLocalizedValue(value, locale = "en") {
+  locale = "en",
+) {
   if (!value) {
     return "";
   }
@@ -21,13 +20,11 @@ function getLocalizedValue(value, locale = "en") {
   );
 }
 
-/*
- * =========================================================
- * MEDIA
- * =========================================================
- */
+function createMediaUrl({
+  companySlug,
 
-function createMediaUrl({ companySlug, mediaId }) {
+  mediaId,
+}) {
   if (!companySlug || !mediaId) {
     return null;
   }
@@ -37,28 +34,33 @@ function createMediaUrl({ companySlug, mediaId }) {
   )}/media/${encodeURIComponent(mediaId)}?variant=medium`;
 }
 
-/*
- * =========================================================
- * PROJECT CARD
- * =========================================================
- */
-
 export default function PublicProjectCard({
   companySlug,
+
   project,
+
   locale = "en",
 }) {
   const title =
-    getLocalizedValue(project?.title, locale) ||
+    getLocalizedValue(
+      project?.title,
+
+      locale,
+    ) ||
     project?.slug ||
     "Untitled Project";
 
-  const location = getLocalizedValue(project?.projectInfo?.location, locale);
+  const location = getLocalizedValue(
+    project?.projectInfo?.location,
+
+    locale,
+  );
 
   const mediaId = project?.featuredImage?.mediaId || null;
 
   const imageUrl = createMediaUrl({
     companySlug,
+
     mediaId,
   });
 
@@ -71,7 +73,12 @@ export default function PublicProjectCard({
       <Link
         href={href}
         aria-label={linkLabel}
-        className="group block w-full outline-none"
+        className="
+          group
+          block
+          w-full
+          outline-none
+        "
       >
         <div
           className="
@@ -98,14 +105,11 @@ export default function PublicProjectCard({
                 select-none
                 object-cover
                 grayscale
-
                 transition-[transform,filter]
                 duration-500
                 ease-out
-
                 group-hover:scale-[1.055]
                 group-hover:grayscale-0
-
                 group-focus-visible:scale-[1.055]
                 group-focus-visible:grayscale-0
               "
@@ -118,46 +122,34 @@ export default function PublicProjectCard({
                 w-full
                 items-center
                 justify-center
-
                 text-[9px]
                 uppercase
                 tracking-[0.08em]
-                text-black/25
+                text-[var(--public-muted-foreground)]
               "
             >
               No Image
             </div>
           )}
 
-          {/* =================================
-              HOVER OVERLAY
-          ================================= */}
-
           <div
             className="
               pointer-events-none
               absolute
               inset-0
-
               flex
               items-end
-
               bg-gradient-to-t
               from-black/70
               via-black/10
               to-transparent
-
               p-4
-
               opacity-0
-
               transition-opacity
               duration-300
               ease-out
-
               group-hover:opacity-100
               group-focus-visible:opacity-100
-
               sm:p-5
             "
           >
@@ -165,20 +157,15 @@ export default function PublicProjectCard({
               className="
                 w-full
                 translate-y-2
-
                 text-left
                 text-white
-
                 opacity-0
-
                 transition-all
                 delay-75
                 duration-300
                 ease-out
-
                 group-hover:translate-y-0
                 group-hover:opacity-100
-
                 group-focus-visible:translate-y-0
                 group-focus-visible:opacity-100
               "
@@ -189,7 +176,6 @@ export default function PublicProjectCard({
                   font-medium
                   leading-[1.35]
                   tracking-[0.01em]
-
                   sm:text-[15px]
                   lg:text-[16px]
                 "
@@ -206,7 +192,6 @@ export default function PublicProjectCard({
                     leading-[1.45]
                     tracking-[0.02em]
                     text-white/80
-
                     sm:text-[11px]
                   "
                 >
@@ -216,22 +201,15 @@ export default function PublicProjectCard({
             </div>
           </div>
 
-          {/* =================================
-              KEYBOARD FOCUS
-          ================================= */}
-
           <span
             aria-hidden="true"
             className="
               pointer-events-none
               absolute
               inset-0
-
               border-2
               border-transparent
-
               transition-colors
-
               group-focus-visible:border-[var(--public-primary)]
             "
           />

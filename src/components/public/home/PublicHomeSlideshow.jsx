@@ -266,7 +266,7 @@ export default function PublicHomeSlideshow({ companySlug, slideshow }) {
             text-[11px]
             uppercase
             tracking-[0.08em]
-            text-black/25
+            text-[var(--public-muted-foreground)]
           "
         >
           No slideshow available
@@ -326,24 +326,24 @@ export default function PublicHomeSlideshow({ companySlug, slideshow }) {
                 key={slide.id}
                 aria-hidden={!active}
                 className={`
-                    col-start-1
-                    row-start-1
+                  col-start-1
+                  row-start-1
 
-                    flex
-                    w-full
-                    items-center
-                    justify-center
+                  flex
+                  w-full
+                  items-center
+                  justify-center
 
-                    transition-opacity
-                    duration-700
-                    ease-in-out
+                  transition-opacity
+                  duration-700
+                  ease-in-out
 
-                    ${
-                      active
-                        ? "pointer-events-auto opacity-100"
-                        : "pointer-events-none opacity-0"
-                    }
-                  `}
+                  ${
+                    active
+                      ? "pointer-events-auto opacity-100"
+                      : "pointer-events-none opacity-0"
+                  }
+                `}
               >
                 <SlideImage slide={slide} priority={index === 0} />
               </div>
@@ -352,9 +352,6 @@ export default function PublicHomeSlideshow({ companySlug, slideshow }) {
 
           {/* ==================================
               PREVIOUS / NEXT
-
-              No background.
-              Soft architectural style.
           ================================== */}
 
           {slideCount > 1 && (
@@ -378,13 +375,18 @@ export default function PublicHomeSlideshow({ companySlug, slideshow }) {
                   items-center
                   justify-center
 
-                  text-black/25
+                  text-[var(--public-muted-foreground)]
+
+                  opacity-60
 
                   transition-all
                   duration-200
 
-                  hover:text-black/50
+                  hover:text-[var(--public-foreground)]
+                  hover:opacity-100
 
+                  focus-visible:text-[var(--public-foreground)]
+                  focus-visible:opacity-100
                   focus-visible:outline-none
 
                   sm:left-2
@@ -416,13 +418,18 @@ export default function PublicHomeSlideshow({ companySlug, slideshow }) {
                   items-center
                   justify-center
 
-                  text-black/25
+                  text-[var(--public-muted-foreground)]
+
+                  opacity-60
 
                   transition-all
                   duration-200
 
-                  hover:text-black/50
+                  hover:text-[var(--public-foreground)]
+                  hover:opacity-100
 
+                  focus-visible:text-[var(--public-foreground)]
+                  focus-visible:opacity-100
                   focus-visible:outline-none
 
                   sm:right-2
@@ -470,30 +477,30 @@ export default function PublicHomeSlideshow({ companySlug, slideshow }) {
                 aria-current={active ? "true" : undefined}
                 onClick={() => handleSelectSlide(index)}
                 className="
-                    flex
-                    h-3
-                    w-3
+                  flex
+                  h-3
+                  w-3
 
-                    items-center
-                    justify-center
+                  items-center
+                  justify-center
 
-                    focus-visible:outline-none
-                  "
+                  focus-visible:outline-none
+                "
               >
                 <span
                   className={`
-                      block
-                      rounded-full
+                    block
+                    rounded-full
 
-                      transition-all
-                      duration-300
+                    transition-all
+                    duration-300
 
-                      ${
-                        active
-                          ? "h-[7px] w-[7px] opacity-50"
-                          : "h-[6px] w-[6px] bg-black/10 hover:bg-black/20"
-                      }
-                    `}
+                    ${
+                      active
+                        ? "h-[7px] w-[7px] opacity-60"
+                        : "h-[6px] w-[6px] bg-[var(--public-muted-foreground)] opacity-25 hover:opacity-55"
+                    }
+                  `}
                   style={
                     active
                       ? {
@@ -560,33 +567,33 @@ export default function PublicHomeSlideshow({ companySlug, slideshow }) {
                   aria-current={active ? "true" : undefined}
                   onClick={() => handleSelectSlide(index)}
                   className="
-                      relative
+                    relative
 
-                      h-[54px]
-                      w-[86px]
+                    h-[54px]
+                    w-[86px]
 
-                      shrink-0
+                    shrink-0
 
-                      overflow-hidden
+                    overflow-hidden
 
-                      border-[2px]
-                      border-transparent
+                    border-[2px]
+                    border-transparent
 
-                      bg-[var(--public-surface)]
+                    bg-[var(--public-surface)]
 
-                      transition-all
-                      duration-300
+                    transition-all
+                    duration-300
 
-                      hover:opacity-75
+                    hover:opacity-75
 
-                      focus-visible:outline-none
+                    focus-visible:outline-none
 
-                      sm:h-[62px]
-                      sm:w-[100px]
+                    sm:h-[62px]
+                    sm:w-[100px]
 
-                      lg:h-[72px]
-                      lg:w-[116px]
-                    "
+                    lg:h-[72px]
+                    lg:w-[116px]
+                  "
                   style={
                     active
                       ? {
@@ -602,14 +609,14 @@ export default function PublicHomeSlideshow({ companySlug, slideshow }) {
                     unoptimized
                     draggable={false}
                     sizes="
-                        (max-width: 639px) 86px,
-                        (max-width: 1023px) 100px,
-                        116px
-                      "
+                      (max-width: 639px) 86px,
+                      (max-width: 1023px) 100px,
+                      116px
+                    "
                     className="
-                        select-none
-                        object-cover
-                      "
+                      select-none
+                      object-cover
+                    "
                   />
                 </button>
               );
@@ -631,7 +638,7 @@ export default function PublicHomeSlideshow({ companySlug, slideshow }) {
             text-center
             text-[11px]
             tracking-[0.02em]
-            text-black/45
+            text-[var(--public-muted-foreground)]
 
             sm:text-[12px]
           "

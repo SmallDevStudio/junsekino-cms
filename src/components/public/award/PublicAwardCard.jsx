@@ -1,7 +1,12 @@
 import Image from "next/image";
+
 import Link from "next/link";
 
-function getLocalizedValue(value, locale = "en") {
+function getLocalizedValue(
+  value,
+
+  locale = "en",
+) {
   if (!value) {
     return "";
   }
@@ -15,7 +20,11 @@ function getLocalizedValue(value, locale = "en") {
   );
 }
 
-function createMediaUrl({ companySlug, mediaId }) {
+function createMediaUrl({
+  companySlug,
+
+  mediaId,
+}) {
   if (!companySlug || !mediaId) {
     return null;
   }
@@ -25,13 +34,13 @@ function createMediaUrl({ companySlug, mediaId }) {
   )}/media/${encodeURIComponent(mediaId)}?variant=medium`;
 }
 
-/*
- * =========================================================
- * INFO ROW
- * =========================================================
- */
+function InfoRow({
+  label,
 
-function InfoRow({ label, value, highlight = false }) {
+  value,
+
+  highlight = false,
+}) {
   if (!value) {
     return null;
   }
@@ -41,21 +50,17 @@ function InfoRow({ label, value, highlight = false }) {
       className="
         grid
         grid-cols-[78px_minmax(0,1fr)]
-
         gap-x-5
-
         text-[11px]
         leading-[1.45]
-
         sm:grid-cols-[88px_minmax(0,1fr)]
         sm:text-[12px]
-
         lg:grid-cols-[92px_minmax(0,1fr)]
       "
     >
       <dt
         className="
-          text-black/35
+          text-[var(--public-muted-foreground)]
         "
       >
         {label}
@@ -68,7 +73,7 @@ function InfoRow({ label, value, highlight = false }) {
           ${
             highlight
               ? "font-semibold text-[var(--public-primary)]"
-              : "font-normal text-black/70"
+              : "font-normal text-[var(--public-foreground)]"
           }
         `}
       >
@@ -78,24 +83,43 @@ function InfoRow({ label, value, highlight = false }) {
   );
 }
 
-/*
- * =========================================================
- * AWARD CARD
- * =========================================================
- */
+export default function PublicAwardCard({
+  companySlug,
 
-export default function PublicAwardCard({ companySlug, award, locale = "en" }) {
-  const awardName = getLocalizedValue(award.awardName, locale) || "Award";
+  award,
+
+  locale = "en",
+}) {
+  const awardName =
+    getLocalizedValue(
+      award.awardName,
+
+      locale,
+    ) || "Award";
 
   const projectName =
-    getLocalizedValue(award.project?.title, locale) ||
+    getLocalizedValue(
+      award.project?.title,
+
+      locale,
+    ) ||
     award.project?.slug ||
     "";
 
-  const categoryName = getLocalizedValue(award.category?.name, locale);
+  const categoryName = getLocalizedValue(
+    award.category?.name,
+
+    locale,
+  );
 
   const imageAlt =
-    getLocalizedValue(award.thumbnail?.alt, locale) || projectName || awardName;
+    getLocalizedValue(
+      award.thumbnail?.alt,
+
+      locale,
+    ) ||
+    projectName ||
+    awardName;
 
   const imageUrl = createMediaUrl({
     companySlug,
@@ -111,33 +135,23 @@ export default function PublicAwardCard({ companySlug, award, locale = "en" }) {
         href={href}
         className="
           group
-
           grid
           grid-cols-1
-
           gap-5
-
+          text-[var(--public-foreground)]
           md:grid-cols-[minmax(280px,420px)_minmax(0,1fr)]
           md:items-start
           md:gap-10
-
           lg:grid-cols-[minmax(320px,440px)_minmax(0,1fr)]
           lg:gap-[clamp(3rem,5vw,5.5rem)]
         "
       >
-        {/* =====================================
-            THUMBNAIL
-        ===================================== */}
-
         <div
           className="
             relative
-
             aspect-video
             w-full
-
             overflow-hidden
-
             bg-[var(--public-surface)]
           "
         >
@@ -156,11 +170,9 @@ export default function PublicAwardCard({ companySlug, award, locale = "en" }) {
               className="
                 select-none
                 object-cover
-
                 transition-transform
                 duration-500
                 ease-out
-
                 group-hover:scale-[1.015]
               "
             />
@@ -170,15 +182,12 @@ export default function PublicAwardCard({ companySlug, award, locale = "en" }) {
                 flex
                 h-full
                 w-full
-
                 items-center
                 justify-center
-
                 text-[9px]
                 uppercase
                 tracking-[0.08em]
-
-                text-black/20
+                text-[var(--public-muted-foreground)]
               "
             >
               No Image
@@ -186,27 +195,17 @@ export default function PublicAwardCard({ companySlug, award, locale = "en" }) {
           )}
         </div>
 
-        {/* =====================================
-            INFORMATION
-        ===================================== */}
-
         <div
           className="
             flex
             min-w-0
             flex-col
-
             items-start
             justify-start
-
             pt-0
           "
         >
-          <dl
-            className="
-              space-y-1.5
-            "
-          >
+          <dl className="space-y-1.5">
             <InfoRow label="Award" value={awardName} highlight />
 
             <InfoRow label="Project" value={projectName} />

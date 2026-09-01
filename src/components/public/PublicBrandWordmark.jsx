@@ -1,27 +1,19 @@
 import Link from "next/link";
 
-function normalizeText(value) {
-  return String(value || "").trim();
-}
-
-function resolveSuffix(company) {
-  const shortName = normalizeText(company?.shortName);
-
-  if (shortName) {
-    return shortName.replace(/^junsekino\s*/i, "").trim();
-  }
-
-  return normalizeText(company?.name)
-    .replace(/^junsekino\s*/i, "")
-    .trim();
-}
+import CompanyLogo from "@/components/company/CompanyLogo";
 
 export default function PublicBrandWordmark({
   company,
+
   primaryColor = "#000000",
+
   href = "/",
+
+  themeVariant = "light",
 }) {
-  const suffix = resolveSuffix(company);
+  const companySlug = company?.slug || "";
+
+  const resolvedVariant = themeVariant === "dark" ? "dark" : "light";
 
   return (
     <Link
@@ -29,45 +21,36 @@ export default function PublicBrandWordmark({
       aria-label={`${company?.name || "Junsekino"} home`}
       className="
         inline-flex
-        items-baseline
-        whitespace-nowrap
-        text-black
+        h-9
+        max-w-[280px]
+        items-end
+        pb-px
         transition-opacity
         duration-200
         hover:opacity-65
       "
+      style={{
+        "--public-primary": primaryColor,
+      }}
     >
-      <span
+      <CompanyLogo
+        company={company}
+        companySlug={companySlug}
+        variant={resolvedVariant}
+        imageVariant="large"
+        priority
         className="
+          h-8
+          max-w-[260px]
+          sm:h-9
+          sm:max-w-[280px]
+        "
+        textClassName="
           text-[22px]
-          font-normal
-          leading-none
-          tracking-[0.085em]
           sm:text-[24px]
           xl:text-[27px]
         "
-      >
-        JUNSEKINO
-      </span>
-
-      {suffix && (
-        <span
-          className="
-            ml-[0.28em]
-            text-[22px]
-            font-semibold
-            leading-none
-            tracking-[-0.035em]
-            sm:text-[24px]
-            xl:text-[27px]
-          "
-          style={{
-            color: primaryColor,
-          }}
-        >
-          {suffix}
-        </span>
-      )}
+      />
     </Link>
   );
 }

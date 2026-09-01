@@ -45,10 +45,6 @@ function resolveSuperAdmin(user) {
   );
 }
 
-function resolveUserId(user) {
-  return user?.uid || user?.id || user?.userId || null;
-}
-
 function resolvePreferredCompany({ companies, user }) {
   if (!companies.length) {
     return null;
@@ -69,6 +65,26 @@ function resolvePreferredCompany({ companies, user }) {
   return companies[0] || null;
 }
 
+function getStoredCompanyId() {
+  try {
+    return window.localStorage.getItem(STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function setStoredCompanyId(companyId) {
+  try {
+    if (companyId) {
+      window.localStorage.setItem(STORAGE_KEY, companyId);
+    } else {
+      window.localStorage.removeItem(STORAGE_KEY);
+    }
+  } catch {
+    // localStorage may be unavailable.
+  }
+}
+
 export function CompanyWorkspaceProvider({ user, children }) {
   const [companies, setCompanies] = useState([]);
 
@@ -80,83 +96,114 @@ export function CompanyWorkspaceProvider({ user, children }) {
 
   const isSuperAdmin = resolveSuperAdmin(user);
 
-  const currentUserId = resolveUserId(user);
+  const currentUserId = user?.uid || user?.id || null;
 
-  const loadCompanies = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  const loadCompanies = useCallback(
+    async ({ selectCompanyId = null, silent = false } = {}) => {
+      try {
+        if (!silent) {
+          setLoading(true);
+        }
 
-      const response = await fetch("/api/v1/auth/companies", {
-        method: "GET",
+        setError(null);
 
-        cache: "no-store",
+        const response = await fetch("/api/v1/companies", {
+          method: "GET",
 
-        credentials: "include",
-      });
+          cache: "no-store",
 
-      const payload = await response.json();
+          credentials: "include",
+        });
 
-      if (!response.ok || payload?.success === false) {
-        throw new Error(payload?.message || "Unable to load companies.");
+        const payload = await response.json();
+
+        if (!response.ok || payload?.success === false) {
+          throw new Error(payload?.message || "Unable to load companies.");
+        }
+
+        const loadedCompanies = normalizeCompanies(payload);
+
+        const preferredCompany = resolvePreferredCompany({
+          companies: loadedCompanies,
+
+          user,
+        });
+
+        const scopedCompanies = isSuperAdmin
+          ? loadedCompanies
+          : preferredCompany
+            ? [preferredCompany]
+            : [];
+
+        setCompanies(scopedCompanies);
+
+        setActiveCompanyId((currentId) => {
+          /*
+           * Non-superadmin always remains inside
+           * their assigned company workspace.
+           */
+          if (!isSuperAdmin) {
+            return preferredCompany?.id || null;
+          }
+
+          /*
+           * Explicitly select a newly created company.
+           */
+          if (
+            selectCompanyId &&
+            scopedCompanies.some((company) => company.id === selectCompanyId)
+          ) {
+            setStoredCompanyId(selectCompanyId);
+
+            return selectCompanyId;
+          }
+
+          /*
+           * Keep the currently selected company
+           * when it still exists.
+           */
+          if (
+            currentId &&
+            scopedCompanies.some((company) => company.id === currentId)
+          ) {
+            return currentId;
+          }
+
+          const storedId = getStoredCompanyId();
+
+          if (
+            storedId &&
+            scopedCompanies.some((company) => company.id === storedId)
+          ) {
+            return storedId;
+          }
+
+          const fallbackId =
+            preferredCompany?.id || scopedCompanies[0]?.id || null;
+
+          setStoredCompanyId(fallbackId);
+
+          return fallbackId;
+        });
+
+        return scopedCompanies;
+      } catch (loadError) {
+        console.error("Load companies error:", loadError);
+
+        setCompanies([]);
+        setActiveCompanyId(null);
+
+        setError(loadError?.message || "Unable to load companies.");
+
+        return [];
+      } finally {
+        if (!silent) {
+          setLoading(false);
+        }
       }
-
-      const loadedCompanies = normalizeCompanies(payload);
-
-      const preferredCompany = resolvePreferredCompany({
-        companies: loadedCompanies,
-
-        user,
-      });
-
-      const scopedCompanies = isSuperAdmin
-        ? loadedCompanies
-        : preferredCompany
-          ? [preferredCompany]
-          : [];
-
-      setCompanies(scopedCompanies);
-
-      setActiveCompanyId((currentId) => {
-        if (!isSuperAdmin) {
-          return preferredCompany?.id || null;
-        }
-
-        if (
-          currentId &&
-          scopedCompanies.some((company) => company.id === currentId)
-        ) {
-          return currentId;
-        }
-
-        let storedId = null;
-
-        try {
-          storedId = window.localStorage.getItem(STORAGE_KEY);
-        } catch {
-          storedId = null;
-        }
-
-        if (
-          storedId &&
-          scopedCompanies.some((company) => company.id === storedId)
-        ) {
-          return storedId;
-        }
-
-        return preferredCompany?.id || scopedCompanies[0]?.id || null;
-      });
-    } catch (loadError) {
-      console.error("Load companies error:", loadError);
-
-      setCompanies([]);
-      setActiveCompanyId(null);
-
-      setError(loadError?.message || "Unable to load companies.");
-    } finally {
-      setLoading(false);
-    }
-  }, [isSuperAdmin, user]);
+    },
+    [isSuperAdmin, user],
+  );
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -173,15 +220,7 @@ export function CompanyWorkspaceProvider({ user, children }) {
       return;
     }
 
-    try {
-      window.localStorage.setItem(
-        STORAGE_KEY,
-
-        activeCompanyId,
-      );
-    } catch {
-      // localStorage may be unavailable.
-    }
+    setStoredCompanyId(activeCompanyId);
   }, [activeCompanyId, isSuperAdmin]);
 
   const activeCompany = useMemo(() => {
@@ -206,9 +245,22 @@ export function CompanyWorkspaceProvider({ user, children }) {
 
       setActiveCompanyId(companyId);
 
+      setStoredCompanyId(companyId);
+
       return true;
     },
     [companies, isSuperAdmin],
+  );
+
+  const refreshCompanies = useCallback(
+    async (options = {}) => {
+      return loadCompanies({
+        ...options,
+
+        silent: options.silent ?? true,
+      });
+    },
+    [loadCompanies],
   );
 
   const value = useMemo(
@@ -216,36 +268,38 @@ export function CompanyWorkspaceProvider({ user, children }) {
       companies,
 
       activeCompany,
-
       activeCompanyId,
 
       loading,
-
       error,
 
-      isSuperAdmin,
-
       currentUser: user,
-
       currentUserId,
+
+      isSuperAdmin,
 
       canSwitchCompany: isSuperAdmin && companies.length > 1,
 
       selectCompany,
 
-      refreshCompanies: loadCompanies,
+      refreshCompanies,
     }),
     [
       companies,
+
       activeCompany,
       activeCompanyId,
+
       loading,
       error,
-      isSuperAdmin,
+
       user,
       currentUserId,
+
+      isSuperAdmin,
+
       selectCompany,
-      loadCompanies,
+      refreshCompanies,
     ],
   );
 

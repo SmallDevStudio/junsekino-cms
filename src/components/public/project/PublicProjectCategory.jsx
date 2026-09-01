@@ -1,7 +1,12 @@
 import PublicProjectBreadcrumbs from "./PublicProjectBreadcrumbs";
+
 import PublicProjectCard from "./PublicProjectCard";
 
-function getLocalizedValue(value, locale = "en") {
+function getLocalizedValue(
+  value,
+
+  locale = "en",
+) {
   if (!value) {
     return "";
   }
@@ -17,25 +22,30 @@ function getLocalizedValue(value, locale = "en") {
 
 export default function PublicProjectCategory({
   companySlug,
+
   category,
+
   projects = [],
+
   locale = "en",
 }) {
-  const categoryName = getLocalizedValue(category?.name, locale);
+  const categoryName = getLocalizedValue(
+    category?.name,
+
+    locale,
+  );
 
   return (
     <div
       className="
         w-full
-
+        bg-[var(--public-background)]
         px-6
         pb-16
-
+        text-[var(--public-foreground)]
         sm:px-8
-
         lg:px-12
         lg:pb-24
-
         xl:px-16
       "
     >
@@ -60,24 +70,19 @@ export default function PublicProjectCategory({
             flex
             items-center
             gap-5
-
             sm:mt-12
             sm:gap-7
-
             lg:mt-14
           "
         >
           <h1
             className="
               shrink-0
-
               text-[12px]
               font-medium
               uppercase
               tracking-[0.06em]
-
               text-[var(--public-primary)]
-
               sm:text-[13px]
             "
           >
@@ -88,37 +93,50 @@ export default function PublicProjectCategory({
             className="
               h-px
               flex-1
-              bg-black/10
+              bg-[var(--public-border)]
             "
           />
         </div>
 
-        <div
-          className="
-            mt-8
-
-            grid
-            grid-cols-1
-
-            gap-x-[clamp(2rem,6vw,6.5rem)]
-            gap-y-12
-
-            sm:grid-cols-2
-
-            lg:mt-10
-            lg:grid-cols-3
-            lg:gap-y-16
-          "
-        >
-          {projects.map((project) => (
-            <PublicProjectCard
-              key={project.id}
-              companySlug={companySlug}
-              project={project}
-              locale={locale}
-            />
-          ))}
-        </div>
+        {projects.length > 0 ? (
+          <div
+            className="
+              mt-8
+              grid
+              grid-cols-1
+              gap-x-[clamp(2rem,6vw,6.5rem)]
+              gap-y-12
+              sm:grid-cols-2
+              lg:mt-10
+              lg:grid-cols-3
+              lg:gap-y-16
+            "
+          >
+            {projects.map((project) => (
+              <PublicProjectCard
+                key={project.id}
+                companySlug={companySlug}
+                project={project}
+                locale={locale}
+              />
+            ))}
+          </div>
+        ) : (
+          <div
+            className="
+              flex
+              min-h-[360px]
+              items-center
+              justify-center
+              text-[10px]
+              uppercase
+              tracking-[0.08em]
+              text-[var(--public-muted-foreground)]
+            "
+          >
+            No projects available
+          </div>
+        )}
       </div>
     </div>
   );

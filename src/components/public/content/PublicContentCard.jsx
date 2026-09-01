@@ -1,18 +1,40 @@
 import Image from "next/image";
+
 import Link from "next/link";
 
 import { Play } from "lucide-react";
 
 import PublicContentEngagement from "./PublicContentEngagement";
+
 import PublicExpandableDescription from "./PublicExpandableDescription";
 
-function localized(value, locale) {
+function localized(
+  value,
+
+  locale,
+) {
+  if (!value) {
+    return "";
+  }
+
+  if (typeof value === "string") {
+    return value.trim();
+  }
+
   return (
     value?.[locale]?.trim() || value?.en?.trim() || value?.th?.trim() || ""
   );
 }
 
-function mediaUrl({ companySlug, mediaId }) {
+function mediaUrl({
+  companySlug,
+
+  mediaId,
+}) {
+  if (!companySlug || !mediaId) {
+    return null;
+  }
+
   return `/api/public/v1/companies/${encodeURIComponent(
     companySlug,
   )}/media/${encodeURIComponent(mediaId)}?variant=medium`;
@@ -31,7 +53,9 @@ function formatDate(value) {
 
   return new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
+
     month: "short",
+
     year: "numeric",
   }).format(date);
 }
@@ -51,14 +75,23 @@ function getProvider(item) {
 function getProviderLabel(provider) {
   const labels = {
     youtube: "YouTube",
+
     facebook: "Facebook",
+
     instagram: "Instagram",
+
     tiktok: "TikTok",
+
     vimeo: "Vimeo",
+
     article: "Article",
+
     publication: "Publication",
+
     video: "Video",
+
     embed: "Embed",
+
     other: "External",
   };
 
@@ -66,6 +99,12 @@ function getProviderLabel(provider) {
 }
 
 function getProviderBadgeClass(provider) {
+  const neutralClass = `
+    border-[var(--public-border)]
+    bg-[var(--public-surface)]
+    text-[var(--public-muted-foreground)]
+  `;
+
   const styles = {
     youtube: "border-[#ff0000]/20 bg-[#ff0000]/[0.07] text-[#d60000]",
 
@@ -73,19 +112,19 @@ function getProviderBadgeClass(provider) {
 
     instagram: "border-[#c13584]/20 bg-[#c13584]/[0.07] text-[#b52c79]",
 
-    tiktok: "border-black/15 bg-black/[0.05] text-black/70",
+    tiktok: neutralClass,
 
     vimeo: "border-[#1ab7ea]/25 bg-[#1ab7ea]/[0.08] text-[#129ac8]",
 
-    article: "border-black/10 bg-black/[0.035] text-black/55",
+    article: neutralClass,
 
-    publication: "border-black/10 bg-black/[0.035] text-black/55",
+    publication: neutralClass,
 
-    video: "border-black/10 bg-black/[0.035] text-black/55",
+    video: neutralClass,
 
-    embed: "border-black/10 bg-black/[0.035] text-black/55",
+    embed: neutralClass,
 
-    other: "border-black/10 bg-black/[0.035] text-black/55",
+    other: neutralClass,
   };
 
   return styles[provider] || styles.other;
@@ -93,14 +132,28 @@ function getProviderBadgeClass(provider) {
 
 export default function PublicContentCard({
   companySlug,
+
   item,
+
   locale = "en",
 }) {
   const title =
-    localized(item.title, locale) || item.source?.metadata?.title || "Untitled";
+    localized(
+      item.title,
+
+      locale,
+    ) ||
+    item.source?.metadata?.title ||
+    "Untitled";
 
   const excerpt =
-    localized(item.excerpt, locale) || item.source?.metadata?.description || "";
+    localized(
+      item.excerpt,
+
+      locale,
+    ) ||
+    item.source?.metadata?.description ||
+    "";
 
   const localImage = item.featuredImage?.mediaId
     ? mediaUrl({
@@ -132,20 +185,22 @@ export default function PublicContentCard({
       className="
         grid
         grid-cols-1
-
         gap-5
-
+        text-[var(--public-foreground)]
         md:grid-cols-[minmax(280px,420px)_minmax(0,1fr)]
         md:items-start
         md:gap-10
-
         lg:grid-cols-[minmax(320px,440px)_minmax(0,1fr)]
         lg:gap-[clamp(3rem,5vw,5.5rem)]
       "
     >
-      {/* THUMBNAIL */}
-
-      <Link href={href} className="group block">
+      <Link
+        href={href}
+        className="
+          group
+          block
+        "
+      >
         <div
           className="
             relative
@@ -170,11 +225,9 @@ export default function PublicContentCard({
               className="
                 select-none
                 object-cover
-
                 transition-transform
                 duration-500
                 ease-out
-
                 group-hover:scale-[1.015]
               "
             />
@@ -185,11 +238,10 @@ export default function PublicContentCard({
                 h-full
                 items-center
                 justify-center
-
                 text-[9px]
                 uppercase
                 tracking-[0.08em]
-                text-black/20
+                text-[var(--public-muted-foreground)]
               "
             >
               No Image
@@ -202,24 +254,19 @@ export default function PublicContentCard({
                 absolute
                 bottom-3
                 right-3
-
                 flex
                 h-8
                 w-8
                 items-center
                 justify-center
-
                 rounded-full
                 border
                 border-white/70
                 bg-black/20
-
                 text-white/90
                 backdrop-blur-[2px]
-
                 transition-all
                 duration-300
-
                 group-hover:scale-105
                 group-hover:bg-black/35
               "
@@ -230,8 +277,6 @@ export default function PublicContentCard({
         </div>
       </Link>
 
-      {/* INFORMATION */}
-
       <div
         className="
           flex
@@ -241,38 +286,27 @@ export default function PublicContentCard({
           justify-start
         "
       >
-        {/* TITLE */}
-
         <Link
           href={href}
           className="
             max-w-[720px]
-
             text-[16px]
             font-semibold
             leading-[1.4]
-
+            text-[var(--public-primary)]
             transition-opacity
             duration-200
-
             hover:opacity-65
-
             sm:text-[17px]
             lg:text-[18px]
           "
-          style={{
-            color: "var(--public-primary)",
-          }}
         >
           {title}
         </Link>
 
-        {/* PROVIDER + DATE */}
-
         <div
           className="
             mt-3
-
             flex
             flex-wrap
             items-center
@@ -283,18 +317,14 @@ export default function PublicContentCard({
             className={`
               inline-flex
               items-center
-
               rounded-full
               border
-
               px-2.5
               py-1
-
               text-[8px]
               font-medium
               uppercase
               tracking-[0.07em]
-
               ${getProviderBadgeClass(provider)}
             `}
           >
@@ -306,15 +336,13 @@ export default function PublicContentCard({
               className="
                 text-[9px]
                 tracking-[0.025em]
-                text-black/30
+                text-[var(--public-muted-foreground)]
               "
             >
               {createdDate}
             </span>
           )}
         </div>
-
-        {/* WEBSITE METRICS */}
 
         <div className="mt-3">
           <PublicContentEngagement
@@ -329,20 +357,15 @@ export default function PublicContentCard({
           />
         </div>
 
-        {/* DESCRIPTION */}
-
         {excerpt && (
           <PublicExpandableDescription
             lines={5}
             className="
               mt-4
-
               max-w-[680px]
-
               text-[11px]
               leading-[1.65]
-              text-black/55
-
+              text-[var(--public-muted-foreground)]
               sm:text-[12px]
             "
           >
@@ -350,28 +373,24 @@ export default function PublicContentCard({
           </PublicExpandableDescription>
         )}
 
-        {/* TAG */}
-
         {Array.isArray(item.tags) && item.tags.length > 0 && (
           <div
             className="
-              mt-4
-
-              flex
-              flex-wrap
-
-              gap-x-3
-              gap-y-1
-            "
+                mt-4
+                flex
+                flex-wrap
+                gap-x-3
+                gap-y-1
+              "
           >
             {item.tags.map((tag) => (
               <span
                 key={tag}
                 className="
-                  text-[9px]
-                  tracking-[0.03em]
-                  text-black/25
-                "
+                      text-[9px]
+                      tracking-[0.03em]
+                      text-[var(--public-muted-foreground)]
+                    "
               >
                 #{tag}
               </span>
