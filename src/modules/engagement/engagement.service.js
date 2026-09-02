@@ -179,6 +179,29 @@ export async function viewContent({
     contentId,
   });
 
+  /*
+   * A passive page view is optional Analytics.
+   * Return the current aggregate counters without
+   * recording a view when consent is unavailable.
+   */
+  if (!analyticsConsent || !visitorHash) {
+    const stats = await getEngagementStats({
+      companyId,
+
+      contentType,
+
+      contentId,
+    });
+
+    return {
+      ...stats,
+
+      counted: false,
+
+      unique: false,
+    };
+  }
+
   const dateKey = getBangkokDateKey();
 
   const result = await incrementViewRecord({
@@ -187,7 +210,7 @@ export async function viewContent({
     contentId,
     dateKey,
 
-    visitorHash: analyticsConsent ? visitorHash : null,
+    visitorHash,
 
     countUnique: analyticsConsent,
   });
@@ -200,6 +223,8 @@ export async function viewContent({
 
   return {
     ...stats,
+
+    counted: result.counted,
 
     unique: result.unique,
   };

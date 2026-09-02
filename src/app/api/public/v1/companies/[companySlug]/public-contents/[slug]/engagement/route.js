@@ -5,7 +5,6 @@ import { companySlugSchema } from "@/modules/company/company-slug.schema";
 import { resolvePublicCompany } from "@/modules/company/company-slug.service";
 
 import {
-  getPublicContentEngagement,
   recordPublicContentShare,
   recordPublicContentView,
   togglePublicContentLike,
@@ -13,19 +12,12 @@ import {
 
 import {
   attachVisitorCookie,
+  getConsent,
   hashVisitorId,
   resolveVisitor,
 } from "@/lib/visitor/visitor";
 
-import { getConsentFromRequest } from "@/lib/visitor/consent";
-
 export const dynamic = "force-dynamic";
-
-/*
- * =========================================================
- * HELPERS
- * =========================================================
- */
 
 function normalizeContentSlug(value) {
   const slug = String(value || "")
@@ -49,40 +41,8 @@ function normalizeAction(value) {
     .trim()
     .toLowerCase();
 
-  if (action === "view" || action === "like" || action === "share") {
-    return action;
-  }
-
-  return null;
+  return ["view", "like", "share"].includes(action) ? action : null;
 }
-
-/*
- * =========================================================
- * POST
- *
- * VIEW
- *
- * {
- *   action: "view"
- * }
- *
- * LIKE
- *
- * {
- *   action: "like"
- * }
- *
- * SHARE
- *
- * {
- *   action: "share",
- *   channel: "facebook"
- * }
- *
- * visitorId is intentionally not accepted
- * from the request body.
- * =========================================================
- */
 
 export async function POST(request, context) {
   try {
@@ -96,7 +56,6 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
-
           message: "Invalid public content request.",
         },
         {
@@ -113,7 +72,6 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
-
           message: "Invalid request body.",
         },
         {
@@ -128,7 +86,6 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
-
           message: "Invalid engagement request.",
         },
         {
@@ -137,15 +94,12 @@ export async function POST(request, context) {
       );
     }
 
-    const companySlug = companyValidation.data;
-
-    const resolved = await resolvePublicCompany(companySlug);
+    const resolved = await resolvePublicCompany(companyValidation.data);
 
     if (!resolved) {
       return NextResponse.json(
         {
           success: false,
-
           message: "Company not found.",
         },
         {
@@ -157,74 +111,36 @@ export async function POST(request, context) {
     if (resolved.redirect) {
       return NextResponse.json({
         success: true,
-
         redirect: true,
-
         redirectTo: resolved.redirectTo,
       });
     }
 
     const companyId = resolved.company.id;
 
-    /*
-     * Visitor identity is created and validated
-     * exclusively on the server.
-     *
-     * The raw visitor ID is never stored in
-     * Firestore.
-     */
     const visitor = resolveVisitor(request);
 
-    const visitorHash = hashVisitorId(visitor.visitorId);
+    const visitorHash = hashVisitorId(visitor.visitorId, companyId);
 
-    const consent = getConsentFromRequest({
-      request,
+    const consent = getConsent(request, companyId);
 
-      companyId,
-    });
+    const analyticsConsent = consent.analytics === true;
 
     let result;
 
-    /*
-     * A passive page view is analytics.
-     *
-     * Without Analytics consent, return the
-     * current aggregate counters without
-     * recording a view.
-     */
     if (action === "view") {
-      if (consent.analytics === true) {
-        result = await recordPublicContentView({
-          companyId,
-
-          slug,
-
-          visitorHash,
-        });
-      } else {
-        result = await getPublicContentEngagement({
-          companyId,
-
-          slug,
-
-          visitorHash,
-        });
-      }
+      result = await recordPublicContentView({
+        companyId,
+        slug,
+        visitorHash: analyticsConsent ? visitorHash : null,
+        analyticsConsent,
+      });
     }
 
-    /*
-     * Like and Share are actions expressly
-     * requested by the visitor.
-     *
-     * They remain available when optional
-     * Analytics cookies are rejected.
-     */
     if (action === "like") {
       result = await togglePublicContentLike({
         companyId,
-
         slug,
-
         visitorHash,
       });
     }
@@ -232,29 +148,31 @@ export async function POST(request, context) {
     if (action === "share") {
       result = await recordPublicContentShare({
         companyId,
-
         slug,
-
         visitorHash,
-
         channel: body?.channel,
       });
     }
 
     const response = NextResponse.json({
       success: true,
-
       redirect: false,
-
       data: result,
     });
 
     response.headers.set("Cache-Control", "no-store");
 
-    if (visitor.isNew) {
+    /*
+     * A passive view may create the cookie only after Analytics consent.
+     * A like is an explicit user action and needs the identifier to preserve
+     * its selected state. Sharing does not require a persistent identifier.
+     */
+    if (
+      visitor.isNew &&
+      ((action === "view" && analyticsConsent) || action === "like")
+    ) {
       attachVisitorCookie({
         response,
-
         visitorId: visitor.visitorId,
       });
     }
@@ -263,41 +181,23 @@ export async function POST(request, context) {
   } catch (error) {
     console.error("Public content engagement error:", error);
 
-    if (error.message === "PUBLIC_CONTENT_NOT_FOUND") {
+    const errors = {
+      PUBLIC_CONTENT_NOT_FOUND: [404, "Public content not found."],
+      ENGAGEMENT_CONTENT_NOT_FOUND: [404, "Public content not found."],
+      INVALID_VISITOR_HASH: [400, "Invalid visitor."],
+      INVALID_SHARE_CHANNEL: [400, "Invalid share channel."],
+    };
+
+    const known = errors[error.message];
+
+    if (known) {
       return NextResponse.json(
         {
           success: false,
-
-          message: "Public content not found.",
+          message: known[1],
         },
         {
-          status: 404,
-        },
-      );
-    }
-
-    if (error.message === "INVALID_VISITOR_HASH") {
-      return NextResponse.json(
-        {
-          success: false,
-
-          message: "Invalid visitor.",
-        },
-        {
-          status: 400,
-        },
-      );
-    }
-
-    if (error.message === "INVALID_SHARE_CHANNEL") {
-      return NextResponse.json(
-        {
-          success: false,
-
-          message: "Invalid share channel.",
-        },
-        {
-          status: 400,
+          status: known[0],
         },
       );
     }
@@ -305,7 +205,6 @@ export async function POST(request, context) {
     return NextResponse.json(
       {
         success: false,
-
         message: "Unable to update content engagement.",
       },
       {

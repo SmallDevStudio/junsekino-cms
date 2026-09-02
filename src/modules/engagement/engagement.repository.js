@@ -8,6 +8,26 @@ import { adminDb } from "@/lib/firebase/admin";
 
 const VIEW_WINDOW_MS = 30 * 60 * 1000;
 
+const RAW_ANALYTICS_RETENTION_DAYS = 90;
+
+const AGGREGATE_ANALYTICS_RETENTION_MONTHS = 25;
+
+function createRawAnalyticsExpiration() {
+  return new Date(
+    Date.now() + RAW_ANALYTICS_RETENTION_DAYS * 24 * 60 * 60 * 1000,
+  );
+}
+
+function createAggregateAnalyticsExpiration() {
+  const expiration = new Date();
+
+  expiration.setUTCMonth(
+    expiration.getUTCMonth() + AGGREGATE_ANALYTICS_RETENTION_MONTHS,
+  );
+
+  return expiration;
+}
+
 function getStatsRef({ companyId, contentType, contentId }) {
   return adminDb
     .collection("companies")
@@ -193,6 +213,8 @@ export async function likeContentRecord({
 
         likes: FieldValue.increment(1),
 
+        expiresAt: createAggregateAnalyticsExpiration(),
+
         updatedAt: FieldValue.serverTimestamp(),
       },
       {
@@ -276,6 +298,8 @@ export async function unlikeContentRecord({
 
         likes: Math.max(dailyLikes - 1, 0),
 
+        expiresAt: createAggregateAnalyticsExpiration(),
+
         updatedAt: FieldValue.serverTimestamp(),
       },
       {
@@ -344,6 +368,8 @@ export async function incrementShareRecord({
 
       shares: FieldValue.increment(1),
 
+      expiresAt: createAggregateAnalyticsExpiration(),
+
       updatedAt: FieldValue.serverTimestamp(),
     },
     {
@@ -357,6 +383,8 @@ export async function incrementShareRecord({
     contentType,
     contentId,
     channel,
+
+    expiresAt: createRawAnalyticsExpiration(),
 
     createdAt: FieldValue.serverTimestamp(),
   });
@@ -472,6 +500,8 @@ export async function incrementViewRecord({
 
       views: FieldValue.increment(1),
 
+      expiresAt: createAggregateAnalyticsExpiration(),
+
       updatedAt: FieldValue.serverTimestamp(),
     };
 
@@ -490,6 +520,8 @@ export async function incrementViewRecord({
          * Analytics consent.
          */
         visitorHash,
+
+        expiresAt: createRawAnalyticsExpiration(),
 
         createdAt: FieldValue.serverTimestamp(),
       });
