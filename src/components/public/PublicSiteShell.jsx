@@ -2,7 +2,19 @@ import PublicHeader from "@/components/public/PublicHeader";
 
 import PublicThemeProvider from "@/components/public/PublicThemeProvider";
 
+import { ConsentProvider } from "@/components/privacy/ConsentProvider";
+
+import CookieBanner from "@/components/privacy/CookieBanner";
+
+import CookiePreferences from "@/components/privacy/CookiePreferences";
+
 import { DEFAULT_COMPANY_NAVIGATION } from "@/constants/company-defaults";
+
+/*
+ * =========================================================
+ * BRAND
+ * =========================================================
+ */
 
 function resolveBrandSuffix(company) {
   const value = company?.shortName || company?.name || "";
@@ -27,6 +39,22 @@ function getBrandFallback(company) {
   return "#000000";
 }
 
+/*
+ * =========================================================
+ * LOCALE
+ * =========================================================
+ */
+
+function resolvePublicLocale(company) {
+  return company?.defaultLocale === "th" ? "th" : "en";
+}
+
+/*
+ * =========================================================
+ * NAVIGATION
+ * =========================================================
+ */
+
 function resolveNavigation(settings) {
   const navigation = settings?.navigation;
 
@@ -41,6 +69,12 @@ function resolveNavigation(settings) {
   return DEFAULT_COMPANY_NAVIGATION;
 }
 
+/*
+ * =========================================================
+ * SOCIAL
+ * =========================================================
+ */
+
 function resolveSocial(company, settings) {
   return {
     ...(settings?.social || {}),
@@ -48,6 +82,12 @@ function resolveSocial(company, settings) {
     ...(company?.social || {}),
   };
 }
+
+/*
+ * =========================================================
+ * THEME
+ * =========================================================
+ */
 
 function resolvePublicTheme(company, settings) {
   const companyColors = company?.colors || {};
@@ -163,6 +203,12 @@ function resolvePublicTheme(company, settings) {
   };
 }
 
+/*
+ * =========================================================
+ * PUBLIC SITE SHELL
+ * =========================================================
+ */
+
 export default function PublicSiteShell({
   company,
 
@@ -182,6 +228,8 @@ export default function PublicSiteShell({
 
   const social = resolveSocial(company, settings);
 
+  const locale = resolvePublicLocale(company);
+
   return (
     <PublicThemeProvider
       companySlug={companySlug}
@@ -193,17 +241,23 @@ export default function PublicSiteShell({
       light={theme.light}
       dark={theme.dark}
     >
-      <PublicHeader
-        company={company}
-        companySlug={companySlug}
-        companies={companies}
-        navigation={navigation}
-        projectCategories={projectCategories}
-        social={social}
-        primaryColor={theme.primary}
-      />
+      <ConsentProvider companySlug={companySlug}>
+        <PublicHeader
+          company={company}
+          companySlug={companySlug}
+          companies={companies}
+          navigation={navigation}
+          projectCategories={projectCategories}
+          social={social}
+          primaryColor={theme.primary}
+        />
 
-      <main className="flex min-h-0 flex-1 flex-col">{children}</main>
+        <main className="flex min-h-0 flex-1 flex-col">{children}</main>
+
+        <CookieBanner locale={locale} />
+
+        <CookiePreferences locale={locale} />
+      </ConsentProvider>
     </PublicThemeProvider>
   );
 }

@@ -11,15 +11,22 @@ import {
   saveVisitorConsent,
 } from "@/modules/legal/legal.service";
 
+import { getCompanyPrivacySettings } from "@/modules/legal/privacy-settings.service";
+
 import {
   attachVisitorCookie,
   hashVisitorId,
   resolveVisitor,
 } from "@/lib/visitor/visitor";
 
-import { decodeConsentCookie, setConsentCookie } from "@/lib/visitor/consent";
+import {
+  decodeConsentCookie,
+  getConsentCookieName,
+  getDefaultConsent,
+  setConsentCookie,
+} from "@/lib/visitor/consent";
 
-import { CONSENT_COOKIE_NAME } from "@/constants/legal";
+import { isTrustedOrigin } from "@/lib/auth/origin";
 
 async function resolveCompany(context) {
   const params = await context.params;
@@ -65,42 +72,66 @@ export async function GET(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Company not found.",
         },
+
         {
           status: 404,
         },
       );
     }
 
-    const legal = await getPublicLegalDocuments(company.id);
+    const [legal, privacySettings] = await Promise.all([
+      getPublicLegalDocuments(company.id),
+
+      getCompanyPrivacySettings(company.id),
+    ]);
 
     const currentVersions = getVersionMap(legal);
 
-    const raw = request.cookies.get(CONSENT_COOKIE_NAME)?.value;
+    const currentConsentVersion =
+      privacySettings.consentManagement?.version || 1;
 
-    const existing = decodeConsentCookie(raw);
+    const cookieName = getConsentCookieName(company.id);
 
-    const versionsMatch = isSameVersion(
-      existing?.legalVersions,
+    const raw = request.cookies.get(cookieName)?.value;
 
-      currentVersions,
-    );
+    const existing = decodeConsentCookie(raw, company.id);
 
-    const requireReConsent = Boolean(
+    const versionsMatch =
+      Boolean(existing) &&
+      isSameVersion(
+        existing.legalVersions,
+
+        currentVersions,
+      );
+
+    const consentVersionMatches =
+      Boolean(existing) && existing.consentVersion === currentConsentVersion;
+
+    const consentEnabled = privacySettings.consentManagement?.enabled !== false;
+
+    const renewOnPolicyChange =
+      privacySettings.consentManagement?.renewOnPolicyChange !== false;
+
+    const policyRequiresConsent = Boolean(
       legal.privacy?.requireReConsent || legal.cookies?.requireReConsent,
     );
+
+    const policyChanged =
+      !versionsMatch && (renewOnPolicyChange || policyRequiresConsent);
+
+    const requireConsent =
+      consentEnabled && (!existing || !consentVersionMatches || policyChanged);
 
     return NextResponse.json({
       success: true,
 
       data: {
-        consent: existing?.consent || {
-          necessary: true,
-          analytics: false,
-          functional: false,
-          marketing: false,
-        },
+        consent: existing?.consent || getDefaultConsent(),
+
+        consentVersion: currentConsentVersion,
 
         legalVersions: currentVersions,
 
@@ -108,18 +139,25 @@ export async function GET(request, context) {
 
         versionsMatch,
 
-        requireConsent:
-          !existing || !versionsMatch || (requireReConsent && !versionsMatch),
+        consentVersionMatches,
+
+        requireConsent,
       },
     });
   } catch (error) {
-    console.error("Get consent status error:", error);
+    console.error(
+      "Get consent status error:",
+
+      error,
+    );
 
     return NextResponse.json(
       {
         success: false,
+
         message: "Unable to retrieve consent status.",
       },
+
       {
         status: 500,
       },
@@ -129,21 +167,53 @@ export async function GET(request, context) {
 
 export async function POST(request, context) {
   try {
+    if (!isTrustedOrigin(request)) {
+      return NextResponse.json(
+        {
+          success: false,
+
+          message: "Invalid request origin.",
+        },
+
+        {
+          status: 403,
+        },
+      );
+    }
+
     const company = await resolveCompany(context);
 
     if (!company) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Company not found.",
         },
+
         {
           status: 404,
         },
       );
     }
 
-    const body = await request.json();
+    let body;
+
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        {
+          success: false,
+
+          message: "Invalid request body.",
+        },
+
+        {
+          status: 400,
+        },
+      );
+    }
 
     const validation = saveConsentSchema.safeParse(body);
 
@@ -156,15 +226,36 @@ export async function POST(request, context) {
 
           errors: validation.error.flatten().fieldErrors,
         },
+
         {
           status: 400,
         },
       );
     }
 
+    const privacySettings = await getCompanyPrivacySettings(company.id);
+
+    if (privacySettings.consentManagement?.enabled === false) {
+      return NextResponse.json(
+        {
+          success: false,
+
+          message: "Consent management is disabled.",
+        },
+
+        {
+          status: 409,
+        },
+      );
+    }
+
     const visitor = resolveVisitor(request);
 
-    const visitorHash = hashVisitorId(visitor.visitorId);
+    const visitorHash = hashVisitorId(
+      visitor.visitorId,
+
+      company.id,
+    );
 
     const result = await saveVisitorConsent({
       companyId: company.id,
@@ -179,7 +270,11 @@ export async function POST(request, context) {
     });
 
     const cookieData = {
-      version: 1,
+      version: 2,
+
+      companyId: company.id,
+
+      consentVersion: result.consentVersion,
 
       consent: result.consent,
 
@@ -190,6 +285,7 @@ export async function POST(request, context) {
 
     const response = NextResponse.json({
       success: true,
+
       data: cookieData,
     });
 
@@ -203,18 +299,29 @@ export async function POST(request, context) {
 
     setConsentCookie({
       response,
+
+      companyId: company.id,
+
       data: cookieData,
+
+      maxAgeDays: privacySettings.consentManagement?.cookieMaxAgeDays,
     });
 
     return response;
   } catch (error) {
-    console.error("Save consent error:", error);
+    console.error(
+      "Save consent error:",
+
+      error,
+    );
 
     return NextResponse.json(
       {
         success: false,
+
         message: "Unable to save consent.",
       },
+
       {
         status: 500,
       },

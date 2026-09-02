@@ -14,7 +14,12 @@ import { getMediaBucket } from "@/lib/firebase/storage";
 import {
   createAttachmentRef,
   createPendingAttachment,
+  deleteAttachmentRecord,
   getAttachmentById,
+  listAttachmentsBySubmissionId,
+  listExpiredUnattachedAttachments,
+  markAttachmentCleanupFailed,
+  markAttachmentCleanupStarted,
   markAttachmentFailed,
   markAttachmentReady,
 } from "./form-attachment.repository";
@@ -30,7 +35,11 @@ function sanitizeFileName(fileName) {
     path
       .basename(fileName, extension)
       .normalize("NFKD")
-      .replace(/[^a-zA-Z0-9-_]+/g, "-")
+      .replace(
+        /[^a-zA-Z0-9-_]+/g,
+
+        "-",
+      )
       .replace(/^-+|-+$/g, "")
       .slice(0, 100) || "attachment";
 
@@ -77,6 +86,44 @@ function validateFormField({ form, fieldId, mimeType, size }) {
   return field;
 }
 
+async function deleteStorageObject(storagePath) {
+  if (!storagePath) {
+    return {
+      deleted: false,
+
+      missing: true,
+    };
+  }
+
+  const file = getMediaBucket().file(storagePath);
+
+  try {
+    await file.delete({
+      ignoreNotFound: true,
+    });
+
+    return {
+      deleted: true,
+
+      missing: false,
+    };
+  } catch (error) {
+    /*
+     * Some Firebase Storage versions do not
+     * support ignoreNotFound.
+     */
+    if (error.code === 404 || error.code === "404") {
+      return {
+        deleted: false,
+
+        missing: true,
+      };
+    }
+
+    throw error;
+  }
+}
+
 export async function createPublicFormAttachmentUpload({
   companyId,
   formSlug,
@@ -89,6 +136,7 @@ export async function createPublicFormAttachmentUpload({
 
   const form = await getFormBySlug({
     companyId,
+
     slug: formSlug,
   });
 
@@ -98,6 +146,7 @@ export async function createPublicFormAttachmentUpload({
 
   validateFormField({
     form,
+
     fieldId: input.fieldId,
 
     mimeType: input.mimeType,
@@ -111,7 +160,10 @@ export async function createPublicFormAttachmentUpload({
 
   const safeFileName = sanitizeFileName(input.fileName);
 
-  const storagePath = `companies/${companyId}/private-form-files/${form.id}/${attachmentId}/${safeFileName}`;
+  const storagePath =
+    `companies/${companyId}` +
+    `/private-form-files/${form.id}` +
+    `/${attachmentId}/${safeFileName}`;
 
   const file = getMediaBucket().file(storagePath);
 
@@ -127,6 +179,7 @@ export async function createPublicFormAttachmentUpload({
 
   const attachment = await createPendingAttachment({
     companyId,
+
     attachmentId,
 
     data: {
@@ -181,6 +234,7 @@ export async function finalizePublicFormAttachment({
 }) {
   const attachment = await getAttachmentById({
     companyId,
+
     attachmentId,
   });
 
@@ -232,6 +286,7 @@ export async function finalizePublicFormAttachment({
 
     const ready = await markAttachmentReady({
       companyId,
+
       attachmentId,
 
       data: {
@@ -245,6 +300,7 @@ export async function finalizePublicFormAttachment({
   } catch (error) {
     await markAttachmentFailed({
       companyId,
+
       attachmentId,
 
       reason: error.message || "FORM_ATTACHMENT_FINALIZE_FAILED",
@@ -260,6 +316,7 @@ export async function createPrivateAttachmentReadUrl({
 }) {
   const attachment = await getAttachmentById({
     companyId,
+
     attachmentId,
   });
 
@@ -290,4 +347,131 @@ export async function createPrivateAttachmentReadUrl({
 
     expiresIn: FORM_ATTACHMENT_READ_EXPIRES_MS,
   };
+}
+
+/*
+ * =========================================================
+ * DELETE ONE ATTACHMENT
+ * =========================================================
+ */
+
+export async function deleteFormAttachment({ companyId, attachment }) {
+  if (!attachment?.id) {
+    throw new Error("FORM_ATTACHMENT_NOT_FOUND");
+  }
+
+  await markAttachmentCleanupStarted({
+    companyId,
+
+    attachmentId: attachment.id,
+  });
+
+  try {
+    await deleteStorageObject(attachment.storagePath);
+
+    await deleteAttachmentRecord({
+      companyId,
+
+      attachmentId: attachment.id,
+    });
+
+    return {
+      id: attachment.id,
+
+      deleted: true,
+    };
+  } catch (error) {
+    await markAttachmentCleanupFailed({
+      companyId,
+
+      attachmentId: attachment.id,
+
+      error: error.message || "ATTACHMENT_CLEANUP_FAILED",
+    });
+
+    throw error;
+  }
+}
+
+/*
+ * =========================================================
+ * DELETE SUBMISSION ATTACHMENTS
+ * =========================================================
+ */
+
+export async function deleteSubmissionAttachments({ companyId, submissionId }) {
+  const attachments = await listAttachmentsBySubmissionId({
+    companyId,
+
+    submissionId,
+  });
+
+  const deleted = [];
+
+  for (const attachment of attachments) {
+    await deleteFormAttachment({
+      companyId,
+
+      attachment,
+    });
+
+    deleted.push(attachment.id);
+  }
+
+  return {
+    deleted,
+
+    count: deleted.length,
+  };
+}
+
+/*
+ * =========================================================
+ * CLEAN EXPIRED UNATTACHED FILES
+ * =========================================================
+ */
+
+export async function cleanupExpiredFormAttachments({
+  companyId,
+  limit = 100,
+}) {
+  const attachments = await listExpiredUnattachedAttachments({
+    companyId,
+
+    limit,
+  });
+
+  const result = {
+    processed: 0,
+
+    deleted: 0,
+
+    failed: 0,
+
+    errors: [],
+  };
+
+  for (const attachment of attachments) {
+    result.processed += 1;
+
+    try {
+      await deleteFormAttachment({
+        companyId,
+
+        attachment,
+      });
+
+      result.deleted += 1;
+    } catch (error) {
+      result.failed += 1;
+
+      result.errors.push({
+        attachmentId: attachment.id,
+
+        message: error.message || "ATTACHMENT_CLEANUP_FAILED",
+      });
+    }
+  }
+
+  return result;
 }

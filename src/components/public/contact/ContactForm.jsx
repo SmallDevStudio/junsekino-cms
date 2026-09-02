@@ -22,6 +22,54 @@ function localized(
   return value?.[locale] || value?.en || value?.th || fallback;
 }
 
+const LEGAL_DOCUMENT_LABELS = {
+  privacy: {
+    en: "Read Privacy Notice",
+
+    th: "อ่านประกาศความเป็นส่วนตัว",
+  },
+
+  cookies: {
+    en: "Read Cookie Policy",
+
+    th: "อ่านนโยบายคุกกี้",
+  },
+
+  terms: {
+    en: "Read Website Terms of Use",
+
+    th: "อ่านข้อกำหนดการใช้งานเว็บไซต์",
+  },
+};
+
+function createLegalDocumentHref({
+  companySlug,
+
+  legalDocument,
+
+  locale,
+}) {
+  if (!companySlug || !LEGAL_DOCUMENT_LABELS[legalDocument]) {
+    return null;
+  }
+
+  const query = locale === "th" ? "?lang=th" : "";
+
+  return `/${encodeURIComponent(
+    companySlug,
+  )}/legal/${encodeURIComponent(legalDocument)}${query}`;
+}
+
+function getLegalDocumentLabel(legalDocument, locale) {
+  const labels = LEGAL_DOCUMENT_LABELS[legalDocument];
+
+  if (!labels) {
+    return null;
+  }
+
+  return labels[locale] || labels.en;
+}
+
 function createInitialValues(fields) {
   const result = {};
 
@@ -122,7 +170,7 @@ function autoComplete(
     return "tel";
   }
 
-  if (/name|surname|ชื่อ|นามสกุล/i.test(label)) {
+  if (/name|surname|เธเธทเนเธญ|เธเธฒเธกเธชเธเธธเธฅ/i.test(label)) {
     return "name";
   }
 
@@ -225,8 +273,8 @@ export default function ContactForm({
         nextErrors[field.id] =
           locale === "th"
             ? booleanField
-              ? "กรุณายอมรับหรือเลือกข้อมูลในช่องนี้"
-              : "กรุณากรอกข้อมูล"
+              ? "เธเธฃเธธเธ“เธฒเธขเธญเธกเธฃเธฑเธเธซเธฃเธทเธญเน€เธฅเธทเธญเธเธเนเธญเธกเธนเธฅเนเธเธเนเธญเธเธเธตเน"
+              : "เธเธฃเธธเธ“เธฒเธเธฃเธญเธเธเนเธญเธกเธนเธฅ"
             : booleanField
               ? "Please accept or select this field."
               : "This field is required.";
@@ -241,7 +289,7 @@ export default function ContactForm({
       ) {
         nextErrors[field.id] =
           locale === "th"
-            ? "กรุณากรอกอีเมลให้ถูกต้อง"
+            ? "เธเธฃเธธเธ“เธฒเธเธฃเธญเธเธญเธตเน€เธกเธฅเนเธซเนเธ–เธนเธเธ•เนเธญเธ"
             : "Enter a valid email address.";
       }
     }
@@ -308,14 +356,16 @@ export default function ContactForm({
         if (payload?.error?.fieldId) {
           setFieldErrors({
             [payload.error.fieldId]:
-              locale === "th" ? "ข้อมูลไม่ถูกต้อง" : "Invalid value.",
+              locale === "th"
+                ? "เธเนเธญเธกเธนเธฅเนเธกเนเธ–เธนเธเธ•เนเธญเธ"
+                : "Invalid value.",
           });
         }
 
         throw new Error(
           payload?.message ||
             (locale === "th"
-              ? "ไม่สามารถส่งข้อมูลได้"
+              ? "เนเธกเนเธชเธฒเธกเธฒเธฃเธ–เธชเนเธเธเนเธญเธกเธนเธฅเนเธ”เน"
               : "Unable to submit form."),
         );
       }
@@ -329,7 +379,7 @@ export default function ContactForm({
       setError(
         submitError?.message ||
           (locale === "th"
-            ? "ไม่สามารถส่งข้อมูลได้"
+            ? "เนเธกเนเธชเธฒเธกเธฒเธฃเธ–เธชเนเธเธเนเธญเธกเธนเธฅเนเธ”เน"
             : "Unable to submit form."),
       );
     } finally {
@@ -547,6 +597,22 @@ export default function ContactForm({
               : undefined;
 
           if (field.type === "consent") {
+            const legalDocument = field.consent?.legalDocument;
+
+            const legalHref = createLegalDocumentHref({
+              companySlug,
+
+              legalDocument,
+
+              locale,
+            });
+
+            const legalLabel = getLegalDocumentLabel(
+              legalDocument,
+
+              locale,
+            );
+
             return (
               <div key={field.id} className={widthClass}>
                 <label
@@ -603,6 +669,38 @@ export default function ContactForm({
                     )}
                   </span>
                 </label>
+
+                {legalHref && legalLabel && (
+                  <a
+                    href={legalHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="
+                      ml-[26px]
+                      mt-1.5
+                      inline-flex
+
+                      text-[10px]
+                      font-medium
+
+                      text-[var(--public-primary)]
+
+                      underline
+                      decoration-[var(--public-border)]
+                      underline-offset-4
+
+                      transition-colors
+
+                      hover:decoration-[var(--public-primary)]
+
+                      focus-visible:outline-2
+                      focus-visible:outline-offset-2
+                      focus-visible:outline-[var(--public-primary)]
+                    "
+                  >
+                    {legalLabel}
+                  </a>
+                )}
 
                 {helpText && !hasError && (
                   <p
@@ -967,7 +1065,7 @@ export default function ContactForm({
                     h-[38px]
                   `}
                 >
-                  <option value="">{placeholder || "—"}</option>
+                  <option value="">{placeholder || "โ€”"}</option>
 
                   {(field.options || []).map((option) => (
                     <option key={option.value} value={option.value}>
@@ -1103,7 +1201,7 @@ export default function ContactForm({
 
             locale,
 
-            locale === "th" ? "ส่ง" : "Send",
+            locale === "th" ? "เธชเนเธ" : "Send",
           )}
         </button>
       </div>

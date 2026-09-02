@@ -3,10 +3,11 @@ import "server-only";
 import crypto from "node:crypto";
 
 import {
-  CONSENT_COOKIE_NAME,
   VISITOR_COOKIE_MAX_AGE,
   VISITOR_COOKIE_NAME,
 } from "@/constants/engagement";
+
+import { getConsentFromRequest } from "@/lib/visitor/consent";
 
 function isValidVisitorId(value) {
   if (!value) {
@@ -36,60 +37,88 @@ export function resolveVisitor(request) {
   };
 }
 
-export function hashVisitorId(visitorId) {
+export function hashVisitorId(
+  visitorId,
+
+  scope = "platform",
+) {
   const secret = process.env.VISITOR_HASH_SECRET;
 
   if (!secret) {
     throw new Error("VISITOR_HASH_SECRET is not configured.");
   }
 
-  return crypto.createHmac("sha256", secret).update(visitorId).digest("hex");
+  /*
+   * Scope prevents the same visitor hash from
+   * being correlated across different companies.
+   */
+  return crypto
+    .createHmac("sha256", secret)
+    .update(`${scope}:${visitorId}`)
+    .digest("hex");
+}
+
+export function hashVisitorTechnicalValue(
+  value,
+
+  scope = "platform",
+) {
+  if (!value) {
+    return null;
+  }
+
+  const secret = process.env.VISITOR_HASH_SECRET;
+
+  if (!secret) {
+    throw new Error("VISITOR_HASH_SECRET is not configured.");
+  }
+
+  return crypto
+    .createHmac("sha256", secret)
+    .update(`${scope}:${String(value)}`)
+    .digest("hex");
 }
 
 export function attachVisitorCookie({ response, visitorId }) {
-  response.cookies.set(VISITOR_COOKIE_NAME, visitorId, {
-    httpOnly: true,
+  response.cookies.set(
+    VISITOR_COOKIE_NAME,
 
-    secure: process.env.NODE_ENV === "production",
+    visitorId,
 
-    sameSite: "lax",
+    {
+      httpOnly: true,
 
-    path: "/",
+      secure: process.env.NODE_ENV === "production",
 
-    maxAge: VISITOR_COOKIE_MAX_AGE,
-  });
+      sameSite: "lax",
+
+      path: "/",
+
+      maxAge: VISITOR_COOKIE_MAX_AGE,
+
+      priority: "high",
+    },
+  );
 
   return response;
 }
 
-export function getConsent(request) {
-  const raw = request.cookies.get(CONSENT_COOKIE_NAME)?.value;
-
-  if (!raw) {
+export function getConsent(request, companyId) {
+  if (!companyId) {
     return {
       necessary: true,
+
       analytics: false,
+
+      functional: false,
+
       marketing: false,
     };
   }
 
-  try {
-    const decoded = decodeURIComponent(raw);
+  return getConsentFromRequest({
+    request,
 
-    const value = JSON.parse(decoded);
-
-    return {
-      necessary: true,
-
-      analytics: value.analytics === true,
-
-      marketing: value.marketing === true,
-    };
-  } catch {
-    return {
-      necessary: true,
-      analytics: false,
-      marketing: false,
-    };
-  }
+    companyId,
+  });
 }

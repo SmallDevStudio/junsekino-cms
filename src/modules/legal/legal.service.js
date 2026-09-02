@@ -1,6 +1,7 @@
 import "server-only";
 
 import {
+  createConsentRecord,
   createLegalVersionRecord,
   getActiveLegalDocuments,
   getActiveLegalVersion,
@@ -8,12 +9,43 @@ import {
   getLegalVersionById,
   listLegalVersions,
   publishLegalVersionRecord,
-  createConsentRecord,
 } from "./legal.repository";
+
+import { hashVisitorTechnicalValue } from "@/lib/visitor/visitor";
+
+import { getCompanyPrivacySettings } from "@/modules/legal/privacy-settings.service";
 
 import { serializeFirestoreDocument } from "@/utils/firestore";
 
 import { createAuditLogSafe } from "@/modules/audit/audit.service";
+
+function resolveConsentDecision(consent) {
+  const optionalValues = [
+    consent.analytics,
+
+    consent.functional,
+
+    consent.marketing,
+  ];
+
+  if (optionalValues.every((value) => value === true)) {
+    return "accepted_all";
+  }
+
+  if (optionalValues.every((value) => value !== true)) {
+    return "necessary_only";
+  }
+
+  return "customized";
+}
+
+function createExpirationDate(days) {
+  const safeDays = Number.isInteger(days)
+    ? Math.max(30, Math.min(3650, days))
+    : 730;
+
+  return new Date(Date.now() + safeDays * 24 * 60 * 60 * 1000);
+}
 
 export async function createLegalVersion({
   companyId,
@@ -30,6 +62,7 @@ export async function createLegalVersion({
 
     changeSummary: input.changeSummary || {
       th: "",
+
       en: "",
     },
 
@@ -48,6 +81,7 @@ export async function createLegalVersion({
 
   const record = await createLegalVersionRecord({
     companyId,
+
     data,
 
     userId: currentUser.uid,
@@ -81,6 +115,7 @@ export async function createLegalVersion({
 export async function getLegalVersions({ companyId, type }) {
   const items = await listLegalVersions({
     companyId,
+
     type,
   });
 
@@ -95,11 +130,13 @@ export async function publishLegalVersion({
 }) {
   const before = await getLegalDocument({
     companyId,
+
     type,
   });
 
   const version = await getLegalVersionById({
     companyId,
+
     versionId,
   });
 
@@ -109,7 +146,9 @@ export async function publishLegalVersion({
 
   const result = await publishLegalVersionRecord({
     companyId,
+
     type,
+
     versionId,
 
     userId: currentUser.uid,
@@ -117,6 +156,7 @@ export async function publishLegalVersion({
 
   const after = await getActiveLegalVersion({
     companyId,
+
     type,
   });
 
@@ -137,6 +177,7 @@ export async function publishLegalVersion({
 
     metadata: {
       versionId,
+
       version: result.version,
     },
   });
@@ -183,7 +224,21 @@ export async function saveVisitorConsent({
   source,
   userAgent,
 }) {
-  const legal = await getActiveLegalDocuments(companyId);
+  const [legal, privacySettings] = await Promise.all([
+    getActiveLegalDocuments(companyId),
+
+    getCompanyPrivacySettings(companyId),
+  ]);
+
+  const normalizedConsent = {
+    necessary: true,
+
+    analytics: consent.analytics === true,
+
+    functional: consent.functional === true,
+
+    marketing: consent.marketing === true,
+  };
 
   const legalVersions = {
     privacy: legal.privacy?.version?.id || null,
@@ -193,22 +248,48 @@ export async function saveVisitorConsent({
     terms: legal.terms?.version?.id || null,
   };
 
-  await createConsentRecord({
-    companyId,
+  const consentVersion = privacySettings.consentManagement?.version || 1;
 
-    visitorHash,
+  const recordProof = privacySettings.consentManagement?.recordProof !== false;
 
-    consent,
+  if (recordProof) {
+    const retentionDays = privacySettings.retention?.consentRecordDays || 730;
 
-    legalVersions,
+    const userAgentHash =
+      userAgent &&
+      privacySettings.consentManagement?.anonymizeTechnicalData !== false
+        ? hashVisitorTechnicalValue(
+            userAgent,
 
-    source,
+            companyId,
+          )
+        : null;
 
-    userAgent,
-  });
+    await createConsentRecord({
+      companyId,
+
+      visitorHash,
+
+      consent: normalizedConsent,
+
+      consentVersion,
+
+      legalVersions,
+
+      source,
+
+      decision: resolveConsentDecision(normalizedConsent),
+
+      userAgentHash,
+
+      expiresAt: createExpirationDate(retentionDays),
+    });
+  }
 
   return {
-    consent,
+    consent: normalizedConsent,
+
+    consentVersion,
 
     legalVersions,
 

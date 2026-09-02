@@ -1,6 +1,6 @@
 import "server-only";
 
-import { FieldValue } from "firebase-admin/firestore";
+import { FieldValue, Timestamp } from "firebase-admin/firestore";
 
 import { adminDb } from "@/lib/firebase/admin";
 
@@ -29,6 +29,57 @@ function getRateLimitCollection(companyId) {
     .collection("companies")
     .doc(companyId)
     .collection("formSubmissionRateLimits");
+}
+
+/*
+ * =========================================================
+ * HELPERS
+ * =========================================================
+ */
+
+function normalizeRetentionTimestamp(value) {
+  if (!value) {
+    return null;
+  }
+
+  if (value instanceof Timestamp) {
+    return value;
+  }
+
+  if (value instanceof Date) {
+    return Timestamp.fromDate(value);
+  }
+
+  if (typeof value?.toDate === "function") {
+    return Timestamp.fromDate(value.toDate());
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return Timestamp.fromDate(date);
+}
+
+function isExpiredTimestamp(
+  value,
+
+  now = new Date(),
+) {
+  if (!value) {
+    return false;
+  }
+
+  const date =
+    typeof value.toDate === "function" ? value.toDate() : new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return false;
+  }
+
+  return date.getTime() <= now.getTime();
 }
 
 /*
@@ -81,15 +132,46 @@ export async function listSubmissionRecords({
     items = items.filter((item) => item.status === status);
   }
 
-  /*
-   * Inbox and Trash are independent from workflow status.
-   */
-
   if (folder === "trash") {
     return items.filter((item) => Boolean(item.deletedAt));
   }
 
   return items.filter((item) => !item.deletedAt);
+}
+
+/*
+ * =========================================================
+ * LIST EXPIRED
+ * =========================================================
+ *
+ * Do not enable Firestore TTL on formSubmissions.
+ *
+ * The cleanup service must remove private Storage
+ * attachments before deleting the submission document.
+ * =========================================================
+ */
+
+export async function listExpiredSubmissionRecords({
+  companyId,
+  now = new Date(),
+  limit = 100,
+}) {
+  const safeLimit = Math.max(
+    1,
+
+    Math.min(200, limit),
+  );
+
+  const snapshot = await getSubmissionCollection(companyId)
+    .where("retentionExpiresAt", "<=", Timestamp.fromDate(now))
+    .limit(safeLimit)
+    .get();
+
+  return snapshot.docs.map((document) => ({
+    id: document.id,
+
+    ...document.data(),
+  }));
 }
 
 /*
@@ -129,15 +211,23 @@ export async function checkSubmissionRateLimit({
 
     transaction.set(
       ref,
+
       {
         formId,
 
         count,
 
-        expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000),
+        /*
+         * This collection contains no Storage
+         * references and can safely use Firestore TTL.
+         */
+        expiresAt: Timestamp.fromDate(
+          new Date(Date.now() + 2 * 60 * 60 * 1000),
+        ),
 
         updatedAt: FieldValue.serverTimestamp(),
       },
+
       {
         merge: true,
       },
@@ -148,7 +238,9 @@ export async function checkSubmissionRateLimit({
 
   return {
     allowed,
+
     count,
+
     limit,
   };
 }
@@ -171,7 +263,15 @@ export async function createSubmissionRecord({
     getAttachmentCollection(companyId).doc(binding.attachmentId),
   );
 
+  const retentionExpiresAt = normalizeRetentionTimestamp(
+    data.retentionExpiresAt,
+  );
+
   await adminDb.runTransaction(async (transaction) => {
+    /*
+     * All transaction reads must happen
+     * before transaction writes.
+     */
     const attachmentSnapshots =
       attachmentRefs.length > 0
         ? await transaction.getAll(...attachmentRefs)
@@ -209,58 +309,72 @@ export async function createSubmissionRecord({
       }
     }
 
-    transaction.set(submissionRef, {
-      ...data,
+    transaction.set(
+      submissionRef,
 
-      status: "new",
+      {
+        ...data,
 
-      createdAt: FieldValue.serverTimestamp(),
+        retentionExpiresAt,
 
-      updatedAt: FieldValue.serverTimestamp(),
+        status: "new",
 
-      assignedTo: null,
+        createdAt: FieldValue.serverTimestamp(),
 
-      /*
-       * Legacy global read timestamp.
-       *
-       * Kept for backwards compatibility.
-       */
-      readAt: null,
+        updatedAt: FieldValue.serverTimestamp(),
 
-      /*
-       * Per-user read receipt.
-       *
-       * {
-       *   uid: {
-       *     uid,
-       *     displayName,
-       *     email,
-       *     avatarUrl,
-       *     readAt
-       *   }
-       * }
-       */
-      readBy: {},
+        assignedTo: null,
 
-      resolvedAt: null,
+        readAt: null,
 
-      deletedAt: null,
+        readBy: {},
 
-      deletedBy: null,
-    });
+        resolvedAt: null,
+
+        deletedAt: null,
+
+        deletedBy: null,
+
+        cleanupStatus: "retained",
+
+        cleanupAttempts: 0,
+
+        cleanupError: null,
+      },
+    );
 
     for (let index = 0; index < attachmentBindings.length; index += 1) {
       const attachmentRef = attachmentRefs[index];
 
-      transaction.update(attachmentRef, {
-        status: "attached",
+      transaction.update(
+        attachmentRef,
 
-        submissionId: submissionRef.id,
+        {
+          status: "attached",
 
-        attachedAt: FieldValue.serverTimestamp(),
+          submissionId: submissionRef.id,
 
-        updatedAt: FieldValue.serverTimestamp(),
-      });
+          attachedAt: FieldValue.serverTimestamp(),
+
+          /*
+           * Attached files follow the same
+           * retention policy as the submission.
+           */
+          retentionExpiresAt,
+
+          /*
+           * The temporary-file cleanup job
+           * must no longer delete this file.
+           */
+          cleanupAfter: null,
+
+          cleanupStatus: "retained",
+
+          cleanupError: null,
+
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+      );
     }
   });
 
@@ -320,6 +434,7 @@ export async function updateSubmissionStatusRecord({
 
     after: await getSubmissionById({
       companyId,
+
       submissionId,
     }),
   };
@@ -356,11 +471,6 @@ export async function markSubmissionReadRecord({
     const existingReadBy =
       before.readBy && typeof before.readBy === "object" ? before.readBy : {};
 
-    /*
-     * First read timestamp is more useful than updating
-     * every time the same person opens the message.
-     */
-
     if (existingReadBy[reader.uid]) {
       return;
     }
@@ -387,12 +497,6 @@ export async function markSubmissionReadRecord({
       updatedAt: FieldValue.serverTimestamp(),
     };
 
-    /*
-     * Preserve legacy global status behavior:
-     * the first person opening NEW changes it to READ.
-     *
-     * Individual unread state will still come from readBy.
-     */
     if (before.status === "new") {
       update.status = "read";
 
@@ -409,6 +513,7 @@ export async function markSubmissionReadRecord({
 
     after: await getSubmissionById({
       companyId,
+
       submissionId,
     }),
   };
@@ -462,6 +567,7 @@ export async function trashSubmissionRecord({
 
     after: await getSubmissionById({
       companyId,
+
       submissionId,
     }),
   };
@@ -519,9 +625,74 @@ export async function restoreSubmissionRecord({
 
     after: await getSubmissionById({
       companyId,
+
       submissionId,
     }),
   };
+}
+
+/*
+ * =========================================================
+ * CLEANUP STATUS
+ * =========================================================
+ */
+
+export async function markSubmissionCleanupStarted({
+  companyId,
+  submissionId,
+}) {
+  const ref = getSubmissionCollection(companyId).doc(submissionId);
+
+  const snapshot = await ref.get();
+
+  if (!snapshot.exists) {
+    return null;
+  }
+
+  await ref.update({
+    cleanupStatus: "processing",
+
+    cleanupAttempts: FieldValue.increment(1),
+
+    cleanupStartedAt: FieldValue.serverTimestamp(),
+
+    cleanupError: null,
+
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+
+  return getSubmissionById({
+    companyId,
+
+    submissionId,
+  });
+}
+
+export async function markSubmissionCleanupFailed({
+  companyId,
+  submissionId,
+  error,
+}) {
+  const ref = getSubmissionCollection(companyId).doc(submissionId);
+
+  const snapshot = await ref.get();
+
+  if (!snapshot.exists) {
+    return;
+  }
+
+  await ref.update({
+    cleanupStatus: "failed",
+
+    cleanupError: String(error || "FORM_SUBMISSION_CLEANUP_FAILED").slice(
+      0,
+      1000,
+    ),
+
+    cleanupFailedAt: FieldValue.serverTimestamp(),
+
+    updatedAt: FieldValue.serverTimestamp(),
+  });
 }
 
 /*
@@ -533,6 +704,8 @@ export async function restoreSubmissionRecord({
 export async function permanentlyDeleteSubmissionRecord({
   companyId,
   submissionId,
+  allowExpired = false,
+  now = new Date(),
 }) {
   const ref = getSubmissionCollection(companyId).doc(submissionId);
 
@@ -548,13 +721,25 @@ export async function permanentlyDeleteSubmissionRecord({
     ...snapshot.data(),
   };
 
-  /*
-   * Safety:
-   * Permanent deletion is allowed only from Trash.
-   */
+  const expired = isExpiredTimestamp(
+    before.retentionExpiresAt,
 
-  if (!before.deletedAt) {
+    now,
+  );
+
+  /*
+   * Manual permanent deletion:
+   * submission must be in Trash.
+   *
+   * Automated retention cleanup:
+   * submission must have actually expired.
+   */
+  if (!before.deletedAt && !(allowExpired && expired)) {
     throw new Error("FORM_SUBMISSION_NOT_IN_TRASH");
+  }
+
+  if (allowExpired && !expired) {
+    throw new Error("FORM_SUBMISSION_RETENTION_NOT_EXPIRED");
   }
 
   await ref.delete();

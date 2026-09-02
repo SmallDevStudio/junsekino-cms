@@ -10,6 +10,8 @@ import { resolvePublicCompany } from "@/modules/company/company-slug.service";
 
 import { finalizePublicFormAttachment } from "@/modules/form/form-attachment.service";
 
+import { isTrustedOrigin } from "@/lib/auth/origin";
+
 import {
   attachVisitorCookie,
   hashVisitorId,
@@ -18,6 +20,20 @@ import {
 
 export async function POST(request, context) {
   try {
+    if (!isTrustedOrigin(request)) {
+      return NextResponse.json(
+        {
+          success: false,
+
+          message: "Invalid request origin.",
+        },
+
+        {
+          status: 403,
+        },
+      );
+    }
+
     const params = await context.params;
 
     const company = companySlugSchema.safeParse(params.companySlug);
@@ -30,8 +46,10 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Attachment not found.",
         },
+
         {
           status: 404,
         },
@@ -44,8 +62,10 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Attachment not found.",
         },
+
         {
           status: 404,
         },
@@ -54,7 +74,11 @@ export async function POST(request, context) {
 
     const visitor = resolveVisitor(request);
 
-    const visitorHash = hashVisitorId(visitor.visitorId);
+    const visitorHash = hashVisitorId(
+      visitor.visitorId,
+
+      resolved.company.id,
+    );
 
     const data = await finalizePublicFormAttachment({
       companyId: resolved.company.id,
@@ -68,9 +92,17 @@ export async function POST(request, context) {
 
     const response = NextResponse.json({
       success: true,
+
       data,
     });
 
+    /*
+     * Normally this cookie already exists from
+     * the attachment upload initialization.
+     *
+     * Keep a fallback for supported clients that
+     * finalize within the same visitor workflow.
+     */
     if (visitor.isNew) {
       attachVisitorCookie({
         response,
@@ -81,14 +113,23 @@ export async function POST(request, context) {
 
     return response;
   } catch (error) {
-    console.error("Finalize form attachment error:", error);
+    console.error(
+      "Finalize form attachment error:",
+
+      error,
+    );
 
     const badRequests = [
       "FORM_ATTACHMENT_FILE_NOT_UPLOADED",
+
       "FORM_ATTACHMENT_TYPE_NOT_ALLOWED",
+
       "FORM_ATTACHMENT_TOO_LARGE",
+
       "FORM_ATTACHMENT_MIME_MISMATCH",
+
       "FORM_ATTACHMENT_SIZE_MISMATCH",
+
       "FORM_ATTACHMENT_INVALID_STATUS",
     ];
 
@@ -96,8 +137,10 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: error.message,
         },
+
         {
           status: 400,
         },
@@ -108,8 +151,10 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Attachment not found.",
         },
+
         {
           status: 404,
         },
@@ -119,8 +164,10 @@ export async function POST(request, context) {
     return NextResponse.json(
       {
         success: false,
+
         message: "Unable to finalize attachment.",
       },
+
       {
         status: 500,
       },

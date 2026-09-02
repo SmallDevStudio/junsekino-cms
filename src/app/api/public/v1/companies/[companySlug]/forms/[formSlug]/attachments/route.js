@@ -10,6 +10,8 @@ import { resolvePublicCompany } from "@/modules/company/company-slug.service";
 
 import { createPublicFormAttachmentUpload } from "@/modules/form/form-attachment.service";
 
+import { isTrustedOrigin } from "@/lib/auth/origin";
+
 import {
   attachVisitorCookie,
   hashVisitorId,
@@ -18,6 +20,20 @@ import {
 
 export async function POST(request, context) {
   try {
+    if (!isTrustedOrigin(request)) {
+      return NextResponse.json(
+        {
+          success: false,
+
+          message: "Invalid request origin.",
+        },
+
+        {
+          status: 403,
+        },
+      );
+    }
+
     const params = await context.params;
 
     const company = companySlugSchema.safeParse(params.companySlug);
@@ -28,8 +44,10 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Form not found.",
         },
+
         {
           status: 404,
         },
@@ -42,15 +60,33 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Form not found.",
         },
+
         {
           status: 404,
         },
       );
     }
 
-    const body = await request.json();
+    let body;
+
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        {
+          success: false,
+
+          message: "Invalid request body.",
+        },
+
+        {
+          status: 400,
+        },
+      );
+    }
 
     const validation = createFormAttachmentSchema.safeParse(body);
 
@@ -63,6 +99,7 @@ export async function POST(request, context) {
 
           errors: validation.error.flatten().fieldErrors,
         },
+
         {
           status: 400,
         },
@@ -71,7 +108,18 @@ export async function POST(request, context) {
 
     const visitor = resolveVisitor(request);
 
-    const visitorHash = hashVisitorId(visitor.visitorId);
+    /*
+     * Scope the visitor hash to the company.
+     *
+     * The upload workflow requires a stable
+     * pseudonymous identifier so another
+     * visitor cannot claim the uploaded file.
+     */
+    const visitorHash = hashVisitorId(
+      visitor.visitorId,
+
+      resolved.company.id,
+    );
 
     const data = await createPublicFormAttachmentUpload({
       companyId: resolved.company.id,
@@ -86,13 +134,20 @@ export async function POST(request, context) {
     const response = NextResponse.json(
       {
         success: true,
+
         data,
       },
+
       {
         status: 201,
       },
     );
 
+    /*
+     * The visitor explicitly started a file
+     * upload. This cookie is necessary for
+     * attachment ownership and security.
+     */
     if (visitor.isNew) {
       attachVisitorCookie({
         response,
@@ -103,7 +158,11 @@ export async function POST(request, context) {
 
     return response;
   } catch (error) {
-    console.error("Create form attachment upload error:", error);
+    console.error(
+      "Create form attachment upload error:",
+
+      error,
+    );
 
     const errors = {
       FORM_NOT_FOUND: [404, "Form not found."],
@@ -121,8 +180,10 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: known[1],
         },
+
         {
           status: known[0],
         },
@@ -132,8 +193,10 @@ export async function POST(request, context) {
     return NextResponse.json(
       {
         success: false,
+
         message: "Unable to create attachment upload.",
       },
+
       {
         status: 500,
       },

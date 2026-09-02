@@ -29,6 +29,7 @@ export async function getLegalDocument({ companyId, type }) {
 
   return {
     id: snapshot.id,
+
     ...snapshot.data(),
   };
 }
@@ -44,6 +45,7 @@ export async function getLegalVersionById({ companyId, versionId }) {
 
   return {
     id: snapshot.id,
+
     ...snapshot.data(),
   };
 }
@@ -95,6 +97,7 @@ export async function createLegalVersionRecord({ companyId, data, userId }) {
 
   return getLegalVersionById({
     companyId,
+
     versionId: ref.id,
   });
 }
@@ -114,6 +117,7 @@ export async function publishLegalVersionRecord({
   await adminDb.runTransaction(async (transaction) => {
     const [documentSnapshot, versionSnapshot] = await transaction.getAll(
       documentRef,
+
       versionRef,
     );
 
@@ -137,15 +141,13 @@ export async function publishLegalVersionRecord({
 
     const nextVersion = previousVersion + 1;
 
-    /*
-     * Archive previous active version.
-     */
     if (previousActiveId && previousActiveId !== versionId) {
       const previousRef =
         getLegalVersionsCollection(companyId).doc(previousActiveId);
 
       transaction.set(
         previousRef,
+
         {
           status: "archived",
 
@@ -153,6 +155,7 @@ export async function publishLegalVersionRecord({
 
           updatedBy: userId,
         },
+
         {
           merge: true,
         },
@@ -175,6 +178,7 @@ export async function publishLegalVersionRecord({
 
     transaction.set(
       documentRef,
+
       {
         type,
 
@@ -200,6 +204,7 @@ export async function publishLegalVersionRecord({
           ? documentSnapshot.data().createdBy
           : userId,
       },
+
       {
         merge: true,
       },
@@ -207,7 +212,9 @@ export async function publishLegalVersionRecord({
 
     result = {
       previousActiveId,
+
       activeVersionId: versionId,
+
       version: nextVersion,
     };
   });
@@ -218,6 +225,7 @@ export async function publishLegalVersionRecord({
 export async function getActiveLegalVersion({ companyId, type }) {
   const document = await getLegalDocument({
     companyId,
+
     type,
   });
 
@@ -241,6 +249,7 @@ export async function getActiveLegalVersion({ companyId, type }) {
 
   return {
     document,
+
     version,
   };
 }
@@ -251,8 +260,10 @@ export async function getActiveLegalDocuments(companyId) {
   const items = await Promise.all(
     types.map(async (type) => [
       type,
+
       await getActiveLegalVersion({
         companyId,
+
         type,
       }),
     ]),
@@ -265,22 +276,42 @@ export async function createConsentRecord({
   companyId,
   visitorHash,
   consent,
+  consentVersion,
   legalVersions,
   source,
-  userAgent = null,
+  decision,
+  userAgentHash = null,
+  expiresAt,
 }) {
   const ref = getConsentCollection(companyId).doc();
+
+  const expiration =
+    expiresAt instanceof Date ? Timestamp.fromDate(expiresAt) : null;
 
   await ref.set({
     visitorHash,
 
     consent,
 
+    consentVersion,
+
     legalVersions,
 
     source,
 
-    userAgent,
+    decision,
+
+    /*
+     * Raw User-Agent and raw IP address are
+     * intentionally not stored.
+     */
+    technical: {
+      userAgentHash,
+    },
+
+    occurredAt: FieldValue.serverTimestamp(),
+
+    expiresAt: expiration,
 
     createdAt: FieldValue.serverTimestamp(),
   });

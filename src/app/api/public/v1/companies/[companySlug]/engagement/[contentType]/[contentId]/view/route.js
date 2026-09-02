@@ -19,26 +19,36 @@ export async function POST(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Content not found.",
         },
+
         {
           status: 404,
         },
       );
     }
 
+    const consent = getConsent(
+      request,
+
+      route.company.id,
+    );
+
     const visitor = resolveVisitor(request);
 
-    const consent = getConsent(request);
-
     /*
-     * Used for operational
-     * deduplication regardless of
-     * Analytics consent.
-     *
-     * Raw visitorId is never stored.
+     * The hash is scoped to the selected company.
+     * It cannot be used to correlate visitors
+     * between independent companies.
      */
-    const visitorHash = hashVisitorId(visitor.visitorId);
+    const visitorHash = hashVisitorId(
+      visitor.visitorId,
+
+      route.company.id,
+    );
+
+    const analyticsConsent = consent.analytics === true;
 
     const data = await viewContent({
       companyId: route.company.id,
@@ -49,15 +59,23 @@ export async function POST(request, context) {
 
       visitorHash,
 
-      analyticsConsent: consent.analytics === true,
+      analyticsConsent,
     });
 
     const response = NextResponse.json({
       success: true,
+
       data,
     });
 
-    if (visitor.isNew) {
+    /*
+     * Do not create a persistent visitor cookie
+     * from a page view before Analytics consent.
+     *
+     * Without consent, the generated ID exists
+     * only during this request.
+     */
+    if (visitor.isNew && analyticsConsent) {
       attachVisitorCookie({
         response,
 
@@ -67,14 +85,20 @@ export async function POST(request, context) {
 
     return response;
   } catch (error) {
-    console.error("View content error:", error);
+    console.error(
+      "View content error:",
+
+      error,
+    );
 
     if (error.message === "ENGAGEMENT_CONTENT_NOT_FOUND") {
       return NextResponse.json(
         {
           success: false,
+
           message: "Content not found.",
         },
+
         {
           status: 404,
         },
@@ -84,8 +108,10 @@ export async function POST(request, context) {
     return NextResponse.json(
       {
         success: false,
+
         message: "Unable to record view.",
       },
+
       {
         status: 500,
       },

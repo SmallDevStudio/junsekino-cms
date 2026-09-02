@@ -10,8 +10,6 @@ import { RiTwitterXFill, RiTwitterXLine } from "react-icons/ri";
 
 import { Check, Share2, X } from "lucide-react";
 
-import { getPublicVisitorId } from "@/utils/public-visitor";
-
 function Tooltip({ label }) {
   return (
     <span
@@ -219,9 +217,7 @@ export default function PublicContentShare({
   }
 
   function recordShare(channel) {
-    const visitorId = getPublicVisitorId();
-
-    if (!visitorId || !companySlug || !slug) {
+    if (!companySlug || !slug) {
       return;
     }
 
@@ -234,8 +230,6 @@ export default function PublicContentShare({
 
       body: JSON.stringify({
         action: "share",
-
-        visitorId,
 
         channel,
       }),
@@ -252,11 +246,7 @@ export default function PublicContentShare({
     });
   }
 
-  function openShare(
-    url,
-
-    channel,
-  ) {
+  function openShare(url, channel) {
     window.open(
       url,
 

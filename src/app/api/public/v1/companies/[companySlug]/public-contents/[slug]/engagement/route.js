@@ -5,10 +5,19 @@ import { companySlugSchema } from "@/modules/company/company-slug.schema";
 import { resolvePublicCompany } from "@/modules/company/company-slug.service";
 
 import {
+  getPublicContentEngagement,
   recordPublicContentShare,
   recordPublicContentView,
   togglePublicContentLike,
 } from "@/modules/public-content/public-content-engagement.service";
+
+import {
+  attachVisitorCookie,
+  hashVisitorId,
+  resolveVisitor,
+} from "@/lib/visitor/visitor";
+
+import { getConsentFromRequest } from "@/lib/visitor/consent";
 
 export const dynamic = "force-dynamic";
 
@@ -54,24 +63,24 @@ function normalizeAction(value) {
  * VIEW
  *
  * {
- *   action: "view",
- *   visitorId
+ *   action: "view"
  * }
  *
  * LIKE
  *
  * {
- *   action: "like",
- *   visitorId
+ *   action: "like"
  * }
  *
  * SHARE
  *
  * {
  *   action: "share",
- *   visitorId,
  *   channel: "facebook"
  * }
+ *
+ * visitorId is intentionally not accepted
+ * from the request body.
  * =========================================================
  */
 
@@ -115,9 +124,7 @@ export async function POST(request, context) {
 
     const action = normalizeAction(body?.action);
 
-    const visitorId = String(body?.visitorId || "").trim();
-
-    if (!action || !visitorId) {
+    if (!action) {
       return NextResponse.json(
         {
           success: false,
@@ -157,35 +164,78 @@ export async function POST(request, context) {
       });
     }
 
+    const companyId = resolved.company.id;
+
+    /*
+     * Visitor identity is created and validated
+     * exclusively on the server.
+     *
+     * The raw visitor ID is never stored in
+     * Firestore.
+     */
+    const visitor = resolveVisitor(request);
+
+    const visitorHash = hashVisitorId(visitor.visitorId);
+
+    const consent = getConsentFromRequest({
+      request,
+
+      companyId,
+    });
+
     let result;
 
+    /*
+     * A passive page view is analytics.
+     *
+     * Without Analytics consent, return the
+     * current aggregate counters without
+     * recording a view.
+     */
     if (action === "view") {
-      result = await recordPublicContentView({
-        companyId: resolved.company.id,
+      if (consent.analytics === true) {
+        result = await recordPublicContentView({
+          companyId,
 
-        slug,
+          slug,
 
-        visitorId,
-      });
+          visitorHash,
+        });
+      } else {
+        result = await getPublicContentEngagement({
+          companyId,
+
+          slug,
+
+          visitorHash,
+        });
+      }
     }
 
+    /*
+     * Like and Share are actions expressly
+     * requested by the visitor.
+     *
+     * They remain available when optional
+     * Analytics cookies are rejected.
+     */
     if (action === "like") {
       result = await togglePublicContentLike({
-        companyId: resolved.company.id,
+        companyId,
 
         slug,
 
-        visitorId,
+        visitorHash,
       });
     }
 
     if (action === "share") {
       result = await recordPublicContentShare({
-        companyId: resolved.company.id,
+        companyId,
 
         slug,
 
-        visitorId,
+        visitorHash,
 
         channel: body?.channel,
       });
@@ -200,6 +250,14 @@ export async function POST(request, context) {
     });
 
     response.headers.set("Cache-Control", "no-store");
+
+    if (visitor.isNew) {
+      attachVisitorCookie({
+        response,
+
+        visitorId: visitor.visitorId,
+      });
+    }
 
     return response;
   } catch (error) {
@@ -218,7 +276,7 @@ export async function POST(request, context) {
       );
     }
 
-    if (error.message === "INVALID_VISITOR_ID") {
+    if (error.message === "INVALID_VISITOR_HASH") {
       return NextResponse.json(
         {
           success: false,

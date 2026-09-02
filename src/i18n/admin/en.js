@@ -2645,114 +2645,6 @@ export const adminEn = {
     },
   },
 
-  email: {
-    title: "Email Settings",
-
-    description:
-      "Configure the email provider, sender identity and notification recipients.",
-
-    enabled: {
-      title: "Email Notifications",
-
-      description: "Allow this company to send notification emails.",
-    },
-
-    provider: {
-      title: "Email Provider",
-
-      description: "Choose how this company sends outgoing email.",
-
-      resendDescription:
-        "Managed email delivery using the server Resend integration.",
-
-      smtpDescription: "Connect to your organization's own SMTP mail server.",
-    },
-
-    smtp: {
-      title: "SMTP Server",
-
-      description: "Configure the mail server used by this company.",
-
-      host: "SMTP Server",
-
-      port: "Port",
-
-      security: "Security",
-
-      username: "Username",
-
-      password: "Password",
-
-      passwordConfigured: "Password configured",
-
-      notConfigured: "Not configured",
-
-      passwordPlaceholder: "Enter SMTP password",
-
-      passwordKeepPlaceholder: "Leave empty to keep current password",
-
-      testConnection: "Test Connection",
-
-      sendTestEmail: "Send Test Email",
-    },
-
-    sender: {
-      title: "Sender Identity",
-
-      name: "Sender Name",
-
-      email: "Sender Email",
-
-      replyTo: "Reply-To",
-    },
-
-    recipients: {
-      title: "Notification Recipients",
-
-      description: "People who should receive website notification emails.",
-    },
-
-    securityNote:
-      "SMTP passwords are encrypted and stored separately from company settings. Passwords are never returned to the browser after saving.",
-
-    save: "Save Email Settings",
-
-    messages: {
-      loadFailed: "Unable to retrieve email settings.",
-
-      saveFailed: "Unable to save email settings.",
-
-      saved: "Email settings saved.",
-
-      passwordSaveFailed: "Unable to save SMTP password.",
-
-      invalidRecipient: "Enter a valid email address.",
-
-      duplicateRecipient: "This email is already added.",
-
-      invalidSender: "Sender email is invalid.",
-
-      invalidReplyTo: "Reply-to email is invalid.",
-
-      smtpHostRequired: "SMTP server is required.",
-
-      smtpPortInvalid: "SMTP port is invalid.",
-
-      testConnectionSuccess: "SMTP connection successful.",
-
-      testConnectionFailed: "Unable to connect to the SMTP server.",
-
-      testEmailPending: "Send Test Email will be enabled in the next step.",
-
-      testEmailRecipientRequired:
-        "Add at least one recipient before sending a test email.",
-
-      testEmailSent: "Test email sent to {email}.",
-
-      testEmailFailed: "Unable to send test email.",
-    },
-  },
-
   notifications: {
     title: "Notifications",
 
@@ -3541,6 +3433,415 @@ export const adminEn = {
     errors: {
       load: "Unable to load preferences.",
       save: "Unable to save preferences.",
+    },
+  },
+
+  settings: {
+    email: {
+      title: "Email Settings",
+
+      description:
+        "Configure the email provider, sender identity and notification recipients.",
+
+      enabled: {
+        title: "Email Notifications",
+
+        description: "Allow this company to send notification emails.",
+      },
+
+      provider: {
+        title: "Email Provider",
+
+        description: "Choose how this company sends outgoing email.",
+
+        resendDescription:
+          "Managed email delivery using the server Resend integration.",
+
+        smtpDescription: "Connect to your organization's own SMTP mail server.",
+      },
+
+      smtp: {
+        title: "SMTP Server",
+
+        description: "Configure the mail server used by this company.",
+
+        host: "SMTP Server",
+
+        port: "Port",
+
+        security: "Security",
+
+        username: "Username",
+
+        password: "Password",
+
+        passwordConfigured: "Password configured",
+
+        notConfigured: "Not configured",
+
+        passwordPlaceholder: "Enter SMTP password",
+
+        passwordKeepPlaceholder: "Leave empty to keep current password",
+
+        testConnection: "Test Connection",
+
+        sendTestEmail: "Send Test Email",
+      },
+
+      sender: {
+        title: "Sender Identity",
+
+        name: "Sender Name",
+
+        email: "Sender Email",
+
+        replyTo: "Reply-To",
+      },
+
+      recipients: {
+        title: "Notification Recipients",
+
+        description: "People who should receive website notification emails.",
+      },
+
+      securityNote:
+        "SMTP passwords are encrypted and stored separately from company settings. Passwords are never returned to the browser after saving.",
+
+      save: "Save Email Settings",
+
+      messages: {
+        loadFailed: "Unable to retrieve email settings.",
+
+        saveFailed: "Unable to save email settings.",
+
+        saved: "Email settings saved.",
+
+        passwordSaveFailed: "Unable to save SMTP password.",
+
+        invalidRecipient: "Enter a valid email address.",
+
+        duplicateRecipient: "This email is already added.",
+
+        invalidSender: "Sender email is invalid.",
+
+        invalidReplyTo: "Reply-to email is invalid.",
+
+        smtpHostRequired: "SMTP server is required.",
+
+        smtpPortInvalid: "SMTP port is invalid.",
+
+        testConnectionSuccess: "SMTP connection successful.",
+
+        testConnectionFailed: "Unable to connect to the SMTP server.",
+
+        testEmailPending: "Send Test Email will be enabled in the next step.",
+
+        testEmailRecipientRequired:
+          "Add at least one recipient before sending a test email.",
+
+        testEmailSent: "Test email sent to {email}.",
+
+        testEmailFailed: "Unable to send test email.",
+      },
+    },
+    privacy: {
+      title: "Privacy & Consent",
+
+      description:
+        "Manage cookie consent, privacy contacts, data subject rights and retention policies.",
+
+      languages: {
+        en: "English",
+        th: "Thai",
+      },
+
+      actions: {
+        save: "Save privacy settings",
+        saving: "Saving...",
+      },
+
+      banner: {
+        title: "Cookie Banner",
+
+        description:
+          "Control when the cookie notice appears and edit the text displayed to visitors.",
+
+        showCookieBanner: "Show cookie banner",
+
+        showCookieBannerDescription:
+          "Display the consent banner to visitors who have not recorded a decision.",
+
+        allowRejectOptional: "Allow optional cookies to be rejected",
+
+        allowRejectOptionalDescription:
+          "Provide a direct option for rejecting non-essential cookies.",
+
+        showPreferences: "Show cookie preferences",
+
+        showPreferencesDescription:
+          "Allow visitors to choose individual cookie categories.",
+
+        fields: {
+          title: "Banner title",
+          description: "Banner description",
+          acceptAll: "Accept all button",
+          rejectOptional: "Reject optional button",
+          preferences: "Preferences button",
+          savePreferences: "Save preferences button",
+          privacyLink: "Privacy notice link",
+          cookieLink: "Cookie policy link",
+        },
+      },
+
+      consent: {
+        title: "Consent Management",
+
+        description:
+          "Configure consent validity, renewal and server-side proof of decisions.",
+
+        enabled: "Enable consent management",
+
+        enabledDescription:
+          "Apply consent controls and category preferences on the public website.",
+
+        version: "Consent version",
+
+        versionDescription:
+          "Increase this value when processing purposes or consent choices materially change.",
+
+        cookieMaxAgeDays: "Consent cookie lifetime (days)",
+
+        cookieMaxAgeDaysDescription:
+          "Visitors will be asked again after this period expires.",
+
+        renewOnPolicyChange: "Renew consent after policy changes",
+
+        renewOnPolicyChangeDescription:
+          "Ask visitors again when a published legal document version changes.",
+
+        recordProof: "Record consent proof",
+
+        recordProofDescription:
+          "Store a server-side record of the visitor's consent decision.",
+
+        anonymizeTechnicalData: "Anonymize technical data",
+
+        anonymizeTechnicalDataDescription:
+          "Store hashed technical identifiers instead of raw values.",
+      },
+
+      categories: {
+        title: "Cookie Categories",
+
+        description:
+          "Choose which optional categories are available and explain their purposes.",
+
+        necessary: "Necessary",
+
+        necessaryDescription:
+          "Required for security and core website operation. This category cannot be disabled.",
+
+        analytics: "Analytics",
+
+        analyticsDescription:
+          "Measurement used to understand website usage and performance.",
+
+        functional: "Functional",
+
+        functionalDescription: "Optional features and visitor preferences.",
+
+        marketing: "Marketing",
+
+        marketingDescription:
+          "Advertising and campaign measurement. Keep disabled until it is actually used.",
+
+        name: "Category name",
+
+        purpose: "Purpose description",
+      },
+
+      rights: {
+        title: "Data Subject Rights",
+
+        description:
+          "Configure how people can exercise their privacy and personal-data rights.",
+
+        enabled: "Enable data subject requests",
+
+        enabledDescription:
+          "Publish contact instructions for privacy-related requests.",
+
+        requestEmail: "Request email",
+
+        responseDays: "Response period (days)",
+
+        responseDaysDescription:
+          "Internal target for responding to a verified request.",
+
+        allowAccessRequest: "Access request",
+
+        allowCorrectionRequest: "Correction request",
+
+        allowDeletionRequest: "Deletion request",
+
+        allowConsentWithdrawal: "Consent withdrawal",
+
+        allowDataPortabilityRequest: "Data portability request",
+
+        instructions: {
+          en: "Instructions in English",
+          th: "Instructions in Thai",
+        },
+      },
+
+      contact: {
+        title: "Privacy Contact",
+
+        description:
+          "Contact details shown in privacy documents and data-subject request instructions.",
+
+        companyName: {
+          en: "Company name in English",
+          th: "Company name in Thai",
+        },
+
+        address: {
+          en: "Address in English",
+          th: "Address in Thai",
+        },
+
+        email: "Privacy contact email",
+
+        phone: "Contact telephone",
+
+        dpoEmail: "DPO email",
+
+        dpoEmailDescription:
+          "Leave blank when the company has not formally appointed a Data Protection Officer.",
+      },
+
+      retention: {
+        title: "Data Retention",
+
+        description:
+          "Set how long each data category is retained before automatic cleanup.",
+
+        consentRecordDays: "Consent records (days)",
+
+        consentRecordDaysDescription:
+          "Retention period for consent proof. Default: 730 days.",
+
+        analyticsRawDays: "Raw analytics events (days)",
+
+        analyticsRawDaysDescription:
+          "Short-term retention for detailed analytics events. Default: 90 days.",
+
+        analyticsAggregateMonths: "Aggregated analytics (months)",
+
+        analyticsAggregateMonthsDescription:
+          "Retention period for reports containing less identifying detail.",
+
+        formSubmissionDays: "Form submissions (days)",
+
+        formSubmissionDaysDescription:
+          "Retention period for messages and files submitted through public forms.",
+
+        securityLogDays: "Security logs (days)",
+
+        securityLogDaysDescription:
+          "Retention period for technical and security-related records.",
+      },
+
+      messages: {
+        loadFailed: "Unable to load privacy settings.",
+
+        saveFailed: "Unable to save privacy settings.",
+
+        saved: "Privacy settings saved successfully.",
+      },
+    },
+
+    legal: {
+      title: "Legal Documents",
+
+      description:
+        "Create, review and publish versioned legal documents for the selected company.",
+
+      types: {
+        privacy: "Privacy Notice",
+        cookies: "Cookie Policy",
+        terms: "Terms & Conditions",
+      },
+
+      actions: {
+        newDraft: "New Draft",
+        copyToDraft: "Copy to New Draft",
+        saveDraft: "Save Draft",
+        saving: "Saving...",
+        publish: "Publish",
+        publishing: "Publishing...",
+      },
+
+      history: {
+        title: "Version History",
+        empty: "No versions have been created.",
+        untitled: "Untitled document",
+      },
+
+      editor: {
+        newDraft: "New Draft",
+        editDraft: "Edit Draft",
+        viewVersion: "View Version",
+        publishedReadonly:
+          "Published and archived versions cannot be edited. Copy this version to create a new draft.",
+      },
+
+      fields: {
+        title: "Document Title",
+
+        content: "Document Content",
+
+        contentHint:
+          "Enter the full legal document text. Markdown-style plain text may be used.",
+
+        changeSummary: "Change Summary",
+
+        effectiveAt: "Effective Date",
+
+        requireReConsent: "Require consent again",
+
+        requireReConsentDescription:
+          "Visitors with an earlier consent record will be asked to provide consent again after this version is published.",
+      },
+
+      status: {
+        draft: "Draft",
+        published: "Published",
+        archived: "Archived",
+      },
+
+      confirm: {
+        publish:
+          "Publish this legal document version? Published content cannot be edited.",
+      },
+
+      messages: {
+        loadFailed: "Unable to load legal documents.",
+
+        saveFailed: "Unable to save the legal draft.",
+
+        publishFailed: "Unable to publish the legal document.",
+
+        titleRequired: "Enter a document title in at least one language.",
+
+        contentRequired: "Enter document content in at least one language.",
+
+        created: "Legal draft created successfully.",
+
+        updated: "Legal draft updated successfully.",
+
+        published: "Legal document published successfully.",
+      },
     },
   },
 };

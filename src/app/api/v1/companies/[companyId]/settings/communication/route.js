@@ -1,190 +1,223 @@
-import { z } from "zod";
+import { NextResponse } from "next/server";
+
+import { PERMISSIONS } from "@/constants/permissions";
+
+import { companyIdSchema } from "@/modules/company/company.schema";
+
+import { getCompanyPermission } from "@/lib/auth/company-guards";
+
+import { isTrustedOrigin } from "@/lib/auth/origin";
+
+import { updateCommunicationSettingsSchema } from "@/modules/settings/communication-settings.schema";
+
+import {
+  getCommunicationSettings,
+  updateCommunicationSettings,
+} from "@/modules/settings/communication-settings.service";
 
 /*
  * =========================================================
- * COMMON
+ * ACCESS
  * =========================================================
  */
 
-const optionalEmailSchema = z.union([z.string().trim().email(), z.literal("")]);
+async function resolveAccess(context) {
+  const params = await context.params;
+
+  const validation = companyIdSchema.safeParse(params.companyId);
+
+  if (!validation.success) {
+    return {
+      companyId: null,
+
+      access: null,
+    };
+  }
+
+  const companyId = validation.data;
+
+  const access = await getCompanyPermission({
+    companyId,
+
+    permission: PERMISSIONS.COMPANY_UPDATE,
+  });
+
+  return {
+    companyId,
+
+    access,
+  };
+}
 
 /*
  * =========================================================
- * EMAIL
+ * GET
  * =========================================================
  */
 
-const emailSettingsSchema = z.object({
-  enabled: z.boolean().default(false),
+export async function GET(request, context) {
+  try {
+    const { companyId, access } = await resolveAccess(context);
 
-  senderName: z.string().trim().max(150).default(""),
+    if (!companyId) {
+      return NextResponse.json(
+        {
+          success: false,
 
-  senderEmail: optionalEmailSchema.default(""),
+          message: "Invalid company ID.",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
 
-  replyTo: optionalEmailSchema.default(""),
+    if (!access.authorized) {
+      return NextResponse.json(
+        {
+          success: false,
 
-  recipients: z.array(z.string().trim().email()).max(50).default([]),
-});
+          message: access.reason,
+        },
+        {
+          status: access.user ? 403 : 401,
+        },
+      );
+    }
 
-/*
- * =========================================================
- * NOTIFICATION EVENT
- * =========================================================
- */
+    const data = await getCommunicationSettings({
+      companyId,
+    });
 
-const notificationEventSchema = z.object({
-  inApp: z.boolean().default(true),
+    return NextResponse.json({
+      success: true,
 
-  email: z.boolean().default(false),
-});
+      data,
+    });
+  } catch (error) {
+    console.error("Get communication settings error:", error);
 
-/*
- * =========================================================
- * NOTIFICATIONS
- * =========================================================
- */
+    return NextResponse.json(
+      {
+        success: false,
 
-const notificationEventsSchema = z.object({
-  formSubmission: notificationEventSchema.default({
-    inApp: true,
-    email: false,
-  }),
-});
-
-const notificationSettingsSchema = z.object({
-  inApp: z.boolean().default(true),
-
-  email: z.boolean().default(false),
-
-  events: notificationEventsSchema.default({
-    formSubmission: {
-      inApp: true,
-      email: false,
-    },
-  }),
-});
-
-/*
- * =========================================================
- * INTEGRATIONS
- * =========================================================
- */
-
-const lineIntegrationSchema = z.object({
-  /*
-   * Reserved for future LINE integration.
-   *
-   * Secrets / access tokens must NOT be stored
-   * directly in this settings object.
-   */
-  enabled: z.boolean().default(false),
-});
-
-const integrationsSchema = z.object({
-  line: lineIntegrationSchema.default({
-    enabled: false,
-  }),
-});
-
-/*
- * =========================================================
- * COMMUNICATION SETTINGS
- * =========================================================
- */
-
-export const communicationSettingsSchema = z.object({
-  email: emailSettingsSchema.default({
-    enabled: false,
-
-    senderName: "",
-
-    senderEmail: "",
-
-    replyTo: "",
-
-    recipients: [],
-  }),
-
-  notifications: notificationSettingsSchema.default({
-    inApp: true,
-
-    email: false,
-
-    events: {
-      formSubmission: {
-        inApp: true,
-
-        email: false,
+        message: "Unable to retrieve communication settings.",
       },
-    },
-  }),
-
-  integrations: integrationsSchema.default({
-    line: {
-      enabled: false,
-    },
-  }),
-});
+      {
+        status: 500,
+      },
+    );
+  }
+}
 
 /*
  * =========================================================
- * UPDATE / PATCH
- * =========================================================
- *
- * Do not use .deepPartial().
- *
- * The Zod version used by this project does not expose
- * deepPartial() on this schema.
- *
- * PATCH therefore declares optional fields explicitly.
- *
- * This also gives us tighter control over which nested
- * settings may be updated from the API.
+ * PATCH
  * =========================================================
  */
 
-const updateEmailSettingsSchema = z.object({
-  enabled: z.boolean().optional(),
+export async function PATCH(request, context) {
+  try {
+    if (!isTrustedOrigin(request)) {
+      return NextResponse.json(
+        {
+          success: false,
 
-  senderName: z.string().trim().max(150).optional(),
+          message: "Invalid request origin.",
+        },
+        {
+          status: 403,
+        },
+      );
+    }
 
-  senderEmail: optionalEmailSchema.optional(),
+    const { companyId, access } = await resolveAccess(context);
 
-  replyTo: optionalEmailSchema.optional(),
+    if (!companyId) {
+      return NextResponse.json(
+        {
+          success: false,
 
-  recipients: z.array(z.string().trim().email()).max(50).optional(),
-});
+          message: "Invalid company ID.",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
 
-const updateNotificationEventSchema = z.object({
-  inApp: z.boolean().optional(),
+    if (!access.authorized) {
+      return NextResponse.json(
+        {
+          success: false,
 
-  email: z.boolean().optional(),
-});
+          message: access.reason,
+        },
+        {
+          status: access.user ? 403 : 401,
+        },
+      );
+    }
 
-const updateNotificationEventsSchema = z.object({
-  formSubmission: updateNotificationEventSchema.optional(),
-});
+    let body;
 
-const updateNotificationSettingsSchema = z.object({
-  inApp: z.boolean().optional(),
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        {
+          success: false,
 
-  email: z.boolean().optional(),
+          message: "Invalid request body.",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
 
-  events: updateNotificationEventsSchema.optional(),
-});
+    const validation = updateCommunicationSettingsSchema.safeParse(body);
 
-const updateLineIntegrationSchema = z.object({
-  enabled: z.boolean().optional(),
-});
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          success: false,
 
-const updateIntegrationsSchema = z.object({
-  line: updateLineIntegrationSchema.optional(),
-});
+          message: "Invalid communication settings.",
 
-export const updateCommunicationSettingsSchema = z.object({
-  email: updateEmailSettingsSchema.optional(),
+          errors: validation.error.flatten().fieldErrors,
+        },
+        {
+          status: 400,
+        },
+      );
+    }
 
-  notifications: updateNotificationSettingsSchema.optional(),
+    const data = await updateCommunicationSettings({
+      companyId,
 
-  integrations: updateIntegrationsSchema.optional(),
-});
+      input: validation.data,
+
+      currentUser: access.user,
+    });
+
+    return NextResponse.json({
+      success: true,
+
+      data,
+    });
+  } catch (error) {
+    console.error("Update communication settings error:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+
+        message: "Unable to update communication settings.",
+      },
+      {
+        status: 500,
+      },
+    );
+  }
+}

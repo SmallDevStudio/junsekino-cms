@@ -7,17 +7,25 @@ import { adminDb } from "@/lib/firebase/admin";
 import { getPublicContentBySlug } from "@/modules/public-content/public-content.repository";
 
 /*
- * Same browser counts a new view
+ * The same visitor counts as a new view
  * after 30 minutes.
  */
 const VIEW_COOLDOWN_MS = 30 * 60 * 1000;
 
 /*
- * Prevent a double click / rapid
- * repeated share from artificially
- * inflating the share counter.
+ * Prevent rapid repeated shares from
+ * artificially increasing the counter.
  */
 const SHARE_COOLDOWN_MS = 5 * 1000;
+
+/*
+ * Raw engagement events are retained for
+ * 90 days. Firestore TTL must be enabled for:
+ *
+ * - viewers.expiresAt
+ * - shareEvents.expiresAt
+ */
+const RAW_ENGAGEMENT_RETENTION_MS = 90 * 24 * 60 * 60 * 1000;
 
 const SHARE_CHANNELS = new Set(["facebook", "x", "linkedin", "copy", "native"]);
 
@@ -33,14 +41,19 @@ function normalizeSlug(value) {
     .toLowerCase();
 }
 
-function normalizeVisitorId(value) {
-  const normalized = String(value || "").trim();
+/*
+ * The service accepts only a server-generated
+ * SHA-256 HMAC hash.
+ *
+ * Raw visitor IDs from the browser must never
+ * be passed to this service.
+ */
+function normalizeVisitorHash(value) {
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase();
 
-  if (
-    normalized.length < 16 ||
-    normalized.length > 100 ||
-    !/^[A-Za-z0-9_-]+$/.test(normalized)
-  ) {
+  if (!/^[0-9a-f]{64}$/.test(normalized)) {
     return null;
   }
 
@@ -93,6 +106,10 @@ function getTimestampMillis(value) {
   return Number.isNaN(parsed) ? 0 : parsed;
 }
 
+function createRawEngagementExpiry() {
+  return new Date(Date.now() + RAW_ENGAGEMENT_RETENTION_MS);
+}
+
 async function resolvePublishedContent({ companyId, slug }) {
   const normalizedSlug = normalizeSlug(slug);
 
@@ -128,19 +145,34 @@ function getContentRef({ companyId, contentId }) {
 
 /*
  * =========================================================
- * VIEW
+ * READ CURRENT ENGAGEMENT
+ * =========================================================
+ *
+ * Used when Analytics consent has not been granted.
+ *
+ * Returns the current aggregate counters without
+ * recording a view.
  * =========================================================
  */
 
-export async function recordPublicContentView({ companyId, slug, visitorId }) {
-  const safeVisitorId = normalizeVisitorId(visitorId);
+export async function getPublicContentEngagement({
+  companyId,
 
-  if (!safeVisitorId) {
-    throw new Error("INVALID_VISITOR_ID");
+  slug,
+
+  visitorHash = null,
+}) {
+  const safeVisitorHash = visitorHash
+    ? normalizeVisitorHash(visitorHash)
+    : null;
+
+  if (visitorHash && !safeVisitorHash) {
+    throw new Error("INVALID_VISITOR_HASH");
   }
 
   const content = await resolvePublishedContent({
     companyId,
+
     slug,
   });
 
@@ -150,13 +182,83 @@ export async function recordPublicContentView({ companyId, slug, visitorId }) {
     contentId: content.id,
   });
 
-  const viewerRef = contentRef.collection("viewers").doc(safeVisitorId);
+  const contentSnapshot = await contentRef.get();
 
-  const likeRef = contentRef.collection("likes").doc(safeVisitorId);
+  if (!contentSnapshot.exists) {
+    throw new Error("PUBLIC_CONTENT_NOT_FOUND");
+  }
+
+  const currentData = contentSnapshot.data();
+
+  if (
+    currentData.deletedAt ||
+    currentData.status !== "published" ||
+    !currentData.publishedAt
+  ) {
+    throw new Error("PUBLIC_CONTENT_NOT_FOUND");
+  }
+
+  let liked = false;
+
+  if (safeVisitorHash) {
+    const likeSnapshot = await contentRef
+      .collection("likes")
+      .doc(safeVisitorHash)
+      .get();
+
+    liked = likeSnapshot.exists;
+  }
+
+  return {
+    engagement: getEngagement(currentData),
+
+    liked,
+
+    counted: false,
+
+    analyticsConsent: false,
+  };
+}
+
+/*
+ * =========================================================
+ * VIEW
+ * =========================================================
+ */
+
+export async function recordPublicContentView({
+  companyId,
+
+  slug,
+
+  visitorHash,
+}) {
+  const safeVisitorHash = normalizeVisitorHash(visitorHash);
+
+  if (!safeVisitorHash) {
+    throw new Error("INVALID_VISITOR_HASH");
+  }
+
+  const content = await resolvePublishedContent({
+    companyId,
+
+    slug,
+  });
+
+  const contentRef = getContentRef({
+    companyId,
+
+    contentId: content.id,
+  });
+
+  const viewerRef = contentRef.collection("viewers").doc(safeVisitorHash);
+
+  const likeRef = contentRef.collection("likes").doc(safeVisitorHash);
 
   return adminDb.runTransaction(async (transaction) => {
     /*
-     * Reads must happen before writes.
+     * All transaction reads must happen
+     * before transaction writes.
      */
     const contentSnapshot = await transaction.get(contentRef);
 
@@ -199,6 +301,8 @@ export async function recordPublicContentView({ companyId, slug, visitorId }) {
           lastViewedAt: FieldValue.serverTimestamp(),
 
           updatedAt: FieldValue.serverTimestamp(),
+
+          expiresAt: createRawEngagementExpiry(),
         },
         {
           merge: true,
@@ -226,6 +330,8 @@ export async function recordPublicContentView({ companyId, slug, visitorId }) {
       liked: likeSnapshot.exists,
 
       counted: shouldCount,
+
+      analyticsConsent: true,
     };
   });
 }
@@ -234,17 +340,31 @@ export async function recordPublicContentView({ companyId, slug, visitorId }) {
  * =========================================================
  * LIKE / UNLIKE
  * =========================================================
+ *
+ * Like is an action expressly requested
+ * by the visitor.
+ *
+ * The like document is retained until the
+ * visitor presses Unlike.
+ * =========================================================
  */
 
-export async function togglePublicContentLike({ companyId, slug, visitorId }) {
-  const safeVisitorId = normalizeVisitorId(visitorId);
+export async function togglePublicContentLike({
+  companyId,
 
-  if (!safeVisitorId) {
-    throw new Error("INVALID_VISITOR_ID");
+  slug,
+
+  visitorHash,
+}) {
+  const safeVisitorHash = normalizeVisitorHash(visitorHash);
+
+  if (!safeVisitorHash) {
+    throw new Error("INVALID_VISITOR_HASH");
   }
 
   const content = await resolvePublishedContent({
     companyId,
+
     slug,
   });
 
@@ -254,7 +374,7 @@ export async function togglePublicContentLike({ companyId, slug, visitorId }) {
     contentId: content.id,
   });
 
-  const likeRef = contentRef.collection("likes").doc(safeVisitorId);
+  const likeRef = contentRef.collection("likes").doc(safeVisitorHash);
 
   return adminDb.runTransaction(async (transaction) => {
     const contentSnapshot = await transaction.get(contentRef);
@@ -283,15 +403,13 @@ export async function togglePublicContentLike({ companyId, slug, visitorId }) {
 
     const nextLikes = nextLiked
       ? currentEngagement.likes + 1
-      : Math.max(
-          0,
-
-          currentEngagement.likes - 1,
-        );
+      : Math.max(0, currentEngagement.likes - 1);
 
     if (nextLiked) {
       transaction.set(likeRef, {
         createdAt: FieldValue.serverTimestamp(),
+
+        updatedAt: FieldValue.serverTimestamp(),
       });
     } else {
       transaction.delete(likeRef);
@@ -324,29 +442,32 @@ export async function togglePublicContentLike({ companyId, slug, visitorId }) {
  * SHARE
  * =========================================================
  *
- * Counts:
+ * Supported channels:
  *
- * Facebook
- * X
- * LinkedIn
- * Copy Link
- * Native Share (future)
+ * - Facebook
+ * - X
+ * - LinkedIn
+ * - Copy Link
+ * - Native Share
  *
- * One browser/channel combination
- * is throttled for 5 seconds.
+ * One visitor/channel combination is throttled
+ * for five seconds.
  * =========================================================
  */
 
 export async function recordPublicContentShare({
   companyId,
+
   slug,
-  visitorId,
+
+  visitorHash,
+
   channel,
 }) {
-  const safeVisitorId = normalizeVisitorId(visitorId);
+  const safeVisitorHash = normalizeVisitorHash(visitorHash);
 
-  if (!safeVisitorId) {
-    throw new Error("INVALID_VISITOR_ID");
+  if (!safeVisitorHash) {
+    throw new Error("INVALID_VISITOR_HASH");
   }
 
   const safeChannel = normalizeShareChannel(channel);
@@ -357,6 +478,7 @@ export async function recordPublicContentShare({
 
   const content = await resolvePublishedContent({
     companyId,
+
     slug,
   });
 
@@ -368,7 +490,7 @@ export async function recordPublicContentShare({
 
   const shareEventRef = contentRef
     .collection("shareEvents")
-    .doc(`${safeVisitorId}_${safeChannel}`);
+    .doc(`${safeVisitorHash}_${safeChannel}`);
 
   return adminDb.runTransaction(async (transaction) => {
     const contentSnapshot = await transaction.get(contentRef);
@@ -413,6 +535,8 @@ export async function recordPublicContentShare({
           lastSharedAt: FieldValue.serverTimestamp(),
 
           updatedAt: FieldValue.serverTimestamp(),
+
+          expiresAt: createRawEngagementExpiry(),
         },
         {
           merge: true,

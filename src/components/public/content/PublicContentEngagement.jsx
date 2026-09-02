@@ -6,8 +6,6 @@ import { Eye, Heart } from "lucide-react";
 
 import PublicContentShare from "./PublicContentShare";
 
-import { getPublicVisitorId } from "@/utils/public-visitor";
-
 function normalizeCount(value) {
   const number = Number(value);
 
@@ -55,21 +53,7 @@ export default function PublicContentEngagement({
 
   const [likeLoading, setLikeLoading] = useState(false);
 
-  const visitorRef = useRef(null);
-
   const viewRequestedRef = useRef(false);
-
-  function resolveVisitor() {
-    if (visitorRef.current) {
-      return visitorRef.current;
-    }
-
-    const visitorId = getPublicVisitorId();
-
-    visitorRef.current = visitorId;
-
-    return visitorId;
-  }
 
   function engagementEndpoint() {
     return `/api/public/v1/companies/${encodeURIComponent(
@@ -78,19 +62,11 @@ export default function PublicContentEngagement({
   }
 
   useEffect(() => {
-    if (!trackView || viewRequestedRef.current) {
+    if (!trackView || !companySlug || !slug || viewRequestedRef.current) {
       return;
     }
 
     viewRequestedRef.current = true;
-
-    const visitorId = getPublicVisitorId();
-
-    visitorRef.current = visitorId;
-
-    if (!visitorId) {
-      return;
-    }
 
     let active = true;
 
@@ -107,8 +83,6 @@ export default function PublicContentEngagement({
 
         body: JSON.stringify({
           action: "view",
-
-          visitorId,
         }),
 
         cache: "no-store",
@@ -150,13 +124,7 @@ export default function PublicContentEngagement({
   }, [companySlug, slug, trackView]);
 
   async function handleLike() {
-    if (!interactiveLike || likeLoading) {
-      return;
-    }
-
-    const visitorId = resolveVisitor();
-
-    if (!visitorId) {
+    if (!interactiveLike || !companySlug || !slug || likeLoading) {
       return;
     }
 
@@ -172,8 +140,6 @@ export default function PublicContentEngagement({
 
         body: JSON.stringify({
           action: "like",
-
-          visitorId,
         }),
 
         cache: "no-store",

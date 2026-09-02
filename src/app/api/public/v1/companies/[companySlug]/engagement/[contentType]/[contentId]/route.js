@@ -4,11 +4,7 @@ import { resolveEngagementRoute } from "@/modules/engagement/engagement-route.he
 
 import { getContentEngagement } from "@/modules/engagement/engagement.service";
 
-import {
-  attachVisitorCookie,
-  hashVisitorId,
-  resolveVisitor,
-} from "@/lib/visitor/visitor";
+import { hashVisitorId, resolveVisitor } from "@/lib/visitor/visitor";
 
 export async function GET(request, context) {
   try {
@@ -18,8 +14,10 @@ export async function GET(request, context) {
       return NextResponse.json(
         {
           success: false,
+
           message: "Content not found.",
         },
+
         {
           status: 404,
         },
@@ -28,7 +26,21 @@ export async function GET(request, context) {
 
     const visitor = resolveVisitor(request);
 
-    const visitorHash = hashVisitorId(visitor.visitorId);
+    /*
+     * Scope the hash to the selected company.
+     *
+     * If the visitor does not yet have a cookie,
+     * resolveVisitor creates an in-memory ID for
+     * this request only.
+     *
+     * This GET endpoint intentionally does not
+     * persist a new visitor cookie.
+     */
+    const visitorHash = hashVisitorId(
+      visitor.visitorId,
+
+      route.company.id,
+    );
 
     const data = await getContentEngagement({
       companyId: route.company.id,
@@ -40,29 +52,26 @@ export async function GET(request, context) {
       visitorHash,
     });
 
-    const response = NextResponse.json({
+    return NextResponse.json({
       success: true,
+
       data,
     });
-
-    if (visitor.isNew) {
-      attachVisitorCookie({
-        response,
-
-        visitorId: visitor.visitorId,
-      });
-    }
-
-    return response;
   } catch (error) {
-    console.error("Get engagement error:", error);
+    console.error(
+      "Get engagement error:",
+
+      error,
+    );
 
     if (error.message === "ENGAGEMENT_CONTENT_NOT_FOUND") {
       return NextResponse.json(
         {
           success: false,
+
           message: "Content not found.",
         },
+
         {
           status: 404,
         },
@@ -72,8 +81,10 @@ export async function GET(request, context) {
     return NextResponse.json(
       {
         success: false,
+
         message: "Unable to retrieve engagement.",
       },
+
       {
         status: 500,
       },

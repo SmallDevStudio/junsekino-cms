@@ -6,7 +6,10 @@ import {
   checkSubmissionRateLimit,
   createSubmissionRecord,
   getSubmissionById,
+  listExpiredSubmissionRecords,
   listSubmissionRecords,
+  markSubmissionCleanupFailed,
+  markSubmissionCleanupStarted,
   markSubmissionReadRecord,
   permanentlyDeleteSubmissionRecord,
   restoreSubmissionRecord,
@@ -14,7 +17,11 @@ import {
   updateSubmissionStatusRecord,
 } from "./form-submission.repository";
 
+import { deleteSubmissionAttachments } from "./form-attachment.service";
+
 import { getActiveLegalDocuments } from "@/modules/legal/legal.repository";
+
+import { getCompanyPrivacySettings } from "@/modules/legal/privacy-settings.service";
 
 import { createFormSubmissionNotification } from "@/modules/notification/notification.service";
 
@@ -23,6 +30,12 @@ import { sendFormSubmissionEmail } from "@/modules/email/email.service";
 import { serializeFirestoreDocument } from "@/utils/firestore";
 
 import { createAuditLogSafe } from "@/modules/audit/audit.service";
+
+/*
+ * =========================================================
+ * HELPERS
+ * =========================================================
+ */
 
 function isEmptyValue(value) {
   if (value === undefined || value === null) {
@@ -39,6 +52,58 @@ function isEmptyValue(value) {
 
   return false;
 }
+
+function createRetentionExpiration(days) {
+  const safeDays = Number.isInteger(days)
+    ? Math.max(
+        30,
+
+        Math.min(3650, days),
+      )
+    : 730;
+
+  return new Date(Date.now() + safeDays * 24 * 60 * 60 * 1000);
+}
+
+function createDeletionAuditSummary({
+  submission,
+  attachmentCount = 0,
+  reason,
+}) {
+  return {
+    id: submission.id,
+
+    formId: submission.formId || null,
+
+    formSlug: submission.formSlug || null,
+
+    formType: submission.formType || null,
+
+    status: submission.status || null,
+
+    createdAt:
+      serializeFirestoreDocument({
+        value: submission.createdAt,
+      })?.value || null,
+
+    attachmentCount,
+
+    deletionReason: reason,
+
+    /*
+     * Do not copy fieldsSnapshot, values,
+     * visitorHash, source or technical data
+     * into the deletion audit record.
+     */
+    personalDataRemoved: true,
+  };
+}
+
+/*
+ * =========================================================
+ * FIELD VALIDATION
+ * =========================================================
+ */
 
 function validateText({ field, value }) {
   if (typeof value !== "string") {
@@ -73,6 +138,7 @@ function validateText({ field, value }) {
 function validateEmail({ field, value }) {
   validateText({
     field,
+
     value,
   });
 
@@ -108,9 +174,11 @@ function validateOption({ field, value }) {
 }
 
 /*
- * Returns both sanitized values
- * and attachment claims.
+ * =========================================================
+ * FORM VALUES
+ * =========================================================
  */
+
 function validateFormValues({ form, values }) {
   const cleaned = {};
 
@@ -144,6 +212,7 @@ function validateFormValues({ form, values }) {
       case "date":
         validateText({
           field,
+
           value,
         });
         break;
@@ -151,6 +220,7 @@ function validateFormValues({ form, values }) {
       case "email":
         validateEmail({
           field,
+
           value,
         });
         break;
@@ -158,6 +228,7 @@ function validateFormValues({ form, values }) {
       case "number":
         validateNumber({
           field,
+
           value,
         });
         break;
@@ -170,9 +241,9 @@ function validateFormValues({ form, values }) {
 
         validateOption({
           field,
+
           value,
         });
-
         break;
 
       case "checkbox":
@@ -189,7 +260,6 @@ function validateFormValues({ form, values }) {
             });
           }
         }
-
         break;
 
       case "consent":
@@ -199,10 +269,6 @@ function validateFormValues({ form, values }) {
         break;
 
       case "file":
-        /*
-         * Public client sends the
-         * finalized attachment ID.
-         */
         if (typeof value !== "string" || !value.trim()) {
           throw new Error(`FORM_FIELD_FILE_INVALID:${field.id}`);
         }
@@ -212,7 +278,6 @@ function validateFormValues({ form, values }) {
 
           attachmentId: value.trim(),
         });
-
         break;
 
       default:
@@ -228,6 +293,12 @@ function validateFormValues({ form, values }) {
     attachmentBindings,
   };
 }
+
+/*
+ * =========================================================
+ * LEGAL
+ * =========================================================
+ */
 
 function resolveLegalVersions(legal) {
   return {
@@ -259,6 +330,12 @@ function validatePrivacyRequirement({ form, legal }) {
     throw new Error("FORM_PRIVACY_CONSENT_FIELD_REQUIRED");
   }
 }
+
+/*
+ * =========================================================
+ * SUBMIT PUBLIC FORM
+ * =========================================================
+ */
 
 export async function submitPublicForm({
   companyId,
@@ -295,10 +372,15 @@ export async function submitPublicForm({
     throw new Error("FORM_RATE_LIMITED");
   }
 
-  const legal = await getActiveLegalDocuments(companyId);
+  const [legal, privacySettings] = await Promise.all([
+    getActiveLegalDocuments(companyId),
+
+    getCompanyPrivacySettings(companyId),
+  ]);
 
   validatePrivacyRequirement({
     form,
+
     legal,
   });
 
@@ -309,6 +391,10 @@ export async function submitPublicForm({
   });
 
   const legalVersions = resolveLegalVersions(legal);
+
+  const retentionDays = privacySettings.retention?.formSubmissionDays || 730;
+
+  const retentionExpiresAt = createRetentionExpiration(retentionDays);
 
   const submission = await createSubmissionRecord({
     companyId,
@@ -338,15 +424,21 @@ export async function submitPublicForm({
 
       visitorHash,
 
+      retentionExpiresAt,
+
       source: {
         pagePath: input.source?.pagePath || null,
 
         popupId: input.source?.popupId || null,
 
         referrer: input.source?.referrer || null,
-      },
 
-      userAgent: userAgent || null,
+        /*
+         * The route now sends only an
+         * irreversible HMAC value.
+         */
+        userAgentHash: userAgent || null,
+      },
     },
   });
 
@@ -355,12 +447,17 @@ export async function submitPublicForm({
   try {
     await createFormSubmissionNotification({
       companyId,
+
       form,
 
       submission: serialized,
     });
   } catch (error) {
-    console.error("Create form notification failed:", error);
+    console.error(
+      "Create form notification failed:",
+
+      error,
+    );
   }
 
   let email = {
@@ -376,7 +473,11 @@ export async function submitPublicForm({
       submission: serialized,
     });
   } catch (error) {
-    console.error("Form email notification failed:", error);
+    console.error(
+      "Form email notification failed:",
+
+      error,
+    );
 
     email = {
       sent: false,
@@ -422,8 +523,11 @@ export async function listFormSubmissions({
 }) {
   const items = await listSubmissionRecords({
     companyId,
+
     formId,
+
     status,
+
     folder,
   });
 
@@ -433,10 +537,6 @@ export async function listFormSubmissions({
   );
 
   let result = items;
-
-  /*
-   * Unread is per-user.
-   */
 
   if (unreadOnly && currentUser?.uid) {
     result = result.filter((item) => {
@@ -483,6 +583,7 @@ export async function getFormSubmission({
 }) {
   const item = await getSubmissionById({
     companyId,
+
     submissionId,
   });
 
@@ -524,7 +625,9 @@ export async function updateFormSubmissionStatus({
 }) {
   const result = await updateSubmissionStatusRecord({
     companyId,
+
     submissionId,
+
     status,
 
     userId: currentUser.uid,
@@ -576,10 +679,6 @@ export async function markFormSubmissionRead({
 
       email: currentUser.email || null,
 
-      /*
-       * Current auth session does not expose an avatar yet.
-       * The read receipt schema is already ready for it.
-       */
       avatarUrl: currentUser.avatarUrl || null,
     },
   });
@@ -587,11 +686,6 @@ export async function markFormSubmissionRead({
   const before = serializeFirestoreDocument(result.before);
 
   const after = serializeFirestoreDocument(result.after);
-
-  /*
-   * Only create an audit entry when this user
-   * actually became a new reader.
-   */
 
   if (!before?.readBy?.[currentUser.uid]) {
     await createAuditLogSafe({
@@ -715,33 +809,193 @@ export async function permanentlyDeleteFormSubmission({
   submissionId,
   currentUser,
 }) {
-  const result = await permanentlyDeleteSubmissionRecord({
+  const existing = await getSubmissionById({
     companyId,
 
     submissionId,
   });
 
-  const before = serializeFirestoreDocument(result.before);
+  if (!existing) {
+    throw new Error("FORM_SUBMISSION_NOT_FOUND");
+  }
 
-  await createAuditLogSafe({
-    userId: currentUser.uid,
+  if (!existing.deletedAt) {
+    throw new Error("FORM_SUBMISSION_NOT_IN_TRASH");
+  }
 
+  await markSubmissionCleanupStarted({
     companyId,
 
-    action: "FORM_SUBMISSION_PERMANENT_DELETE",
-
-    resource: "formSubmission",
-
-    resourceId: submissionId,
-
-    before,
-
-    after: null,
+    submissionId,
   });
 
-  return {
-    id: submissionId,
+  try {
+    const attachments = await deleteSubmissionAttachments({
+      companyId,
 
-    deleted: true,
+      submissionId,
+    });
+
+    const result = await permanentlyDeleteSubmissionRecord({
+      companyId,
+
+      submissionId,
+    });
+
+    const auditSummary = createDeletionAuditSummary({
+      submission: result.before,
+
+      attachmentCount: attachments.count,
+
+      reason: "manual_permanent_delete",
+    });
+
+    await createAuditLogSafe({
+      userId: currentUser.uid,
+
+      companyId,
+
+      action: "FORM_SUBMISSION_PERMANENT_DELETE",
+
+      resource: "formSubmission",
+
+      resourceId: submissionId,
+
+      before: auditSummary,
+
+      after: {
+        id: submissionId,
+
+        deleted: true,
+
+        personalDataRemoved: true,
+      },
+    });
+
+    return {
+      id: submissionId,
+
+      deleted: true,
+
+      attachmentCount: attachments.count,
+    };
+  } catch (error) {
+    await markSubmissionCleanupFailed({
+      companyId,
+
+      submissionId,
+
+      error: error.message || "FORM_SUBMISSION_CLEANUP_FAILED",
+    });
+
+    throw error;
+  }
+}
+
+/*
+ * =========================================================
+ * AUTOMATED RETENTION CLEANUP
+ * =========================================================
+ */
+
+export async function cleanupExpiredFormSubmissions({ companyId, limit = 50 }) {
+  const submissions = await listExpiredSubmissionRecords({
+    companyId,
+
+    limit,
+  });
+
+  const result = {
+    processed: 0,
+
+    deleted: 0,
+
+    failed: 0,
+
+    attachmentCount: 0,
+
+    errors: [],
   };
+
+  for (const submission of submissions) {
+    result.processed += 1;
+
+    await markSubmissionCleanupStarted({
+      companyId,
+
+      submissionId: submission.id,
+    });
+
+    try {
+      const attachments = await deleteSubmissionAttachments({
+        companyId,
+
+        submissionId: submission.id,
+      });
+
+      await permanentlyDeleteSubmissionRecord({
+        companyId,
+
+        submissionId: submission.id,
+
+        allowExpired: true,
+      });
+
+      result.deleted += 1;
+
+      result.attachmentCount += attachments.count;
+
+      const auditSummary = createDeletionAuditSummary({
+        submission,
+
+        attachmentCount: attachments.count,
+
+        reason: "retention_expired",
+      });
+
+      await createAuditLogSafe({
+        userId: "system:retention",
+
+        companyId,
+
+        action: "FORM_SUBMISSION_RETENTION_DELETE",
+
+        resource: "formSubmission",
+
+        resourceId: submission.id,
+
+        before: auditSummary,
+
+        after: {
+          id: submission.id,
+
+          deleted: true,
+
+          personalDataRemoved: true,
+        },
+
+        metadata: {
+          automated: true,
+        },
+      });
+    } catch (error) {
+      result.failed += 1;
+
+      result.errors.push({
+        submissionId: submission.id,
+
+        message: error.message || "FORM_SUBMISSION_CLEANUP_FAILED",
+      });
+
+      await markSubmissionCleanupFailed({
+        companyId,
+
+        submissionId: submission.id,
+
+        error: error.message || "FORM_SUBMISSION_CLEANUP_FAILED",
+      });
+    }
+  }
+
+  return result;
 }

@@ -2,7 +2,7 @@ import "server-only";
 
 import { getFormBySlug } from "./form.repository";
 
-import { createForm, publishForm } from "./form.service";
+import { createForm, publishForm, updateForm } from "./form.service";
 
 import { serializeFirestoreDocument } from "@/utils/firestore";
 
@@ -14,6 +14,108 @@ import { serializeFirestoreDocument } from "@/utils/firestore";
 
 export const CONTACT_FORM_SLUG = "contact";
 
+const PRIVACY_CONSENT_ID = "privacyConsent";
+
+const TERMS_ACKNOWLEDGEMENT_ID = "termsAcknowledgement";
+
+/*
+ * =========================================================
+ * CONSENT FIELDS
+ * =========================================================
+ */
+
+function createPrivacyConsentField(sortOrder = 4) {
+  return {
+    id: PRIVACY_CONSENT_ID,
+
+    type: "consent",
+
+    label: {
+      en: "I have read and acknowledged the Privacy Notice and consent to the processing of my information for the purpose of handling this request.",
+
+      th: "ข้าพเจ้าได้อ่านและรับทราบประกาศความเป็นส่วนตัว และยินยอมให้บริษัทประมวลผลข้อมูลเพื่อดำเนินการตามคำขอนี้",
+    },
+
+    placeholder: {
+      en: "",
+
+      th: "",
+    },
+
+    helpText: {
+      en: "",
+
+      th: "",
+    },
+
+    required: true,
+
+    sortOrder,
+
+    options: [],
+
+    validation: {
+      allowedMimeTypes: [],
+    },
+
+    consent: {
+      legalDocument: "privacy",
+
+      required: true,
+    },
+
+    width: "full",
+
+    enabled: true,
+  };
+}
+
+function createTermsAcknowledgementField(sortOrder = 5) {
+  return {
+    id: TERMS_ACKNOWLEDGEMENT_ID,
+
+    type: "consent",
+
+    label: {
+      en: "I confirm that I am authorized to submit the information, images, documents, drawings, and attachments provided, and acknowledge the Website Terms of Use.",
+
+      th: "ข้าพเจ้ายืนยันว่ามีสิทธิส่งข้อมูล รูปภาพ เอกสาร แบบแปลน และไฟล์แนบดังกล่าว และรับทราบข้อกำหนดการใช้งานเว็บไซต์",
+    },
+
+    placeholder: {
+      en: "",
+
+      th: "",
+    },
+
+    helpText: {
+      en: "",
+
+      th: "",
+    },
+
+    required: true,
+
+    sortOrder,
+
+    options: [],
+
+    validation: {
+      allowedMimeTypes: [],
+    },
+
+    consent: {
+      legalDocument: "terms",
+
+      required: true,
+    },
+
+    width: "full",
+
+    enabled: true,
+  };
+}
+
 /*
  * =========================================================
  * DEFAULT CONTACT FORM
@@ -24,6 +126,7 @@ function createDefaultContactFormInput() {
   return {
     name: {
       en: "Contact Us",
+
       th: "ติดต่อเรา",
     },
 
@@ -33,6 +136,7 @@ function createDefaultContactFormInput() {
 
     description: {
       en: "Contact form for website enquiries.",
+
       th: "แบบฟอร์มสำหรับติดต่อสอบถามผ่านเว็บไซต์",
     },
 
@@ -44,16 +148,19 @@ function createDefaultContactFormInput() {
 
         label: {
           en: "Name & Surname",
+
           th: "ชื่อ - นามสกุล",
         },
 
         placeholder: {
           en: "Name & Surname",
+
           th: "ชื่อ - นามสกุล",
         },
 
         helpText: {
           en: "",
+
           th: "",
         },
 
@@ -83,16 +190,19 @@ function createDefaultContactFormInput() {
 
         label: {
           en: "Email",
+
           th: "อีเมล",
         },
 
         placeholder: {
           en: "Email",
+
           th: "อีเมล",
         },
 
         helpText: {
           en: "",
+
           th: "",
         },
 
@@ -120,16 +230,19 @@ function createDefaultContactFormInput() {
 
         label: {
           en: "Tel",
-          th: "เบอร์โทรศัพท์",
+
+          th: "หมายเลขโทรศัพท์",
         },
 
         placeholder: {
           en: "Tel",
-          th: "เบอร์โทรศัพท์",
+
+          th: "หมายเลขโทรศัพท์",
         },
 
         helpText: {
           en: "",
+
           th: "",
         },
 
@@ -157,16 +270,19 @@ function createDefaultContactFormInput() {
 
         label: {
           en: "Information",
+
           th: "ข้อมูลที่ต้องการสอบถาม",
         },
 
         placeholder: {
           en: "Information",
+
           th: "ข้อมูลที่ต้องการสอบถาม",
         },
 
         helpText: {
           en: "",
+
           th: "",
         },
 
@@ -188,34 +304,34 @@ function createDefaultContactFormInput() {
 
         enabled: true,
       },
+
+      createPrivacyConsentField(4),
+
+      createTermsAcknowledgementField(5),
     ],
 
     settings: {
       submitLabel: {
         en: "Submit",
+
         th: "ส่งข้อมูล",
       },
 
       successTitle: {
         en: "Thank you",
+
         th: "ขอบคุณ",
       },
 
       successMessage: {
         en: "Thank you. We have received your message.",
+
         th: "ขอบคุณสำหรับข้อมูล เราได้รับข้อความของคุณเรียบร้อยแล้ว",
       },
 
       allowMultipleSubmissions: true,
 
-      /*
-       * Privacy consent is disabled initially.
-       *
-       * We can enable this from Form Manager
-       * once the company has published its
-       * Privacy Notice.
-       */
-      requirePrivacyConsent: false,
+      requirePrivacyConsent: true,
 
       notifyEmployees: true,
 
@@ -250,36 +366,183 @@ async function getExistingContactForm(companyId) {
 
 /*
  * =========================================================
+ * REPAIR
+ * =========================================================
+ */
+
+function getNextSortOrder(fields) {
+  const highest = fields.reduce((result, field) => {
+    const sortOrder = Number(field?.sortOrder);
+
+    if (!Number.isFinite(sortOrder)) {
+      return result;
+    }
+
+    return Math.max(result, sortOrder);
+  }, -1);
+
+  return highest + 1;
+}
+
+function repairConsentField(field) {
+  const legalDocument = field?.consent?.legalDocument;
+
+  if (
+    field?.type !== "consent" ||
+    !["privacy", "terms"].includes(legalDocument)
+  ) {
+    return {
+      field,
+
+      changed: false,
+    };
+  }
+
+  const changed =
+    field.required !== true ||
+    field.enabled === false ||
+    field.consent?.required !== true;
+
+  if (!changed) {
+    return {
+      field,
+
+      changed: false,
+    };
+  }
+
+  return {
+    field: {
+      ...field,
+
+      required: true,
+
+      enabled: true,
+
+      consent: {
+        ...field.consent,
+
+        legalDocument,
+
+        required: true,
+      },
+    },
+
+    changed: true,
+  };
+}
+
+function repairContactForm(form) {
+  const existingFields = Array.isArray(form?.fields) ? form.fields : [];
+
+  let changed = false;
+
+  const fields = existingFields.map((field) => {
+    const repaired = repairConsentField(field);
+
+    if (repaired.changed) {
+      changed = true;
+    }
+
+    return repaired.field;
+  });
+
+  const hasPrivacyConsent = fields.some(
+    (field) =>
+      field?.type === "consent" &&
+      field?.consent?.legalDocument === "privacy" &&
+      field?.enabled !== false,
+  );
+
+  const hasTermsAcknowledgement = fields.some(
+    (field) =>
+      field?.type === "consent" &&
+      field?.consent?.legalDocument === "terms" &&
+      field?.enabled !== false,
+  );
+
+  let nextSortOrder = getNextSortOrder(fields);
+
+  if (!hasPrivacyConsent) {
+    fields.push(createPrivacyConsentField(nextSortOrder));
+
+    nextSortOrder += 1;
+
+    changed = true;
+  }
+
+  if (!hasTermsAcknowledgement) {
+    fields.push(createTermsAcknowledgementField(nextSortOrder));
+
+    changed = true;
+  }
+
+  if (form?.settings?.requirePrivacyConsent !== true) {
+    changed = true;
+  }
+
+  return {
+    changed,
+
+    fields,
+
+    settings: {
+      requirePrivacyConsent: true,
+    },
+  };
+}
+
+/*
+ * =========================================================
  * ENSURE CONTACT FORM
  * =========================================================
  */
 
 export async function ensureContactForm({
   companyId,
+
   currentUser,
+
   publish = true,
 }) {
-  /*
-   * First reuse an existing contact form.
-   *
-   * This makes the operation idempotent:
-   * calling bootstrap repeatedly will not
-   * create duplicate forms.
-   */
   let form = await getExistingContactForm(companyId);
 
+  /*
+   * Existing forms are repaired without
+   * replacing or removing user-defined fields.
+   */
   if (form) {
+    const repair = repairContactForm(form);
+
+    if (repair.changed) {
+      form = await updateForm({
+        companyId,
+
+        formId: form.id,
+
+        input: {
+          fields: repair.fields,
+
+          settings: repair.settings,
+        },
+
+        currentUser,
+      });
+    }
+
     return {
       form,
 
       created: false,
+
+      repaired: repair.changed,
     };
   }
 
   /*
    * Create the default form through the
-   * existing Form Service so audit logging,
-   * normalization and validation remain
+   * existing Form Service so validation,
+   * normalization and audit logging remain
    * centralized.
    */
   form = await createForm({
@@ -290,13 +553,6 @@ export async function ensureContactForm({
     currentUser,
   });
 
-  /*
-   * Contact is a system/default form.
-   *
-   * Publishing immediately allows the
-   * public Contact page to work without
-   * another setup step.
-   */
   if (publish && form.status !== "published") {
     form = await publishForm({
       companyId,
@@ -311,6 +567,8 @@ export async function ensureContactForm({
     form,
 
     created: true,
+
+    repaired: false,
   };
 }
 
