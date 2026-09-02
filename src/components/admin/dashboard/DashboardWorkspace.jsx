@@ -19,23 +19,24 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useCompanyWorkspace } from "@/components/admin/company/CompanyWorkspaceProvider";
+import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
 
 const RANGE_OPTIONS = [
   {
     value: "today",
-    label: "Today",
+    labelKey: "dashboard.ranges.today",
   },
   {
     value: "7d",
-    label: "7 days",
+    labelKey: "dashboard.ranges.sevenDays",
   },
   {
     value: "30d",
-    label: "30 days",
+    labelKey: "dashboard.ranges.thirtyDays",
   },
   {
     value: "month",
-    label: "This month",
+    labelKey: "dashboard.ranges.thisMonth",
   },
 ];
 
@@ -109,16 +110,30 @@ const CARD_STYLES = {
   },
 };
 
-function formatNumber(value) {
-  return new Intl.NumberFormat("en-US", {
-    notation: Number(value) >= 10000 ? "compact" : "standard",
+function resolveIntlLocale(locale) {
+  return locale === "th" ? "th-TH-u-ca-gregory" : "en-GB";
+}
 
-    maximumFractionDigits: 1,
-  }).format(Number(value) || 0);
+function formatNumber(
+  value,
+
+  locale = "en",
+) {
+  return new Intl.NumberFormat(
+    resolveIntlLocale(locale),
+
+    {
+      notation: Number(value) >= 10000 ? "compact" : "standard",
+
+      maximumFractionDigits: 1,
+    },
+  ).format(Number(value) || 0);
 }
 
 function formatDate(
   value,
+
+  locale = "en",
 
   options = {},
 ) {
@@ -153,46 +168,62 @@ function formatDate(
   }
 
   return new Intl.DateTimeFormat(
-    "en-GB",
+    resolveIntlLocale(locale),
 
     formatOptions,
   ).format(date);
 }
 
-function getLocalizedText(value) {
+function getLocalizedText(
+  value,
+
+  locale = "en",
+
+  fallback = "",
+) {
   if (!value) {
-    return "Untitled";
+    return fallback;
   }
 
   if (typeof value === "string") {
     return value;
   }
 
-  return value.en || value.th || "Untitled";
+  return value?.[locale] || value?.en || value?.th || fallback;
 }
 
-function getActivityDate(value) {
+function getActivityDate(
+  value,
+
+  locale = "en",
+
+  fallback = "",
+) {
   if (!value) {
-    return "Recently";
+    return fallback;
   }
 
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    return "Recently";
+    return fallback;
   }
 
-  return new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Asia/Bangkok",
+  return new Intl.DateTimeFormat(
+    resolveIntlLocale(locale),
 
-    day: "2-digit",
+    {
+      timeZone: "Asia/Bangkok",
 
-    month: "short",
+      day: "2-digit",
 
-    hour: "2-digit",
+      month: "short",
 
-    minute: "2-digit",
-  }).format(date);
+      hour: "2-digit",
+
+      minute: "2-digit",
+    },
+  ).format(date);
 }
 
 /*
@@ -201,17 +232,7 @@ function getActivityDate(value) {
  * =========================================================
  */
 
-function MetricCard({
-  label,
-
-  value,
-
-  description,
-
-  icon: Icon,
-
-  tone,
-}) {
+function MetricCard({ label, value, description, icon: Icon, tone, locale }) {
   const style = CARD_STYLES[tone];
 
   return (
@@ -264,7 +285,11 @@ function MetricCard({
               ${style.accent}
             `}
           >
-            {formatNumber(value)}
+            {formatNumber(
+              value,
+
+              locale,
+            )}
           </p>
 
           <p
@@ -310,7 +335,7 @@ function MetricCard({
  * =========================================================
  */
 
-function TrafficChart({ rows }) {
+function TrafficChart({ rows, locale, t }) {
   const width = 760;
 
   const height = 230;
@@ -367,12 +392,14 @@ function TrafficChart({ rows }) {
       >
         <span className="inline-flex items-center gap-2">
           <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
-          Views
+
+          {t("dashboard.chart.views")}
         </span>
 
         <span className="inline-flex items-center gap-2">
           <span className="h-2.5 w-2.5 rounded-full bg-violet-500" />
-          Unique visitors
+
+          {t("dashboard.chart.uniqueVisitors")}
         </span>
       </div>
 
@@ -385,7 +412,7 @@ function TrafficChart({ rows }) {
             w-full
           "
           role="img"
-          aria-label="Website traffic chart"
+          aria-label={t("dashboard.chart.ariaLabel")}
         >
           {[0, 1, 2, 3, 4].map((line) => {
             const y = paddingY + (line / 4) * (height - paddingY * 2);
@@ -444,17 +471,21 @@ function TrafficChart({ rows }) {
             ? formatDate(
                 rows[0].date,
 
+                locale,
+
                 {
                   year: false,
                 },
               )
-            : "No data"}
+            : t("dashboard.chart.noData")}
         </span>
 
         <span>
           {rows.length
             ? formatDate(
                 rows[rows.length - 1].date,
+
+                locale,
 
                 {
                   year: false,
@@ -466,12 +497,6 @@ function TrafficChart({ rows }) {
     </div>
   );
 }
-
-/*
- * =========================================================
- * EMPTY STATE
- * =========================================================
- */
 
 function EmptyState({ children }) {
   return (
@@ -506,10 +531,16 @@ function EmptyState({ children }) {
 
 export default function DashboardWorkspace({ userName }) {
   const {
+    t,
+
+    locale,
+
+    statusLabel,
+  } = useAdminTranslation();
+
+  const {
     activeCompany,
-
     activeCompanyId,
-
     loading: companyLoading,
   } = useCompanyWorkspace();
 
@@ -544,6 +575,8 @@ export default function DashboardWorkspace({ userName }) {
           {
             cache: "no-store",
 
+            credentials: "same-origin",
+
             signal,
           },
         );
@@ -551,7 +584,7 @@ export default function DashboardWorkspace({ userName }) {
         const payload = await response.json().catch(() => null);
 
         if (!response.ok || !payload?.success) {
-          throw new Error(payload?.message || "Unable to load dashboard.");
+          throw new Error(payload?.message || t("dashboard.errors.load"));
         }
 
         setData({
@@ -579,7 +612,7 @@ export default function DashboardWorkspace({ userName }) {
             loadError,
           );
 
-          setError(loadError.message || "Unable to load dashboard.");
+          setError(loadError.message || t("dashboard.errors.load"));
         }
       } finally {
         if (!signal?.aborted) {
@@ -588,15 +621,19 @@ export default function DashboardWorkspace({ userName }) {
       }
     },
 
-    [activeCompanyId, range],
+    [activeCompanyId, range, t],
   );
 
   useEffect(() => {
     const controller = new AbortController();
 
-    const timeoutId = window.setTimeout(() => {
-      loadDashboard(controller.signal);
-    }, 0);
+    const timeoutId = window.setTimeout(
+      () => {
+        loadDashboard(controller.signal);
+      },
+
+      0,
+    );
 
     return () => {
       window.clearTimeout(timeoutId);
@@ -608,11 +645,11 @@ export default function DashboardWorkspace({ userName }) {
   const cards = useMemo(
     () => [
       {
-        label: "Page views",
+        label: t("dashboard.metrics.views.title"),
 
         value: data.overview.views,
 
-        description: "Consent-based visits",
+        description: t("dashboard.metrics.views.description"),
 
         icon: Eye,
 
@@ -620,11 +657,11 @@ export default function DashboardWorkspace({ userName }) {
       },
 
       {
-        label: "Unique visitors",
+        label: t("dashboard.metrics.uniqueVisitors.title"),
 
         value: data.overview.uniqueVisitors,
 
-        description: "Anonymous visitors",
+        description: t("dashboard.metrics.uniqueVisitors.description"),
 
         icon: Users,
 
@@ -632,11 +669,11 @@ export default function DashboardWorkspace({ userName }) {
       },
 
       {
-        label: "Likes",
+        label: t("dashboard.metrics.likes.title"),
 
         value: data.overview.likes,
 
-        description: "Content reactions",
+        description: t("dashboard.metrics.likes.description"),
 
         icon: Heart,
 
@@ -644,11 +681,11 @@ export default function DashboardWorkspace({ userName }) {
       },
 
       {
-        label: "Shares",
+        label: t("dashboard.metrics.shares.title"),
 
         value: data.overview.shares,
 
-        description: "Content shared",
+        description: t("dashboard.metrics.shares.description"),
 
         icon: Share2,
 
@@ -656,13 +693,21 @@ export default function DashboardWorkspace({ userName }) {
       },
 
       {
-        label: "Submissions",
+        label: t("dashboard.metrics.submissions.title"),
 
         value: data.overview.submissions,
 
-        description: `${formatNumber(
-          data.overview.newSubmissions,
-        )} new messages`,
+        description: t(
+          "dashboard.metrics.submissions.description",
+
+          {
+            count: formatNumber(
+              data.overview.newSubmissions,
+
+              locale,
+            ),
+          },
+        ),
 
         icon: FileText,
 
@@ -670,11 +715,11 @@ export default function DashboardWorkspace({ userName }) {
       },
 
       {
-        label: "Notifications",
+        label: t("dashboard.metrics.notifications.title"),
 
         value: data.overview.notifications,
 
-        description: "Workspace activity",
+        description: t("dashboard.metrics.notifications.description"),
 
         icon: Bell,
 
@@ -682,17 +727,61 @@ export default function DashboardWorkspace({ userName }) {
       },
     ],
 
-    [data.overview],
+    [data.overview, locale, t],
+  );
+
+  const formCards = useMemo(
+    () => [
+      {
+        key: "contact",
+
+        label: t("dashboard.forms.contact"),
+
+        value: data.forms?.contact,
+
+        color: "bg-blue-500",
+      },
+
+      {
+        key: "survey",
+
+        label: t("dashboard.forms.survey"),
+
+        value: data.forms?.survey,
+
+        color: "bg-violet-500",
+      },
+
+      {
+        key: "career",
+
+        label: t("dashboard.forms.career"),
+
+        value: data.forms?.career,
+
+        color: "bg-emerald-500",
+      },
+
+      {
+        key: "custom",
+
+        label: t("dashboard.forms.custom"),
+
+        value: data.forms?.custom,
+
+        color: "bg-amber-500",
+      },
+    ],
+
+    [data.forms, t],
   );
 
   const websiteSlug = activeCompany?.slug || activeCompany?.companySlug;
 
+  const companyName = activeCompany?.name || t("dashboard.selectedCompany");
+
   return (
     <div>
-      {/* =================================
-          HEADER
-      ================================= */}
-
       <header
         className="
           flex
@@ -720,7 +809,8 @@ export default function DashboardWorkspace({ userName }) {
             "
           >
             <Sparkles size={14} />
-            Company overview
+
+            {t("dashboard.eyebrow")}
           </div>
 
           <h1
@@ -734,12 +824,12 @@ export default function DashboardWorkspace({ userName }) {
               text-[var(--admin-foreground)]
             "
           >
-            Dashboard
+            {t("dashboard.title")}
           </h1>
 
           <p
             className="
-              mt-22
+              mt-2
               max-w-[720px]
 
               admin-text-12
@@ -748,9 +838,15 @@ export default function DashboardWorkspace({ userName }) {
               text-[var(--admin-muted)]
             "
           >
-            Welcome back, {userName}. Monitor website traffic, engagement and
-            incoming messages for{" "}
-            {activeCompany?.name || "the selected company"}.
+            {t(
+              "dashboard.welcome",
+
+              {
+                user: userName,
+
+                company: companyName,
+              },
+            )}
           </p>
         </div>
 
@@ -759,7 +855,7 @@ export default function DashboardWorkspace({ userName }) {
             value={range}
             onChange={(event) => setRange(event.target.value)}
             disabled={loading || companyLoading}
-            aria-label="Dashboard date range"
+            aria-label={t("dashboard.actions.dateRange")}
             className="
               h-10
 
@@ -785,7 +881,7 @@ export default function DashboardWorkspace({ userName }) {
           >
             {RANGE_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(option.labelKey)}
               </option>
             ))}
           </select>
@@ -794,6 +890,8 @@ export default function DashboardWorkspace({ userName }) {
             type="button"
             onClick={() => loadDashboard()}
             disabled={loading || !activeCompanyId}
+            aria-label={t("dashboard.actions.refresh")}
+            title={t("dashboard.actions.refresh")}
             className="
               inline-flex
               h-10
@@ -819,7 +917,6 @@ export default function DashboardWorkspace({ userName }) {
               disabled:cursor-not-allowed
               disabled:opacity-50
             "
-            aria-label="Refresh dashboard"
           >
             <RefreshCw size={15} className={loading ? "animate-spin" : ""} />
           </button>
@@ -828,7 +925,7 @@ export default function DashboardWorkspace({ userName }) {
             <a
               href={`/${websiteSlug}`}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="
                 inline-flex
                 h-10
@@ -853,16 +950,13 @@ export default function DashboardWorkspace({ userName }) {
                 hover:opacity-90
               "
             >
-              View website
+              {t("dashboard.actions.viewWebsite")}
+
               <ArrowUpRight size={15} />
             </a>
           )}
         </div>
       </header>
-
-      {/* =================================
-          ERROR
-      ================================= */}
 
       {error && (
         <div
@@ -891,10 +985,6 @@ export default function DashboardWorkspace({ userName }) {
         </div>
       )}
 
-      {/* =================================
-          LOADING
-      ================================= */}
-
       {loading && !data.chart.length ? (
         <div
           className="
@@ -917,15 +1007,11 @@ export default function DashboardWorkspace({ userName }) {
           <div className="text-center text-[var(--admin-muted)]">
             <LoaderCircle className="mx-auto animate-spin" size={24} />
 
-            <p className="mt-3 admin-text-11">Loading dashboard…</p>
+            <p className="mt-3 admin-text-11">{t("dashboard.loading")}</p>
           </div>
         </div>
       ) : (
         <>
-          {/* =============================
-              METRIC CARDS
-          ============================= */}
-
           <section
             className="
               mt-8
@@ -942,13 +1028,9 @@ export default function DashboardWorkspace({ userName }) {
             "
           >
             {cards.map((card) => (
-              <MetricCard key={card.label} {...card} />
+              <MetricCard key={card.label} {...card} locale={locale} />
             ))}
           </section>
-
-          {/* =============================
-              TRAFFIC + FORMS
-          ============================= */}
 
           <section
             className="
@@ -996,7 +1078,7 @@ export default function DashboardWorkspace({ userName }) {
                       text-[var(--admin-foreground)]
                     "
                   >
-                    Website traffic
+                    {t("dashboard.traffic.title")}
                   </h2>
 
                   <p
@@ -1008,7 +1090,7 @@ export default function DashboardWorkspace({ userName }) {
                       text-[var(--admin-muted)]
                     "
                   >
-                    Views and consent-based unique visitors.
+                    {t("dashboard.traffic.description")}
                   </p>
                 </div>
 
@@ -1031,13 +1113,25 @@ export default function DashboardWorkspace({ userName }) {
                   "
                 >
                   <CalendarDays size={13} />
-                  {formatDate(data.period?.from)} —{" "}
-                  {formatDate(data.period?.to)}
+
+                  {formatDate(
+                    data.period?.from,
+
+                    locale,
+                  )}
+
+                  {" — "}
+
+                  {formatDate(
+                    data.period?.to,
+
+                    locale,
+                  )}
                 </span>
               </div>
 
               <div className="p-5 sm:p-6">
-                <TrafficChart rows={data.chart || []} />
+                <TrafficChart rows={data.chart || []} locale={locale} t={t} />
               </div>
             </article>
 
@@ -1068,7 +1162,7 @@ export default function DashboardWorkspace({ userName }) {
                     text-[var(--admin-foreground)]
                   "
                 >
-                  Message summary
+                  {t("dashboard.forms.title")}
                 </h2>
 
                 <p
@@ -1080,75 +1174,67 @@ export default function DashboardWorkspace({ userName }) {
                     text-[var(--admin-muted)]
                   "
                 >
-                  Form submissions in this period.
+                  {t("dashboard.forms.description")}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-3 p-5">
-                {[
-                  ["Contact", data.forms?.contact, "bg-blue-500"],
-
-                  ["Survey", data.forms?.survey, "bg-violet-500"],
-
-                  ["Career", data.forms?.career, "bg-emerald-500"],
-
-                  ["Custom", data.forms?.custom, "bg-amber-500"],
-                ].map(([label, value, color]) => (
+                {formCards.map((item) => (
                   <div
-                    key={label}
+                    key={item.key}
                     className="
-                      rounded-xl
+                        rounded-xl
 
-                      bg-[var(--admin-background)]
+                        bg-[var(--admin-background)]
 
-                      p-4
-                    "
+                        p-4
+                      "
                   >
                     <span
                       className={`
-                        block
-                        h-2
-                        w-8
+                          block
+                          h-2
+                          w-8
 
-                        rounded-full
+                          rounded-full
 
-                        ${color}
-                      `}
+                          ${item.color}
+                        `}
                     />
 
                     <p
                       className="
-                        mt-3
+                          mt-3
 
-                        text-xl
-                        font-semibold
+                          text-xl
+                          font-semibold
 
-                        text-[var(--admin-foreground)]
-                      "
+                          text-[var(--admin-foreground)]
+                        "
                     >
-                      {formatNumber(value)}
+                      {formatNumber(
+                        item.value,
+
+                        locale,
+                      )}
                     </p>
 
                     <p
                       className="
-                        mt-1
+                          mt-1
 
-                        admin-text-9
+                          admin-text-9
 
-                        text-[var(--admin-muted)]
-                      "
+                          text-[var(--admin-muted)]
+                        "
                     >
-                      {label}
+                      {item.label}
                     </p>
                   </div>
                 ))}
               </div>
             </article>
           </section>
-
-          {/* =============================
-              TOP CONTENT + ACTIVITY
-          ============================= */}
 
           <section
             className="
@@ -1191,7 +1277,7 @@ export default function DashboardWorkspace({ userName }) {
                     text-[var(--admin-foreground)]
                   "
                 >
-                  Top content
+                  {t("dashboard.topContent.title")}
                 </h2>
 
                 <p
@@ -1203,116 +1289,137 @@ export default function DashboardWorkspace({ userName }) {
                     text-[var(--admin-muted)]
                   "
                 >
-                  Ranked by views, likes and shares.
+                  {t("dashboard.topContent.description")}
                 </p>
               </div>
 
               {!data.topContent?.length ? (
-                <EmptyState>
-                  Content performance will appear after visitors interact with
-                  the website.
-                </EmptyState>
+                <EmptyState>{t("dashboard.topContent.empty")}</EmptyState>
               ) : (
                 <div className="divide-y divide-[var(--admin-border)]">
-                  {data.topContent.slice(0, 6).map((item, index) => (
-                    <div
-                      key={`${item.contentType}-${item.contentId}`}
-                      className="
-                          flex
-                          items-center
-                          gap-4
+                  {data.topContent.slice(0, 6).map(
+                    (
+                      item,
 
-                          px-5
-                          py-4
-
-                          sm:px-6
-                        "
-                    >
-                      <span
+                      index,
+                    ) => (
+                      <div
+                        key={`${item.contentType}-${item.contentId}`}
                         className="
                             flex
-                            h-8
-                            w-8
-                            shrink-0
-
                             items-center
-                            justify-center
+                            gap-4
 
-                            rounded-xl
+                            px-5
+                            py-4
 
-                            bg-[var(--company-primary-soft)]
-
-                            admin-text-10
-                            font-semibold
-
-                            text-[var(--company-primary)]
+                            sm:px-6
                           "
                       >
-                        {index + 1}
-                      </span>
-
-                      <div className="min-w-0 flex-1">
-                        <p
+                        <span
                           className="
-                              truncate
+                              flex
+                              h-8
+                              w-8
+                              shrink-0
 
-                              admin-text-11
+                              items-center
+                              justify-center
+
+                              rounded-xl
+
+                              bg-[var(--company-primary-soft)]
+
+                              admin-text-10
                               font-semibold
 
-                              text-[var(--admin-foreground)]
+                              text-[var(--company-primary)]
                             "
                         >
-                          {getLocalizedText(item.title)}
-                        </p>
+                          {index + 1}
+                        </span>
 
-                        <p
+                        <div className="min-w-0 flex-1">
+                          <p
+                            className="
+                                truncate
+
+                                admin-text-11
+                                font-semibold
+
+                                text-[var(--admin-foreground)]
+                              "
+                          >
+                            {getLocalizedText(
+                              item.title,
+
+                              locale,
+
+                              t("dashboard.untitled"),
+                            )}
+                          </p>
+
+                          <p
+                            className="
+                                mt-1
+
+                                admin-text-9
+                                uppercase
+                                tracking-[0.1em]
+
+                                text-[var(--admin-muted)]
+                              "
+                          >
+                            {item.contentType}
+                          </p>
+                        </div>
+
+                        <div
                           className="
-                              mt-1
+                              hidden
+                              items-center
+                              gap-3
 
                               admin-text-9
-                              uppercase
-                              tracking-[0.1em]
 
                               text-[var(--admin-muted)]
+
+                              sm:flex
                             "
                         >
-                          {item.contentType}
-                        </p>
+                          <span className="inline-flex items-center gap-1">
+                            <Eye size={12} />
+
+                            {formatNumber(
+                              item.views,
+
+                              locale,
+                            )}
+                          </span>
+
+                          <span className="inline-flex items-center gap-1">
+                            <Heart size={12} />
+
+                            {formatNumber(
+                              item.likes,
+
+                              locale,
+                            )}
+                          </span>
+
+                          <span className="inline-flex items-center gap-1">
+                            <Share2 size={12} />
+
+                            {formatNumber(
+                              item.shares,
+
+                              locale,
+                            )}
+                          </span>
+                        </div>
                       </div>
-
-                      <div
-                        className="
-                            hidden
-                            items-center
-                            gap-3
-
-                            admin-text-9
-
-                            text-[var(--admin-muted)]
-
-                            sm:flex
-                          "
-                      >
-                        <span className="inline-flex items-center gap-1">
-                          <Eye size={12} />
-
-                          {formatNumber(item.views)}
-                        </span>
-
-                        <span className="inline-flex items-center gap-1">
-                          <Heart size={12} />
-
-                          {formatNumber(item.likes)}
-                        </span>
-
-                        <span className="inline-flex items-center gap-1">
-                          <Share2 size={12} />
-
-                          {formatNumber(item.shares)}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
               )}
             </article>
@@ -1348,7 +1455,7 @@ export default function DashboardWorkspace({ userName }) {
                     text-[var(--admin-foreground)]
                   "
                 >
-                  Recent activity
+                  {t("dashboard.activity.title")}
                 </h2>
 
                 <p
@@ -1360,98 +1467,126 @@ export default function DashboardWorkspace({ userName }) {
                     text-[var(--admin-muted)]
                   "
                 >
-                  Latest messages and system notifications.
+                  {t("dashboard.activity.description")}
                 </p>
               </div>
 
               {!data.recentActivity?.length ? (
-                <EmptyState>New activity will appear here.</EmptyState>
+                <EmptyState>{t("dashboard.activity.empty")}</EmptyState>
               ) : (
                 <div className="divide-y divide-[var(--admin-border)]">
-                  {data.recentActivity.slice(0, 6).map((item, index) => {
-                    const submission = item.type === "form_submission";
+                  {data.recentActivity.slice(0, 6).map(
+                    (
+                      item,
 
-                    const Icon = submission ? Mail : Activity;
+                      index,
+                    ) => {
+                      const submission = item.type === "form_submission";
 
-                    return (
-                      <div
-                        key={`${item.type}-${item.id}-${index}`}
-                        className="
-                            flex
-                            items-start
-                            gap-3
+                      const Icon = submission ? Mail : Activity;
 
-                            px-5
-                            py-4
+                      const activityType = submission
+                        ? t(
+                            "dashboard.activity.submission",
 
-                            sm:px-6
-                          "
-                      >
-                        <span
-                          className={`
+                            {
+                              status:
+                                statusLabel(item.status) ||
+                                t("dashboard.activity.newStatus"),
+                            },
+                          )
+                        : item.level || t("dashboard.activity.notification");
+
+                      return (
+                        <div
+                          key={`${item.type}-${item.id}-${index}`}
+                          className="
                               flex
-                              h-9
-                              w-9
-                              shrink-0
+                              items-start
+                              gap-3
 
-                              items-center
-                              justify-center
+                              px-5
+                              py-4
 
-                              rounded-xl
-
-                              ${
-                                submission
-                                  ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                                  : "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                              }
-                            `}
+                              sm:px-6
+                            "
                         >
-                          <Icon size={15} />
-                        </span>
+                          <span
+                            className={`
+                                flex
+                                h-9
+                                w-9
+                                shrink-0
 
-                        <div className="min-w-0 flex-1">
-                          <p
-                            className="
-                                truncate
+                                items-center
+                                justify-center
 
-                                admin-text-11
-                                font-semibold
+                                rounded-xl
 
-                                text-[var(--admin-foreground)]
-                              "
+                                ${
+                                  submission
+                                    ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                                    : "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                                }
+                              `}
                           >
-                            {getLocalizedText(item.title)}
-                          </p>
+                            <Icon size={15} />
+                          </span>
 
-                          <p
+                          <div className="min-w-0 flex-1">
+                            <p
+                              className="
+                                  truncate
+
+                                  admin-text-11
+                                  font-semibold
+
+                                  text-[var(--admin-foreground)]
+                                "
+                            >
+                              {getLocalizedText(
+                                item.title,
+
+                                locale,
+
+                                t("dashboard.untitled"),
+                              )}
+                            </p>
+
+                            <p
+                              className="
+                                  mt-1
+
+                                  admin-text-9
+
+                                  text-[var(--admin-muted)]
+                                "
+                            >
+                              {activityType}
+                            </p>
+                          </div>
+
+                          <time
                             className="
-                                mt-1
+                                shrink-0
 
                                 admin-text-9
 
                                 text-[var(--admin-muted)]
                               "
                           >
-                            {submission
-                              ? `Submission · ${item.status || "new"}`
-                              : item.level || "Notification"}
-                          </p>
+                            {getActivityDate(
+                              item.createdAt,
+
+                              locale,
+
+                              t("dashboard.activity.recently"),
+                            )}
+                          </time>
                         </div>
-
-                        <time
-                          className="
-                              shrink-0
-
-                              admin-text-9
-
-                              text-[var(--admin-muted)]
-                            "
-                        >
-                          {getActivityDate(item.createdAt)}
-                        </time>
-                      </div>
-                    );
-                  })}
+                      );
+                    },
+                  )}
                 </div>
               )}
             </article>

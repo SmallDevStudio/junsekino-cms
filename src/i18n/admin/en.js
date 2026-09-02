@@ -3928,4 +3928,134 @@ export const adminEn = {
       invalidExternal: "External links must begin with http:// or https://.",
     },
   },
+
+  dashboard: {
+    eyebrow: "Company Overview",
+
+    title: "Dashboard",
+
+    welcome:
+      "Welcome back, {user}. Monitor website traffic, engagement and incoming messages for {company}.",
+
+    selectedCompany: "the selected company",
+
+    loading: "Loading dashboard...",
+
+    untitled: "Untitled",
+
+    ranges: {
+      today: "Today",
+
+      sevenDays: "7 days",
+
+      thirtyDays: "30 days",
+
+      thisMonth: "This month",
+    },
+
+    actions: {
+      dateRange: "Dashboard date range",
+
+      refresh: "Refresh dashboard",
+
+      viewWebsite: "View Website",
+    },
+
+    metrics: {
+      views: {
+        title: "Page Views",
+
+        description: "Consent-based visits",
+      },
+
+      uniqueVisitors: {
+        title: "Unique Visitors",
+
+        description: "Anonymous visitors",
+      },
+
+      likes: {
+        title: "Likes",
+
+        description: "Content reactions",
+      },
+
+      shares: {
+        title: "Shares",
+
+        description: "Content shared",
+      },
+
+      submissions: {
+        title: "Submissions",
+
+        description: "{count} new messages",
+      },
+
+      notifications: {
+        title: "Notifications",
+
+        description: "Workspace activity",
+      },
+    },
+
+    chart: {
+      views: "Views",
+
+      uniqueVisitors: "Unique visitors",
+
+      ariaLabel: "Website traffic chart",
+
+      noData: "No data",
+    },
+
+    traffic: {
+      title: "Website Traffic",
+
+      description: "Views and consent-based unique visitors.",
+    },
+
+    forms: {
+      title: "Message Summary",
+
+      description: "Form submissions in this period.",
+
+      contact: "Contact",
+
+      survey: "Survey",
+
+      career: "Career",
+
+      custom: "Custom",
+    },
+
+    topContent: {
+      title: "Top Content",
+
+      description: "Ranked by views, likes and shares.",
+
+      empty:
+        "Content performance will appear after visitors interact with the website.",
+    },
+
+    activity: {
+      title: "Recent Activity",
+
+      description: "Latest messages and system notifications.",
+
+      empty: "New activity will appear here.",
+
+      submission: "Submission · {status}",
+
+      notification: "Notification",
+
+      recently: "Recently",
+
+      newStatus: "New",
+    },
+
+    errors: {
+      load: "Unable to load dashboard.",
+    },
+  },
 };

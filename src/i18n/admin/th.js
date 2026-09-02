@@ -3882,4 +3882,134 @@ export const adminTh = {
       invalidExternal: "ลิงก์ภายนอกต้องขึ้นต้นด้วย http:// หรือ https://",
     },
   },
+
+  dashboard: {
+    eyebrow: "ภาพรวมบริษัท",
+
+    title: "แดชบอร์ด",
+
+    welcome:
+      "ยินดีต้อนรับกลับ {user} ติดตามจำนวนผู้เข้าชม การมีส่วนร่วม และข้อความที่เข้ามาของ {company}",
+
+    selectedCompany: "บริษัทที่เลือก",
+
+    loading: "กำลังโหลดแดชบอร์ด...",
+
+    untitled: "ไม่มีชื่อ",
+
+    ranges: {
+      today: "วันนี้",
+
+      sevenDays: "7 วัน",
+
+      thirtyDays: "30 วัน",
+
+      thisMonth: "เดือนนี้",
+    },
+
+    actions: {
+      dateRange: "ช่วงเวลาของแดชบอร์ด",
+
+      refresh: "รีเฟรชแดชบอร์ด",
+
+      viewWebsite: "ดูเว็บไซต์",
+    },
+
+    metrics: {
+      views: {
+        title: "จำนวนการเข้าชม",
+
+        description: "การเข้าชมที่ได้รับความยินยอม",
+      },
+
+      uniqueVisitors: {
+        title: "ผู้เข้าชมไม่ซ้ำ",
+
+        description: "ผู้เข้าชมแบบไม่ระบุตัวตน",
+      },
+
+      likes: {
+        title: "ถูกใจ",
+
+        description: "การตอบรับต่อเนื้อหา",
+      },
+
+      shares: {
+        title: "แชร์",
+
+        description: "จำนวนการแชร์เนื้อหา",
+      },
+
+      submissions: {
+        title: "แบบฟอร์ม",
+
+        description: "ข้อความใหม่ {count} รายการ",
+      },
+
+      notifications: {
+        title: "การแจ้งเตือน",
+
+        description: "กิจกรรมภายในพื้นที่ทำงาน",
+      },
+    },
+
+    chart: {
+      views: "การเข้าชม",
+
+      uniqueVisitors: "ผู้เข้าชมไม่ซ้ำ",
+
+      ariaLabel: "กราฟการเข้าชมเว็บไซต์",
+
+      noData: "ไม่มีข้อมูล",
+    },
+
+    traffic: {
+      title: "การเข้าชมเว็บไซต์",
+
+      description: "จำนวนการเข้าชมและผู้เข้าชมไม่ซ้ำที่ได้รับความยินยอม",
+    },
+
+    forms: {
+      title: "สรุปข้อความ",
+
+      description: "แบบฟอร์มที่ส่งเข้ามาในช่วงเวลานี้",
+
+      contact: "ติดต่อ",
+
+      survey: "แบบสำรวจ",
+
+      career: "สมัครงาน",
+
+      custom: "แบบฟอร์มอื่น",
+    },
+
+    topContent: {
+      title: "เนื้อหายอดนิยม",
+
+      description: "จัดอันดับจากจำนวนการเข้าชม ถูกใจ และแชร์",
+
+      empty:
+        "ข้อมูลประสิทธิภาพของเนื้อหาจะแสดงเมื่อผู้เข้าชมเริ่มใช้งานเว็บไซต์",
+    },
+
+    activity: {
+      title: "กิจกรรมล่าสุด",
+
+      description: "ข้อความและการแจ้งเตือนล่าสุดของระบบ",
+
+      empty: "กิจกรรมใหม่จะแสดงที่นี่",
+
+      submission: "ส่งแบบฟอร์ม · {status}",
+
+      notification: "การแจ้งเตือน",
+
+      recently: "เมื่อสักครู่",
+
+      newStatus: "ใหม่",
+    },
+
+    errors: {
+      load: "ไม่สามารถโหลดแดชบอร์ดได้",
+    },
+  },
 };
