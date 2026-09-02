@@ -61,7 +61,7 @@ function normalizeSlides({ slides, companySlug }) {
     }));
 }
 
-function SlideImage({ slide, priority = false }) {
+function SlideImage({ slide, priority = false, eager = false }) {
   const alt =
     getLocalizedValue(slide?.alt, "en") ||
     getLocalizedValue(slide?.caption, "en") ||
@@ -74,6 +74,7 @@ function SlideImage({ slide, priority = false }) {
       width={1600}
       height={1000}
       priority={priority}
+      loading={priority ? undefined : eager ? "eager" : "lazy"}
       unoptimized
       draggable={false}
       className="
@@ -345,7 +346,11 @@ export default function PublicHomeSlideshow({ companySlug, slideshow }) {
                   }
                 `}
               >
-                <SlideImage slide={slide} priority={index === 0} />
+                <SlideImage
+                  slide={slide}
+                  priority={index === 0}
+                  eager={active}
+                />
               </div>
             );
           })}

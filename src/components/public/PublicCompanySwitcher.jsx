@@ -4,18 +4,29 @@ import Link from "next/link";
 
 import { useEffect, useRef, useState } from "react";
 
-function CompanyCircle({ company, active = false, large = false }) {
+function CompanyCircle({
+  company,
+
+  active = false,
+
+  large = false,
+}) {
   return (
     <span
       className={`
         flex
         shrink-0
+
         items-center
         justify-center
+
         rounded-full
+
         font-semibold
         leading-none
+
         text-white
+
         transition-transform
         duration-200
 
@@ -38,8 +49,12 @@ function CompanyCircle({ company, active = false, large = false }) {
 
 export default function PublicCompanySwitcher({
   companies = [],
+
   currentCompanySlug,
+
   large = false,
+
+  dropUp = false,
 }) {
   const [open, setOpen] = useState(false);
 
@@ -65,14 +80,30 @@ export default function PublicCompanySwitcher({
       }
     }
 
-    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener(
+      "pointerdown",
 
-    document.addEventListener("keydown", handleKeyDown);
+      handlePointerDown,
+    );
+
+    document.addEventListener(
+      "keydown",
+
+      handleKeyDown,
+    );
 
     return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener(
+        "pointerdown",
 
-      document.removeEventListener("keydown", handleKeyDown);
+        handlePointerDown,
+      );
+
+      document.removeEventListener(
+        "keydown",
+
+        handleKeyDown,
+      );
     };
   }, []);
 
@@ -81,7 +112,7 @@ export default function PublicCompanySwitcher({
   }
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative shrink-0">
       <button
         type="button"
         aria-label="Select company"
@@ -89,12 +120,21 @@ export default function PublicCompanySwitcher({
         onClick={() => setOpen((current) => !current)}
         className="
           block
+
           rounded-full
+
           outline-none
+
           transition-all
           duration-200
+
           hover:scale-105
           hover:opacity-85
+
+          focus-visible:ring-2
+          focus-visible:ring-[var(--public-primary)]
+          focus-visible:ring-offset-2
+          focus-visible:ring-offset-[var(--public-background)]
         "
       >
         <CompanyCircle company={currentCompany} active large={large} />
@@ -104,18 +144,24 @@ export default function PublicCompanySwitcher({
         className={`
           absolute
           right-0
-          top-[calc(100%+14px)]
           z-[150]
+
           flex
           flex-col
           items-center
-          gap-2.5
+          gap-2
+
           transition-all
           duration-200
+
+          ${dropUp ? "bottom-[calc(100%+10px)]" : "top-[calc(100%+10px)]"}
+
           ${
             open
               ? "visible translate-y-0 opacity-100"
-              : "invisible -translate-y-1 opacity-0"
+              : dropUp
+                ? "invisible translate-y-1 opacity-0"
+                : "invisible -translate-y-1 opacity-0"
           }
         `}
       >
@@ -128,12 +174,19 @@ export default function PublicCompanySwitcher({
               onClick={() => setOpen(false)}
               aria-label={`Switch to ${company.name}`}
               className="
-                block
-                rounded-full
-                transition-transform
-                duration-200
-                hover:scale-110
-              "
+                  block
+
+                  rounded-full
+
+                  transition-transform
+                  duration-200
+
+                  hover:scale-110
+
+                  focus-visible:outline-none
+                  focus-visible:ring-2
+                  focus-visible:ring-[var(--public-primary)]
+                "
             >
               <CompanyCircle company={company} large={large} />
             </Link>

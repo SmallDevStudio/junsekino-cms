@@ -124,27 +124,17 @@ function InfoRow({
         grid
         grid-cols-[118px_1fr]
         gap-3
+
         text-[11px]
         leading-[1.3]
+
         sm:grid-cols-[126px_1fr]
         sm:text-[12px]
       "
     >
-      <dt
-        className="
-          text-[var(--public-muted-foreground)]
-        "
-      >
-        {label}
-      </dt>
+      <dt className="text-[var(--public-muted-foreground)]">{label}</dt>
 
-      <dd
-        className="
-          text-[var(--public-foreground)]
-        "
-      >
-        {value}
-      </dd>
+      <dd className="text-[var(--public-foreground)]">{value}</dd>
     </div>
   );
 }
@@ -220,13 +210,22 @@ export default function PublicProjectDetail({
     <div
       className="
         w-full
+
         bg-[var(--public-background)]
+
         px-5
         pb-14
+
         text-[var(--public-foreground)]
+
         sm:px-8
+
+        lg:h-[calc(100svh-129px)]
+        lg:min-h-0
+        lg:overflow-hidden
         lg:px-12
-        lg:pb-20
+        lg:pb-6
+
         xl:px-16
       "
     >
@@ -235,9 +234,20 @@ export default function PublicProjectDetail({
           mx-auto
           w-full
           max-w-[1680px]
+
+          lg:grid
+          lg:h-full
+          lg:min-h-0
+          lg:grid-rows-[auto_minmax(0,1fr)]
         "
       >
-        <div className="pt-2 lg:pt-4">
+        <div
+          className="
+            pt-2
+
+            lg:pt-1
+          "
+        >
           <PublicProjectBreadcrumbs
             companySlug={companySlug}
             category={project.category}
@@ -249,16 +259,28 @@ export default function PublicProjectDetail({
         <div
           className="
             mt-8
+
             grid
             grid-cols-1
             gap-10
-            lg:mt-10
+
+            lg:mt-5
+            lg:min-h-0
             lg:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.8fr)]
             lg:gap-[clamp(3rem,5vw,6rem)]
+
             xl:grid-cols-[minmax(0,1.75fr)_minmax(360px,0.75fr)]
           "
         >
-          <div className="min-w-0">
+          <div
+            className="
+              min-w-0
+
+              lg:h-full
+              lg:min-h-0
+              lg:overflow-hidden
+            "
+          >
             <PublicProjectSlideshow
               companySlug={companySlug}
               project={project}
@@ -269,9 +291,13 @@ export default function PublicProjectDetail({
           <aside
             className="
               min-w-0
-              lg:max-h-[calc(100svh-150px)]
+
+              lg:h-full
+              lg:min-h-0
               lg:overflow-y-auto
+              lg:overscroll-contain
               lg:pr-2
+
               [scrollbar-width:none]
               [&::-webkit-scrollbar]:hidden
             "
@@ -288,6 +314,7 @@ export default function PublicProjectDetail({
                 className="
                   min-w-0
                   flex-1
+
                   text-center
                 "
               >
@@ -297,8 +324,11 @@ export default function PublicProjectDetail({
                     font-normal
                     leading-none
                     tracking-[0.025em]
+
                     text-[var(--public-foreground)]
+
                     sm:text-[26px]
+
                     lg:text-[28px]
                   "
                 >
@@ -309,9 +339,12 @@ export default function PublicProjectDetail({
                   <p
                     className="
                       mt-3
+
                       text-[13px]
                       leading-none
+
                       text-[var(--public-muted-foreground)]
+
                       sm:text-[14px]
                     "
                   >
@@ -327,7 +360,9 @@ export default function PublicProjectDetail({
               <div
                 className="
                   mt-7
+
                   text-[var(--public-foreground)]
+
                   lg:mt-8
                 "
               >
@@ -339,9 +374,13 @@ export default function PublicProjectDetail({
               className="
                 mt-10
                 space-y-1
+
                 border-t
                 border-[var(--public-border)]
+
                 pt-6
+                pb-6
+
                 lg:mt-12
               "
             >

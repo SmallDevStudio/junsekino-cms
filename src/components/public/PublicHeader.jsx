@@ -292,41 +292,90 @@ export default function PublicHeader({
 
         <div
           className="
-            flex
+            relative
+
             h-[calc(100svh-92px)]
-            flex-col
-            items-center
-            justify-center
+            min-h-0
+
             overflow-y-auto
+
             px-6
-            py-10
+            pb-24
+            pt-4
           "
         >
-          <PublicNavigation
-            companySlug={companySlug}
-            navigation={navigation}
-            projectCategories={projectCategories}
-            locale="en"
-            primaryColor={primaryColor}
-            mobile
-            onNavigate={() => setMobileOpen(false)}
-          />
+          <div
+            className="
+              mx-auto
+              w-[min(82vw,360px)]
+
+              border-b
+              border-[var(--public-border)]
+
+              pb-3
+
+              text-[10px]
+              font-medium
+              uppercase
+              tracking-[0.12em]
+
+              text-[var(--public-muted-foreground)]
+            "
+          >
+            Menu
+          </div>
 
           <div
             className="
-              mt-12
+              mt-8
+
               flex
-              flex-col
-              items-center
-              gap-8
+              items-start
+              justify-center
             "
           >
-            <PublicSocialLinks social={social} size="large" />
+            <PublicNavigation
+              companySlug={companySlug}
+              navigation={navigation}
+              projectCategories={projectCategories}
+              locale="en"
+              primaryColor={primaryColor}
+              mobile
+              resetKey={mobileOpen}
+              onNavigate={() => setMobileOpen(false)}
+            />
+          </div>
+
+          <div
+            className="
+              fixed
+              bottom-5
+              left-1/2
+              z-[130]
+
+              flex
+              -translate-x-1/2
+              flex-nowrap
+
+              items-center
+              justify-center
+
+              gap-2
+
+              rounded-full
+
+              bg-[var(--public-background)]
+
+              px-2
+              py-1
+            "
+          >
+            <PublicSocialLinks social={social} />
 
             <PublicCompanySwitcher
               companies={companies}
               currentCompanySlug={companySlug}
-              large
+              dropUp
             />
           </div>
         </div>

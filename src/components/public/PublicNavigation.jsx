@@ -1,8 +1,12 @@
 "use client";
 
+import { ArrowLeft, ChevronRight } from "lucide-react";
+
 import Link from "next/link";
 
 import { usePathname } from "next/navigation";
+
+import { useEffect, useState } from "react";
 
 import { usePublicTheme } from "@/components/public/PublicThemeProvider";
 
@@ -12,7 +16,11 @@ import { usePublicTheme } from "@/components/public/PublicThemeProvider";
  * =========================================================
  */
 
-function getLocalizedValue(value, locale = "en") {
+function getLocalizedValue(
+  value,
+
+  locale = "en",
+) {
   if (!value) {
     return "";
   }
@@ -86,7 +94,11 @@ function isPublicItem(item) {
   );
 }
 
-function resolveHref(companySlug, item) {
+function resolveHref(
+  companySlug,
+
+  item,
+) {
   if (isExternalItem(item)) {
     return item.url.trim();
   }
@@ -104,7 +116,15 @@ function resolveHref(companySlug, item) {
   return path ? `/${companySlug}/${path}` : `/${companySlug}`;
 }
 
-function isMainItemActive({ pathname, href, companySlug, external = false }) {
+function isMainItemActive({
+  pathname,
+
+  href,
+
+  companySlug,
+
+  external = false,
+}) {
   if (external) {
     return false;
   }
@@ -116,14 +136,26 @@ function isMainItemActive({ pathname, href, companySlug, external = false }) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function isProjectCategoryActive({ pathname, companySlug, categorySlug }) {
+function isProjectCategoryActive({
+  pathname,
+
+  companySlug,
+
+  categorySlug,
+}) {
   return (
     pathname === `/${companySlug}/project/${categorySlug}` ||
     pathname.startsWith(`/${companySlug}/project/${categorySlug}/`)
   );
 }
 
-function isPublicCategoryActive({ pathname, companySlug, category }) {
+function isPublicCategoryActive({
+  pathname,
+
+  companySlug,
+
+  category,
+}) {
   return (
     pathname === `/${companySlug}/public/${category}` ||
     pathname.startsWith(`/${companySlug}/public/${category}/`)
@@ -134,7 +166,11 @@ function resolveNormalColor(resolvedTheme) {
   return resolvedTheme === "dark" ? "#ffffff" : "#000000";
 }
 
-function resolveHoverColor({ primaryColor, resolvedTheme }) {
+function resolveHoverColor({
+  primaryColor,
+
+  resolvedTheme,
+}) {
   if (resolvedTheme === "dark") {
     return `color-mix(
       in srgb,
@@ -150,25 +186,57 @@ function resolveHoverColor({ primaryColor, resolvedTheme }) {
   )`;
 }
 
+function getMobileLabels(locale) {
+  if (locale === "th") {
+    return {
+      back: "ย้อนกลับ",
+
+      viewAllProjects: "ดูโปรเจกต์ทั้งหมด",
+
+      viewAllPublic: "ดู Public ทั้งหมด",
+
+      video: "วิดีโอ",
+
+      publication: "สิ่งพิมพ์",
+    };
+  }
+
+  return {
+    back: "Back",
+
+    viewAllProjects: "View all projects",
+
+    viewAllPublic: "View all public",
+
+    video: "Video",
+
+    publication: "Publication",
+  };
+}
+
 /*
  * =========================================================
- * CONTROLLED NAVIGATION LINK
- * =========================================================
- *
- * Internal links use Next Link.
- * External links use a normal anchor element.
+ * CONTROLLED LINK
  * =========================================================
  */
 
 function NavigationLink({
   href,
+
   active = false,
+
   external = false,
+
   openInNewTab = false,
+
   primaryColor,
+
   resolvedTheme,
+
   onClick,
+
   className = "",
+
   children,
 }) {
   const normalColor = resolveNormalColor(resolvedTheme);
@@ -183,28 +251,8 @@ function NavigationLink({
 
   const restingColor = active ? activeColor : normalColor;
 
-  const linkClassName = `
-    transition-colors
-    duration-150
-    ease-out
-
-    ${active ? "font-semibold" : "font-normal"}
-
-    ${className}
-  `;
-
-  const linkStyle = {
-    color: restingColor,
-  };
-
   function handlePointerEnter(event) {
-    if (active) {
-      event.currentTarget.style.color = activeColor;
-
-      return;
-    }
-
-    event.currentTarget.style.color = hoverColor;
+    event.currentTarget.style.color = active ? activeColor : hoverColor;
   }
 
   function handlePointerLeave(event) {
@@ -212,21 +260,21 @@ function NavigationLink({
   }
 
   function handleFocus(event) {
-    if (active) {
-      event.currentTarget.style.color = activeColor;
-
-      return;
-    }
-
-    event.currentTarget.style.color = hoverColor;
+    event.currentTarget.style.color = active ? activeColor : hoverColor;
   }
 
   function handleBlur(event) {
     event.currentTarget.style.color = restingColor;
   }
 
+  function handleClick(event) {
+    onClick?.(event);
+
+    event.currentTarget.blur();
+  }
+
   const commonProps = {
-    onClick,
+    onClick: handleClick,
 
     onMouseEnter: handlePointerEnter,
 
@@ -236,9 +284,19 @@ function NavigationLink({
 
     onBlur: handleBlur,
 
-    className: linkClassName,
+    className: `
+      transition-colors
+      duration-150
+      ease-out
 
-    style: linkStyle,
+      ${active ? "font-semibold" : "font-normal"}
+
+      ${className}
+    `,
+
+    style: {
+      color: restingColor,
+    },
   };
 
   if (external) {
@@ -263,16 +321,99 @@ function NavigationLink({
 
 /*
  * =========================================================
- * DESKTOP PROJECT CATEGORY DROPDOWN
+ * MOBILE SECTION BUTTON
+ * =========================================================
+ */
+
+function MobileSectionButton({
+  label,
+
+  primaryColor,
+
+  resolvedTheme,
+
+  onClick,
+}) {
+  const normalColor = resolveNormalColor(resolvedTheme);
+
+  const hoverColor = resolveHoverColor({
+    primaryColor: primaryColor || "#000000",
+
+    resolvedTheme,
+  });
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      onMouseEnter={(event) => {
+        event.currentTarget.style.color = hoverColor;
+      }}
+      onMouseLeave={(event) => {
+        event.currentTarget.style.color = normalColor;
+      }}
+      onFocus={(event) => {
+        event.currentTarget.style.color = hoverColor;
+      }}
+      onBlur={(event) => {
+        event.currentTarget.style.color = normalColor;
+      }}
+      className="
+        flex
+        w-full
+        max-w-[300px]
+
+        items-center
+        justify-start
+        gap-5
+
+        py-1
+
+        text-left
+        text-[16px]
+        font-normal
+        uppercase
+        tracking-[0.055em]
+
+        transition-colors
+        duration-150
+      "
+      style={{
+        color: normalColor,
+      }}
+    >
+      <span>{label}</span>
+
+      <ChevronRight
+        size={16}
+        strokeWidth={1.25}
+        aria-hidden="true"
+        className="ml-1.5 shrink-0"
+      />
+    </button>
+  );
+}
+
+/*
+ * =========================================================
+ * DESKTOP DROPDOWNS
  * =========================================================
  */
 
 function ProjectCategoryDropdown({
   companySlug,
+
   categories = [],
+
   locale = "en",
+
   primaryColor,
+
   resolvedTheme,
+
+  visible,
+
+  onNavigate,
 }) {
   const pathname = usePathname();
 
@@ -282,29 +423,23 @@ function ProjectCategoryDropdown({
 
   return (
     <div
-      className="
-        invisible
-
+      aria-hidden={!visible}
+      className={`
         absolute
         left-0
         top-full
         z-[110]
 
-        translate-y-1
-        opacity-0
-
         transition-all
         duration-150
         ease-out
 
-        group-hover/navitem:visible
-        group-hover/navitem:translate-y-0
-        group-hover/navitem:opacity-100
-
-        group-focus-within/navitem:visible
-        group-focus-within/navitem:translate-y-0
-        group-focus-within/navitem:opacity-100
-      "
+        ${
+          visible
+            ? "visible translate-y-0 opacity-100"
+            : "invisible translate-y-1 opacity-0"
+        }
+      `}
     >
       <div className="h-[12px]" />
 
@@ -335,13 +470,14 @@ function ProjectCategoryDropdown({
               active={active}
               primaryColor={primaryColor}
               resolvedTheme={resolvedTheme}
+              onClick={onNavigate}
               className="
-                text-[11px]
-                uppercase
-                tracking-[0.02em]
+                  text-[11px]
+                  uppercase
+                  tracking-[0.02em]
 
-                xl:text-[12px]
-              "
+                  xl:text-[12px]
+                "
             >
               {getLocalizedValue(
                 category.name,
@@ -356,13 +492,17 @@ function ProjectCategoryDropdown({
   );
 }
 
-/*
- * =========================================================
- * DESKTOP PUBLIC CATEGORY DROPDOWN
- * =========================================================
- */
+function PublicCategoryDropdown({
+  companySlug,
 
-function PublicCategoryDropdown({ companySlug, primaryColor, resolvedTheme }) {
+  primaryColor,
+
+  resolvedTheme,
+
+  visible,
+
+  onNavigate,
+}) {
   const pathname = usePathname();
 
   const categories = [
@@ -381,29 +521,23 @@ function PublicCategoryDropdown({ companySlug, primaryColor, resolvedTheme }) {
 
   return (
     <div
-      className="
-        invisible
-
+      aria-hidden={!visible}
+      className={`
         absolute
         left-0
         top-full
         z-[110]
 
-        translate-y-1
-        opacity-0
-
         transition-all
         duration-150
         ease-out
 
-        group-hover/navitem:visible
-        group-hover/navitem:translate-y-0
-        group-hover/navitem:opacity-100
-
-        group-focus-within/navitem:visible
-        group-focus-within/navitem:translate-y-0
-        group-focus-within/navitem:opacity-100
-      "
+        ${
+          visible
+            ? "visible translate-y-0 opacity-100"
+            : "invisible translate-y-1 opacity-0"
+        }
+      `}
     >
       <div className="h-[12px]" />
 
@@ -434,13 +568,14 @@ function PublicCategoryDropdown({ companySlug, primaryColor, resolvedTheme }) {
               active={active}
               primaryColor={primaryColor}
               resolvedTheme={resolvedTheme}
+              onClick={onNavigate}
               className="
-                text-[11px]
-                uppercase
-                tracking-[0.02em]
+                  text-[11px]
+                  uppercase
+                  tracking-[0.02em]
 
-                xl:text-[12px]
-              "
+                  xl:text-[12px]
+                "
             >
               {category.label}
             </NavigationLink>
@@ -451,21 +586,22 @@ function PublicCategoryDropdown({ companySlug, primaryColor, resolvedTheme }) {
   );
 }
 
-/*
- * =========================================================
- * DESKTOP MAIN ITEM
- * =========================================================
- */
-
 function DesktopNavigationItem({
   item,
+
   companySlug,
+
   locale,
+
   primaryColor,
+
   resolvedTheme,
+
   projectCategories,
 }) {
   const pathname = usePathname();
+
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const external = isExternalItem(item);
 
@@ -498,10 +634,44 @@ function DesktopNavigationItem({
 
   const publicItem = isPublicItem(item);
 
+  const hasDropdown = (project && projectCategories.length > 0) || publicItem;
+
+  function closeDropdown() {
+    setDropdownOpen(false);
+  }
+
+  function handleBlur(event) {
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+      closeDropdown();
+    }
+  }
+
+  function handleKeyDown(event) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+
+      closeDropdown();
+
+      event.currentTarget.querySelector("a")?.focus();
+    }
+  }
+
   return (
     <div
+      onMouseEnter={() => {
+        if (hasDropdown) {
+          setDropdownOpen(true);
+        }
+      }}
+      onMouseLeave={closeDropdown}
+      onFocusCapture={() => {
+        if (hasDropdown) {
+          setDropdownOpen(true);
+        }
+      }}
+      onBlurCapture={handleBlur}
+      onKeyDown={handleKeyDown}
       className="
-        group/navitem
         relative
         flex
         h-9
@@ -516,6 +686,7 @@ function DesktopNavigationItem({
         active={active}
         primaryColor={primaryColor}
         resolvedTheme={resolvedTheme}
+        onClick={closeDropdown}
         className="
           relative
           flex
@@ -544,6 +715,8 @@ function DesktopNavigationItem({
           locale={locale}
           primaryColor={primaryColor}
           resolvedTheme={resolvedTheme}
+          visible={dropdownOpen}
+          onNavigate={closeDropdown}
         />
       )}
 
@@ -552,6 +725,8 @@ function DesktopNavigationItem({
           companySlug={companySlug}
           primaryColor={primaryColor}
           resolvedTheme={resolvedTheme}
+          visible={dropdownOpen}
+          onNavigate={closeDropdown}
         />
       )}
     </div>
@@ -560,144 +735,372 @@ function DesktopNavigationItem({
 
 /*
  * =========================================================
- * MOBILE PROJECT CATEGORIES
+ * MOBILE NAVIGATION
  * =========================================================
  */
 
-function MobileProjectCategories({
+function MobileNavigation({
+  items,
+
   companySlug,
-  categories = [],
-  locale = "en",
+
+  projectCategories,
+
+  locale,
+
   primaryColor,
+
   resolvedTheme,
+
   onNavigate,
+
+  resetKey,
 }) {
   const pathname = usePathname();
 
-  if (!categories.length) {
-    return null;
+  const [section, setSection] = useState(null);
+
+  const labels = getMobileLabels(locale);
+
+  /*
+   * Reset submenu whenever the parent
+   * mobile overlay closes.
+   */
+  useEffect(() => {
+    if (resetKey !== false) {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setSection(null);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [resetKey]);
+
+  function handleNavigate(event) {
+    setSection(null);
+
+    onNavigate?.(event);
   }
 
+  const projectItem = items.find((item) => isProjectItem(item));
+
+  const publicItem = items.find((item) => isPublicItem(item));
+
+  const activeSectionItem =
+    section === "project"
+      ? projectItem
+      : section === "public"
+        ? publicItem
+        : null;
+
+  const sectionTitle =
+    getLocalizedValue(
+      activeSectionItem?.label,
+
+      locale,
+    ) ||
+    activeSectionItem?.key ||
+    "";
+
   return (
-    <div
+    <nav
+      aria-label="Mobile navigation"
       className="
-        mt-4
-
-        flex
-        max-w-[340px]
-        flex-wrap
-
-        items-center
-        justify-center
-
-        gap-x-5
-        gap-y-3
+        w-[min(82vw,360px)]
+        overflow-hidden
       "
     >
-      {categories.map((category) => {
-        const active = isProjectCategoryActive({
-          pathname,
+      <div
+        className={`
+          flex
+          w-[200%]
 
-          companySlug,
+          items-start
 
-          categorySlug: category.slug,
-        });
+          transition-transform
+          duration-300
+          ease-out
 
-        return (
-          <NavigationLink
-            key={category.id}
-            href={`/${companySlug}/project/${category.slug}`}
-            active={active}
-            primaryColor={primaryColor}
-            resolvedTheme={resolvedTheme}
-            onClick={onNavigate}
+          ${section ? "-translate-x-1/2" : "translate-x-0"}
+        `}
+      >
+        {/* MAIN MENU */}
+
+        <div
+          className="
+            flex
+            w-1/2
+            shrink-0
+            flex-col
+            items-center
+            gap-7
+
+            px-3
+          "
+          aria-hidden={Boolean(section)}
+        >
+          {items.map((item) => {
+            const external = isExternalItem(item);
+
+            const href = resolveHref(
+              companySlug,
+
+              item,
+            );
+
+            const active = isMainItemActive({
+              pathname,
+
+              href,
+
+              companySlug,
+
+              external,
+            });
+
+            const label =
+              getLocalizedValue(
+                item?.label,
+
+                locale,
+              ) ||
+              item?.key ||
+              "";
+
+            const project = isProjectItem(item);
+
+            const publicItemValue = isPublicItem(item);
+
+            const hasSubmenu =
+              (project && projectCategories.length > 0) || publicItemValue;
+
+            if (hasSubmenu) {
+              return (
+                <MobileSectionButton
+                  key={item?.key || href}
+                  label={label}
+                  primaryColor={primaryColor}
+                  resolvedTheme={resolvedTheme}
+                  onClick={() => setSection(project ? "project" : "public")}
+                />
+              );
+            }
+
+            return (
+              <NavigationLink
+                key={item?.key || href}
+                href={href}
+                external={external}
+                openInNewTab={item?.openInNewTab === true}
+                active={active}
+                primaryColor={primaryColor}
+                resolvedTheme={resolvedTheme}
+                onClick={handleNavigate}
+                className="
+                    flex
+                    w-full
+                    max-w-[300px]
+
+                    items-center
+
+                    py-1
+
+                    text-left
+                    text-[16px]
+                    uppercase
+                    tracking-[0.055em]
+                  "
+              >
+                {label}
+              </NavigationLink>
+            );
+          })}
+        </div>
+
+        {/* SUBMENU */}
+
+        <div
+          className="
+            w-1/2
+            shrink-0
+
+            px-3
+          "
+          aria-hidden={!section}
+        >
+          <button
+            type="button"
+            onClick={() => setSection(null)}
             className="
+              inline-flex
+              items-center
+              gap-2
+
+              py-1
+
               text-[11px]
               uppercase
-              tracking-[0.025em]
+              tracking-[0.08em]
+
+              text-[var(--public-muted-foreground)]
+
+              transition-colors
+
+              hover:text-[var(--public-primary)]
+              focus-visible:text-[var(--public-primary)]
+              focus-visible:outline-none
             "
           >
-            {getLocalizedValue(
-              category.name,
+            <ArrowLeft size={16} strokeWidth={1.25} aria-hidden="true" />
 
-              locale,
+            {labels.back}
+          </button>
+
+          <div
+            className="
+              mt-8
+
+              border-b
+              border-[var(--public-border)]
+
+              pb-5
+
+              text-[18px]
+              font-medium
+              uppercase
+              tracking-[0.07em]
+
+              text-[var(--public-primary)]
+            "
+          >
+            {sectionTitle}
+          </div>
+
+          <div
+            className="
+              mt-7
+
+              flex
+              flex-col
+              items-start
+              gap-5
+            "
+          >
+            {section === "project" && (
+              <>
+                <NavigationLink
+                  href={`/${companySlug}/project`}
+                  active={pathname === `/${companySlug}/project`}
+                  primaryColor={primaryColor}
+                  resolvedTheme={resolvedTheme}
+                  onClick={handleNavigate}
+                  className="
+                    text-[14px]
+                    uppercase
+                    tracking-[0.05em]
+                  "
+                >
+                  {labels.viewAllProjects}
+                </NavigationLink>
+
+                {projectCategories.map((category) => (
+                  <NavigationLink
+                    key={category.id}
+                    href={`/${companySlug}/project/${category.slug}`}
+                    active={isProjectCategoryActive({
+                      pathname,
+
+                      companySlug,
+
+                      categorySlug: category.slug,
+                    })}
+                    primaryColor={primaryColor}
+                    resolvedTheme={resolvedTheme}
+                    onClick={handleNavigate}
+                    className="
+                        text-[14px]
+                        uppercase
+                        tracking-[0.05em]
+                      "
+                  >
+                    {getLocalizedValue(
+                      category.name,
+
+                      locale,
+                    )}
+                  </NavigationLink>
+                ))}
+              </>
             )}
-          </NavigationLink>
-        );
-      })}
-    </div>
-  );
-}
 
-/*
- * =========================================================
- * MOBILE PUBLIC CATEGORIES
- * =========================================================
- */
+            {section === "public" && (
+              <>
+                <NavigationLink
+                  href={`/${companySlug}/public`}
+                  active={pathname === `/${companySlug}/public`}
+                  primaryColor={primaryColor}
+                  resolvedTheme={resolvedTheme}
+                  onClick={handleNavigate}
+                  className="
+                    text-[14px]
+                    uppercase
+                    tracking-[0.05em]
+                  "
+                >
+                  {labels.viewAllPublic}
+                </NavigationLink>
 
-function MobilePublicCategories({
-  companySlug,
-  primaryColor,
-  resolvedTheme,
-  onNavigate,
-}) {
-  const pathname = usePathname();
+                <NavigationLink
+                  href={`/${companySlug}/public/video`}
+                  active={isPublicCategoryActive({
+                    pathname,
 
-  const categories = [
-    {
-      key: "video",
+                    companySlug,
 
-      label: "Video",
-    },
+                    category: "video",
+                  })}
+                  primaryColor={primaryColor}
+                  resolvedTheme={resolvedTheme}
+                  onClick={handleNavigate}
+                  className="
+                    text-[14px]
+                    uppercase
+                    tracking-[0.05em]
+                  "
+                >
+                  {labels.video}
+                </NavigationLink>
 
-    {
-      key: "publication",
+                <NavigationLink
+                  href={`/${companySlug}/public/publication`}
+                  active={isPublicCategoryActive({
+                    pathname,
 
-      label: "Publication",
-    },
-  ];
+                    companySlug,
 
-  return (
-    <div
-      className="
-        mt-4
-
-        flex
-        items-center
-        justify-center
-
-        gap-x-5
-        gap-y-3
-      "
-    >
-      {categories.map((category) => {
-        const active = isPublicCategoryActive({
-          pathname,
-
-          companySlug,
-
-          category: category.key,
-        });
-
-        return (
-          <NavigationLink
-            key={category.key}
-            href={`/${companySlug}/public/${category.key}`}
-            active={active}
-            primaryColor={primaryColor}
-            resolvedTheme={resolvedTheme}
-            onClick={onNavigate}
-            className="
-              text-[11px]
-              uppercase
-              tracking-[0.025em]
-            "
-          >
-            {category.label}
-          </NavigationLink>
-        );
-      })}
-    </div>
+                    category: "publication",
+                  })}
+                  primaryColor={primaryColor}
+                  resolvedTheme={resolvedTheme}
+                  onClick={handleNavigate}
+                  className="
+                    text-[14px]
+                    uppercase
+                    tracking-[0.05em]
+                  "
+                >
+                  {labels.publication}
+                </NavigationLink>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </nav>
   );
 }
 
@@ -709,125 +1112,39 @@ function MobilePublicCategories({
 
 export default function PublicNavigation({
   companySlug,
-  navigation = [],
-  projectCategories = [],
-  locale = "en",
-  primaryColor = "#000000",
-  mobile = false,
-  onNavigate,
-}) {
-  const pathname = usePathname();
 
+  navigation = [],
+
+  projectCategories = [],
+
+  locale = "en",
+
+  primaryColor = "#000000",
+
+  mobile = false,
+
+  onNavigate,
+
+  resetKey,
+}) {
   const { resolvedTheme } = usePublicTheme();
 
   const items = normalizeNavigation(navigation);
 
-  /*
-   * =======================================================
-   * MOBILE
-   * =======================================================
-   */
-
   if (mobile) {
     return (
-      <nav
-        aria-label="Mobile navigation"
-        className="
-          flex
-          flex-col
-          items-center
-          gap-7
-        "
-      >
-        {items.map((item) => {
-          const external = isExternalItem(item);
-
-          const href = resolveHref(
-            companySlug,
-
-            item,
-          );
-
-          const active = isMainItemActive({
-            pathname,
-
-            href,
-
-            companySlug,
-
-            external,
-          });
-
-          const label =
-            getLocalizedValue(
-              item?.label,
-
-              locale,
-            ) ||
-            item?.key ||
-            "";
-
-          const project = isProjectItem(item);
-
-          const publicItem = isPublicItem(item);
-
-          return (
-            <div
-              key={item?.key || href}
-              className="
-                flex
-                flex-col
-                items-center
-              "
-            >
-              <NavigationLink
-                href={href}
-                external={external}
-                openInNewTab={item?.openInNewTab === true}
-                active={active}
-                primaryColor={primaryColor}
-                resolvedTheme={resolvedTheme}
-                onClick={onNavigate}
-                className="
-                  text-[16px]
-                  uppercase
-                  tracking-[0.055em]
-                "
-              >
-                {label}
-              </NavigationLink>
-
-              {project && (
-                <MobileProjectCategories
-                  companySlug={companySlug}
-                  categories={projectCategories}
-                  locale={locale}
-                  primaryColor={primaryColor}
-                  resolvedTheme={resolvedTheme}
-                  onNavigate={onNavigate}
-                />
-              )}
-
-              {publicItem && (
-                <MobilePublicCategories
-                  companySlug={companySlug}
-                  primaryColor={primaryColor}
-                  resolvedTheme={resolvedTheme}
-                  onNavigate={onNavigate}
-                />
-              )}
-            </div>
-          );
-        })}
-      </nav>
+      <MobileNavigation
+        items={items}
+        companySlug={companySlug}
+        projectCategories={projectCategories}
+        locale={locale}
+        primaryColor={primaryColor}
+        resolvedTheme={resolvedTheme}
+        onNavigate={onNavigate}
+        resetKey={resetKey}
+      />
     );
   }
-
-  /*
-   * =======================================================
-   * DESKTOP
-   * =======================================================
-   */
 
   return (
     <nav
@@ -837,6 +1154,7 @@ export default function PublicNavigation({
         h-9
         items-end
         justify-center
+
         gap-[clamp(1.6rem,2vw,2.6rem)]
 
         lg:flex
