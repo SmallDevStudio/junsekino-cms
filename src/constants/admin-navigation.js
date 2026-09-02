@@ -12,12 +12,25 @@ import {
   LayoutDashboard,
   Mail,
   Megaphone,
+  Menu,
   Newspaper,
   Search,
   Settings,
   Tags,
   Users,
 } from "lucide-react";
+
+/*
+ * =========================================================
+ * PHASE 1 SIDEBAR
+ * =========================================================
+ *
+ * แสดงเฉพาะ Module ที่พร้อมใช้งานใน Phase 1
+ * รายการที่ยังไม่พร้อมจะอยู่ใน
+ * ADMIN_NAVIGATION_BACKLOG และไม่ถูกแสดง
+ * ใน Admin Sidebar
+ * =========================================================
+ */
 
 export const ADMIN_NAVIGATION = [
   {
@@ -105,16 +118,6 @@ export const ADMIN_NAVIGATION = [
       },
 
       {
-        id: "people",
-
-        labelKey: "navigation.people",
-
-        href: "/admin/people",
-
-        icon: Users,
-      },
-
-      {
         id: "contact",
 
         labelKey: "navigation.contact",
@@ -153,53 +156,13 @@ export const ADMIN_NAVIGATION = [
       },
 
       {
-        id: "forms",
+        id: "menu-management",
 
-        labelKey: "navigation.forms",
+        labelKey: "navigation.menuManagement",
 
-        href: "/admin/forms",
+        href: "/admin/navigation",
 
-        icon: FormInput,
-      },
-
-      {
-        id: "popups",
-
-        labelKey: "navigation.popups",
-
-        href: "/admin/popups",
-
-        icon: Megaphone,
-      },
-
-      {
-        id: "tags",
-
-        labelKey: "navigation.tags",
-
-        href: "/admin/tags",
-
-        icon: Tags,
-      },
-
-      {
-        id: "search",
-
-        labelKey: "navigation.search",
-
-        href: "/admin/search",
-
-        icon: Search,
-      },
-
-      {
-        id: "notifications",
-
-        labelKey: "navigation.notifications",
-
-        href: "/admin/notifications",
-
-        icon: Bell,
+        icon: Menu,
       },
     ],
   },
@@ -246,5 +209,100 @@ export const ADMIN_NAVIGATION = [
         adminOnly: true,
       },
     ],
+  },
+];
+
+/*
+ * =========================================================
+ * PHASE 2 BACKLOG
+ * =========================================================
+ *
+ * รายการเหล่านี้ไม่ถูกส่งให้ AdminSidebar
+ * จึงไม่แสดงใน Phase 1
+ *
+ * เมื่อต้องการเปิด Module สามารถย้ายรายการ
+ * กลับเข้า ADMIN_NAVIGATION ได้
+ * =========================================================
+ */
+
+export const ADMIN_NAVIGATION_BACKLOG = [
+  {
+    id: "people",
+
+    labelKey: "navigation.people",
+
+    href: "/admin/people",
+
+    icon: Users,
+  },
+
+  {
+    id: "forms",
+
+    labelKey: "navigation.forms",
+
+    href: "/admin/forms",
+
+    icon: FormInput,
+  },
+
+  {
+    id: "popups",
+
+    labelKey: "navigation.popups",
+
+    href: "/admin/popups",
+
+    icon: Megaphone,
+  },
+
+  {
+    id: "tags",
+
+    labelKey: "navigation.tags",
+
+    href: "/admin/tags",
+
+    icon: Tags,
+  },
+
+  {
+    id: "search",
+
+    labelKey: "navigation.search",
+
+    href: "/admin/search",
+
+    icon: Search,
+  },
+
+  {
+    id: "notifications",
+
+    labelKey: "navigation.notifications",
+
+    href: "/admin/notifications",
+
+    icon: Bell,
+  },
+
+  {
+    id: "page-management",
+
+    labelKey: "navigation.pageManagement",
+
+    href: "/admin/pages",
+
+    icon: FileText,
+  },
+
+  {
+    id: "docs",
+
+    labelKey: "navigation.docs",
+
+    href: "/admin/docs",
+
+    icon: FileText,
   },
 ];

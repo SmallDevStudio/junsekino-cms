@@ -42,7 +42,29 @@ function normalizePath(value) {
     .replace(/\/+$/, "");
 }
 
+function isSafeExternalUrl(value) {
+  if (typeof value !== "string") {
+    return false;
+  }
+
+  try {
+    const url = new URL(value.trim());
+
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function isExternalItem(item) {
+  return item?.type === "external" && isSafeExternalUrl(item?.url);
+}
+
 function isProjectItem(item) {
+  if (isExternalItem(item)) {
+    return false;
+  }
+
   return (
     item?.key === "project" ||
     item?.key === "projects" ||
@@ -52,6 +74,10 @@ function isProjectItem(item) {
 }
 
 function isPublicItem(item) {
+  if (isExternalItem(item)) {
+    return false;
+  }
+
   return (
     item?.key === "public" ||
     item?.key === "public-content" ||
@@ -61,6 +87,10 @@ function isPublicItem(item) {
 }
 
 function resolveHref(companySlug, item) {
+  if (isExternalItem(item)) {
+    return item.url.trim();
+  }
+
   if (isProjectItem(item)) {
     return `/${companySlug}/project`;
   }
@@ -74,7 +104,11 @@ function resolveHref(companySlug, item) {
   return path ? `/${companySlug}/${path}` : `/${companySlug}`;
 }
 
-function isMainItemActive({ pathname, href, companySlug }) {
+function isMainItemActive({ pathname, href, companySlug, external = false }) {
+  if (external) {
+    return false;
+  }
+
   if (href === `/${companySlug}`) {
     return pathname === href || pathname === `${href}/`;
   }
@@ -102,11 +136,6 @@ function resolveNormalColor(resolvedTheme) {
 
 function resolveHoverColor({ primaryColor, resolvedTheme }) {
   if (resolvedTheme === "dark") {
-    /*
-     * Dark Mode:
-     * Mix the company color with black
-     * so the hover color becomes deeper.
-     */
     return `color-mix(
       in srgb,
       ${primaryColor} 78%,
@@ -114,11 +143,6 @@ function resolveHoverColor({ primaryColor, resolvedTheme }) {
     )`;
   }
 
-  /*
-   * Light Mode:
-   * Mix the company color with white
-   * so the hover color becomes softer.
-   */
   return `color-mix(
     in srgb,
     ${primaryColor} 68%,
@@ -131,15 +155,16 @@ function resolveHoverColor({ primaryColor, resolvedTheme }) {
  * CONTROLLED NAVIGATION LINK
  * =========================================================
  *
- * Color is set directly through inline style.
- * This prevents a global anchor selector or Public Theme
- * selector from overriding the navigation color.
+ * Internal links use Next Link.
+ * External links use a normal anchor element.
  * =========================================================
  */
 
 function NavigationLink({
   href,
   active = false,
+  external = false,
+  openInNewTab = false,
   primaryColor,
   resolvedTheme,
   onClick,
@@ -152,10 +177,25 @@ function NavigationLink({
 
   const hoverColor = resolveHoverColor({
     primaryColor: activeColor,
+
     resolvedTheme,
   });
 
   const restingColor = active ? activeColor : normalColor;
+
+  const linkClassName = `
+    transition-colors
+    duration-150
+    ease-out
+
+    ${active ? "font-semibold" : "font-normal"}
+
+    ${className}
+  `;
+
+  const linkStyle = {
+    color: restingColor,
+  };
 
   function handlePointerEnter(event) {
     if (active) {
@@ -185,27 +225,37 @@ function NavigationLink({
     event.currentTarget.style.color = restingColor;
   }
 
+  const commonProps = {
+    onClick,
+
+    onMouseEnter: handlePointerEnter,
+
+    onMouseLeave: handlePointerLeave,
+
+    onFocus: handleFocus,
+
+    onBlur: handleBlur,
+
+    className: linkClassName,
+
+    style: linkStyle,
+  };
+
+  if (external) {
+    return (
+      <a
+        href={href}
+        target={openInNewTab ? "_blank" : undefined}
+        rel={openInNewTab ? "noopener noreferrer" : "external"}
+        {...commonProps}
+      >
+        {children}
+      </a>
+    );
+  }
+
   return (
-    <Link
-      href={href}
-      onClick={onClick}
-      onMouseEnter={handlePointerEnter}
-      onMouseLeave={handlePointerLeave}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-      className={`
-        transition-colors
-        duration-150
-        ease-out
-
-        ${active ? "font-semibold" : "font-normal"}
-
-        ${className}
-      `}
-      style={{
-        color: restingColor,
-      }}
-    >
+    <Link href={href} {...commonProps}>
       {children}
     </Link>
   );
@@ -272,7 +322,9 @@ function ProjectCategoryDropdown({
         {categories.map((category) => {
           const active = isProjectCategoryActive({
             pathname,
+
             companySlug,
+
             categorySlug: category.slug,
           });
 
@@ -291,7 +343,11 @@ function ProjectCategoryDropdown({
                 xl:text-[12px]
               "
             >
-              {getLocalizedValue(category.name, locale)}
+              {getLocalizedValue(
+                category.name,
+
+                locale,
+              )}
             </NavigationLink>
           );
         })}
@@ -312,10 +368,13 @@ function PublicCategoryDropdown({ companySlug, primaryColor, resolvedTheme }) {
   const categories = [
     {
       key: "video",
+
       label: "Video",
     },
+
     {
       key: "publication",
+
       label: "Publication",
     },
   ];
@@ -362,7 +421,9 @@ function PublicCategoryDropdown({ companySlug, primaryColor, resolvedTheme }) {
         {categories.map((category) => {
           const active = isPublicCategoryActive({
             pathname,
+
             companySlug,
+
             category: category.key,
           });
 
@@ -406,15 +467,32 @@ function DesktopNavigationItem({
 }) {
   const pathname = usePathname();
 
-  const href = resolveHref(companySlug, item);
+  const external = isExternalItem(item);
+
+  const href = resolveHref(
+    companySlug,
+
+    item,
+  );
 
   const active = isMainItemActive({
     pathname,
+
     href,
+
     companySlug,
+
+    external,
   });
 
-  const label = getLocalizedValue(item?.label, locale) || item?.key || "";
+  const label =
+    getLocalizedValue(
+      item?.label,
+
+      locale,
+    ) ||
+    item?.key ||
+    "";
 
   const project = isProjectItem(item);
 
@@ -433,6 +511,8 @@ function DesktopNavigationItem({
     >
       <NavigationLink
         href={href}
+        external={external}
+        openInNewTab={item?.openInNewTab === true}
         active={active}
         primaryColor={primaryColor}
         resolvedTheme={resolvedTheme}
@@ -517,7 +597,9 @@ function MobileProjectCategories({
       {categories.map((category) => {
         const active = isProjectCategoryActive({
           pathname,
+
           companySlug,
+
           categorySlug: category.slug,
         });
 
@@ -535,7 +617,11 @@ function MobileProjectCategories({
               tracking-[0.025em]
             "
           >
-            {getLocalizedValue(category.name, locale)}
+            {getLocalizedValue(
+              category.name,
+
+              locale,
+            )}
           </NavigationLink>
         );
       })}
@@ -560,10 +646,13 @@ function MobilePublicCategories({
   const categories = [
     {
       key: "video",
+
       label: "Video",
     },
+
     {
       key: "publication",
+
       label: "Publication",
     },
   ];
@@ -584,7 +673,9 @@ function MobilePublicCategories({
       {categories.map((category) => {
         const active = isPublicCategoryActive({
           pathname,
+
           companySlug,
+
           category: category.key,
         });
 
@@ -649,16 +740,32 @@ export default function PublicNavigation({
         "
       >
         {items.map((item) => {
-          const href = resolveHref(companySlug, item);
+          const external = isExternalItem(item);
+
+          const href = resolveHref(
+            companySlug,
+
+            item,
+          );
 
           const active = isMainItemActive({
             pathname,
+
             href,
+
             companySlug,
+
+            external,
           });
 
           const label =
-            getLocalizedValue(item?.label, locale) || item?.key || "";
+            getLocalizedValue(
+              item?.label,
+
+              locale,
+            ) ||
+            item?.key ||
+            "";
 
           const project = isProjectItem(item);
 
@@ -675,6 +782,8 @@ export default function PublicNavigation({
             >
               <NavigationLink
                 href={href}
+                external={external}
+                openInNewTab={item?.openInNewTab === true}
                 active={active}
                 primaryColor={primaryColor}
                 resolvedTheme={resolvedTheme}
@@ -729,12 +838,13 @@ export default function PublicNavigation({
         items-end
         justify-center
         gap-[clamp(1.6rem,2vw,2.6rem)]
+
         lg:flex
       "
     >
       {items.map((item) => (
         <DesktopNavigationItem
-          key={item?.key || item?.path}
+          key={item?.key || item?.path || item?.url}
           item={item}
           companySlug={companySlug}
           locale={locale}

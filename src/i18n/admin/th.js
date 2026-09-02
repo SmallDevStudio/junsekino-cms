@@ -73,6 +73,10 @@ export const adminTh = {
     collapseSidebar: "ย่อเมนู",
 
     platformAdministration: "ระบบจัดการเว็บไซต์",
+
+    menuManagement: "จัดการเมนู",
+
+    pageManagement: "จัดการหน้าเว็บไซต์",
   },
 
   header: {
@@ -3796,6 +3800,86 @@ export const adminTh = {
 
         published: "เผยแพร่เอกสารทางกฎหมายเรียบร้อยแล้ว",
       },
+    },
+  },
+
+  menuManagement: {
+    eyebrow: "เมนูเว็บไซต์",
+
+    title: "จัดการเมนู",
+
+    description: "แก้ไข จัดเรียง และควบคุมเมนูเว็บไซต์ของ {company}",
+
+    loading: "กำลังโหลดเมนู...",
+
+    noCompany: "กรุณาเลือกบริษัทก่อนจัดการเมนูเว็บไซต์",
+
+    summary: {
+      total: "เมนูทั้งหมด",
+
+      visible: "กำลังแสดง",
+
+      external: "ลิงก์ภายนอก",
+    },
+
+    types: {
+      system: "เมนูระบบ",
+
+      external: "ลิงก์ภายนอก",
+    },
+
+    fields: {
+      label: "ชื่อเมนู",
+
+      externalUrl: "URL ภายนอก",
+
+      externalPlaceholder: "https://example.com",
+
+      visible: "แสดงในเมนูเว็บไซต์",
+
+      newTab: "เปิดในแท็บใหม่",
+    },
+
+    actions: {
+      moveUp: "เลื่อนเมนูขึ้น",
+
+      moveDown: "เลื่อนเมนูลง",
+
+      delete: "ลบเมนู",
+
+      addExternal: "เพิ่มลิงก์ภายนอก",
+
+      save: "บันทึกเมนู",
+    },
+
+    labels: {
+      newItem: "เมนูใหม่",
+
+      externalUrl: "URL ภายนอก",
+    },
+
+    confirm: {
+      delete: "ต้องการลบลิงก์ภายนอกนี้หรือไม่?",
+
+      reset: "ต้องการคืนค่าเมนูทั้งหมดเป็นค่าเริ่มต้นของบริษัทหรือไม่?",
+    },
+
+    messages: {
+      saved: "บันทึกเมนูเรียบร้อยแล้ว",
+
+      reset: "คืนค่าเมนูเป็นค่าเริ่มต้นเรียบร้อยแล้ว",
+    },
+
+    errors: {
+      load: "ไม่สามารถโหลดเมนูได้",
+
+      save: "ไม่สามารถบันทึกเมนูได้",
+
+      reset: "ไม่สามารถคืนค่าเมนูได้",
+
+      englishRequired: "เมนูทุกรายการต้องมีชื่อภาษาอังกฤษ",
+
+      invalidExternal: "ลิงก์ภายนอกต้องขึ้นต้นด้วย http:// หรือ https://",
     },
   },
 };

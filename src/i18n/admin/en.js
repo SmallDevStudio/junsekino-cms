@@ -73,6 +73,10 @@ export const adminEn = {
     collapseSidebar: "Collapse sidebar",
 
     platformAdministration: "Platform Administration",
+
+    menuManagement: "Menu Management",
+
+    pageManagement: "Page Management",
   },
 
   header: {
@@ -3842,6 +3846,86 @@ export const adminEn = {
 
         published: "Legal document published successfully.",
       },
+    },
+  },
+
+  menuManagement: {
+    eyebrow: "Website Navigation",
+
+    title: "Menu Management",
+
+    description: "Edit, arrange and control the public menu for {company}.",
+
+    loading: "Loading menu...",
+
+    noCompany: "Select a company before managing its public menu.",
+
+    summary: {
+      total: "Total Items",
+
+      visible: "Visible",
+
+      external: "External Links",
+    },
+
+    types: {
+      system: "System",
+
+      external: "External",
+    },
+
+    fields: {
+      label: "Menu Label",
+
+      externalUrl: "External URL",
+
+      externalPlaceholder: "https://example.com",
+
+      visible: "Show in public menu",
+
+      newTab: "Open in new tab",
+    },
+
+    actions: {
+      moveUp: "Move menu item up",
+
+      moveDown: "Move menu item down",
+
+      delete: "Delete menu item",
+
+      addExternal: "Add External Link",
+
+      save: "Save Menu",
+    },
+
+    labels: {
+      newItem: "New menu item",
+
+      externalUrl: "External URL",
+    },
+
+    confirm: {
+      delete: "Delete this external menu item?",
+
+      reset: "Reset the complete menu to the company defaults?",
+    },
+
+    messages: {
+      saved: "Menu saved successfully.",
+
+      reset: "Menu reset to defaults.",
+    },
+
+    errors: {
+      load: "Unable to load menu.",
+
+      save: "Unable to save menu.",
+
+      reset: "Unable to reset menu.",
+
+      englishRequired: "Every menu item requires an English label.",
+
+      invalidExternal: "External links must begin with http:// or https://.",
     },
   },
 };
