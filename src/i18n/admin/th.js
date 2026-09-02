@@ -359,6 +359,19 @@ export const adminTh = {
           "Section เป็นตัวเลือกเสริม สามารถใช้ About แบบ Cover และข้อความหลักเพียงอย่างเดียวได้",
       },
     },
+    summary: {
+      label: "คำอธิบายหน้าโดยย่อ",
+
+      placeholderEnglish:
+        "A short summary of the company, studio and design approach.",
+
+      placeholderThai: "สรุปข้อมูลบริษัท สตูดิโอ และแนวทางการออกแบบโดยย่อ",
+
+      infoTitle: "คำอธิบายหน้า About",
+
+      infoDescription:
+        "ใช้เป็นค่าเริ่มต้นของ SEO Description และ Open Graph Description ควรเขียนให้กระชับและสื่อความหมายชัดเจน",
+    },
   },
 
   project: {
@@ -886,6 +899,12 @@ export const adminTh = {
       dropTitle: "ลากรูปมาวางที่นี่ หรือคลิกเพื่ออัปโหลด",
 
       formats: "JPG, PNG, WebP หรือ AVIF • สูงสุด {size}",
+
+      batch: {
+        processing: "กำลังอัปโหลดรูปที่ {current} จาก {total}",
+        complete:
+          "อัปโหลดเสร็จแล้ว · สำเร็จ {completed} รูป, ไม่สำเร็จ {failed} รูป",
+      },
 
       errors: {
         unsupportedType: "ไม่รองรับประเภทไฟล์นี้",
@@ -2613,6 +2632,20 @@ export const adminTh = {
 
       emptyDescription:
         "เพิ่มข้อมูลติดต่อในหน้าข้อมูลบริษัทก่อนเผยแพร่หน้า Contact",
+    },
+
+    summary: {
+      label: "คำอธิบายหน้าโดยย่อ",
+
+      placeholderEnglish:
+        "Contact information, location and ways to reach the company.",
+
+      placeholderThai: "ข้อมูลติดต่อ ที่ตั้ง และช่องทางการติดต่อบริษัทโดยย่อ",
+
+      infoTitle: "คำอธิบายหน้า Contact",
+
+      infoDescription:
+        "ใช้เป็นค่าเริ่มต้นของ SEO Description และ Open Graph Description ควรเขียนให้กระชับและมีข้อมูลที่เป็นประโยชน์",
     },
   },
 

@@ -24,6 +24,13 @@ import {
   normalizeServerFieldErrors,
 } from "@/utils/admin-form-validation";
 
+import {
+  applyContentSeoDefaults,
+  syncSeoImageSource,
+  syncSeoKeywordsSource,
+  syncSeoTextSource,
+} from "@/utils/content-seo";
+
 import { cn } from "@/utils/cn";
 
 import { slugify } from "@/utils/slug";
@@ -161,7 +168,7 @@ function normalizeProject(project) {
     return emptyForm();
   }
 
-  return {
+  const normalized = {
     slug: project.slug || "",
 
     title: {
@@ -237,6 +244,22 @@ function normalizeProject(project) {
     featured: project.featured === true,
 
     seo: normalizeSeo(project.seo),
+  };
+
+  return {
+    ...normalized,
+
+    seo: applyContentSeoDefaults({
+      seo: normalized.seo,
+
+      title: normalized.title,
+
+      description: normalized.excerpt,
+
+      keywords: normalized.tags,
+
+      image: normalized.featuredImage,
+    }),
   };
 }
 
@@ -476,15 +499,34 @@ export default function ProjectEditor({
    */
 
   function updateLocalized(field, language, value) {
-    setForm((current) => ({
-      ...current,
+    setForm((current) => {
+      const previousValue = current[field]?.[language] || "";
 
-      [field]: {
-        ...current[field],
+      return {
+        ...current,
 
-        [language]: value,
-      },
-    }));
+        [field]: {
+          ...current[field],
+
+          [language]: value,
+        },
+
+        seo:
+          field === "excerpt"
+            ? syncSeoTextSource({
+                seo: current.seo,
+
+                language,
+
+                previousSource: previousValue,
+
+                nextSource: value,
+
+                fields: ["description", "ogDescription"],
+              })
+            : current.seo,
+      };
+    });
 
     if (field === "title") {
       clearFieldError(setErrors, "title");
@@ -514,20 +556,36 @@ export default function ProjectEditor({
    */
 
   function updateTitle(language, value) {
-    setForm((current) => ({
-      ...current,
+    setForm((current) => {
+      const previousTitle = current.title?.[language] || "";
 
-      title: {
-        ...current.title,
+      return {
+        ...current,
 
-        [language]: value,
-      },
+        title: {
+          ...current.title,
 
-      slug:
-        language === "en" && !project && !slugManuallyEditedRef.current
-          ? slugify(value)
-          : current.slug,
-    }));
+          [language]: value,
+        },
+
+        slug:
+          language === "en" && !project && !slugManuallyEditedRef.current
+            ? slugify(value)
+            : current.slug,
+
+        seo: syncSeoTextSource({
+          seo: current.seo,
+
+          language,
+
+          previousSource: previousTitle,
+
+          nextSource: value,
+
+          fields: ["title", "ogTitle"],
+        }),
+      };
+    });
 
     clearFieldError(setErrors, "title");
 
@@ -1513,6 +1571,14 @@ export default function ProjectEditor({
                     ...current,
 
                     tags,
+
+                    seo: syncSeoKeywordsSource({
+                      seo: current.seo,
+
+                      previousSource: current.tags,
+
+                      nextSource: tags,
+                    }),
                   }))
                 }
               />
@@ -1651,6 +1717,14 @@ export default function ProjectEditor({
                 ...current,
 
                 featuredImage,
+
+                seo: syncSeoImageSource({
+                  seo: current.seo,
+
+                  previousSource: current.featuredImage,
+
+                  nextSource: featuredImage,
+                }),
               }))
             }
             onGalleryChange={(gallery) =>

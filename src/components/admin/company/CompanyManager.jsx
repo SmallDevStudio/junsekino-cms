@@ -21,6 +21,11 @@ import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
 
 import CoverImageField from "@/components/admin/media/CoverImageField";
 
+import {
+  applyContentSeoDefaults,
+  syncSeoTextSource,
+} from "@/utils/content-seo";
+
 import { cn } from "@/utils/cn";
 
 import CompanyMarketingEditor from "@/components/admin/company/CompanyMarketingEditor";
@@ -149,7 +154,7 @@ function normalizeCompany(value) {
 
   const profile = company.profile || {};
 
-  return {
+  const normalized = {
     name: company.name || "",
 
     legalName: company.legalName || "",
@@ -291,6 +296,40 @@ function normalizeCompany(value) {
         seo: company.setup?.completedSteps?.seo === true,
       },
     },
+  };
+
+  return {
+    ...normalized,
+
+    seo: applyContentSeoDefaults({
+      seo: normalized.seo,
+
+      title: {
+        en: normalized.name,
+
+        /*
+         * Company currently has no localized
+         * Thai company-name field.
+         *
+         * Do not copy English into Thai SEO.
+         */
+        th: "",
+      },
+
+      description: {
+        en: "",
+
+        th: "",
+      },
+
+      keywords: [],
+
+      /*
+       * Logo is not a suitable automatic
+       * Open Graph image.
+       */
+      image: null,
+    }),
   };
 }
 
@@ -680,11 +719,30 @@ export default function CompanyManager() {
    */
 
   function updateRoot(field, value) {
-    setForm((current) => ({
-      ...current,
+    setForm((current) => {
+      const previousValue = current[field] || "";
 
-      [field]: value,
-    }));
+      return {
+        ...current,
+
+        [field]: value,
+
+        seo:
+          field === "name"
+            ? syncSeoTextSource({
+                seo: current.seo,
+
+                language: "en",
+
+                previousSource: previousValue,
+
+                nextSource: value,
+
+                fields: ["title", "ogTitle"],
+              })
+            : current.seo,
+      };
+    });
   }
 
   function updateProfile(field, value) {

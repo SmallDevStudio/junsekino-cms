@@ -99,7 +99,13 @@ function uploadWithProgress({ url, method, headers, file, onProgress }) {
  * =========================================================
  */
 
-export default function MediaUploadDropzone({ companyId, onUploaded }) {
+export default function MediaUploadDropzone({
+  companyId,
+
+  onUploaded,
+
+  onBusyChange,
+}) {
   const { t } = useAdminTranslation();
 
   const inputRef = useRef(null);
@@ -107,6 +113,10 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
   const [dragging, setDragging] = useState(false);
 
   const [uploads, setUploads] = useState([]);
+
+  const [batch, setBatch] = useState(null);
+
+  const processingRef = useRef(false);
 
   /*
    * =======================================================
@@ -159,7 +169,7 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
         ...current,
       ]);
 
-      return;
+      return false;
     }
 
     /*
@@ -187,7 +197,7 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
         ...current,
       ]);
 
-      return;
+      return false;
     }
 
     /*
@@ -306,6 +316,8 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
       });
 
       await onUploaded?.(finalized.data);
+
+      return true;
     } catch (error) {
       console.error("Media upload error:", error);
 
@@ -317,6 +329,8 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
             ? error.message
             : t("media.upload.errors.failed"),
       });
+
+      return false;
     }
   }
 
@@ -329,13 +343,77 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
   async function processFiles(fileList) {
     const files = Array.from(fileList || []);
 
-    /*
-     * Sequential uploads reduce spikes
-     * in browser memory and signed-upload
-     * requests when users drop many files.
-     */
-    for (const file of files) {
-      await uploadFile(file);
+    if (files.length === 0 || processingRef.current) {
+      return;
+    }
+
+    processingRef.current = true;
+
+    setBatch({
+      total: files.length,
+
+      processed: 0,
+
+      completed: 0,
+
+      failed: 0,
+
+      activeFileName: files[0]?.name || "",
+
+      status: "processing",
+    });
+
+    onBusyChange?.(true);
+
+    let completed = 0;
+
+    let failed = 0;
+
+    try {
+      /*
+       * Sequential uploads reduce spikes
+       * in browser memory and signed-upload
+       * requests when users drop many files.
+       */
+      for (let index = 0; index < files.length; index += 1) {
+        const file = files[index];
+
+        setBatch((current) => ({
+          ...current,
+
+          activeFileName: file.name,
+        }));
+
+        const success = await uploadFile(file);
+
+        if (success) {
+          completed += 1;
+        } else {
+          failed += 1;
+        }
+
+        setBatch((current) => ({
+          ...current,
+
+          processed: index + 1,
+
+          completed,
+
+          failed,
+        }));
+      }
+
+      setBatch((current) => ({
+        ...current,
+
+        activeFileName: "",
+
+        status: "complete",
+      }));
+    } finally {
+      processingRef.current = false;
+
+      onBusyChange?.(false);
     }
   }
 
@@ -378,6 +456,7 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
           setDragging(false);
         }}
         onDrop={handleDrop}
+        disabled={batch?.status === "processing"}
         className={cn(
           "flex w-full flex-col items-center justify-center",
 
@@ -390,6 +469,8 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
           "text-center",
 
           "transition",
+
+          "disabled:cursor-wait disabled:opacity-60",
 
           dragging
             ? "border-[var(--company-primary)] bg-[var(--company-primary-soft)]"
@@ -449,6 +530,7 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
         type="file"
         multiple
         accept={ALLOWED_IMAGE_MIME_TYPES.join(",")}
+        disabled={batch?.status === "processing"}
         className="hidden"
         onChange={(event) => {
           processFiles(event.target.files);
@@ -456,6 +538,71 @@ export default function MediaUploadDropzone({ companyId, onUploaded }) {
           event.target.value = "";
         }}
       />
+
+      {/* =====================================
+          BATCH STATUS
+      ===================================== */}
+
+      {batch && (
+        <div
+          className={cn(
+            "mt-4 rounded-2xl border px-4 py-3",
+
+            batch.status === "processing"
+              ? "border-[var(--company-primary-border)] bg-[var(--company-primary-soft)]"
+              : batch.failed > 0
+                ? "border-amber-200 bg-amber-50"
+                : "border-emerald-200 bg-emerald-50",
+          )}
+        >
+          <div className="flex items-center gap-3">
+            {batch.status === "processing" ? (
+              <LoaderCircle
+                size={17}
+                className="shrink-0 animate-spin text-[var(--company-primary)]"
+              />
+            ) : (
+              <CheckCircle2 size={18} className="shrink-0 text-emerald-600" />
+            )}
+
+            <div className="min-w-0 flex-1">
+              <div className="admin-text-12 font-semibold text-[var(--admin-foreground)]">
+                {batch.status === "processing"
+                  ? t("media.upload.batch.processing", {
+                      current: Math.min(batch.processed + 1, batch.total),
+
+                      total: batch.total,
+                    })
+                  : t("media.upload.batch.complete", {
+                      completed: batch.completed,
+
+                      failed: batch.failed,
+                    })}
+              </div>
+
+              {batch.status === "processing" && batch.activeFileName && (
+                <div className="mt-1 truncate admin-text-11 text-[var(--admin-muted)]">
+                  {batch.activeFileName}
+                </div>
+              )}
+
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/70">
+                <div
+                  className="h-full rounded-full bg-[var(--company-primary)] transition-[width]"
+                  style={{
+                    width:
+                      String(
+                        batch.total > 0
+                          ? Math.round((batch.processed / batch.total) * 100)
+                          : 0,
+                      ) + "%",
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* =====================================
           UPLOAD QUEUE

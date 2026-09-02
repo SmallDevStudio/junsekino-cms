@@ -1,13 +1,17 @@
 "use client";
 
+import { Globe2, Link2, Search } from "lucide-react";
+
 import {
-  AtSign,
-  Globe2,
-  Link2,
-  MessageCircle,
-  Music2,
-  Search,
-} from "lucide-react";
+  FaFacebookF,
+  FaInstagram,
+  FaLinkedinIn,
+  FaLine,
+  FaPinterestP,
+  FaYoutube,
+} from "react-icons/fa";
+
+import { FaTiktok, FaXTwitter } from "react-icons/fa6";
 
 import CoverImageField from "@/components/admin/media/CoverImageField";
 
@@ -22,35 +26,66 @@ import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
 const SOCIAL_FIELDS = [
   {
     key: "facebook",
-    icon: Link2,
+
+    icon: FaFacebookF,
+
+    iconClassName: "text-[#1877F2]",
   },
+
   {
     key: "instagram",
-    icon: Link2,
+
+    icon: FaInstagram,
+
+    iconClassName: "text-[#E4405F]",
   },
+
   {
     key: "youtube",
-    icon: Link2,
+
+    icon: FaYoutube,
+
+    iconClassName: "text-[#FF0000]",
   },
+
   {
     key: "linkedin",
-    icon: Link2,
+
+    icon: FaLinkedinIn,
+
+    iconClassName: "text-[#0A66C2]",
   },
+
   {
     key: "tiktok",
-    icon: Music2,
+
+    icon: FaTiktok,
+
+    iconClassName: "text-[var(--admin-foreground)]",
   },
+
   {
     key: "x",
-    icon: AtSign,
+
+    icon: FaXTwitter,
+
+    iconClassName: "text-[var(--admin-foreground)]",
   },
+
   {
     key: "pinterest",
-    icon: Link2,
+
+    icon: FaPinterestP,
+
+    iconClassName: "text-[#E60023]",
   },
+
   {
     key: "line",
-    icon: MessageCircle,
+
+    icon: FaLine,
+
+    iconClassName: "text-[#06C755]",
   },
 ];
 
@@ -424,10 +459,42 @@ export default function CompanyMarketingEditor({
               key,
 
               icon: Icon,
+
+              iconClassName,
             }) => (
               <label key={key} className="grid gap-1.5">
-                <span className="flex items-center gap-2 admin-text-11 font-medium">
-                  <Icon size={14} className="text-[var(--company-primary)]" />
+                <span
+                  className="
+                    flex
+                    items-center
+                    gap-2
+
+                    admin-text-11
+                    font-medium
+
+                    text-[var(--admin-foreground)]
+                  "
+                >
+                  <span
+                    className="
+                      flex
+                      h-7
+                      w-7
+                      shrink-0
+
+                      items-center
+                      justify-center
+
+                      rounded-lg
+
+                      border
+                      border-[var(--admin-border)]
+
+                      bg-[var(--admin-background)]
+                    "
+                  >
+                    <Icon size={14} className={iconClassName} />
+                  </span>
 
                   {t(`companyAdmin.social.${key}`)}
                 </span>
@@ -445,6 +512,7 @@ export default function CompanyMarketingEditor({
                   }
                   className="
                     h-11
+
                     rounded-xl
 
                     border
@@ -454,11 +522,18 @@ export default function CompanyMarketingEditor({
 
                     px-3
 
-                    admin-text-12
+                    admin-text-11
+
+                    text-[var(--admin-foreground)]
 
                     outline-none
 
+                    transition
+
+                    placeholder:text-[var(--admin-muted-light)]
+
                     focus:border-[var(--company-primary)]
+
                     focus:ring-2
                     focus:ring-[var(--company-primary-soft)]
                   "

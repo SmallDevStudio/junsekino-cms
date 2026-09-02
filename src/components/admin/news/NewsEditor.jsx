@@ -32,6 +32,13 @@ import {
   normalizeServerFieldErrors,
 } from "@/utils/admin-form-validation";
 
+import {
+  applyContentSeoDefaults,
+  syncSeoImageSource,
+  syncSeoKeywordsSource,
+  syncSeoTextSource,
+} from "@/utils/content-seo";
+
 import { cn } from "@/utils/cn";
 
 import { slugify } from "@/utils/slug";
@@ -133,7 +140,7 @@ function normalizeNews(item) {
     return emptyForm();
   }
 
-  return {
+  const normalized = {
     slug: item.slug || "",
 
     title: {
@@ -165,6 +172,22 @@ function normalizeNews(item) {
     featured: item.featured === true,
 
     seo: normalizeSeo(item.seo),
+  };
+
+  return {
+    ...normalized,
+
+    seo: applyContentSeoDefaults({
+      seo: normalized.seo,
+
+      title: normalized.title,
+
+      description: normalized.excerpt,
+
+      keywords: normalized.tags,
+
+      image: normalized.featuredImage,
+    }),
   };
 }
 
@@ -351,20 +374,36 @@ export default function NewsEditor({
    */
 
   function updateTitle(language, value) {
-    setForm((current) => ({
-      ...current,
+    setForm((current) => {
+      const previousTitle = current.title?.[language] || "";
 
-      title: {
-        ...current.title,
+      return {
+        ...current,
 
-        [language]: value,
-      },
+        title: {
+          ...current.title,
 
-      slug:
-        language === "en" && !item && !slugManuallyEditedRef.current
-          ? slugify(value)
-          : current.slug,
-    }));
+          [language]: value,
+        },
+
+        slug:
+          language === "en" && !item && !slugManuallyEditedRef.current
+            ? slugify(value)
+            : current.slug,
+
+        seo: syncSeoTextSource({
+          seo: current.seo,
+
+          language,
+
+          previousSource: previousTitle,
+
+          nextSource: value,
+
+          fields: ["title", "ogTitle"],
+        }),
+      };
+    });
 
     clearFieldError(setErrors, "title");
 
@@ -380,15 +419,34 @@ export default function NewsEditor({
    */
 
   function updateLocalized(field, language, value) {
-    setForm((current) => ({
-      ...current,
+    setForm((current) => {
+      const previousValue = current[field]?.[language] || "";
 
-      [field]: {
-        ...current[field],
+      return {
+        ...current,
 
-        [language]: value,
-      },
-    }));
+        [field]: {
+          ...current[field],
+
+          [language]: value,
+        },
+
+        seo:
+          field === "excerpt"
+            ? syncSeoTextSource({
+                seo: current.seo,
+
+                language,
+
+                previousSource: previousValue,
+
+                nextSource: value,
+
+                fields: ["description", "ogDescription"],
+              })
+            : current.seo,
+      };
+    });
 
     if (field === "content") {
       clearFieldError(setErrors, "content");
@@ -575,10 +633,8 @@ export default function NewsEditor({
       return;
     }
 
-    setForm((current) => ({
-      ...current,
-
-      featuredImage: {
+    setForm((current) => {
+      const featuredImage = {
         mediaId: media.id,
 
         alt: {
@@ -592,8 +648,22 @@ export default function NewsEditor({
 
           en: media.caption?.en || "",
         },
-      },
-    }));
+      };
+
+      return {
+        ...current,
+
+        featuredImage,
+
+        seo: syncSeoImageSource({
+          seo: current.seo,
+
+          previousSource: current.featuredImage,
+
+          nextSource: featuredImage,
+        }),
+      };
+    });
   }
 
   /*
@@ -1126,6 +1196,14 @@ export default function NewsEditor({
                               ...current,
 
                               featuredImage: null,
+
+                              seo: syncSeoImageSource({
+                                seo: current.seo,
+
+                                previousSource: current.featuredImage,
+
+                                nextSource: null,
+                              }),
                             }));
                           }}
                           className="
@@ -1241,6 +1319,14 @@ export default function NewsEditor({
                         ...current,
 
                         tags,
+
+                        seo: syncSeoKeywordsSource({
+                          seo: current.seo,
+
+                          previousSource: current.tags,
+
+                          nextSource: tags,
+                        }),
                       }))
                     }
                   />

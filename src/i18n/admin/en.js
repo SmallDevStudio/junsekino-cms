@@ -351,6 +351,20 @@ export const adminEn = {
           "Sections are optional. Add one only when this About page needs additional content.",
       },
     },
+
+    summary: {
+      label: "Page Summary",
+
+      placeholderEnglish:
+        "A short summary of the company, studio and design approach.",
+
+      placeholderThai: "สรุปข้อมูลบริษัท สตูดิโอ และแนวทางการออกแบบโดยย่อ",
+
+      infoTitle: "About page summary",
+
+      infoDescription:
+        "Used as the default SEO description and Open Graph description. Keep it concise and meaningful.",
+    },
   },
 
   project: {
@@ -884,6 +898,11 @@ export const adminEn = {
       dropTitle: "Drop images here or click to upload",
 
       formats: "JPG, PNG, WebP or AVIF • up to {size}",
+
+      batch: {
+        processing: "Uploading image {current} of {total}",
+        complete: "Upload complete · {completed} succeeded, {failed} failed",
+      },
 
       errors: {
         unsupportedType: "Unsupported file type.",
@@ -2646,6 +2665,20 @@ export const adminEn = {
 
       emptyDescription:
         "Add contact information in Company Settings before publishing this Contact page.",
+    },
+
+    summary: {
+      label: "Page Summary",
+
+      placeholderEnglish:
+        "Contact information, location and ways to reach the company.",
+
+      placeholderThai: "ข้อมูลติดต่อ ที่ตั้ง และช่องทางการติดต่อบริษัทโดยย่อ",
+
+      infoTitle: "Contact page summary",
+
+      infoDescription:
+        "Used as the default SEO description and Open Graph description. Keep it concise and informative.",
     },
   },
 

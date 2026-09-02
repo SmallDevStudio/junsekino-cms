@@ -943,7 +943,7 @@ export default function DashboardWorkspace({ userName }) {
                 admin-text-11
                 font-semibold
 
-                text-[var(--company-primary-foreground)]
+               text-[var(--company-primary-foreground)]
 
                 transition
 

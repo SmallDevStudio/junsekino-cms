@@ -25,6 +25,12 @@ import {
   normalizeServerFieldErrors,
 } from "@/utils/admin-form-validation";
 
+import {
+  applyContentSeoDefaults,
+  syncSeoImageSource,
+  syncSeoTextSource,
+} from "@/utils/content-seo";
+
 import { cn } from "@/utils/cn";
 
 import { slugify } from "@/utils/slug";
@@ -138,7 +144,7 @@ function normalizeAward(award) {
     return emptyForm();
   }
 
-  return {
+  const normalized = {
     slug: award.slug || "",
 
     title: {
@@ -196,6 +202,29 @@ function normalizeAward(award) {
     featured: award.featured === true,
 
     seo: normalizeSeo(award.seo),
+  };
+
+  return {
+    ...normalized,
+
+    seo: applyContentSeoDefaults({
+      seo: normalized.seo,
+
+      title: normalized.title,
+
+      description: normalized.excerpt,
+
+      /*
+       * Award does not currently have
+       * a shared Tags field.
+       *
+       * SEO keywords therefore remain
+       * editable manually.
+       */
+      keywords: [],
+
+      image: normalized.featuredImage,
+    }),
   };
 }
 
@@ -321,15 +350,34 @@ export default function AwardEditor({
    */
 
   function updateLocalized(field, language, value) {
-    setForm((current) => ({
-      ...current,
+    setForm((current) => {
+      const previousValue = current[field]?.[language] || "";
 
-      [field]: {
-        ...current[field],
+      return {
+        ...current,
 
-        [language]: value,
-      },
-    }));
+        [field]: {
+          ...current[field],
+
+          [language]: value,
+        },
+
+        seo:
+          field === "excerpt"
+            ? syncSeoTextSource({
+                seo: current.seo,
+
+                language,
+
+                previousSource: previousValue,
+
+                nextSource: value,
+
+                fields: ["description", "ogDescription"],
+              })
+            : current.seo,
+      };
+    });
 
     if (field === "title") {
       clearFieldError(setErrors, "title");
@@ -337,20 +385,36 @@ export default function AwardEditor({
   }
 
   function updateTitle(language, value) {
-    setForm((current) => ({
-      ...current,
+    setForm((current) => {
+      const previousTitle = current.title?.[language] || "";
 
-      title: {
-        ...current.title,
+      return {
+        ...current,
 
-        [language]: value,
-      },
+        title: {
+          ...current.title,
 
-      slug:
-        language === "en" && !award && !slugManuallyEditedRef.current
-          ? slugify(value)
-          : current.slug,
-    }));
+          [language]: value,
+        },
+
+        slug:
+          language === "en" && !award && !slugManuallyEditedRef.current
+            ? slugify(value)
+            : current.slug,
+
+        seo: syncSeoTextSource({
+          seo: current.seo,
+
+          language,
+
+          previousSource: previousTitle,
+
+          nextSource: value,
+
+          fields: ["title", "ogTitle"],
+        }),
+      };
+    });
 
     clearFieldError(setErrors, "title");
 
@@ -1267,13 +1331,14 @@ export default function AwardEditor({
                   ...current,
 
                   featuredImage,
-                }))
-              }
-              onGalleryChange={(gallery) =>
-                setForm((current) => ({
-                  ...current,
 
-                  gallery,
+                  seo: syncSeoImageSource({
+                    seo: current.seo,
+
+                    previousSource: current.featuredImage,
+
+                    nextSource: featuredImage,
+                  }),
                 }))
               }
             />

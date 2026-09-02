@@ -16,6 +16,14 @@ import LocalizedRichTextEditor from "@/components/admin/localization/LocalizedRi
 
 import { PAGE_TYPE } from "@/constants/page";
 
+import ContentSeoSection from "@/components/admin/content/ContentSeoSection";
+
+import {
+  applyContentSeoDefaults,
+  syncSeoImageSource,
+  syncSeoTextSource,
+} from "@/utils/content-seo";
+
 import AboutPreviewDialog from "./AboutPreviewDialog";
 
 import AboutSectionsEditor from "./AboutSectionsEditor";
@@ -33,19 +41,76 @@ function emptyLocalized() {
   };
 }
 
+function emptySeoLanguage() {
+  return {
+    title: "",
+
+    description: "",
+
+    keywords: [],
+
+    ogTitle: "",
+
+    ogDescription: "",
+
+    ogImage: null,
+  };
+}
+
+function emptySeo() {
+  return {
+    en: emptySeoLanguage(),
+
+    th: emptySeoLanguage(),
+
+    index: true,
+
+    follow: true,
+  };
+}
+
+function normalizeSeoLanguage(value) {
+  return {
+    title: value?.title || "",
+
+    description: value?.description || "",
+
+    keywords: Array.isArray(value?.keywords) ? value.keywords : [],
+
+    ogTitle: value?.ogTitle || "",
+
+    ogDescription: value?.ogDescription || "",
+
+    ogImage: value?.ogImage || null,
+  };
+}
+
+function normalizeSeo(value) {
+  return {
+    en: normalizeSeoLanguage(value?.en),
+
+    th: normalizeSeoLanguage(value?.th),
+
+    index: value?.index !== false,
+
+    follow: value?.follow !== false,
+  };
+}
+
 function createVersionSlug() {
   return `about-${Date.now().toString(36)}`;
 }
 
 function normalizePage(page) {
   if (!page) {
-    return {
+    const normalized = {
       slug: createVersionSlug(),
 
       pageType: PAGE_TYPE.ABOUT,
 
       title: {
         en: "About",
+
         th: "",
       },
 
@@ -62,15 +127,34 @@ function normalizePage(page) {
 
         label: {
           en: "About",
+
           th: "",
         },
 
         sortOrder: 0,
       },
+
+      seo: emptySeo(),
+    };
+
+    return {
+      ...normalized,
+
+      seo: applyContentSeoDefaults({
+        seo: normalized.seo,
+
+        title: normalized.title,
+
+        description: normalized.excerpt,
+
+        keywords: [],
+
+        image: normalized.featuredImage,
+      }),
     };
   }
 
-  return {
+  const normalized = {
     ...page,
 
     title: {
@@ -91,14 +175,6 @@ function normalizePage(page) {
       th: page.content?.th || "",
     },
 
-    /*
-     * Keep the entire featuredImage object.
-     *
-     * This is important because the new Media Core
-     * stores crop metadata inside:
-     *
-     * featuredImage.crop
-     */
     featuredImage: page.featuredImage || null,
 
     sections: Array.isArray(page.sections) ? page.sections : [],
@@ -114,6 +190,24 @@ function normalizePage(page) {
 
       sortOrder: page.navigation?.sortOrder ?? 0,
     },
+
+    seo: normalizeSeo(page.seo),
+  };
+
+  return {
+    ...normalized,
+
+    seo: applyContentSeoDefaults({
+      seo: normalized.seo,
+
+      title: normalized.title,
+
+      description: normalized.excerpt,
+
+      keywords: [],
+
+      image: normalized.featuredImage,
+    }),
   };
 }
 
@@ -175,15 +269,51 @@ export default function AboutEditor({
    */
 
   function updateLocalized(field, locale, value) {
-    setForm((current) => ({
-      ...current,
+    setForm((current) => {
+      const previousValue = current[field]?.[locale] || "";
 
-      [field]: {
-        ...current[field],
+      let seo = current.seo;
 
-        [locale]: value,
-      },
-    }));
+      if (field === "title") {
+        seo = syncSeoTextSource({
+          seo,
+
+          language: locale,
+
+          previousSource: previousValue,
+
+          nextSource: value,
+
+          fields: ["title", "ogTitle"],
+        });
+      }
+
+      if (field === "excerpt") {
+        seo = syncSeoTextSource({
+          seo,
+
+          language: locale,
+
+          previousSource: previousValue,
+
+          nextSource: value,
+
+          fields: ["description", "ogDescription"],
+        });
+      }
+
+      return {
+        ...current,
+
+        [field]: {
+          ...current[field],
+
+          [locale]: value,
+        },
+
+        seo,
+      };
+    });
   }
 
   /*
@@ -197,6 +327,14 @@ export default function AboutEditor({
       ...current,
 
       featuredImage,
+
+      seo: syncSeoImageSource({
+        seo: current.seo,
+
+        previousSource: current.featuredImage,
+
+        nextSource: featuredImage,
+      }),
     }));
   }
 
@@ -246,6 +384,8 @@ export default function AboutEditor({
         sections: form.sections || [],
 
         navigation: form.navigation,
+
+        seo: form.seo,
       };
 
       const response = await fetch(
@@ -553,6 +693,25 @@ export default function AboutEditor({
                   "
                 />
               </div>
+
+              <div className="mt-5">
+                <LocalizedFormField
+                  label={t("about.summary.label")}
+                  type="textarea"
+                  rows={4}
+                  value={form.excerpt}
+                  onChange={(locale, value) =>
+                    updateLocalized("excerpt", locale, value)
+                  }
+                  placeholder={{
+                    en: t("about.summary.placeholderEnglish"),
+
+                    th: t("about.summary.placeholderThai"),
+                  }}
+                  infoTitle={t("about.summary.infoTitle")}
+                  infoContent={t("about.summary.infoDescription")}
+                />
+              </div>
             </section>
 
             {/* ===============================
@@ -627,6 +786,17 @@ export default function AboutEditor({
                 />
               </div>
             </section>
+            <ContentSeoSection
+              companyId={companyId}
+              seo={form.seo}
+              onChange={(seo) =>
+                setForm((current) => ({
+                  ...current,
+
+                  seo,
+                }))
+              }
+            />
           </div>
 
           {/* =================================

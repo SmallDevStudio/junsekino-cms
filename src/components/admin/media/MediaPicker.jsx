@@ -584,6 +584,8 @@ export default function MediaPicker({
 
   const [activeTab, setActiveTab] = useState("library");
 
+  const [uploadBusy, setUploadBusy] = useState(false);
+
   /*
    * =======================================================
    * CROP STATE
@@ -685,6 +687,8 @@ export default function MediaPicker({
       setSearch("");
 
       setActiveTab("library");
+
+      setUploadBusy(false);
 
       setCropDialogOpen(false);
 
@@ -803,7 +807,11 @@ export default function MediaPicker({
    * =======================================================
    */
 
-  async function handleMediaCreated(media) {
+  async function handleMediaCreated(
+    media,
+
+    { returnToLibrary = true } = {},
+  ) {
     const refreshed = await loadMedia();
 
     const mediaId = media?.id;
@@ -812,7 +820,9 @@ export default function MediaPicker({
       addToSelection(mediaId);
     }
 
-    setActiveTab("library");
+    if (returnToLibrary) {
+      setActiveTab("library");
+    }
   }
 
   /*
@@ -1058,7 +1068,7 @@ export default function MediaPicker({
           type="button"
           aria-label={t("media.picker.close")}
           onClick={onClose}
-          disabled={cropLoading}
+          disabled={cropLoading || uploadBusy}
           className="
             absolute
             inset-0
@@ -1155,7 +1165,7 @@ export default function MediaPicker({
             <button
               type="button"
               onClick={onClose}
-              disabled={cropLoading}
+              disabled={cropLoading || uploadBusy}
               aria-label={t("common.close")}
               title={t("common.close")}
               className="
@@ -1212,7 +1222,7 @@ export default function MediaPicker({
                 <button
                   key={tab.value}
                   type="button"
-                  disabled={cropLoading}
+                  disabled={cropLoading || uploadBusy}
                   onClick={() => setActiveTab(tab.value)}
                   className={cn(
                     "relative",
@@ -1318,7 +1328,7 @@ export default function MediaPicker({
                     <input
                       type="search"
                       value={search}
-                      disabled={cropLoading}
+                      disabled={cropLoading || uploadBusy}
                       onChange={(event) => setSearch(event.target.value)}
                       placeholder={t("media.picker.searchPlaceholder")}
                       className="
@@ -1664,7 +1674,7 @@ export default function MediaPicker({
                         <button
                           key={media.id}
                           type="button"
-                          disabled={cropLoading}
+                          disabled={cropLoading || uploadBusy}
                           onClick={() => toggleMedia(media.id)}
                           className={cn(
                             "group overflow-hidden",
@@ -1790,7 +1800,12 @@ export default function MediaPicker({
             {activeTab === "upload" && (
               <MediaUploadDropzone
                 companyId={companyId}
-                onUploaded={handleMediaCreated}
+                onUploaded={(media) =>
+                  handleMediaCreated(media, {
+                    returnToLibrary: false,
+                  })
+                }
+                onBusyChange={setUploadBusy}
               />
             )}
 
@@ -1858,7 +1873,7 @@ export default function MediaPicker({
               <button
                 type="button"
                 onClick={onClose}
-                disabled={cropLoading}
+                disabled={cropLoading || uploadBusy}
                 className="
                   h-10
 
@@ -1889,7 +1904,7 @@ export default function MediaPicker({
               <button
                 type="button"
                 onClick={handleConfirm}
-                disabled={selection.length === 0 || cropLoading}
+                disabled={selection.length === 0 || cropLoading || uploadBusy}
                 className="
                   inline-flex
                   h-10

@@ -14,7 +14,15 @@ import LocalizedFormField from "@/components/admin/localization/LocalizedFormFie
 
 import { PAGE_TYPE } from "@/constants/page";
 
+import {
+  applyContentSeoDefaults,
+  syncSeoImageSource,
+  syncSeoTextSource,
+} from "@/utils/content-seo";
+
 import CompanyContactProfileSummary from "./CompanyContactProfileSummary";
+
+import ContentSeoSection from "@/components/admin/content/ContentSeoSection";
 
 /*
  * =========================================================
@@ -26,6 +34,62 @@ function emptyLocalized() {
   return {
     en: "",
     th: "",
+  };
+}
+
+function emptySeoLanguage() {
+  return {
+    title: "",
+
+    description: "",
+
+    keywords: [],
+
+    ogTitle: "",
+
+    ogDescription: "",
+
+    ogImage: null,
+  };
+}
+
+function emptySeo() {
+  return {
+    en: emptySeoLanguage(),
+
+    th: emptySeoLanguage(),
+
+    index: true,
+
+    follow: true,
+  };
+}
+
+function normalizeSeoLanguage(value) {
+  return {
+    title: value?.title || "",
+
+    description: value?.description || "",
+
+    keywords: Array.isArray(value?.keywords) ? value.keywords : [],
+
+    ogTitle: value?.ogTitle || "",
+
+    ogDescription: value?.ogDescription || "",
+
+    ogImage: value?.ogImage || null,
+  };
+}
+
+function normalizeSeo(value) {
+  return {
+    en: normalizeSeoLanguage(value?.en),
+
+    th: normalizeSeoLanguage(value?.th),
+
+    index: value?.index !== false,
+
+    follow: value?.follow !== false,
   };
 }
 
@@ -95,7 +159,7 @@ function normalizeContact(
 
 function normalizePage(page, company, contactForm) {
   if (!page) {
-    return {
+    const normalized = {
       slug: createVersionSlug(),
 
       pageType: PAGE_TYPE.CONTACT,
@@ -127,10 +191,28 @@ function normalizePage(page, company, contactForm) {
       },
 
       contact: normalizeContact(null, company, contactForm),
+
+      seo: emptySeo(),
+    };
+
+    return {
+      ...normalized,
+
+      seo: applyContentSeoDefaults({
+        seo: normalized.seo,
+
+        title: normalized.title,
+
+        description: normalized.excerpt,
+
+        keywords: [],
+
+        image: normalized.featuredImage,
+      }),
     };
   }
 
-  return {
+  const normalized = {
     ...page,
 
     title: {
@@ -164,6 +246,24 @@ function normalizePage(page, company, contactForm) {
     },
 
     contact: normalizeContact(page.contact, company, contactForm),
+
+    seo: normalizeSeo(page.seo),
+  };
+
+  return {
+    ...normalized,
+
+    seo: applyContentSeoDefaults({
+      seo: normalized.seo,
+
+      title: normalized.title,
+
+      description: normalized.excerpt,
+
+      keywords: [],
+
+      image: normalized.featuredImage,
+    }),
   };
 }
 
@@ -327,6 +427,54 @@ export default function ContactEditor({
    * =======================================================
    */
 
+  function updatePageLocalized(field, locale, value) {
+    setForm((current) => {
+      const previousValue = current[field]?.[locale] || "";
+
+      let seo = current.seo;
+
+      if (field === "title") {
+        seo = syncSeoTextSource({
+          seo,
+
+          language: locale,
+
+          previousSource: previousValue,
+
+          nextSource: value,
+
+          fields: ["title", "ogTitle"],
+        });
+      }
+
+      if (field === "excerpt") {
+        seo = syncSeoTextSource({
+          seo,
+
+          language: locale,
+
+          previousSource: previousValue,
+
+          nextSource: value,
+
+          fields: ["description", "ogDescription"],
+        });
+      }
+
+      return {
+        ...current,
+
+        [field]: {
+          ...current[field],
+
+          [locale]: value,
+        },
+
+        seo,
+      };
+    });
+  }
+
   function updateContactLocalized(field, locale, value) {
     setForm((current) => ({
       ...current,
@@ -360,6 +508,14 @@ export default function ContactEditor({
       ...current,
 
       featuredImage,
+
+      seo: syncSeoImageSource({
+        seo: current.seo,
+
+        previousSource: current.featuredImage,
+
+        nextSource: featuredImage,
+      }),
     }));
   }
 
@@ -410,6 +566,8 @@ export default function ContactEditor({
         sections: form.sections || [],
 
         navigation: form.navigation,
+
+        seo: form.seo,
 
         contact: {
           ...form.contact,
@@ -640,16 +798,28 @@ export default function ContactEditor({
                 required
                 disabled={readOnly}
                 onChange={(locale, value) =>
-                  setForm((current) => ({
-                    ...current,
-
-                    title: {
-                      ...current.title,
-
-                      [locale]: value,
-                    },
-                  }))
+                  updatePageLocalized("title", locale, value)
                 }
+              />
+            </div>
+
+            <div className="mt-5">
+              <LocalizedFormField
+                label={t("contact.summary.label")}
+                type="textarea"
+                rows={4}
+                value={form.excerpt}
+                disabled={readOnly}
+                onChange={(locale, value) =>
+                  updatePageLocalized("excerpt", locale, value)
+                }
+                placeholder={{
+                  en: t("contact.summary.placeholderEnglish"),
+
+                  th: t("contact.summary.placeholderThai"),
+                }}
+                infoTitle={t("contact.summary.infoTitle")}
+                infoContent={t("contact.summary.infoDescription")}
               />
             </div>
           </section>
@@ -704,24 +874,24 @@ export default function ContactEditor({
           <section className="mt-10">
             <h3
               className="
-      admin-text-14
-      font-semibold
+                admin-text-14
+                font-semibold
 
-      text-[var(--admin-foreground)]
-    "
+                text-[var(--admin-foreground)]
+              "
             >
               {t("contact.companyInformation")}
             </h3>
 
             <p
               className="
-      mt-1
+                mt-1
 
-      admin-text-12
-      leading-[1.65]
+                admin-text-12
+                leading-[1.65]
 
-      text-[var(--admin-muted)]
-    "
+                text-[var(--admin-muted)]
+              "
             >
               {t("contact.companyInformationDescription")}
             </p>
@@ -753,11 +923,11 @@ export default function ContactEditor({
               <label className="block">
                 <span
                   className="
-          admin-text-11
-          font-medium
+                    admin-text-11
+                    font-medium
 
-          text-[var(--admin-muted)]
-        "
+                    text-[var(--admin-muted)]
+                  "
                 >
                   {t("contact.fields.establishedYear")}
                 </span>
@@ -774,33 +944,33 @@ export default function ContactEditor({
                     )
                   }
                   className="
-          mt-2
-          h-11
-          w-full
+                    mt-2
+                    h-11
+                    w-full
 
-          rounded-xl
+                    rounded-xl
 
-          border
-          border-[var(--admin-border)]
+                    border
+                    border-[var(--admin-border)]
 
-          bg-[var(--admin-surface)]
+                    bg-[var(--admin-surface)]
 
-          px-3
+                    px-3
 
-          admin-text-13
+                    admin-text-13
 
-          outline-none
+                    outline-none
 
-          transition
+                    transition
 
-          focus:border-[var(--company-primary)]
+                    focus:border-[var(--company-primary)]
 
-          focus:ring-2
-          focus:ring-[var(--company-primary-soft)]
+                    focus:ring-2
+                    focus:ring-[var(--company-primary-soft)]
 
-          disabled:bg-[var(--admin-background)]
-          disabled:opacity-70
-        "
+                    disabled:bg-[var(--admin-background)]
+                    disabled:opacity-70
+                  "
                 />
               </label>
             </div>
@@ -940,6 +1110,20 @@ export default function ContactEditor({
               </div>
             </div>
           </section>
+
+          {!readOnly && (
+            <ContentSeoSection
+              companyId={companyId}
+              seo={form.seo}
+              onChange={(seo) =>
+                setForm((current) => ({
+                  ...current,
+
+                  seo,
+                }))
+              }
+            />
+          )}
         </div>
 
         {/* FOOTER */}
