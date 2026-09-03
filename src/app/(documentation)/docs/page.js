@@ -1,9 +1,10 @@
-import DocsWorkspace from "@/components/admin/docs/DocsWorkspace";
+import DocsOverview from "@/components/docs/DocsOverview";
 
 export const metadata = {
-  title: "Getting Started",
+  title: "Overview",
 
-  description: "Learn how to configure and manage websites with Junsekino CMS.",
+  description:
+    "Overview of Junsekino CMS, its capabilities and recommended operating workflow.",
 
   robots: {
     index: false,
@@ -13,5 +14,5 @@ export const metadata = {
 };
 
 export default function DocumentationHomePage() {
-  return <DocsWorkspace initialSectionId="getting-started" />;
+  return <DocsOverview />;
 }

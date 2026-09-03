@@ -5,7 +5,6 @@ import {
   BookOpen,
   ChevronDown,
   ExternalLink,
-  Languages,
   Menu,
   Search,
   X,
@@ -27,6 +26,8 @@ import {
 } from "@/constants/docs-navigation";
 
 import { cn } from "@/utils/cn";
+
+import AdminDisplaySettings from "@/components/admin/layout/AdminDisplaySettings";
 
 /*
  * =========================================================
@@ -210,7 +211,7 @@ function DocsSearch({
 
               bg-transparent
 
-              text-[13px]
+              admin-text-13
               text-[var(--admin-foreground)]
 
               outline-none
@@ -255,7 +256,7 @@ function DocsSearch({
                 py-12
                 text-center
 
-                text-[12px]
+                admin-text-12
                 text-[var(--admin-muted)]
               "
             >
@@ -314,7 +315,7 @@ function DocsSearch({
                       className="
                         block
 
-                        text-[12px]
+                        admin-text-12
                         font-semibold
 
                         text-[var(--admin-foreground)]
@@ -328,7 +329,7 @@ function DocsSearch({
                         mt-0.5
                         block
 
-                        text-[9px]
+                        admin-text-9
                         font-semibold
                         uppercase
                         tracking-[0.1em]
@@ -345,7 +346,7 @@ function DocsSearch({
                           mt-1
                           block
 
-                          text-[10px]
+                          admin-text-10
                           leading-[1.6]
 
                           text-[var(--admin-muted)]
@@ -385,7 +386,7 @@ function DocsSearch({
             px-4
             py-3
 
-            text-[9px]
+            admin-text-9
             text-[var(--admin-muted)]
           "
         >
@@ -452,7 +453,7 @@ function DocsSidebar({
           mb-3
           px-4
 
-          text-[9px]
+          admin-text-9
           font-semibold
           uppercase
           tracking-[0.16em]
@@ -490,7 +491,7 @@ function DocsSidebar({
                 <span
                   className={cn(
                     "min-w-0 flex-1",
-                    "text-[11px] font-semibold",
+                    "admin-text-11 font-semibold",
 
                     categoryActive
                       ? "text-[var(--company-primary)]"
@@ -545,7 +546,7 @@ function DocsSidebar({
                           "relative block",
                           "rounded-lg",
                           "px-3 py-2",
-                          "text-[10px] leading-[1.5]",
+                          "admin-text-10 leading-[1.5]",
                           "transition",
 
                           active
@@ -593,8 +594,6 @@ function DocsSidebar({
 
 function DocsHeader({
   locale,
-
-  onChangeLanguage,
 
   onOpenMenu,
 
@@ -690,7 +689,7 @@ function DocsHeader({
                 block
                 truncate
 
-                text-[13px]
+                admin-text-13
                 font-semibold
                 tracking-[0.03em]
               "
@@ -702,7 +701,7 @@ function DocsHeader({
               className="
                 block
 
-                text-[9px]
+                admin-text-9
                 font-semibold
                 uppercase
                 tracking-[0.16em]
@@ -759,7 +758,7 @@ function DocsHeader({
               flex-1
               truncate
 
-              text-[10px]
+              admin-text-10
 
               text-[var(--admin-muted)]
             "
@@ -770,38 +769,7 @@ function DocsHeader({
           </span>
         </button>
 
-        <button
-          type="button"
-          onClick={onChangeLanguage}
-          className="
-            inline-flex
-            h-10
-            shrink-0
-            items-center
-            justify-center
-            gap-2
-
-            rounded-xl
-
-            border
-            border-[var(--admin-border)]
-
-            bg-white
-
-            px-3
-
-            text-[10px]
-            font-semibold
-
-            transition
-
-            hover:bg-[var(--admin-hover)]
-          "
-        >
-          <Languages size={15} />
-
-          <span className="hidden xl:inline">{languageLabel}</span>
-        </button>
+        <AdminDisplaySettings />
 
         <Link
           href="/admin/dashboard"
@@ -819,7 +787,7 @@ function DocsHeader({
 
             px-3
 
-            text-[10px]
+            admin-text-10
             font-semibold
 
             !text-white
@@ -855,18 +823,11 @@ export default function DocsShell({
 }) {
   const pathname = usePathname();
 
-  const {
-    locale,
-
-    setLocale,
-  } = useAdminTranslation();
+  const { locale } = useAdminTranslation();
 
   const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
 
   const [searchOpen, setSearchOpen] = useState(false);
-
-  const nextLocale =
-    locale === ADMIN_LOCALE.TH ? ADMIN_LOCALE.EN : ADMIN_LOCALE.TH;
 
   return (
     <div
@@ -881,7 +842,6 @@ export default function DocsShell({
     >
       <DocsHeader
         locale={locale}
-        onChangeLanguage={() => setLocale(nextLocale)}
         onOpenMenu={() => setMobileNavigationOpen(true)}
         onOpenSearch={() => setSearchOpen(true)}
       />
@@ -978,7 +938,7 @@ export default function DocsShell({
                   items-center
                   gap-2
 
-                  text-[12px]
+                  admin-text-12
                   font-semibold
                 "
               >
@@ -1033,7 +993,7 @@ export default function DocsShell({
                 className="
                   truncate
 
-                  text-[9px]
+                  admin-text-9
 
                   text-[var(--admin-muted)]
                 "

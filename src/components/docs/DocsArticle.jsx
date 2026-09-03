@@ -20,11 +20,184 @@ import {
   getDocsSearchItems,
 } from "@/constants/docs-navigation";
 
+import Image from "next/image";
+
 /*
  * =========================================================
  * HELPERS
  * =========================================================
  */
+
+function DocsFigure({
+  image,
+
+  locale,
+}) {
+  if (!image?.src) {
+    return null;
+  }
+
+  return (
+    <figure
+      id={image.id}
+      className="
+        mt-6
+        scroll-mt-24
+        overflow-hidden
+
+        rounded-2xl
+
+        border
+        border-[var(--admin-border)]
+
+        bg-[var(--admin-background)]
+      "
+    >
+      <a
+        href={image.src}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={
+          locale === "th"
+            ? `เปิดรูปขนาดเต็ม: ${image.alt}`
+            : `Open full-size image: ${image.alt}`
+        }
+        className="
+          group
+          relative
+          block
+          overflow-hidden
+
+          bg-white
+        "
+      >
+        <Image
+          src={image.src}
+          alt={image.alt || ""}
+          width={1920}
+          height={1080}
+          sizes="
+            (max-width: 767px) 100vw,
+            (max-width: 1279px) 75vw,
+            1000px
+          "
+          className="
+            h-auto
+            w-full
+
+            transition-transform
+            duration-300
+
+            group-hover:scale-[1.005]
+          "
+        />
+
+        <span
+          className="
+            absolute
+            bottom-3
+            right-3
+
+            rounded-lg
+
+            border
+            border-white/50
+
+            bg-black/55
+
+            px-2.5
+            py-1.5
+
+            admin-text-9
+            font-medium
+
+            text-white
+
+            opacity-0
+
+            backdrop-blur-sm
+
+            transition-opacity
+
+            group-hover:opacity-100
+          "
+        >
+          {locale === "th" ? "เปิดรูปขนาดเต็ม" : "Open full size"}
+        </span>
+      </a>
+
+      <figcaption
+        className="
+          flex
+          items-start
+          gap-3
+
+          border-t
+          border-[var(--admin-border)]
+
+          px-4
+          py-3
+        "
+      >
+        {image.number && (
+          <span
+            className="
+              flex
+              h-6
+              min-w-6
+              shrink-0
+              items-center
+              justify-center
+
+              rounded-full
+
+              bg-[var(--company-primary)]
+
+              px-1.5
+
+              admin-text-9
+              font-semibold
+
+              !text-white
+            "
+          >
+            {image.number}
+          </span>
+        )}
+
+        <div className="min-w-0">
+          {image.title && (
+            <div
+              className="
+                admin-text-10
+                font-semibold
+
+                text-[var(--admin-foreground)]
+              "
+            >
+              {image.title}
+            </div>
+          )}
+
+          {image.caption && (
+            <p
+              className="
+                mt-1
+
+                admin-text-9
+                leading-[1.65]
+
+                text-[var(--admin-muted)]
+              "
+            >
+              {image.caption}
+            </p>
+          )}
+        </div>
+      </figcaption>
+    </figure>
+  );
+}
 
 function ArticleSection({
   section,
@@ -35,7 +208,7 @@ function ArticleSection({
     <section id={section.id} className="scroll-mt-24">
       <h2
         className="
-          text-[19px]
+          admin-text-18
           font-semibold
           tracking-[-0.02em]
 
@@ -53,7 +226,7 @@ function ArticleSection({
 
               max-w-[860px]
 
-              text-[12px]
+              admin-text-12
               leading-[1.9]
 
               text-[var(--admin-muted)]
@@ -61,6 +234,10 @@ function ArticleSection({
         >
           {paragraph}
         </p>
+      ))}
+
+      {section.images?.map((image) => (
+        <DocsFigure key={image.id || image.src} image={image} locale={locale} />
       ))}
 
       {section.items?.length > 0 && (
@@ -73,7 +250,7 @@ function ArticleSection({
                 items-start
                 gap-3
 
-                text-[12px]
+                admin-text-12
                 leading-[1.75]
 
                 text-[var(--admin-foreground)]
@@ -119,7 +296,7 @@ function ArticleSection({
 
                   bg-[var(--company-primary)]
 
-                  text-[10px]
+                  admin-text-10
                   font-semibold
 
                   !text-white
@@ -132,7 +309,7 @@ function ArticleSection({
                 className="
                   pt-1
 
-                  text-[12px]
+                  admin-text-12
                   leading-[1.75]
 
                   text-[var(--admin-foreground)]
@@ -174,7 +351,7 @@ function ArticleSection({
             <div>
               <h3
                 className="
-                  text-[11px]
+                  admin-text-11
                   font-semibold
 
                   text-[var(--admin-foreground)]
@@ -191,7 +368,7 @@ function ArticleSection({
                         flex
                         gap-2
 
-                        text-[10px]
+                        admin-text-10
                         leading-[1.7]
 
                         text-[var(--admin-muted)]
@@ -270,7 +447,7 @@ function PendingArticle({
           className="
             mt-6
 
-            text-[9px]
+            admin-text-9
             font-semibold
             uppercase
             tracking-[0.14em]
@@ -302,7 +479,7 @@ function PendingArticle({
             mt-3
             max-w-[720px]
 
-            text-[12px]
+            admin-text-12
             leading-[1.8]
 
             text-[var(--admin-muted)]
@@ -327,7 +504,7 @@ function PendingArticle({
         >
           <p
             className="
-              text-[11px]
+              admin-text-11
               leading-[1.8]
 
               text-[var(--admin-muted)]
@@ -417,7 +594,7 @@ export default function DocsArticle({
           items-center
           gap-2
 
-          text-[9px]
+          admin-text-9
           font-medium
 
           text-[var(--admin-muted)]
@@ -486,7 +663,7 @@ export default function DocsArticle({
             className="
               mt-5
 
-              text-[9px]
+              admin-text-9
               font-semibold
               uppercase
               tracking-[0.15em]
@@ -503,13 +680,11 @@ export default function DocsArticle({
 
               max-w-[820px]
 
-              text-2xl
+              admin-text-28
               font-semibold
               tracking-[-0.035em]
 
               text-[var(--admin-foreground)]
-
-              sm:text-4xl
             "
           >
             {content.title}
@@ -520,12 +695,12 @@ export default function DocsArticle({
               mt-4
               max-w-[820px]
 
-              text-[12px]
+              admin-text-12
               leading-[1.85]
 
               text-[var(--admin-muted)]
 
-              sm:text-[13px]
+              sm:admin-text-13
             "
           >
             {content.description}
@@ -540,7 +715,7 @@ export default function DocsArticle({
                 className="
                     max-w-[860px]
 
-                    text-[12px]
+                    admin-text-12
                     leading-[1.9]
 
                     text-[var(--admin-foreground)]
@@ -577,7 +752,7 @@ export default function DocsArticle({
                 >
                   <h2
                     className="
-                        text-[12px]
+                        admin-text-12
                         font-semibold
 
                         text-[var(--admin-foreground)]
@@ -590,7 +765,7 @@ export default function DocsArticle({
                     className="
                         mt-2
 
-                        text-[10px]
+                        admin-text-10
                         leading-[1.75]
 
                         text-[var(--admin-muted)]
@@ -655,7 +830,7 @@ export default function DocsArticle({
               >
                 <span
                   className="
-                    text-[9px]
+                    admin-text-9
                     font-semibold
                     uppercase
                     tracking-[0.12em]
@@ -673,7 +848,7 @@ export default function DocsArticle({
                     items-center
                     gap-2
 
-                    text-[11px]
+                    admin-text-11
                     font-semibold
 
                     text-[var(--admin-foreground)]
@@ -707,7 +882,7 @@ export default function DocsArticle({
               >
                 <span
                   className="
-                    text-[9px]
+                    admin-text-9
                     font-semibold
                     uppercase
                     tracking-[0.12em]
@@ -726,7 +901,7 @@ export default function DocsArticle({
                     justify-end
                     gap-2
 
-                    text-[11px]
+                    admin-text-11
                     font-semibold
 
                     text-[var(--admin-foreground)]

@@ -7,6 +7,9 @@ const nextConfig = {
       {
         pathname: "/api/public/v1/companies/**/media/**",
       },
+      {
+        pathname: "/docs/**",
+      },
     ],
     remotePatterns: [
       {
@@ -16,6 +19,10 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "img.youtube.com",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
       },
     ],
   },
