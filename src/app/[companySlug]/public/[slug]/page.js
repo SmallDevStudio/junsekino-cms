@@ -5,11 +5,11 @@ import Link from "next/link";
 
 import { ExternalLink } from "lucide-react";
 
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-
 import PublicContentEngagement from "@/components/public/content/PublicContentEngagement";
+
 import PublicExpandableDescription from "@/components/public/content/PublicExpandableDescription";
+
+import PublicRichText from "@/components/public/content/PublicRichText";
 
 import { getPublicCompany } from "@/modules/public/public-company.service";
 
@@ -21,18 +21,96 @@ function normalize(value) {
     .toLowerCase();
 }
 
-function localized(value, locale = "en") {
+function localizedText(
+  value,
+
+  locale = "en",
+) {
   if (!value) {
     return "";
   }
 
   if (typeof value === "string") {
-    return value;
+    return value.trim();
   }
 
-  return (
-    value?.[locale]?.trim() || value?.en?.trim() || value?.th?.trim() || ""
-  );
+  const candidates = [value?.[locale], value?.en, value?.th];
+
+  for (const candidate of candidates) {
+    if (typeof candidate === "string" && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+
+  return "";
+}
+
+function isTiptapDocument(value) {
+  return value && typeof value === "object" && value.type === "doc";
+}
+
+function richTextHasContent(value) {
+  if (typeof value === "string") {
+    return Boolean(value.trim());
+  }
+
+  if (!isTiptapDocument(value)) {
+    return false;
+  }
+
+  function nodeHasContent(node) {
+    if (!node || typeof node !== "object") {
+      return false;
+    }
+
+    if (
+      node.type === "text" &&
+      typeof node.text === "string" &&
+      node.text.trim()
+    ) {
+      return true;
+    }
+
+    if (
+      ["image", "horizontalRule", "youtube", "video", "embed"].includes(
+        node.type,
+      )
+    ) {
+      return true;
+    }
+
+    return Array.isArray(node.content) && node.content.some(nodeHasContent);
+  }
+
+  return Array.isArray(value.content) && value.content.some(nodeHasContent);
+}
+
+function localizedRichText(
+  value,
+
+  locale = "en",
+) {
+  if (!value) {
+    return "";
+  }
+
+  /*
+   * Compatibility with legacy records
+   * that contain only one string.
+   */
+  if (typeof value === "string" || isTiptapDocument(value)) {
+    return richTextHasContent(value) ? value : "";
+  }
+
+  const candidates = [value?.[locale], value?.en, value?.th];
+
+  for (const candidate of candidates) {
+    if (richTextHasContent(candidate)) {
+      return candidate;
+    }
+  }
+
+  return "";
 }
 
 function mediaUrl({ companySlug, mediaId }) {
@@ -163,9 +241,9 @@ export default async function PublicContentDetailPage({ params }) {
   }
 
   const title =
-    localized(item.title) || item.source?.metadata?.title || "Untitled";
+    localizedText(item.title) || item.source?.metadata?.title || "Untitled";
 
-  const excerpt = localized(item.excerpt);
+  const excerpt = localizedText(item.excerpt);
 
   const externalDescription = String(
     item.source?.metadata?.description || "",
@@ -173,7 +251,7 @@ export default async function PublicContentDetailPage({ params }) {
 
   const description = excerpt || externalDescription;
 
-  const content = localized(item.content);
+  const content = localizedRichText(item.content);
 
   const provider =
     item.source?.provider ||
@@ -516,54 +594,16 @@ export default async function PublicContentDetailPage({ params }) {
           {/* CONTENT */}
 
           {content && (
-            <div
+            <PublicRichText
+              value={content}
               className="
                 mt-8
 
-                text-[12px]
-                leading-[1.75]
-                text-black/70
+                !leading-[1.75]
 
-                sm:text-[13px]
-
-                [&_a]:text-[var(--public-primary)]
-                [&_a]:underline
-                [&_a]:underline-offset-2
-
-                [&_blockquote]:my-6
-                [&_blockquote]:border-l
-                [&_blockquote]:border-black/15
-                [&_blockquote]:pl-4
-
-                [&_h2]:mb-3
-                [&_h2]:mt-8
-                [&_h2]:text-[15px]
-                [&_h2]:font-semibold
-
-                [&_h3]:mb-3
-                [&_h3]:mt-7
-                [&_h3]:text-[14px]
-                [&_h3]:font-semibold
-
-                [&_li]:mb-1
-
-                [&_ol]:my-5
-                [&_ol]:list-decimal
-                [&_ol]:pl-5
-
-                [&_p]:mb-5
-
-                [&_strong]:font-semibold
-
-                [&_ul]:my-5
-                [&_ul]:list-disc
-                [&_ul]:pl-5
+                !text-black/70
               "
-            >
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {content}
-              </ReactMarkdown>
-            </div>
+            />
           )}
 
           {/* TAGS */}
