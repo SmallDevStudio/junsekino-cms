@@ -164,6 +164,16 @@ export const ADMIN_NAVIGATION = [
 
         icon: Menu,
       },
+
+      {
+        id: "docs",
+
+        labelKey: "navigation.docs",
+
+        href: "/admin/docs",
+
+        icon: FileText,
+      },
     ],
   },
 
@@ -292,16 +302,6 @@ export const ADMIN_NAVIGATION_BACKLOG = [
     labelKey: "navigation.pageManagement",
 
     href: "/admin/pages",
-
-    icon: FileText,
-  },
-
-  {
-    id: "docs",
-
-    labelKey: "navigation.docs",
-
-    href: "/admin/docs",
 
     icon: FileText,
   },

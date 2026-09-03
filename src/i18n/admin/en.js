@@ -4091,4 +4091,42 @@ export const adminEn = {
       load: "Unable to load dashboard.",
     },
   },
+
+  docs: {
+    eyebrow: "Help Center",
+
+    title: "System Documentation",
+
+    description:
+      "Instructions and operational guidelines for managing company websites with Junsekino CMS.",
+
+    contents: "Documentation Contents",
+
+    selectSection: "Select a documentation section",
+
+    section: "Section {current} of {total}",
+
+    steps: "Instructions",
+
+    checklist: "Checklist",
+
+    notes: "Important Notes",
+
+    version: "Version {version}",
+
+    updated: "Updated {date}",
+
+    quickStart: {
+      title: "Recommended Setup Order",
+
+      description:
+        "Follow these steps when preparing a new company website or reviewing the system before publishing.",
+
+      phase: "Phase 1",
+
+      step: "Step {number}",
+
+      open: "Open {title} documentation",
+    },
+  },
 };

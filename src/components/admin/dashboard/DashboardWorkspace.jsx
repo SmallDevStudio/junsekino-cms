@@ -403,14 +403,16 @@ function TrafficChart({ rows, locale, t }) {
         </span>
       </div>
 
-      <div className="mt-5 overflow-x-auto">
+      <div className="mt-5 max-w-full overflow-x-auto overscroll-x-contain">
         <svg
           viewBox={`0 0 ${width} ${height}`}
           className="
-            h-[230px]
-            min-w-[620px]
-            w-full
-          "
+              h-[200px]
+              min-w-[620px]
+              w-full
+
+              sm:h-[230px]
+            "
           role="img"
           aria-label={t("dashboard.chart.ariaLabel")}
         >
@@ -943,7 +945,8 @@ export default function DashboardWorkspace({ userName }) {
                 admin-text-11
                 font-semibold
 
-               text-[var(--company-primary-foreground)]
+                !text-white
+                [&_svg]:!text-white
 
                 transition
 
@@ -1037,6 +1040,8 @@ export default function DashboardWorkspace({ userName }) {
               mt-6
 
               grid
+              min-w-0
+              grid-cols-1
               gap-6
 
               xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.75fr)]
@@ -1130,13 +1135,16 @@ export default function DashboardWorkspace({ userName }) {
                 </span>
               </div>
 
-              <div className="p-5 sm:p-6">
+              <div className="min-w-0 overflow-hidden p-4 sm:p-6">
                 <TrafficChart rows={data.chart || []} locale={locale} t={t} />
               </div>
             </article>
 
             <article
               className="
+                min-w-0
+                overflow-hidden
+
                 rounded-2xl
 
                 border
