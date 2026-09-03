@@ -6,20 +6,69 @@ import {
   PUBLIC_PROVIDERS,
 } from "@/constants/public-content";
 
-const localizedString = z.object({
+/*
+ * =========================================================
+ * COMMON
+ * =========================================================
+ */
+
+const localizedStringSchema = z.object({
   th: z.string().default(""),
+
   en: z.string().default(""),
 });
+
+const nullableStringSchema = z.union([z.string(), z.null()]);
+
+/*
+ * =========================================================
+ * RICH TEXT
+ *
+ * Legacy records:
+ * string
+ *
+ * New records:
+ * TipTap JSON document
+ * =========================================================
+ */
+
+const tiptapDocumentSchema = z
+  .object({
+    type: z.literal("doc"),
+
+    content: z.array(z.unknown()).optional(),
+  })
+  .passthrough();
+
+const richTextValueSchema = z.union([z.string(), tiptapDocumentSchema]);
+
+const localizedRichTextSchema = z.object({
+  th: richTextValueSchema.default(""),
+
+  en: richTextValueSchema.default(""),
+});
+
+/*
+ * =========================================================
+ * IMAGE
+ * =========================================================
+ */
 
 const imageSchema = z.object({
   mediaId: z.string().min(1),
 
-  alt: localizedString.optional(),
+  alt: localizedStringSchema.optional(),
 
-  caption: localizedString.optional(),
+  caption: localizedStringSchema.optional(),
 });
 
-const localizedSeo = z.object({
+/*
+ * =========================================================
+ * SEO
+ * =========================================================
+ */
+
+const localizedSeoSchema = z.object({
   title: z.string().max(70).default(""),
 
   description: z.string().max(180).default(""),
@@ -30,17 +79,39 @@ const localizedSeo = z.object({
 
   ogDescription: z.string().max(200).default(""),
 
-  ogImage: z.union([z.string(), z.null()]).optional(),
+  ogImage: nullableStringSchema.optional(),
 });
 
 const seoSchema = z.object({
-  th: localizedSeo,
+  th: localizedSeoSchema,
 
-  en: localizedSeo,
+  en: localizedSeoSchema,
 
   index: z.boolean().default(true),
 
   follow: z.boolean().default(true),
+});
+
+/*
+ * =========================================================
+ * EXTERNAL METADATA
+ * =========================================================
+ */
+
+const externalStatisticsSchema = z.object({
+  viewCount: z
+    .union([z.number().nonnegative(), z.string(), z.null()])
+    .optional(),
+
+  likeCount: z
+    .union([z.number().nonnegative(), z.string(), z.null()])
+    .optional(),
+
+  commentCount: z
+    .union([z.number().nonnegative(), z.string(), z.null()])
+    .optional(),
+
+  fetchedAt: z.union([z.string(), z.null()]).optional(),
 });
 
 const externalMetadataSchema = z.object({
@@ -65,6 +136,8 @@ const externalMetadataSchema = z.object({
   publishedAt: z.union([z.string(), z.null()]).default(null),
 
   duration: z.union([z.string(), z.null()]).default(null),
+
+  statistics: z.union([externalStatisticsSchema, z.null()]).optional(),
 });
 
 const sourceSchema = z.object({
@@ -77,21 +150,35 @@ const sourceSchema = z.object({
   metadata: z.union([externalMetadataSchema, z.null()]).optional(),
 });
 
+/*
+ * =========================================================
+ * PUBLIC CONTENT
+ * =========================================================
+ */
+
 const baseSchema = z.object({
   slug: z
     .string()
     .trim()
     .min(2)
     .max(150)
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Invalid public content slug."),
+    .regex(
+      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+
+      "Invalid public content slug.",
+    ),
 
   contentType: z.enum(PUBLIC_CONTENT_TYPES),
 
-  title: localizedString,
+  title: localizedStringSchema,
 
-  excerpt: localizedString.optional(),
+  excerpt: localizedStringSchema.optional(),
 
-  content: localizedString.optional(),
+  /*
+   * Supports legacy string and
+   * new TipTap JSON content.
+   */
+  content: localizedRichTextSchema.optional(),
 
   source: sourceSchema.optional(),
 

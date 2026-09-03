@@ -406,13 +406,50 @@ function formatIsoDuration(value) {
  */
 
 function richTextHasContent(value) {
-  const text = String(value || "")
-    .replace(/<[^>]*>/g, " ")
-    .replace(/&nbsp;/gi, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  if (typeof value === "string") {
+    const text = value
+      .replace(/<[^>]*>/g, " ")
+      .replace(/&nbsp;/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim();
 
-  return Boolean(text);
+    return Boolean(text);
+  }
+
+  if (
+    !value ||
+    typeof value !== "object" ||
+    value.type !== "doc" ||
+    !Array.isArray(value.content)
+  ) {
+    return false;
+  }
+
+  function nodeHasContent(node) {
+    if (!node) {
+      return false;
+    }
+
+    if (
+      node.type === "text" &&
+      typeof node.text === "string" &&
+      node.text.trim()
+    ) {
+      return true;
+    }
+
+    if (
+      ["image", "horizontalRule", "youtube", "video", "embed"].includes(
+        node.type,
+      )
+    ) {
+      return true;
+    }
+
+    return Array.isArray(node.content) && node.content.some(nodeHasContent);
+  }
+
+  return value.content.some(nodeHasContent);
 }
 
 /*

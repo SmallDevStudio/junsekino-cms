@@ -36,6 +36,58 @@ function mergeLocalized(existing = {}, incoming = {}) {
   };
 }
 
+function isTiptapDocument(value) {
+  return value && typeof value === "object" && value.type === "doc";
+}
+
+function hasTiptapContent(document) {
+  if (!isTiptapDocument(document) || !Array.isArray(document.content)) {
+    return false;
+  }
+
+  function nodeHasContent(node) {
+    if (!node) {
+      return false;
+    }
+
+    if (
+      node.type === "text" &&
+      typeof node.text === "string" &&
+      node.text.trim()
+    ) {
+      return true;
+    }
+
+    /*
+     * Non-text nodes may be meaningful
+     * content even without a text value.
+     */
+    if (
+      ["image", "horizontalRule", "youtube", "video", "embed"].includes(
+        node.type,
+      )
+    ) {
+      return true;
+    }
+
+    return Array.isArray(node.content) && node.content.some(nodeHasContent);
+  }
+
+  return document.content.some(nodeHasContent);
+}
+
+function hasRichTextContent(value) {
+  if (typeof value === "string") {
+    return Boolean(value.trim());
+  }
+
+  return hasTiptapContent(value);
+}
+
+function hasLocalizedRichText(value) {
+  return hasRichTextContent(value?.th) || hasRichTextContent(value?.en);
+}
+
 function mergeSeo(seo = {}) {
   return {
     ...DEFAULT_PUBLIC_SEO,
@@ -130,8 +182,7 @@ function validateContent(item) {
   }
 
   if (item.contentType === PUBLIC_CONTENT_TYPE.ARTICLE) {
-    const hasArticle =
-      Boolean(item.content?.th?.trim()) || Boolean(item.content?.en?.trim());
+    const hasArticle = hasLocalizedRichText(item.content);
 
     if (!hasArticle) {
       throw new Error("PUBLIC_ARTICLE_CONTENT_REQUIRED");
