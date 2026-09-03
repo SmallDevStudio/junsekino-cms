@@ -111,14 +111,22 @@ function localizedRichText(
   return "";
 }
 
-function mediaUrl({ companySlug, mediaId }) {
+function mediaUrl({
+  companySlug,
+
+  mediaId,
+
+  variant = "medium",
+}) {
   if (!companySlug || !mediaId) {
     return null;
   }
 
   return `/api/public/v1/companies/${encodeURIComponent(
     companySlug,
-  )}/media/${encodeURIComponent(mediaId)}?variant=large`;
+  )}/media/${encodeURIComponent(mediaId)}?variant=${encodeURIComponent(
+    variant,
+  )}`;
 }
 
 function youtubeEmbedUrl(item) {

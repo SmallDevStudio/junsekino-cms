@@ -898,13 +898,20 @@ export const adminTh = {
     upload: {
       dropTitle: "ลากรูปมาวางที่นี่ หรือคลิกเพื่ออัปโหลด",
 
-      formats: "JPG, PNG, WebP หรือ AVIF • สูงสุด {size}",
+      formats: "JPG, PNG, WebP หรือ AVIF • สูงสุด {size} • ปรับขนาดอัตโนมัติ",
 
       batch: {
         processing: "กำลังอัปโหลดรูปที่ {current} จาก {total}",
         complete:
           "อัปโหลดเสร็จแล้ว · สำเร็จ {completed} รูป, ไม่สำเร็จ {failed} รูป",
       },
+
+      optimizing: "กำลังปรับขนาดและลดขนาดไฟล์ก่อนอัปโหลด...",
+
+      optimizedSize: "ลดขนาดจาก {original} เหลือ {optimized}",
+
+      recommendation:
+        "ระบบจะปรับรูปให้มีด้านยาวไม่เกิน 3000px และลดขนาดไฟล์อัตโนมัติก่อนอัปโหลด",
 
       errors: {
         unsupportedType: "ไม่รองรับประเภทไฟล์นี้",

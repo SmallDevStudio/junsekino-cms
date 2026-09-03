@@ -21,6 +21,7 @@
     "@tiptap/pm": "^3.30.5",
     "@tiptap/react": "^3.30.5",
     "@tiptap/starter-kit": "^3.30.5",
+    "browser-image-compression": "^2.0.2",
     "clsx": "^2.1.1",
     "firebase": "^12.18.0",
     "firebase-admin": "^10.3.0",

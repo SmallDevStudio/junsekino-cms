@@ -15,9 +15,14 @@ import { useAdminTranslation } from "@/components/admin/i18n/AdminI18nProvider";
 import {
   ALLOWED_IMAGE_MIME_TYPES,
   MAX_MEDIA_FILE_SIZE,
+  MEDIA_CLIENT_MAX_DIMENSION,
+  MEDIA_CLIENT_MAX_SIZE_MB,
+  MEDIA_CLIENT_WEBP_QUALITY,
 } from "@/constants/media";
 
 import { cn } from "@/utils/cn";
+
+import imageCompression from "browser-image-compression";
 
 /*
  * =========================================================
@@ -47,6 +52,55 @@ function formatBytes(bytes) {
   const normalized = value / 1024 ** index;
 
   return `${normalized.toFixed(index === 0 ? 0 : 1)} ${units[index]}`;
+}
+
+function createOptimizedFileName(fileName) {
+  const baseName = String(fileName || "image")
+    .replace(/\.[^.]+$/, "")
+    .trim();
+
+  return `${baseName || "image"}.webp`;
+}
+
+async function optimizeImage(file) {
+  const compressed = await imageCompression(file, {
+    maxSizeMB: MEDIA_CLIENT_MAX_SIZE_MB,
+
+    maxWidthOrHeight: MEDIA_CLIENT_MAX_DIMENSION,
+
+    useWebWorker: true,
+
+    fileType: "image/webp",
+
+    initialQuality: MEDIA_CLIENT_WEBP_QUALITY,
+
+    maxIteration: 10,
+
+    preserveExif: false,
+  });
+
+  /*
+   * If compression unexpectedly produces
+   * a larger file, keep the original.
+   */
+  if (
+    compressed.size >= file.size &&
+    file.size <= MEDIA_CLIENT_MAX_SIZE_MB * 1024 * 1024
+  ) {
+    return file;
+  }
+
+  return new File(
+    [compressed],
+
+    createOptimizedFileName(file.name),
+
+    {
+      type: compressed.type || "image/webp",
+
+      lastModified: file.lastModified || Date.now(),
+    },
+  );
 }
 
 /*
@@ -159,6 +213,8 @@ export default function MediaUploadDropzone({
 
           size: file.size,
 
+          originalSize: file.size,
+
           status: "error",
 
           progress: 0,
@@ -173,7 +229,7 @@ export default function MediaUploadDropzone({
     }
 
     /*
-     * SIZE
+     * ORIGINAL SIZE LIMIT
      */
 
     if (file.size > MAX_MEDIA_FILE_SIZE) {
@@ -185,13 +241,19 @@ export default function MediaUploadDropzone({
 
           size: file.size,
 
+          originalSize: file.size,
+
           status: "error",
 
           progress: 0,
 
-          error: t("media.upload.errors.fileTooLarge", {
-            size: formatBytes(MAX_MEDIA_FILE_SIZE),
-          }),
+          error: t(
+            "media.upload.errors.fileTooLarge",
+
+            {
+              size: formatBytes(MAX_MEDIA_FILE_SIZE),
+            },
+          ),
         },
 
         ...current,
@@ -210,9 +272,15 @@ export default function MediaUploadDropzone({
 
         fileName: file.name,
 
+        originalFileName: file.name,
+
         size: file.size,
 
-        status: "creating",
+        originalSize: file.size,
+
+        optimized: false,
+
+        status: "optimizing",
 
         progress: 0,
 
@@ -224,11 +292,30 @@ export default function MediaUploadDropzone({
 
     try {
       /*
+       * CLIENT OPTIMIZATION
+       */
+
+      const uploadFile = await optimizeImage(file);
+
+      const optimized = uploadFile !== file || uploadFile.size < file.size;
+
+      updateUpload(localId, {
+        fileName: uploadFile.name,
+
+        size: uploadFile.size,
+
+        optimized,
+
+        status: "creating",
+      });
+
+      /*
        * CREATE MEDIA RECORD
        */
 
       const createResponse = await fetch(
         `/api/v1/companies/${companyId}/media`,
+
         {
           method: "POST",
 
@@ -239,11 +326,11 @@ export default function MediaUploadDropzone({
           credentials: "include",
 
           body: JSON.stringify({
-            fileName: file.name,
+            fileName: uploadFile.name,
 
-            mimeType: file.type,
+            mimeType: uploadFile.type,
 
-            size: file.size,
+            size: uploadFile.size,
           }),
         },
       );
@@ -265,7 +352,7 @@ export default function MediaUploadDropzone({
       });
 
       /*
-       * STORAGE
+       * STORAGE UPLOAD
        */
 
       await uploadWithProgress({
@@ -275,7 +362,7 @@ export default function MediaUploadDropzone({
 
         headers: upload.headers,
 
-        file,
+        file: uploadFile,
 
         onProgress: (progress) => {
           updateUpload(localId, {
@@ -296,6 +383,7 @@ export default function MediaUploadDropzone({
 
       const finalizeResponse = await fetch(
         `/api/v1/companies/${companyId}/media/${media.id}/finalize`,
+
         {
           method: "POST",
 
@@ -319,7 +407,11 @@ export default function MediaUploadDropzone({
 
       return true;
     } catch (error) {
-      console.error("Media upload error:", error);
+      console.error(
+        "Media upload error:",
+
+        error,
+      );
 
       updateUpload(localId, {
         status: "error",
@@ -519,7 +611,7 @@ export default function MediaUploadDropzone({
             text-[var(--admin-muted)]
           "
         >
-          {t("media.upload.formats", {
+          {t("media.upload.recommendation", {
             size: formatBytes(MAX_MEDIA_FILE_SIZE),
           })}
         </div>
@@ -674,6 +766,43 @@ export default function MediaUploadDropzone({
                   {upload.fileName}
                 </div>
 
+                {upload.status === "optimizing" && (
+                  <div
+                    className="
+                      mt-1
+
+                      admin-text-11
+                      font-medium
+
+                      text-[var(--company-primary)]
+                    "
+                  >
+                    {t("media.upload.optimizing")}
+                  </div>
+                )}
+
+                {upload.optimized && upload.originalSize > upload.size && (
+                  <div
+                    className="
+                        mt-1
+
+                        admin-text-11
+
+                        text-emerald-600
+                      "
+                  >
+                    {t(
+                      "media.upload.optimizedSize",
+
+                      {
+                        original: formatBytes(upload.originalSize),
+
+                        optimized: formatBytes(upload.size),
+                      },
+                    )}
+                  </div>
+                )}
+
                 <div
                   className="
                       mt-1
@@ -733,7 +862,7 @@ export default function MediaUploadDropzone({
               </div>
 
               <div className="shrink-0">
-                {["creating", "uploading", "finalizing"].includes(
+                {["optimizing", "creating", "uploading", "finalizing"].includes(
                   upload.status,
                 ) && (
                   <LoaderCircle

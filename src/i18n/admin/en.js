@@ -897,12 +897,19 @@ export const adminEn = {
     upload: {
       dropTitle: "Drop images here or click to upload",
 
-      formats: "JPG, PNG, WebP or AVIF • up to {size}",
+      formats: "JPG, PNG, WebP or AVIF • up to {size} • automatic optimization",
 
       batch: {
         processing: "Uploading image {current} of {total}",
         complete: "Upload complete · {completed} succeeded, {failed} failed",
       },
+
+      optimizing: "Optimizing image before upload...",
+
+      optimizedSize: "Optimized from {original} to {optimized}",
+
+      recommendation:
+        "Images are automatically optimized to a maximum dimension of 3000px before upload.",
 
       errors: {
         unsupportedType: "Unsupported file type.",
