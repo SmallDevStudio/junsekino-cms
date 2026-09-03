@@ -1,227 +1,491 @@
 # Junsekino CMS
 
-Professional Multi-Company Content Management System and Corporate Website Platform for Junsekino.
+Multi-company content management system and corporate website platform for Junsekino.
 
-ระบบนี้ถูกออกแบบใหม่ทั้งหมดเพื่อรองรับการจัดการเว็บไซต์ของหลายบริษัทภายใต้ Junsekino โดยใช้ CMS กลางเพียงระบบเดียว รองรับหลายภาษา การกำหนดสิทธิ์ผู้ใช้งาน การจัดการแบรนด์ SEO Media และ Content Publishing
+Junsekino CMS ใช้สำหรับจัดการเว็บไซต์ของหลายบริษัทจากระบบกลาง รองรับการแยกข้อมูลตามบริษัท การจัดการสิทธิ์ผู้ใช้งาน เนื้อหาสองภาษา Media, SEO, Social Media, Analytics, Privacy, Cookie consent และการเผยแพร่เนื้อหา
+
+> Project status: Phase 1 feature-complete  
+> Current work: Documentation, production verification and final delivery  
+> Admin mobile-first improvements are planned for Phase 2
 
 ---
 
-## Overview
+## Contents
 
-Junsekino CMS เป็น Web Application ที่รองรับทั้ง Desktop และ Mobile โดยแบ่งระบบหลักออกเป็น 2 ส่วน
+- [System Overview](#system-overview)
+- [Phase 1 Features](#phase-1-features)
+- [Public Website](#public-website)
+- [Admin CMS](#admin-cms)
+- [Documentation](#documentation)
+- [Technology Stack](#technology-stack)
+- [Architecture](#architecture)
+- [Authentication and Authorization](#authentication-and-authorization)
+- [Localization](#localization)
+- [Content Workflow](#content-workflow)
+- [Media](#media)
+- [SEO](#seo)
+- [Analytics and Engagement](#analytics-and-engagement)
+- [Privacy and Cookie Consent](#privacy-and-cookie-consent)
+- [Email and Notifications](#email-and-notifications)
+- [Scheduled Jobs](#scheduled-jobs)
+- [Installation](#installation)
+- [Environment Variables](#environment-variables)
+- [Development](#development)
+- [Testing and Build](#testing-and-build)
+- [Deployment](#deployment)
+- [Project Structure](#project-structure)
+- [Security Principles](#security-principles)
+- [Phase 2 Roadmap](#phase-2-roadmap)
+- [License](#license)
 
-### Public Website
+---
 
-สำหรับผู้เข้าชมเว็บไซต์
+## System Overview
+
+ระบบแบ่งออกเป็น 3 ส่วนหลัก
 
 ```text
-Welcome Page
-    ↓
-Select Company
-    ↓
-Company Website
-    ↓
-Projects / News / People / About / Contact
+Public Website
+├── Welcome
+├── Company Selection
+└── Company Website
+
+Admin CMS
+├── Content Management
+├── Company Management
+├── Media
+├── Members
+├── Settings
+└── Analytics
+
+Documentation
+├── Standalone Docs Layout
+├── Search
+├── Topic Navigation
+└── Step-by-step Guides
 ```
 
-รองรับหลายบริษัท เช่น
+ระบบรองรับหลายบริษัท เช่น:
 
 ```text
 Junsekino I+D
-Junsekino D+I
+Junsekino A+D
 Future Companies
 ```
 
-แต่ละบริษัทสามารถกำหนด Branding ของตัวเองได้ เช่น
+ข้อมูลของแต่ละบริษัทถูกแยกออกจากกัน ได้แก่:
 
-- Logo
-- Primary Color
-- Secondary Color
-- Accent Color
-- Background Color
-- Font
-- Social Media
-- SEO Settings
+- Company profile
+- Branding and theme
+- Website content
+- Projects
+- Awards
+- Public content
+- News
+- Contact information
+- Form submissions
+- Media
+- Navigation
+- Members and permissions
+- SEO
+- Social media
+- Privacy settings
+- Analytics
 
 ---
 
+## Phase 1 Features
+
+### Public Website
+
+- Welcome page
+- Company selection
+- Company-specific public website
+- Company branding and theme
+- Home slideshow
+- About page
+- Project listing
+- Project category navigation
+- Project detail and slideshow
+- Awards
+- Public content
+- Publications
+- Video and external media
+- Contact page and contact form
+- Desktop navigation and dropdown menus
+- Mobile navigation and submenu flow
+- Social media links
+- Company switcher
+- Content views, likes and shares
+- Cookie banner and preference controls
+- Privacy Notice, Cookie Policy and Terms of Use
+- Google Analytics integration after consent
+- Responsive image loading
+- Page-specific skeleton loading
+- SEO metadata and Open Graph information
+
 ### Admin CMS
 
-สำหรับพนักงาน Junsekino
+- Dashboard
+- Company workspace switching
+- Company profile management
+- Branding and theme management
+- Home page management
+- About page management
+- Project management
+- Project category management
+- Award management
+- Public content management
+- News management
+- Contact page management
+- Contact message management
+- Media Library
+- Batch media upload
+- Menu Management
+- Member and permission management
+- Admin interface localization
+- Public website localization settings
+- Email settings
+- Notification settings
+- Privacy settings
+- Legal document versioning and publishing
+- Analytics dashboard
+- Documentation entry point
+
+### Platform
+
+- Multi-company data isolation
+- Firebase Authentication
+- HttpOnly session cookies
+- Server-side permission checks
+- Permission-based access control
+- Soft delete
+- Audit logs
+- Firestore TTL support
+- Privacy retention cleanup
+- Scheduled publishing
+- Vercel deployment
+- Web App manifest and favicon assets
+
+---
+
+## Public Website
+
+### Public flow
+
+```text
+/
+↓
+Welcome
+↓
+Select Company
+↓
+/{companySlug}
+↓
+Company Website
+```
+
+### Primary routes
+
+```text
+/
+
+/{companySlug}
+/{companySlug}/about
+/{companySlug}/project
+/{companySlug}/project/{projectSlug}
+/{companySlug}/awards
+/{companySlug}/public
+/{companySlug}/public/publication
+/{companySlug}/public/video
+/{companySlug}/public/{contentSlug}
+/{companySlug}/contact
+```
+
+Company slug history is preserved. When a company slug changes, supported old URLs redirect to the current canonical slug.
+
+### Company-specific presentation
+
+Each company can define its own:
+
+- Logo
+- Primary color
+- Secondary color
+- Accent color
+- Background
+- Surface color
+- Text color
+- Light theme
+- Dark theme
+- Social media links
+- Default language
+- Supported languages
+- Global SEO
+
+UI components consume company theme variables rather than hard-coded company conditions.
+
+---
+
+## Admin CMS
+
+Admin entry point:
 
 ```text
 /admin
 ```
 
-ใช้สำหรับจัดการ
+Primary Admin routes:
 
-- Companies
-- Projects
-- News
-- Pages
-- People
-- Media
-- Users
-- Branding
-- SEO
-- Social Media
-- Publishing
-- Audit Logs
+```text
+/admin/login
+/admin/dashboard
+/admin/home
+/admin/about
+/admin/projects
+/admin/awards
+/admin/public-contents
+/admin/news
+/admin/contact
+/admin/messages
+/admin/media
+/admin/navigation
+/admin/company
+/admin/members
+/admin/settings
+```
+
+The Sidebar displays only modules available in Phase 1. Future modules remain hidden until their workflows are complete.
+
+### Admin support policy
+
+Phase 1 focuses on:
+
+- Desktop workflows
+- Tablet usability
+- Critical mobile usability
+- No blocking overflow or broken actions
+
+Complete mobile-first Admin UX and reusable responsive Admin components are planned for Phase 2.
 
 ---
 
-# Technology Stack
+## Documentation
 
-โปรเจกต์พัฒนาด้วย
+Documentation is available separately from the Admin layout:
 
 ```text
-Next.js
-React
-JavaScript
-Tailwind CSS
+/docs
+```
 
+The Docs system requires an authenticated session and opens in a new browser window from Admin so users can read instructions while continuing their work.
+
+Planned documentation structure:
+
+```text
+/docs
+/docs/getting-started
+/docs/dashboard
+/docs/company
+/docs/projects
+/docs/media
+/docs/navigation
+/docs/privacy
+/docs/seo
+/docs/publishing
+/docs/troubleshooting
+```
+
+Documentation features:
+
+- Independent Header
+- Independent Sidebar
+- Expandable categories and submenus
+- Thai and English content
+- Search
+- Deep links
+- Section anchors
+- Previous and next navigation
+- Screenshots
+- Tips and warnings
+- Privacy and copyright notices
+- Links from Admin editors to relevant guides
+
+---
+
+## Technology Stack
+
+### Application
+
+```text
+Next.js 16.3.2
+React 19.2.8
+JavaScript
+Tailwind CSS 4
+```
+
+### Firebase
+
+```text
 Firebase Authentication
 Cloud Firestore
 Firebase Storage
 Firebase Admin SDK
-
-Vercel
 ```
 
-Libraries หลัก
+### Content and UI
 
 ```text
-firebase
-firebase-admin
-zod
+Tiptap
+React Markdown
+Remark GFM
+Lucide React
+React Icons
+React Easy Crop
+Sonner
+Sharp
+```
+
+### Validation and utilities
+
+```text
+Zod
 clsx
 tailwind-merge
-lucide-react
-sonner
-next-intl
 ```
+
+### Email
+
+```text
+Resend
+Nodemailer
+```
+
+### Hosting
+
+```text
+GitHub
+Vercel
+Firebase
+```
+
+See [`package.json`](./package.json) for exact dependency versions.
 
 ---
 
-# Core Features
+## Architecture
 
-## Multi-Company CMS
-
-ระบบรองรับหลายบริษัทโดยไม่ต้องแก้ source code เมื่อมีการเพิ่มบริษัทใหม่
-
-ตัวอย่าง
+The application follows a layered module structure:
 
 ```text
-companies
-├── Junsekino I+D
-├── Junsekino D+I
-└── Future Company
+UI Component
+↓
+Route Handler
+↓
+Service
+↓
+Repository
+↓
+Firebase
 ```
 
-แต่ละบริษัทมี
+Responsibilities:
 
-```text
-Branding
-Content
-Projects
-News
-People
-Users
-Media
-SEO
-Social
-Settings
-```
+| Layer      | Responsibility                                  |
+| ---------- | ----------------------------------------------- |
+| Component  | Presentation and user interaction               |
+| Route      | Authentication, permission and request handling |
+| Schema     | Input validation                                |
+| Service    | Business rules                                  |
+| Repository | Firestore and Storage operations                |
+| Firebase   | Persistent data and authentication              |
 
-แยกออกจากกัน
+Business logic should not be distributed directly across UI components.
+
+Avoid calling Firestore write methods directly from presentation components unless the architecture explicitly requires it.
 
 ---
 
-# User Roles
+## Authentication and Authorization
 
-ระบบเริ่มต้นด้วย 3 ระดับสิทธิ์
-
-## SUPERADMIN
-
-สามารถจัดการทุกบริษัทและทุกส่วนของระบบ
-
-สิทธิ์หลัก
+Admin authentication uses:
 
 ```text
-Manage Companies
-Manage All Users
-Manage All Content
-Manage Branding
-Manage SEO
-Manage Social
-Manage System Settings
-View Audit Logs
+Firebase Authentication
++
+Firebase Admin SDK
++
+HttpOnly Session Cookie
 ```
 
----
-
-## ADMIN
-
-ดูแลบริษัทของตัวเอง
-
-สามารถ
+Authentication flow:
 
 ```text
-Manage Company Content
-Manage Company Users
-Manage Branding
-Manage SEO
-Manage Social
-Manage Media
-Publish Content
+Email and Password
+↓
+Firebase Authentication
+↓
+Firebase ID Token
+↓
+POST /api/v1/auth/session
+↓
+Firebase Admin verification
+↓
+HttpOnly Session Cookie
+↓
+Protected Admin route
 ```
 
----
+Session cookies use security options appropriate to the environment, including:
 
-## EDITOR
+- `HttpOnly`
+- `Secure` in production
+- `SameSite`
+- Controlled expiration
 
-ดูแล Content ของบริษัทที่ได้รับสิทธิ์
+### Roles
 
-สามารถ
+The platform currently supports:
 
-```text
-Create Content
-Edit Content
-Delete Content
-Manage Media
-Publish Content
-```
+#### Superadmin
 
-ไม่สามารถจัดการ User หรือ Company Settings
+- Access all companies
+- Create and manage companies
+- Manage platform users
+- Manage members across companies
+- Access all authorized content and settings
+- Cannot remove their own Superadmin access through restricted workflows
 
----
+#### Admin
 
-# Permission Architecture
+- Manage assigned company
+- Manage authorized company members
+- Manage company content
+- Manage company settings
+- Manage branding, SEO and social media
+- Publish content when permitted
 
-ระบบไม่ได้ผูก Business Logic กับ Role โดยตรง
+#### Editor
 
-ใช้ Permission-Based Access Control เช่น
+- Access assigned company content
+- Create and edit permitted content
+- Upload and select media
+- Publish only when the required permission is assigned
+- Cannot manage restricted company or member settings
+
+### Permissions
+
+The application uses permission-based authorization such as:
 
 ```text
 company.view
+company.create
 company.update
+company.delete
 
 user.view
 user.create
 user.update
 user.delete
-
-project.view
-project.create
-project.update
-project.delete
-project.publish
-
-news.view
-news.create
-news.update
-news.delete
-news.publish
 
 page.view
 page.create
@@ -229,13 +493,38 @@ page.update
 page.delete
 page.publish
 
-people.view
-people.create
-people.update
-people.delete
+project.view
+project.create
+project.update
+project.delete
+project.publish
+
+projectCategory.view
+projectCategory.create
+projectCategory.update
+projectCategory.delete
+
+award.view
+award.create
+award.update
+award.delete
+award.publish
+
+public.view
+public.create
+public.update
+public.delete
+public.publish
+
+news.view
+news.create
+news.update
+news.delete
+news.publish
 
 media.view
 media.upload
+media.update
 media.delete
 
 branding.view
@@ -246,449 +535,164 @@ seo.update
 
 social.view
 social.update
+
+formSubmission.view
+formSubmission.update
+
+analytics.view
+notification.view
+notification.update
+audit.view
 ```
 
-ทำให้สามารถเพิ่ม Role ใหม่ได้ในอนาคต เช่น
-
-```text
-CONTENT_MANAGER
-SEO_EDITOR
-PUBLISHER
-VIEWER
-```
+Frontend menu visibility is not considered a security control. Sensitive actions must always be authorized on the server.
 
 ---
 
-# Multi-Language
+## Localization
 
-ระบบรองรับ
+The system separates two localization concerns.
+
+### Admin interface language
+
+Admin users can select:
 
 ```text
-Thai
 English
+Thai
 ```
 
-Public URL
+This changes labels, instructions, status messages and supported Admin content.
+
+### Public content languages
+
+Company Localization settings control which language fields appear in content editors.
+
+Current behavior:
 
 ```text
-/th/
-/en/
+English enabled
+→
+Display English content fields
+
+English and Thai enabled
+→
+Display English and Thai content fields
 ```
 
-ตัวอย่าง
+English is the current primary and fallback content language.
 
-```text
-/th/junsekino-id
-
-/en/junsekino-id
-```
-
-Project
-
-```text
-/th/junsekino-id/projects/project-name
-
-/en/junsekino-id/projects/project-name
-```
-
-Admin CMS ไม่แยกภาษาใน URL
-
-```text
-/admin
-```
-
-แต่สามารถเลือกภาษา UI ภายในระบบได้
+Admin UI language does not automatically change the public website content language.
 
 ---
 
-# Public Website Flow
+## Content Workflow
 
-```text
-/
-│
-├── Welcome
-│
-├── /th/select
-│
-├── /en/select
-│
-│
-├── /th/[company]
-│   ├── about
-│   ├── projects
-│   ├── news
-│   ├── people
-│   └── contact
-│
-└── /en/[company]
-    ├── about
-    ├── projects
-    ├── news
-    ├── people
-    └── contact
-```
-
----
-
-# Admin Routes
-
-```text
-/admin
-
-/admin/login
-
-/admin/dashboard
-
-/admin/companies
-
-/admin/projects
-
-/admin/news
-
-/admin/pages
-
-/admin/people
-
-/admin/media
-
-/admin/users
-
-/admin/settings
-```
-
----
-
-# Authentication Architecture
-
-Admin Authentication ใช้
-
-```text
-Firebase Authentication
-+
-Firebase Admin SDK
-+
-HttpOnly Session Cookie
-```
-
-Flow
-
-```text
-Email + Password
-        ↓
-Firebase Authentication
-        ↓
-Firebase ID Token
-        ↓
-POST /api/v1/auth/session
-        ↓
-Firebase Admin
-        ↓
-Session Cookie
-        ↓
-Admin CMS
-```
-
-Session Cookie จะถูกกำหนดเป็น
-
-```text
-HttpOnly
-Secure
-SameSite
-```
-
-เพื่อลดความเสี่ยงจากการเข้าถึง session ผ่าน browser JavaScript
-
----
-
-# Firestore Architecture
-
-โครงสร้างหลัก
-
-```text
-users/
-    {uid}
-
-
-companies/
-    {companyId}
-
-        members/
-            {uid}
-
-        pages/
-            {pageId}
-
-        projects/
-            {projectId}
-
-        news/
-            {newsId}
-
-        people/
-            {peopleId}
-
-        categories/
-            {categoryId}
-
-        menus/
-            {menuId}
-
-        media/
-            {mediaId}
-
-        settings/
-            general
-            seo
-            social
-
-
-auditLogs/
-    {logId}
-
-
-system/
-    configuration
-```
-
----
-
-# User Structure
-
-```javascript
-users / { uid };
-
-{
-  (email,
-    displayName,
-    userType,
-    status,
-    isSuperAdmin,
-    defaultCompanyId,
-    createdAt,
-    updatedAt);
-}
-```
-
----
-
-# Company Structure
-
-```javascript
-companies/{companyId}
-
-{
-  name,
-  legalName,
-  shortName,
-
-  slug,
-
-  status,
-
-  defaultLocale,
-
-  supportedLocales: [
-    "th",
-    "en"
-  ],
-
-  branding: {
-    logoLight,
-    logoDark,
-    favicon,
-
-    colors: {
-      primary,
-      secondary,
-      accent,
-      background,
-      text
-    }
-  },
-
-  social: {
-    facebook,
-    instagram,
-    linkedin,
-    youtube,
-    x
-  },
-
-  createdAt,
-  updatedAt
-}
-```
-
----
-
-# Company Membership
-
-```text
-companies/{companyId}/members/{uid}
-```
-
-ตัวอย่าง
-
-```javascript
-{
-  userId,
-
-  role: "ADMIN",
-
-  status: "active",
-
-  permissions: [],
-
-  createdAt,
-  updatedAt
-}
-```
-
-User หนึ่งคนสามารถอยู่หลายบริษัทได้
-
-ตัวอย่าง
-
-```text
-User A
-
-Junsekino I+D
-Role: ADMIN
-
-Junsekino D+I
-Role: EDITOR
-```
-
----
-
-# Content Architecture
-
-Content เช่น Project รองรับหลายภาษาใน Document เดียว
-
-ตัวอย่าง
-
-```javascript
-{
-  slug: "sukhumvit-residence",
-
-  title: {
-    th: "บ้านสุขุมวิท",
-    en: "Sukhumvit Residence"
-  },
-
-  excerpt: {
-    th: "",
-    en: ""
-  },
-
-  content: {
-    th: "",
-    en: ""
-  }
-}
-```
-
----
-
-# Content Status
-
-ทุก Content ใช้ Workflow มาตรฐาน
-
-```text
-draft
-review
-scheduled
-published
-archived
-```
-
-Flow
+Content follows a controlled publishing workflow.
 
 ```text
 Create
-  ↓
+↓
 Draft
-  ↓
-Review
-  ↓
-Preview
-  ↓
+↓
+Edit
+↓
+Save
+↓
+Preview or Review
+↓
 Publish
 ```
 
-รองรับ Scheduled Publishing ในอนาคต
+Where supported:
 
----
+```text
+Published
+↓
+Unpublish
+↓
+Draft
+```
 
-# Soft Delete
+Save and Publish are separate operations.
 
-Content จะไม่ถูกลบจาก Database ทันที
+Before publishing:
 
-ใช้
+- Complete required fields
+- Complete every enabled language
+- Verify names, dates and facts
+- Verify media usage rights
+- Check links
+- Check SEO
+- Check Open Graph image
+- Preview the public result
+- Confirm the selected company
 
-```javascript
+### Soft delete
+
+Supported content is not immediately removed from the database.
+
+Example fields:
+
+```js
 {
   deletedAt: null,
   deletedBy: null
 }
 ```
 
-เมื่อ Delete
-
-```text
-deletedAt
-deletedBy
-```
-
-ทำให้สามารถรองรับ
-
-```text
-Restore
-Recovery
-Audit
-```
-
-ได้
+Soft delete supports future restoration, recovery and audit workflows.
 
 ---
 
-# Audit Logs
+## Media
 
-ระบบจะเก็บ Activity ที่สำคัญ
+Media is separated by company.
 
-ตัวอย่าง
-
-```javascript
-{
-  (companyId, userId, action, resource, resourceId, before, after, timestamp);
-}
-```
-
-ตัวอย่าง Action
+Typical path:
 
 ```text
-CONTENT_CREATE
-CONTENT_UPDATE
-CONTENT_DELETE
-CONTENT_PUBLISH
-
-USER_CREATE
-USER_UPDATE
-
-COMPANY_UPDATE
-
-BRANDING_UPDATE
+companies/{companyId}/media/{mediaId}
 ```
+
+Media features include:
+
+- Media Library
+- Single and batch upload
+- Upload progress
+- Image selection
+- Image cropping where supported
+- Image metadata
+- Alternative text
+- Cover images
+- Gallery images
+- Optimized image variants
+- Private original file strategy
+
+### Media rules
+
+Only upload media that is:
+
+- Owned by Junsekino
+- Properly licensed
+- Supplied with permission
+- Approved for public use
+
+Unauthorized copying, downloading, modification, reproduction or redistribution of protected images is prohibited.
+
+Browser-delivered images cannot be protected from screenshots or saving with absolute certainty. Technical controls reduce casual misuse but do not replace copyright and legal protection.
 
 ---
 
-# SEO
+## SEO
 
-รองรับ SEO แยกตามภาษา
+SEO can be configured globally for each company and individually for supported content.
 
-```javascript
+Supported values include:
+
+```js
 seo: {
-
-  th: {
+  en: {
     title: "",
     description: "",
     keywords: [],
@@ -697,7 +701,7 @@ seo: {
     ogImage: null
   },
 
-  en: {
+  th: {
     title: "",
     description: "",
     keywords: [],
@@ -711,793 +715,570 @@ seo: {
 }
 ```
 
-ระบบจะรองรับ
+Automatic SEO behavior includes:
 
-```text
-Metadata
-Canonical URL
-Open Graph
-Twitter/X Metadata
-hreflang
-Sitemap
-robots.txt
-Structured Data
-```
+- Content title → SEO title
+- Content title → Open Graph title
+- Excerpt or description → SEO description
+- Tags → SEO keywords
+- Cover image → Open Graph image
+
+When users manually edit generated SEO values, later source-field changes should not overwrite those manual values unexpectedly.
 
 ---
 
-# Social Media
+## Analytics and Engagement
 
-แต่ละบริษัทสามารถกำหนด
+Supported engagement includes:
 
-```text
-Facebook
-Instagram
-LinkedIn
-YouTube
-X
-TikTok
-Pinterest
-```
+- Views
+- Unique visitors
+- Likes
+- Shares
+- Share channels
+- Top content
+- Daily website traffic
+- Recent activity
+- Form submission summaries
 
-Content สามารถ Share ผ่าน
+Analytics data is displayed in the Admin Dashboard according to the selected reporting range.
 
-```text
-Facebook
-X
-LinkedIn
-LINE
-Copy Link
-Native Mobile Share
-```
+Persistent Analytics visitor identification must not be created before Analytics consent where consent is required.
 
-รองรับ Social Publishing API ใน Phase ต่อไป
+Raw visitor IDs are not stored directly. Supported identifiers are hashed and scoped to the relevant company to reduce cross-company correlation.
 
 ---
 
-# Media Architecture
+## Privacy and Cookie Consent
 
-Media Library จะเป็นระบบกลางของแต่ละบริษัท
+The platform includes:
 
-```text
-companies/{companyId}/media
-```
+- Cookie banner
+- Cookie preferences
+- Necessary cookies
+- Analytics cookies
+- Functional cookies
+- Marketing cookies
+- Accept All
+- Necessary Only
+- Consent versioning
+- Consent records
+- Privacy Notice
+- Cookie Policy
+- Terms of Use
+- Data retention settings
+- Data subject request information
+- Technical data anonymization
+- Policy change re-consent
+- Retention cleanup
 
-Media Metadata ตัวอย่าง
+Optional cookie categories should remain disabled until the visitor provides valid consent unless another lawful basis is confirmed.
 
-```javascript
-{
-  filename,
-  originalFilename,
-
-  width,
-  height,
-
-  mimeType,
-  size,
-
-  alt: {
-    th: "",
-    en: ""
-  },
-
-  caption: {
-    th: "",
-    en: ""
-  },
-
-  uploadedBy,
-  createdAt
-}
-```
+Legal documents and privacy settings must reflect the company's actual operations. They should be reviewed by qualified legal counsel before production use.
 
 ---
 
-# Image Protection
+## Email and Notifications
 
-เนื่องจาก Browser จำเป็นต้องได้รับข้อมูลภาพเพื่อแสดงผล จึงไม่สามารถป้องกันการ Save หรือ Screenshot ได้ 100%
+The Admin Settings module supports:
 
-ระบบจึงออกแบบให้
+- Sender configuration
+- SMTP configuration
+- Protected SMTP password storage
+- Resend configuration
+- Notification recipients
+- Activity notifications
+- Test email workflow
 
-```text
-Original Image
-      ↓
-Private Storage
-      ↓
-Optimized Image
-      ↓
-Public Website
-```
-
-Public Website จะไม่ส่งไฟล์ Original ความละเอียดสูงให้ผู้ชมโดยตรง
-
-แนวทางเพิ่มเติม
-
-```text
-Responsive Image
-WebP
-AVIF
-Image Optimization
-Disable Drag
-Disable Context Menu
-Optional Watermark
-```
+Sensitive email credentials must never be committed to GitHub, copied into documentation or shown in screenshots.
 
 ---
 
-# Performance Architecture
+## Scheduled Jobs
 
-Public Website จะไม่ Query Firestore จาก Client โดยตรงทุกครั้ง
+Vercel scheduled jobs currently include:
 
-Architecture
-
-```text
-Browser
-   ↓
-Next.js Server
-   ↓
-Cache
-   ↓
-Firestore
-```
-
-Content ที่ Publish แล้วสามารถใช้
+### Scheduled publishing
 
 ```text
-Server Rendering
-Caching
-Revalidation
-CDN
+/api/cron/publish-scheduled
 ```
 
-เพื่อลด Firestore Reads และเพิ่มความเร็วในการโหลดเว็บไซต์
+Schedule:
+
+```text
+*/5 * * * *
+```
+
+### Privacy retention cleanup
+
+```text
+/api/internal/cron/privacy-retention
+```
+
+Schedule:
+
+```text
+30 18 * * *
+```
+
+Cron routes must validate `CRON_SECRET`.
+
+Firestore TTL may also be used for supported temporary or expiring records.
 
 ---
 
-# Theme Architecture
+## Installation
 
-แต่ละบริษัทสามารถตั้ง Branding ได้จาก Admin
+Clone the repository:
 
-Public UI จะใช้ CSS Variables เช่น
-
-```css
---brand-primary;
---brand-secondary;
---brand-accent;
---brand-background;
---brand-surface;
---brand-text;
+```bash
+git clone https://github.com/SmallDevStudio/junsekino-cms.git
 ```
 
-จึงไม่ต้องเขียนเงื่อนไข Company ลงใน Component
+Enter the project:
 
-ไม่ใช้แนวทาง
-
-```javascript
-if (company === "company-a") {
-}
+```bash
+cd junsekino-cms
 ```
 
-แต่ใช้
+Install dependencies:
 
-```text
-Company
-  ↓
-Branding
-  ↓
-Theme Variables
-  ↓
-Components
+```bash
+npm install
 ```
+
+Copy the environment template:
+
+### PowerShell
+
+```powershell
+Copy-Item ".env.example" ".env.local"
+```
+
+### macOS or Linux
+
+```bash
+cp .env.example .env.local
+```
+
+Complete the required environment variables before starting the application.
 
 ---
 
-# Project Structure
+## Environment Variables
 
-```text
-junsekino-cms/
-│
-├── public/
-│   ├── images/
-│   ├── icons/
-│   └── fonts/
-│
-├── src/
-│   │
-│   ├── app/
-│   │   │
-│   │   ├── (public)/
-│   │   │   └── [locale]/
-│   │   │       ├── page.js
-│   │   │       ├── select/
-│   │   │       └── [company]/
-│   │   │
-│   │   ├── admin/
-│   │   │   ├── (auth)/
-│   │   │   └── (dashboard)/
-│   │   │
-│   │   ├── api/
-│   │   │   └── v1/
-│   │   │
-│   │   ├── globals.css
-│   │   ├── layout.js
-│   │   ├── not-found.js
-│   │   └── error.js
-│   │
-│   ├── modules/
-│   │   ├── auth/
-│   │   ├── company/
-│   │   ├── user/
-│   │   ├── content/
-│   │   ├── project/
-│   │   ├── page/
-│   │   ├── news/
-│   │   ├── people/
-│   │   ├── media/
-│   │   ├── seo/
-│   │   ├── social/
-│   │   └── audit/
-│   │
-│   ├── components/
-│   │   ├── ui/
-│   │   ├── common/
-│   │   ├── public/
-│   │   ├── admin/
-│   │   ├── forms/
-│   │   ├── tables/
-│   │   ├── media/
-│   │   └── editor/
-│   │
-│   ├── layouts/
-│   │   ├── public/
-│   │   └── admin/
-│   │
-│   ├── lib/
-│   │   ├── firebase/
-│   │   ├── auth/
-│   │   ├── permissions/
-│   │   ├── validation/
-│   │   ├── cache/
-│   │   └── logger/
-│   │
-│   ├── services/
-│   ├── hooks/
-│   ├── contexts/
-│   ├── constants/
-│   ├── utils/
-│   └── i18n/
-│
-├── .env.local
-├── .env.example
-├── eslint.config.mjs
-├── jsconfig.json
-├── next.config.mjs
-├── package.json
-└── README.md
-```
+The repository contains `.env.example` without production secrets.
 
----
+Main environment groups:
 
-# Environment
-
-ระบบแยก Firebase Environment ออกจากกัน
-
-```text
-Development
-    ↓
-junsekino-dev
-
-
-Production
-    ↓
-junsekino-prod
-```
-
-Recommended Deployment
-
-```text
-Local Development
-        ↓
-Firebase DEV
-
-
-Vercel Preview
-        ↓
-Firebase DEV
-
-
-Vercel Production
-        ↓
-Firebase PROD
-```
-
----
-
-# Environment Variables
-
-สร้าง
-
-```text
-.env.local
-```
-
-ตัวอย่าง
+### Application
 
 ```env
-NEXT_PUBLIC_APP_NAME=Junsekino
-NEXT_PUBLIC_APP_ENV=development
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_NAME=
+NEXT_PUBLIC_APP_ENV=
+NEXT_PUBLIC_APP_URL=
+```
 
+### Firebase Client
+
+```env
 NEXT_PUBLIC_FIREBASE_API_KEY=
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=
 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
 NEXT_PUBLIC_FIREBASE_APP_ID=
+```
 
+### Firebase Admin
+
+```env
 FIREBASE_ADMIN_PROJECT_ID=
 FIREBASE_ADMIN_CLIENT_EMAIL=
 FIREBASE_ADMIN_PRIVATE_KEY=
+FIREBASE_STORAGE_BUCKET=
 ```
 
-ห้าม Commit `.env.local`
+### Security and scheduled jobs
 
-Repository ต้องมีเฉพาะ
-
-```text
-.env.example
+```env
+CRON_SECRET=
+VISITOR_HASH_SECRET=
+EMAIL_CREDENTIALS_ENCRYPTION_KEY=
 ```
 
-ที่ไม่มี Secret
+### Email
+
+```env
+RESEND_API_KEY=
+EMAIL_FROM=
+```
+
+### Analytics
+
+```env
+NEXT_PUBLIC_GA_MEASUREMENT_ID=
+NEXT_PUBLIC_GOOGLE_ANALYTICS=
+```
+
+### External media
+
+```env
+YOUTUBE_API_KEY=
+```
+
+Rules:
+
+- Never commit `.env.local`
+- Never commit Firebase Admin private keys
+- Never expose encryption or visitor hashing secrets
+- Use separate values for Development and Production
+- Configure Vercel variables per environment
+- Rotate any secret accidentally exposed
 
 ---
 
-# Installation
+## Development
 
-Clone Repository
-
-```bash
-git clone <repository-url>
-```
-
-เข้า Project
-
-```bash
-cd junsekino-cms
-```
-
-ติดตั้ง Dependencies
-
-```bash
-npm install
-```
-
-สร้าง
-
-```text
-.env.local
-```
-
-โดย Copy จาก
-
-```text
-.env.example
-```
-
-แล้วใส่ Firebase Configuration
-
----
-
-# Development
-
-เริ่ม Development Server
+Start the development server:
 
 ```bash
 npm run dev
 ```
 
-เปิด
+Local URL:
 
 ```text
 http://localhost:3000
 ```
 
----
-
-# Build
-
-ทดสอบ Production Build
-
-```bash
-npm run build
-```
-
-Run Production
-
-```bash
-npm start
-```
+Network URL depends on the development machine and local network.
 
 ---
 
-# Lint
+## Testing and Build
 
-ตรวจสอบ Code
+Run lint:
 
 ```bash
 npm run lint
 ```
 
----
-
-# Git Workflow
-
-Branch หลัก
-
-```text
-main
-develop
-```
-
-Development Flow
-
-```text
-feature/*
-    ↓
-develop
-    ↓
-main
-```
-
-ตัวอย่าง
-
-```text
-feature/auth
-feature/company-management
-feature/project-cms
-feature/media-library
-feature/seo
-```
-
----
-
-# Commit Convention
-
-Recommended Commit Messages
-
-```text
-feat:
-fix:
-refactor:
-style:
-docs:
-test:
-chore:
-```
-
-ตัวอย่าง
+Run the production build:
 
 ```bash
-git commit -m "feat: add admin authentication"
+npm run build
 ```
 
-```bash
-git commit -m "feat: add company management"
-```
+Run the production server locally:
 
 ```bash
-git commit -m "fix: resolve firebase session issue"
+npm start
 ```
 
+Before committing, run:
+
 ```bash
-git commit -m "refactor: improve project service"
+git diff --check
+npm run lint
+npm run build
 ```
+
+### Phase 1 verification
+
+At minimum, test:
+
+- Admin login and logout
+- Password change flow
+- Company switching
+- Dashboard ranges and metrics
+- Company profile save
+- Admin TH/EN
+- Public content TH/EN
+- Home slideshow
+- About save and publish
+- Project create, edit, save and publish
+- Award create, edit, save and publish
+- Public content create, edit, save and publish
+- News create, edit, save and publish
+- Contact page
+- Contact form submission
+- Admin Messages
+- Media batch upload
+- Menu ordering and submenu behavior
+- Cookie banner in a new private session
+- Consent preferences
+- Legal document publishing
+- Analytics after consent
+- Desktop public navigation
+- Mobile public navigation
+- Documentation routes
+- Favicons and Web App manifest
 
 ---
 
-# Deployment
+## Deployment
 
-Production Deployment ใช้
+Deployment flow:
 
 ```text
-GitHub
-  ↓
+Local Development
+↓
+GitHub master
+↓
 Vercel
-  ↓
-Next.js
-  ↓
-Firebase Production
+↓
+Firebase services
 ```
 
-Recommended Branch Mapping
+Push to GitHub:
 
-```text
-develop
-   ↓
-Vercel Preview
-
-
-main
-   ↓
-Vercel Production
+```bash
+git add -A
+git commit -m "feat: complete phase 1"
+git push origin master
 ```
 
-Environment Variables ต้องกำหนดใน Vercel แยกตาม Environment
+Vercel deploys the connected branch automatically.
 
-```text
-Development
-Preview
-Production
+Before connecting the production domain:
+
+1. Confirm the Vercel deployment is Ready.
+2. Verify production environment variables.
+3. Verify Firebase project selection.
+4. Test public pages.
+5. Test Admin authentication.
+6. Test form submissions.
+7. Test email delivery.
+8. Test Cookie consent in a private browser.
+9. Confirm legal documents are published.
+10. Confirm scheduled jobs.
+11. Confirm no secret appears in logs or source.
+12. Confirm the production domain and canonical URLs.
+
+### Firebase commands
+
+Select the development project:
+
+```bash
+npm run firebase:dev
 ```
 
-ห้ามใช้ Firebase Production สำหรับ Preview Deployment
+Deploy Firestore indexes:
+
+```bash
+npm run firebase:indexes
+```
+
+Deploy Firestore rules:
+
+```bash
+npm run firebase:rules
+```
+
+Deploy Storage rules:
+
+```bash
+npm run firebase:storage
+```
+
+Review the selected Firebase project before every deployment.
 
 ---
 
-# Security Principles
+## Project Structure
 
-ระบบยึดหลัก
+Simplified current structure:
+
+```text
+junsekino-cms/
+├── public/
+│   ├── android-chrome-192x192.png
+│   ├── android-chrome-512x512.png
+│   ├── apple-touch-icon.png
+│   ├── favicon-16x16.png
+│   ├── favicon-32x32.png
+│   ├── site.webmanifest
+│   └── docs/
+│
+├── src/
+│   ├── app/
+│   │   ├── (documentation)/
+│   │   │   └── docs/
+│   │   ├── [companySlug]/
+│   │   ├── admin/
+│   │   ├── api/
+│   │   ├── favicon.ico
+│   │   ├── globals.css
+│   │   └── layout.js
+│   │
+│   ├── components/
+│   │   ├── admin/
+│   │   ├── docs/
+│   │   ├── privacy/
+│   │   └── public/
+│   │
+│   ├── constants/
+│   ├── i18n/
+│   ├── lib/
+│   ├── modules/
+│   └── utils/
+│
+├── .env.example
+├── eslint.config.mjs
+├── firebase.json
+├── firestore.indexes.json
+├── firestore.rules
+├── jsconfig.json
+├── next.config.mjs
+├── package.json
+├── storage.rules
+├── vercel.json
+└── README.md
+```
+
+---
+
+## Security Principles
+
+The application follows these principles:
 
 ```text
 Default Deny
 Least Privilege
-Server Authorization
-Role-Based Access Control
-Permission-Based Access Control
-Tenant Isolation
-Secure Session Cookie
+Server-side Authorization
+Permission-based Access Control
+Company Data Isolation
+Secure Session Cookies
+Schema Validation
 Private Original Media
+Secret Separation
 Audit Logging
-Environment Separation
+Retention Controls
+Consent Before Optional Analytics
 ```
 
-ทุก Sensitive Action ต้องผ่าน
+Sensitive request flow:
 
 ```text
 Authentication
-      ↓
-User Status
-      ↓
-Company Membership
-      ↓
-Role
-      ↓
+↓
+User status
+↓
+Company access
+↓
 Permission
-      ↓
-Validation
-      ↓
-Service
-      ↓
-Database
-```
-
-การซ่อน Menu ใน Frontend ไม่ถือเป็น Security
-
----
-
-# Development Principles
-
-Junsekino CMS ใช้หลักการ
-
-```text
-Components != Business Logic
-```
-
-Component มีหน้าที่แสดงผลและ Interaction
-
-```text
-Component
-   ↓
-Module
-   ↓
-Service
-   ↓
+↓
+Schema validation
+↓
+Service rules
+↓
 Repository
-   ↓
+↓
 Firebase
 ```
 
-หลีกเลี่ยงการเรียก
+Security requirements:
 
-```javascript
-getDocs();
-updateDoc();
-deleteDoc();
-```
-
-โดยตรงกระจายอยู่ใน UI Components
-
----
-
-# Roadmap
-
-## Phase 1 — Foundation
-
-```text
-Next.js
-Firebase
-Environment
-Architecture
-Firestore Model
-Project Structure
-```
+- Do not rely on hidden frontend menus as authorization
+- Do not expose Firebase Admin credentials
+- Do not store raw visitor IDs
+- Do not enable optional Analytics before consent
+- Do not expose form attachments publicly
+- Do not log passwords or sensitive submission data
+- Do not upload unapproved copyrighted media
+- Do not bypass retention requirements
 
 ---
 
-## Phase 2 — Authentication
+## Phase 2 Roadmap
 
-```text
-Login
-Logout
-Firebase Session Cookie
-Current User
-Auth Guard
-RBAC
-Permissions
-Superadmin
-```
+### Admin Mobile Core
 
----
+- Mobile-first Admin shell
+- Reusable responsive page containers
+- Mobile sidebar and navigation
+- Responsive forms and editors
+- Mobile tables converted to cards or lists
+- Sticky Save and Publish actions
+- Touch-friendly Media Picker
+- Standard loading, error and empty states
+- Reusable mobile module patterns
 
-## Phase 3 — Company Management
+### Page Management
 
-```text
-Create Company
-Edit Company
-Company Status
-Branding
-Logo
-Theme
-Social
-SEO
-Company Members
-```
+- User-created pages
+- Single-page content
+- Public route `/p/{pageSlug}`
+- Page templates
+- Page navigation integration
+- Page permissions
+- Page publishing workflow
 
----
+### Form Management
 
-## Phase 4 — Admin CMS
+- Form builder
+- Custom fields
+- Consent fields
+- Validation management
+- File upload settings
+- Form publishing
+- Submission workflow
 
-```text
-Dashboard
-Pages
-Projects
-News
-People
-Media
-Users
-Settings
-```
+### Workflow and Recovery
 
----
+- Restore soft-deleted records
+- Revision history
+- Approval workflow
+- Draft comparison
+- Scheduled unpublishing
+- Content locking or conflict detection
 
-## Phase 5 — Content Publishing
+### Search and Discovery
 
-```text
-Draft
-Review
-Preview
-Publish
-Schedule
-Archive
-Revision History
-Audit Log
-```
+- Admin content search
+- Advanced filters
+- Cross-module search
+- Search suggestions
 
----
+### Advanced Platform Features
 
-## Phase 6 — Public Website
+- Popup management
+- Tags management
+- People management
+- Content calendar
+- Social publishing
+- Advanced analytics
+- Analytics aggregation
+- Custom reports
+- AI translation assistance
+- AI SEO suggestions
+- AI alternative text
+- AI content assistance
 
-```text
-Welcome
-Company Selection
-Company Home
-Projects
-News
-People
-About
-Contact
-```
+### Documentation
 
----
-
-## Phase 7 — Internationalization
-
-```text
-Thai
-English
-hreflang
-Localized Metadata
-```
+- Detailed module guides
+- Screenshots
+- Search index
+- Contextual help links
+- Troubleshooting
+- Glossary
+- Role-specific learning paths
+- Documentation feedback
 
 ---
 
-## Phase 8 — SEO
-
-```text
-Metadata
-Open Graph
-Canonical
-Sitemap
-robots.txt
-Structured Data
-SEO Management
-```
-
----
-
-## Phase 9 — Media Protection
-
-```text
-Private Originals
-Optimized Web Images
-Responsive Images
-Image Transformation
-CDN
-Watermark Support
-```
-
----
-
-## Phase 10 — Advanced Features
-
-```text
-Social Publishing
-Analytics
-Content Calendar
-Approval Workflow
-AI Translation
-AI SEO Suggestions
-AI Alt Text
-AI Content Assistant
-Notifications
-```
-
----
-
-# Project Architecture Concept
-
-Junsekino CMS ถูกออกแบบตามแนวคิด
-
-```text
-Company
-   ↓
-Brand
-   ↓
-Content
-   ↓
-Publish
-```
-
-แทนการสร้างเว็บไซต์แยกแต่ละบริษัท
-
-```text
-Website A
-Website B
-Website C
-```
-
-ทำให้สามารถเพิ่มบริษัทในอนาคตได้โดยไม่ต้องสร้างระบบใหม่
-
----
-
-# Project Status
-
-```text
-Status: Active Development
-
-Current Phase:
-Phase 1 - Foundation
-```
-
----
-
-# License
+## License
 
 This project is proprietary software developed for Junsekino.
 
-All source code, content, images, media, designs and related materials are confidential and intended for authorized Junsekino use only.
+All source code, content, images, media, documents, visual designs, trademarks and related materials are confidential and intended only for authorized Junsekino use.
 
-Unauthorized copying, redistribution, modification or commercial use is prohibited.
+Unauthorized copying, downloading, reproduction, modification, adaptation, redistribution, sublicensing, publication or commercial use is prohibited unless written permission has been granted by the lawful rights holder.
+
+Third-party libraries remain subject to their respective licenses.
 
 ---
 

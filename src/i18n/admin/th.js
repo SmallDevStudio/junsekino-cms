@@ -4081,5 +4081,19 @@ export const adminTh = {
 
       open: "เปิดคู่มือ {title}",
     },
+
+    header: {
+      changeLanguage: "เปลี่ยนภาษาคู่มือ",
+
+      backToAdmin: "กลับไป Admin",
+    },
+
+    search: {
+      placeholder: "ค้นหาในคู่มือ...",
+    },
+
+    footer: {
+      copyright: "คู่มือ Junsekino CMS สำหรับผู้ใช้งานระบบที่ได้รับอนุญาต",
+    },
   },
 };

@@ -164,15 +164,16 @@ export const ADMIN_NAVIGATION = [
 
         icon: Menu,
       },
-
       {
         id: "docs",
 
         labelKey: "navigation.docs",
 
-        href: "/admin/docs",
+        href: "/docs",
 
         icon: FileText,
+
+        newWindow: true,
       },
     ],
   },

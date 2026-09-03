@@ -4128,5 +4128,19 @@ export const adminEn = {
 
       open: "Open {title} documentation",
     },
+
+    header: {
+      changeLanguage: "Change documentation language",
+
+      backToAdmin: "Back to Admin",
+    },
+
+    search: {
+      placeholder: "Search documentation...",
+    },
+
+    footer: {
+      copyright: "Junsekino CMS documentation. For authorized system users.",
+    },
   },
 };

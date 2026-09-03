@@ -1,6 +1,6 @@
 "use client";
 
-import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { ExternalLink, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
 import Link from "next/link";
 
@@ -150,6 +150,8 @@ function CollapsedNavItem({ item, active, label }) {
       <Link
         href={item.href}
         aria-label={label}
+        target={item.newWindow ? "_blank" : undefined}
+        rel={item.newWindow ? "noopener noreferrer" : undefined}
         onMouseEnter={showTooltip}
         onMouseLeave={hideTooltip}
         onFocus={showTooltip}
@@ -216,6 +218,21 @@ function CollapsedNavItem({ item, active, label }) {
             }}
           />
         )}
+        {item.newWindow ? (
+          <ExternalLink
+            size={13}
+            aria-hidden="true"
+            className="
+                ml-auto
+                shrink-0
+                opacity-50
+
+                transition-opacity
+
+                group-hover:opacity-100
+              "
+          />
+        ) : null}
       </Link>
 
       <SidebarTooltip tooltip={tooltip} />
@@ -236,6 +253,8 @@ function ExpandedNavItem({ item, active, label }) {
     <Link
       href={item.href}
       aria-label={label}
+      target={item.newWindow ? "_blank" : undefined}
+      rel={item.newWindow ? "noopener noreferrer" : undefined}
       className={cn(
         "group relative",
 

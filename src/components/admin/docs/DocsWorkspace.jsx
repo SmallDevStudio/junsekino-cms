@@ -38,6 +38,8 @@ import {
   getAdminDocs,
 } from "@/constants/admin-docs";
 
+import { useRouter } from "next/navigation";
+
 /*
  * =========================================================
  * ICONS
@@ -729,7 +731,11 @@ function Notes({
  * =========================================================
  */
 
-export default function DocsWorkspace() {
+export default function DocsWorkspace({
+  initialSectionId = "getting-started",
+}) {
+  const router = useRouter();
+
   const { locale, t } = useAdminTranslation();
 
   const sections = useMemo(
@@ -738,9 +744,15 @@ export default function DocsWorkspace() {
     [locale],
   );
 
-  const [activeId, setActiveId] = useState(
-    sections[0]?.id || "getting-started",
-  );
+  const [activeId, setActiveId] = useState(() => {
+    const initialExists = sections.some(
+      (section) => section.id === initialSectionId,
+    );
+
+    return initialExists
+      ? initialSectionId
+      : sections[0]?.id || "getting-started";
+  });
 
   const activeSection =
     sections.find((section) => section.id === activeId) || sections[0];
@@ -756,17 +768,34 @@ export default function DocsWorkspace() {
   const ActiveIcon = ICONS[activeSection?.icon] || FileText;
 
   function selectSection(sectionId) {
+    const sectionExists = sections.some((section) => section.id === sectionId);
+
+    if (!sectionExists) {
+      return;
+    }
+
     setActiveId(sectionId);
 
-    if (typeof window !== "undefined") {
-      window.requestAnimationFrame(() => {
-        window.scrollTo({
-          top: 0,
+    const href =
+      sectionId === "getting-started"
+        ? "/docs"
+        : `/docs/${encodeURIComponent(sectionId)}`;
 
-          behavior: "smooth",
-        });
+    router.push(
+      href,
+
+      {
+        scroll: false,
+      },
+    );
+
+    window.requestAnimationFrame(() => {
+      window.scrollTo({
+        top: 0,
+
+        behavior: "smooth",
       });
-    }
+    });
   }
 
   function goToRelativeSection(offset) {

@@ -5,7 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { Menu, X } from "lucide-react";
+import { Menu, X, ExternalLink } from "lucide-react";
 
 import { useCompanyWorkspace } from "@/components/admin/company/CompanyWorkspaceProvider";
 
@@ -173,6 +173,12 @@ export default function AdminMobileNav() {
                             <Link
                               key={item.id}
                               href={item.href}
+                              target={item.newWindow ? "_blank" : undefined}
+                              rel={
+                                item.newWindow
+                                  ? "noopener noreferrer"
+                                  : undefined
+                              }
                               onClick={() => setOpen(false)}
                               className={cn(
                                 "flex min-h-11 items-center gap-3",
@@ -188,7 +194,27 @@ export default function AdminMobileNav() {
                                   : "text-[var(--admin-muted)] hover:bg-[var(--admin-hover)] hover:text-[var(--admin-foreground)]",
                               )}
                             >
-                              <Icon size={18} strokeWidth={1.8} />
+                              <Icon
+                                size={18}
+                                strokeWidth={1.8}
+                                className="shrink-0"
+                              />
+
+                              <span className="min-w-0 flex-1">
+                                {t(item.labelKey)}
+                              </span>
+
+                              {item.newWindow ? (
+                                <ExternalLink
+                                  size={13}
+                                  aria-hidden="true"
+                                  className="
+                                    ml-auto
+                                    shrink-0
+                                    opacity-50
+     "
+                                />
+                              ) : null}
 
                               {t(item.labelKey)}
                             </Link>
