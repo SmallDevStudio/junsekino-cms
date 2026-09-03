@@ -7,9 +7,7 @@ import { ExternalLink } from "lucide-react";
 
 import PublicContentEngagement from "@/components/public/content/PublicContentEngagement";
 
-import PublicExpandableDescription from "@/components/public/content/PublicExpandableDescription";
-
-import PublicRichText from "@/components/public/content/PublicRichText";
+import PublicExpandableRichText from "@/components/public/content/PublicExpandableRichText";
 
 import { getPublicCompany } from "@/modules/public/public-company.service";
 
@@ -243,14 +241,6 @@ export default async function PublicContentDetailPage({ params }) {
   const title =
     localizedText(item.title) || item.source?.metadata?.title || "Untitled";
 
-  const excerpt = localizedText(item.excerpt);
-
-  const externalDescription = String(
-    item.source?.metadata?.description || "",
-  ).trim();
-
-  const description = excerpt || externalDescription;
-
   const content = localizedRichText(item.content);
 
   const provider =
@@ -375,14 +365,14 @@ export default async function PublicContentDetailPage({ params }) {
             className="
               mx-auto
 
-              mt-8
+              mt-5
 
               w-full
-              max-w-[900px]
+              max-w-[min(900px,82vh)]
 
               overflow-hidden
 
-              sm:mt-10
+              sm:mt-6
             "
           >
             <div
@@ -427,12 +417,12 @@ export default async function PublicContentDetailPage({ params }) {
             className="
               mx-auto
 
-              mt-8
+              mt-5
 
               w-full
-              max-w-[1000px]
+              max-w-[min(1000px,82vh)]
 
-              sm:mt-10
+              sm:mt-6
             "
           >
             <div
@@ -472,7 +462,7 @@ export default async function PublicContentDetailPage({ params }) {
           className="
             mx-auto
 
-            mt-7
+            mt-5
 
             w-full
             max-w-[900px]
@@ -572,38 +562,27 @@ export default async function PublicContentDetailPage({ params }) {
             />
           </div>
 
-          {/* DESCRIPTION */}
-
-          {description && (
-            <PublicExpandableDescription
-              lines={5}
-              className="
-                mt-5
-
-                text-[12px]
-                leading-[1.7]
-                text-black/60
-
-                sm:text-[13px]
-              "
-            >
-              {description}
-            </PublicExpandableDescription>
-          )}
-
-          {/* CONTENT */}
+          {/* RICH TEXT CONTENT */}
 
           {content && (
-            <PublicRichText
-              value={content}
-              className="
-                mt-8
+            <div className="mt-5">
+              <PublicExpandableRichText
+                value={content}
+                lines={5}
+                className="
+                  !text-[12px]
+                  !leading-[1.75]
 
-                !leading-[1.75]
+                  !text-black/70
 
-                !text-black/70
-              "
-            />
+                  sm:!text-[13px]
+
+                  [&_h2:first-child]:mt-0
+                  [&_h3:first-child]:mt-0
+                  [&_p:first-child]:mt-0
+                "
+              />
+            </div>
           )}
 
           {/* TAGS */}

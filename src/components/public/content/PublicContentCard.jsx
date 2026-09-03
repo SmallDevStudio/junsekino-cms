@@ -6,8 +6,6 @@ import { Play } from "lucide-react";
 
 import PublicContentEngagement from "./PublicContentEngagement";
 
-import PublicExpandableDescription from "./PublicExpandableDescription";
-
 function localized(
   value,
 
@@ -358,19 +356,23 @@ export default function PublicContentCard({
         </div>
 
         {excerpt && (
-          <PublicExpandableDescription
-            lines={5}
+          <p
             className="
               mt-4
               max-w-[680px]
+
+              line-clamp-5
+
               text-[11px]
               leading-[1.65]
+
               text-[var(--public-muted-foreground)]
+
               sm:text-[12px]
             "
           >
             {excerpt}
-          </PublicExpandableDescription>
+          </p>
         )}
 
         {Array.isArray(item.tags) && item.tags.length > 0 && (

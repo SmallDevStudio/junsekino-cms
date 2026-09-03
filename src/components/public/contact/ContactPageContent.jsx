@@ -305,13 +305,16 @@ export default function ContactPageContent({
           {hasCompanyIntroduction && (
             <section className={resolvedCoverUrl ? "mt-5" : "mt-8"}>
               <div className="space-y-0.5">
+                <p className="font-bold text-lg">
+                  JUNSEKINO ARCHITECT AND DESIGN CO.,LTD
+                </p>
                 {displayNames.map((name, index) => (
                   <p
                     key={`${name}-${index}`}
                     className={
                       index === 0
-                        ? "text-[16px] font-semibold leading-[1.35] tracking-[-0.025em] text-[var(--public-foreground)] sm:text-[17px]"
-                        : "text-[13px] font-medium leading-[1.5] text-[var(--public-foreground)] sm:text-[14px]"
+                        ? "text-[16px] font-semibold leading-[1.35] tracking-[-0.025em] text-[var(--public-primary)] sm:text-[17px]"
+                        : "text-[13px] font-medium leading-[1.5] text-[var(--public-primary)] sm:text-[14px]"
                     }
                   >
                     {index === 0 ? name.toUpperCase() : name}
@@ -361,21 +364,6 @@ export default function ContactPageContent({
               />
 
               <section>
-                {hasText(contactHeading) && (
-                  <h1
-                    className="
-                      mb-5
-                      text-[14px]
-                      font-semibold
-                      leading-[1.55]
-                      text-[var(--public-foreground)]
-                      sm:text-[15px]
-                    "
-                  >
-                    {contactHeading}
-                  </h1>
-                )}
-
                 <dl
                   className="
                     grid
@@ -524,25 +512,6 @@ export default function ContactPageContent({
               />
 
               <section aria-labelledby="contact-form-title">
-                <h2
-                  id="contact-form-title"
-                  className="
-                    mb-2.5
-                    text-center
-                    text-[15px]
-                    font-semibold
-                    leading-[1.5]
-                    text-[var(--public-foreground)]
-                    sm:text-[16px]
-                  "
-                >
-                  {localized(
-                    form.name,
-
-                    locale,
-                  ) || "Contact Us"}
-                </h2>
-
                 <div
                   className="
                     rounded-xl
