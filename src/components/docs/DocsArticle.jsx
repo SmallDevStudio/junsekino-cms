@@ -199,6 +199,154 @@ function DocsFigure({
   );
 }
 
+function getLocalizedTableValue(value, locale) {
+  if (value === null || value === undefined) {
+    return "";
+  }
+
+  if (typeof value === "string" || typeof value === "number") {
+    return String(value);
+  }
+
+  if (typeof value === "object") {
+    return value[locale] || value.en || value.th || "";
+  }
+
+  return "";
+}
+
+function DocsTable({
+  table,
+
+  locale,
+}) {
+  if (
+    !table ||
+    !Array.isArray(table.columns) ||
+    table.columns.length === 0 ||
+    !Array.isArray(table.rows) ||
+    table.rows.length === 0
+  ) {
+    return null;
+  }
+
+  return (
+    <div className="mt-6">
+      {table.title && (
+        <h3
+          className="
+            admin-text-13
+            font-semibold
+            text-[var(--admin-foreground)]
+          "
+        >
+          {getLocalizedTableValue(table.title, locale)}
+        </h3>
+      )}
+
+      {table.description && (
+        <p
+          className="
+            mt-2
+            max-w-[860px]
+            admin-text-11
+            leading-[1.75]
+            text-[var(--admin-muted)]
+          "
+        >
+          {getLocalizedTableValue(table.description, locale)}
+        </p>
+      )}
+
+      <div
+        className="
+          mt-4
+          overflow-x-auto
+          rounded-2xl
+          border
+          border-[var(--admin-border)]
+          bg-[var(--admin-surface)]
+        "
+      >
+        <table className="min-w-[760px] w-full border-collapse">
+          <thead>
+            <tr className="bg-[var(--admin-background)]">
+              {table.columns.map((column, index) => (
+                <th
+                  key={column.id || `column-${index}`}
+                  scope="col"
+                  className="
+                    border-b
+                    border-[var(--admin-border)]
+                    px-4
+                    py-3
+                    text-left
+                    admin-text-10
+                    font-semibold
+                    uppercase
+                    tracking-[0.08em]
+                    text-[var(--admin-muted)]
+                  "
+                >
+                  {getLocalizedTableValue(column.label, locale)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+
+          <tbody>
+            {table.rows.map((row, rowIndex) => (
+              <tr
+                key={row.id || `row-${rowIndex}`}
+                className="
+                  border-b
+                  border-[var(--admin-border)]
+                  last:border-b-0
+                  hover:bg-[var(--admin-background)]
+                "
+              >
+                {table.columns.map((column, columnIndex) => {
+                  const value = row[column.id];
+
+                  return (
+                    <td
+                      key={`${row.id || rowIndex}-${column.id || columnIndex}`}
+                      className="
+                        px-4
+                        py-3
+                        align-top
+                        admin-text-11
+                        leading-[1.65]
+                        text-[var(--admin-foreground)]
+                      "
+                    >
+                      {getLocalizedTableValue(value, locale)}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p
+        className="
+          mt-2
+          admin-text-9
+          leading-[1.6]
+          text-[var(--admin-muted)]
+          md:hidden
+        "
+      >
+        {locale === "th"
+          ? "เลื่อนตารางไปทางซ้ายหรือขวาเพื่อดูข้อมูลทั้งหมด"
+          : "Swipe the table horizontally to view all information."}
+      </p>
+    </div>
+  );
+}
+
 function ArticleSection({
   section,
 
@@ -238,6 +386,14 @@ function ArticleSection({
 
       {section.images?.map((image) => (
         <DocsFigure key={image.id || image.src} image={image} locale={locale} />
+      ))}
+
+      {section.tables?.map((table, index) => (
+        <DocsTable
+          key={table.id || `${section.id}-table-${index}`}
+          table={table}
+          locale={locale}
+        />
       ))}
 
       {section.items?.length > 0 && (

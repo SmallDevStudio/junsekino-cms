@@ -12845,6 +12845,1674 @@ export const DOCS_CONTENT = {
       },
     ],
   },
+  "assets/media-library": {
+    eyebrow: {
+      en: "Media and Assets",
+      th: "Media และ Asset",
+    },
+
+    title: {
+      en: "Media Library",
+      th: "คลัง Media",
+    },
+
+    description: {
+      en: "Upload, optimize, find, review, crop, select and safely remove company media.",
+      th: "Upload, Optimize, ค้นหา ตรวจสอบ Crop, เลือก และนำ Media ของบริษัทออกอย่างปลอดภัย",
+    },
+
+    introduction: {
+      en: [
+        "The Media Library stores images and supported assets belonging to the active company. Editors use these managed assets for covers, galleries, slideshows, SEO and public content.",
+        "Large images are optimized before upload to reduce storage and public loading costs. Users must wait for the complete upload batch to finish before selecting files or leaving the dialog.",
+        "Uploading a file does not confirm copyright ownership or publication approval. Use only assets the company owns or is authorized to use.",
+      ],
+
+      th: [
+        "Media Library ใช้เก็บรูปและ Asset ที่รองรับของบริษัทปัจจุบัน Editor จะนำ Asset เหล่านี้ไปใช้กับ Cover, Gallery, Slideshow, SEO และ Public content",
+        "รูปขนาดใหญ่จะถูก Optimize ก่อน Upload เพื่อลด Storage และเวลาโหลดหน้า Public ผู้ใช้ต้องรอให้ Upload batch ทั้งหมดเสร็จก่อนเลือกไฟล์หรือออกจาก Dialog",
+        "การ Upload สำเร็จไม่ได้ยืนยันว่าบริษัทเป็นเจ้าของลิขสิทธิ์หรือได้รับอนุมัติให้เผยแพร่ ต้องใช้เฉพาะ Asset ที่บริษัทเป็นเจ้าของหรือมีสิทธิ์ใช้งาน",
+      ],
+    },
+
+    highlights: [
+      {
+        title: {
+          en: "Company-isolated",
+          th: "แยกตามบริษัท",
+        },
+
+        description: {
+          en: "Assets belong to the currently selected company.",
+          th: "Asset เป็นของบริษัทที่กำลังเลือก",
+        },
+      },
+
+      {
+        title: {
+          en: "Optimized upload",
+          th: "Optimize ก่อน Upload",
+        },
+
+        description: {
+          en: "Large images are resized and compressed before transfer.",
+          th: "ระบบ Resize และ Compress รูปใหญ่ก่อนส่ง",
+        },
+      },
+
+      {
+        title: {
+          en: "Reusable assets",
+          th: "นำกลับมาใช้ได้",
+        },
+
+        description: {
+          en: "One approved asset can be selected by supported content editors.",
+          th: "Asset ที่อนุมัติแล้วสามารถนำไปใช้ใน Editor ที่รองรับ",
+        },
+      },
+
+      {
+        title: {
+          en: "Controlled deletion",
+          th: "ควบคุมการลบ",
+        },
+
+        description: {
+          en: "Review asset identity and usage before confirming deletion.",
+          th: "ตรวจ Asset และการใช้งานก่อนยืนยัน Delete",
+        },
+      },
+    ],
+
+    sections: [
+      {
+        id: "media-library-overview",
+
+        title: {
+          en: "1. Media Library overview",
+          th: "1. ภาพรวม Media Library",
+        },
+
+        paragraphs: {
+          en: [
+            "The Media Library displays assets belonging to the active company. Use it to upload, search, inspect and manage reusable media.",
+            "Always confirm the selected company before uploading. Uploading under the wrong company places the asset in the wrong isolated library.",
+            "Available management actions depend on the signed-in user's role and permissions.",
+          ],
+
+          th: [
+            "Media Library แสดง Asset ของบริษัทปัจจุบัน ใช้สำหรับ Upload, Search, ตรวจสอบ และจัดการ Media ที่นำกลับมาใช้ได้",
+            "ตรวจสอบบริษัทก่อน Upload เสมอ เพราะหากเลือกบริษัทผิด Asset จะถูกเก็บใน Library ของบริษัทนั้น",
+            "คำสั่งจัดการขึ้นอยู่กับ Role และ Permission",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-media-library-overview",
+            number: "1",
+            src: "/docs/assets/media-library/media-library-overview.png",
+
+            title: {
+              en: "Media Library",
+              th: "Media Library",
+            },
+
+            alt: {
+              en: "Junsekino CMS Media Library showing upload controls, filters and media cards",
+              th: "Media Library แสดง Upload, Filter และ Media card",
+            },
+
+            caption: {
+              en: "Use the company Media Library to manage approved reusable assets.",
+              th: "ใช้ Media Library ของบริษัทเพื่อจัดการ Asset ที่อนุมัติแล้ว",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Upload adds approved assets to the active company.",
+            "Search locates assets using supported metadata.",
+            "Filters narrow the visible asset list.",
+            "Media cards provide previews and available actions.",
+            "Media Detail displays technical and descriptive information.",
+          ],
+
+          th: [
+            "Upload เพิ่ม Asset ให้บริษัทปัจจุบัน",
+            "Search ค้นหาจาก Metadata ที่รองรับ",
+            "Filter จำกัดรายการที่แสดง",
+            "Media card แสดง Preview และ Action",
+            "Media Detail แสดงข้อมูลทางเทคนิคและคำอธิบาย",
+          ],
+        },
+      },
+
+      {
+        id: "library-and-picker",
+
+        title: {
+          en: "2. Media Library and Media Picker",
+          th: "2. Media Library และ Media Picker",
+        },
+
+        paragraphs: {
+          en: [
+            "The Media Library is the main workspace for managing company assets. The Media Picker is a selection dialog opened from another editor.",
+            "Uploading through a Media Picker still adds the asset to the active company's Media Library.",
+            "Selecting an asset connects it to the current content record. It does not create another physical copy of the same media.",
+          ],
+
+          th: [
+            "Media Library เป็น Workspace หลักสำหรับจัดการ Asset ส่วน Media Picker เป็น Dialog สำหรับเลือก Asset จาก Editor อื่น",
+            "การ Upload ผ่าน Media Picker ยังคงเพิ่ม Asset เข้า Media Library ของบริษัท",
+            "การเลือก Asset เป็นการเชื่อม Reference เข้ากับ Content record ไม่ได้สร้างไฟล์จริงซ้ำอีกชุด",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-media-picker",
+            number: "2",
+            src: "/docs/assets/media-library/media-picker.png",
+
+            title: {
+              en: "Media Picker",
+              th: "Media Picker",
+            },
+
+            alt: {
+              en: "Media Picker showing Select and Upload tabs",
+              th: "Media Picker แสดงแท็บ Select และ Upload",
+            },
+
+            caption: {
+              en: "Use Select for an existing asset or Upload when a new approved file is required.",
+              th: "ใช้ Select สำหรับ Asset เดิม หรือ Upload เมื่อจำเป็นต้องเพิ่มไฟล์ใหม่",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Library: manage the complete company asset collection.",
+            "Picker Select: choose an existing asset for an editor.",
+            "Picker Upload: add a new asset and then select it.",
+            "Cancel: close the Picker without changing the current selection.",
+            "Select: confirm the highlighted completed asset.",
+          ],
+
+          th: [
+            "Library: จัดการ Asset ทั้งหมดของบริษัท",
+            "Picker Select: เลือก Asset เดิมให้ Editor",
+            "Picker Upload: เพิ่ม Asset ใหม่แล้วเลือกใช้งาน",
+            "Cancel: ปิด Picker โดยไม่เปลี่ยนค่าปัจจุบัน",
+            "Select: ยืนยัน Asset ที่เลือกและประมวลผลเสร็จแล้ว",
+          ],
+        },
+      },
+
+      {
+        id: "upload-media",
+
+        title: {
+          en: "3. Upload media",
+          th: "3. Upload Media",
+        },
+
+        paragraphs: {
+          en: [
+            "Use the upload area to browse for files or drag approved files into the Dropzone. Multiple files may be added as one batch.",
+            "Review the accepted file types and size limits displayed by the interface before selecting files.",
+            "Keep the upload interface open until every file has reached a final state.",
+          ],
+
+          th: [
+            "ใช้พื้นที่ Upload เพื่อเลือกไฟล์หรือ Drag ไฟล์ที่ได้รับอนุมัติเข้า Dropzone สามารถเพิ่มหลายไฟล์เป็นหนึ่ง Batch ได้",
+            "ตรวจ File type และ Size limit ที่ UI แสดงก่อนเลือกไฟล์",
+            "เปิด Upload interface ค้างไว้จนทุกไฟล์เข้าสู่สถานะสุดท้าย",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-media-upload",
+            number: "3",
+            src: "/docs/assets/media-library/media-upload.png",
+
+            title: {
+              en: "Media upload",
+              th: "Upload Media",
+            },
+
+            alt: {
+              en: "Media upload Dropzone before files are selected",
+              th: "Media upload Dropzone ก่อนเลือกไฟล์",
+            },
+
+            caption: {
+              en: "Browse for approved files or drag them into the supported Dropzone.",
+              th: "เลือกไฟล์ที่ได้รับอนุมัติหรือ Drag เข้า Dropzone",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Confirm the active company.",
+            "Open Upload.",
+            "Review the displayed file requirements.",
+            "Select or drag the approved files.",
+            "Review the queued file names.",
+            "Remove any incorrect file before transfer.",
+            "Start or allow the upload workflow to continue.",
+            "Keep the dialog open until the entire batch finishes.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัท",
+            "เปิด Upload",
+            "ตรวจข้อกำหนดไฟล์ที่แสดง",
+            "เลือกหรือ Drag ไฟล์",
+            "ตรวจชื่อไฟล์ใน Queue",
+            "นำไฟล์ผิดออกก่อนส่ง",
+            "เริ่มหรือรอ Upload workflow",
+            "เปิด Dialog ค้างไว้จน Batch เสร็จ",
+          ],
+        },
+      },
+
+      {
+        id: "optimization-process",
+
+        title: {
+          en: "4. Image optimization",
+          th: "4. การ Optimize รูป",
+        },
+
+        paragraphs: {
+          en: [
+            "Before transfer, supported images are processed in the browser. Large images may be resized to a maximum dimension of approximately 3000 pixels and compressed toward a target of 4 MB or less.",
+            "The current client optimization uses WebP output with an approximate quality setting of 0.85 where the workflow applies.",
+            "Optimization reduces file size but does not correct poor composition, blur, copyright issues or inappropriate content.",
+          ],
+
+          th: [
+            "ก่อนส่งไฟล์ Browser จะประมวลผลรูปที่รองรับ รูปใหญ่อาจถูกลดด้านยาวสูงสุดเหลือประมาณ 3000 Pixels และ Compress ไปยังเป้าหมายประมาณ 4 MB หรือน้อยกว่า",
+            "Client optimization ปัจจุบันใช้ WebP และ Quality ประมาณ 0.85 ใน Workflow ที่รองรับ",
+            "Optimization ลด File size แต่ไม่สามารถแก้ Composition, รูปเบลอ, ลิขสิทธิ์ หรือเนื้อหารูปที่ไม่เหมาะสม",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-media-optimizing",
+            number: "4",
+            src: "/docs/assets/media-library/media-optimizing.png",
+
+            title: {
+              en: "Optimizing and uploading",
+              th: "กำลัง Optimize และ Upload",
+            },
+
+            alt: {
+              en: "Media batch displaying optimizing and uploading states",
+              th: "Media batch แสดงสถานะ Optimizing และ Uploading",
+            },
+
+            caption: {
+              en: "Do not leave the dialog or select an unfinished asset while processing continues.",
+              th: "อย่าออกจาก Dialog หรือเลือก Asset ที่ยังไม่เสร็จขณะระบบทำงาน",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Queued: waiting for processing.",
+            "Optimizing: resizing or compressing the image.",
+            "Uploading: transferring the optimized file.",
+            "Completed: asset is ready for normal selection.",
+            "Failed: processing or transfer did not finish successfully.",
+          ],
+
+          th: [
+            "Queued: รอประมวลผล",
+            "Optimizing: กำลัง Resize หรือ Compress",
+            "Uploading: กำลังส่งไฟล์",
+            "Completed: Asset พร้อมให้เลือก",
+            "Failed: ประมวลผลหรือส่งไฟล์ไม่สำเร็จ",
+          ],
+        },
+      },
+
+      {
+        id: "batch-upload",
+
+        title: {
+          en: "5. Complete a batch upload",
+          th: "5. รอ Batch Upload ให้เสร็จ",
+        },
+
+        paragraphs: {
+          en: [
+            "Files in one batch may finish at different times. The first Completed file does not mean that the entire batch has finished.",
+            "Wait until every item is Completed or Failed. Resolve failed files separately instead of uploading the successful files again.",
+            "Do not switch back to Select and confirm an asset while other required files are still running.",
+          ],
+
+          th: [
+            "ไฟล์ใน Batch เดียวกันอาจเสร็จคนละเวลา ไฟล์แรกที่ Completed ไม่ได้หมายความว่าทั้ง Batch เสร็จ",
+            "รอทุกไฟล์เป็น Completed หรือ Failed และแก้เฉพาะไฟล์ที่ Failed ไม่ต้อง Upload ไฟล์สำเร็จซ้ำ",
+            "ไม่ควรกลับไป Select และยืนยัน Asset ขณะที่ไฟล์ที่ต้องใช้ยังทำงาน",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-media-batch-complete",
+            number: "5",
+            src: "/docs/assets/media-library/media-batch-complete.png",
+
+            title: {
+              en: "Completed upload batch",
+              th: "Upload Batch เสร็จ",
+            },
+
+            alt: {
+              en: "Media upload batch showing all files in completed states",
+              th: "Media upload batch แสดงทุกไฟล์เป็น Completed",
+            },
+
+            caption: {
+              en: "Continue only after every required file has reached a final state.",
+              th: "ดำเนินการต่อเมื่อทุกไฟล์ที่ต้องใช้เข้าสู่สถานะสุดท้าย",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Check every row in the batch.",
+            "Compare original and optimized sizes where displayed.",
+            "Confirm that expected files are Completed.",
+            "Retry only Failed files.",
+            "Return to Select after processing finishes.",
+            "Confirm the intended asset rather than the first completed asset.",
+          ],
+
+          th: [
+            "ตรวจทุกแถวใน Batch",
+            "เปรียบเทียบขนาดก่อนและหลังเมื่อแสดง",
+            "ตรวจว่าไฟล์ที่ต้องการ Completed",
+            "ลองใหม่เฉพาะ Failed file",
+            "กลับไป Select หลังประมวลผลเสร็จ",
+            "เลือก Asset ที่ต้องการจริง ไม่ใช่ไฟล์แรกที่เสร็จ",
+          ],
+        },
+      },
+
+      {
+        id: "search-and-filter",
+
+        title: {
+          en: "6. Search and filter media",
+          th: "6. Search และ Filter",
+        },
+
+        paragraphs: {
+          en: [
+            "Use Search and supported filters to locate an existing asset before uploading another copy.",
+            "Search results depend on the metadata stored with each asset. Clear filters when an expected item does not appear.",
+            "Reuse the existing approved asset when it is the same file and remains suitable.",
+          ],
+
+          th: [
+            "ใช้ Search และ Filter เพื่อค้นหา Asset เดิมก่อน Upload ไฟล์ซ้ำ",
+            "ผล Search ขึ้นอยู่กับ Metadata ของ Asset ให้ Clear filter เมื่อไม่พบรายการที่คาดไว้",
+            "ใช้ Asset เดิมเมื่อเป็นไฟล์เดียวกัน ได้รับอนุมัติ และยังเหมาะสม",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-media-search-filter",
+            number: "6",
+            src: "/docs/assets/media-library/media-search-filter.png",
+
+            title: {
+              en: "Media search and filters",
+              th: "Search และ Filter Media",
+            },
+
+            alt: {
+              en: "Media Library search, filter and sort controls",
+              th: "Search, Filter และ Sort ของ Media Library",
+            },
+
+            caption: {
+              en: "Search the current company library before creating duplicate assets.",
+              th: "ค้นหาใน Library ของบริษัทก่อนสร้าง Asset ซ้ำ",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Confirm the active company.",
+            "Enter a relevant filename or descriptive term.",
+            "Apply the required type or supported filter.",
+            "Change sort order when necessary.",
+            "Review the matching thumbnails.",
+            "Clear Search and filters if no expected result appears.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัท",
+            "กรอก Filename หรือคำอธิบาย",
+            "เลือก Type หรือ Filter",
+            "เปลี่ยน Sort เมื่อจำเป็น",
+            "ตรวจ Thumbnail ที่ตรง",
+            "Clear Search และ Filter หากไม่พบผลที่คาดไว้",
+          ],
+        },
+      },
+
+      {
+        id: "media-card-actions",
+
+        title: {
+          en: "7. Media cards and actions",
+          th: "7. Media Card และ Action",
+        },
+
+        paragraphs: {
+          en: [
+            "A Media card provides a visual preview and access to supported actions. Verify the thumbnail and identity before opening an action.",
+            "Similar images may have different crops, ownership or usage. Do not identify an asset by thumbnail alone.",
+          ],
+
+          th: [
+            "Media card แสดง Preview และ Action ที่รองรับ ต้องตรวจ Thumbnail และข้อมูลระบุตัวตนก่อนใช้คำสั่ง",
+            "รูปที่คล้ายกันอาจมี Crop, Ownership หรือ Usage ต่างกัน ไม่ควรตรวจจาก Thumbnail อย่างเดียว",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-media-card-actions",
+            number: "7",
+            src: "/docs/assets/media-library/media-card-actions.png",
+
+            title: {
+              en: "Media card actions",
+              th: "คำสั่งของ Media Card",
+            },
+
+            alt: {
+              en: "Media card showing preview and available management actions",
+              th: "Media card แสดง Preview และคำสั่งจัดการ",
+            },
+
+            caption: {
+              en: "Open Media Detail before changing or deleting an uncertain asset.",
+              th: "เปิด Media Detail ก่อนแก้หรือลบ Asset ที่ยังไม่แน่ใจ",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Preview: visually identify the asset.",
+            "Details: inspect dimensions, size and metadata.",
+            "Edit: update supported descriptive information.",
+            "Crop: prepare a supported visual crop.",
+            "Delete: begin the protected removal workflow.",
+          ],
+
+          th: [
+            "Preview: ตรวจรูป",
+            "Details: ตรวจ Dimension, Size และ Metadata",
+            "Edit: แก้ข้อมูลคำอธิบายที่รองรับ",
+            "Crop: เตรียม Visual crop",
+            "Delete: เริ่ม Removal workflow",
+          ],
+        },
+      },
+
+      {
+        id: "media-detail",
+
+        title: {
+          en: "8. Media Detail",
+          th: "8. Media Detail",
+        },
+
+        paragraphs: {
+          en: [
+            "Media Detail displays technical and descriptive information used to identify and manage an asset.",
+            "Review dimensions and file size when investigating image quality or loading performance.",
+            "Use meaningful alternative text. A filename is normally not an appropriate public description.",
+          ],
+
+          th: [
+            "Media Detail แสดงข้อมูลทางเทคนิคและคำอธิบายสำหรับระบุและจัดการ Asset",
+            "ตรวจ Dimension และ File size เมื่อวิเคราะห์คุณภาพหรือ Performance",
+            "ใช้ Alternative text ที่มีความหมาย โดยทั่วไป Filename ไม่เหมาะเป็นคำอธิบาย Public",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-media-detail",
+            number: "8",
+            src: "/docs/assets/media-library/media-detail.png",
+
+            title: {
+              en: "Media Detail",
+              th: "รายละเอียด Media",
+            },
+
+            alt: {
+              en: "Media Detail drawer showing asset preview dimensions file size and metadata",
+              th: "Media Detail drawer แสดง Preview, Dimension, File size และ Metadata",
+            },
+
+            caption: {
+              en: "Inspect technical and descriptive information before reusing, editing or deleting an asset.",
+              th: "ตรวจข้อมูลทางเทคนิคและคำอธิบายก่อนใช้ซ้ำ แก้ หรือลบ Asset",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Filename identifies the uploaded file.",
+            "Dimensions show image width and height.",
+            "File size helps evaluate transfer and storage cost.",
+            "MIME type identifies the stored media format.",
+            "Alternative text describes meaningful visual content.",
+            "Created and updated information supports operational review.",
+          ],
+
+          th: [
+            "Filename ระบุไฟล์ที่ Upload",
+            "Dimensions แสดงความกว้างและสูง",
+            "File size ใช้ประเมิน Transfer และ Storage",
+            "MIME type ระบุ Format",
+            "Alternative text อธิบายความหมายของภาพ",
+            "Created และ Updated information ช่วยตรวจสอบการทำงาน",
+          ],
+        },
+      },
+
+      {
+        id: "image-variants",
+
+        title: {
+          en: "9. Image variants",
+          th: "9. Image Variant",
+        },
+
+        paragraphs: {
+          en: [
+            "The media service can provide image variants appropriate for different public contexts. Public components should request a suitable variant rather than loading the largest file everywhere.",
+            "Current server processing uses different quality settings for Thumbnail, Medium and Large output, while the managed source remains available for appropriate workflows.",
+            "Variant generation improves delivery but cannot restore detail missing from a low-quality source.",
+          ],
+
+          th: [
+            "Media service สามารถส่ง Image variant ให้เหมาะกับแต่ละบริบท หน้า Public ควรเรียก Variant ที่เหมาะสมแทนการโหลดไฟล์ใหญ่ที่สุดทุกตำแหน่ง",
+            "Server processing ปัจจุบันใช้ Quality ต่างกันสำหรับ Thumbnail, Medium และ Large ส่วน Managed source ยังคงใช้ใน Workflow ที่เหมาะสม",
+            "Variant ช่วยการส่งรูป แต่ไม่สามารถสร้างรายละเอียดที่หายจาก Source คุณภาพต่ำกลับมาได้",
+          ],
+        },
+
+        items: {
+          en: [
+            "Thumbnail: small previews and selection lists; current quality approximately 72.",
+            "Medium: normal cards and suitable content presentation; current quality approximately 78.",
+            "Large: larger public presentation; current quality approximately 80.",
+            "Original or managed source: use only where the full managed asset is required.",
+            "Choose variants through application components rather than constructing storage URLs manually.",
+          ],
+
+          th: [
+            "Thumbnail: Preview ขนาดเล็กและ Selection list; Quality ปัจจุบันประมาณ 72",
+            "Medium: Card และ Content ทั่วไป; Quality ปัจจุบันประมาณ 78",
+            "Large: การแสดงผล Public ขนาดใหญ่; Quality ปัจจุบันประมาณ 80",
+            "Original หรือ Managed source: ใช้เมื่อ Workflow ต้องการ Asset เต็ม",
+            "ให้ Component เลือก Variant ไม่ควรประกอบ Storage URL เอง",
+          ],
+        },
+      },
+
+      {
+        id: "crop-media",
+
+        title: {
+          en: "10. Crop an image",
+          th: "10. Crop รูป",
+        },
+
+        paragraphs: {
+          en: [
+            "Use Crop when the image composition must fit a supported display ratio. Cropping removes visible edge areas from the selected composition.",
+            "Keep important subjects, architecture and required attribution inside the safe area.",
+            "Review the resulting use in its destination editor because a crop that looks correct in the dialog may appear differently in a card or responsive layout.",
+          ],
+
+          th: [
+            "ใช้ Crop เมื่อ Composition ต้องตรงกับ Ratio ที่รองรับ การ Crop จะตัดพื้นที่ขอบออกจากภาพที่แสดง",
+            "เก็บ Subject, Architecture และ Attribution ที่บังคับให้อยู่ใน Safe area",
+            "ตรวจผลใน Editor ปลายทาง เพราะ Crop ที่ดูถูกต้องใน Dialog อาจแสดงต่างกันใน Card หรือ Responsive layout",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-media-crop",
+            number: "9",
+            src: "/docs/assets/media-library/media-crop.png",
+
+            title: {
+              en: "Image Crop",
+              th: "Crop รูป",
+            },
+
+            alt: {
+              en: "Image Crop dialog showing crop area and controls",
+              th: "Image Crop dialog แสดงพื้นที่และเครื่องมือ Crop",
+            },
+
+            caption: {
+              en: "Keep important visual information inside the selected safe area.",
+              th: "เก็บข้อมูลสำคัญของภาพไว้ใน Safe area",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Open the correct asset.",
+            "Select Crop.",
+            "Choose the supported ratio when available.",
+            "Move and scale the image carefully.",
+            "Check important edges and subjects.",
+            "Confirm the crop.",
+            "Review the destination content on desktop and mobile.",
+          ],
+
+          th: [
+            "เปิด Asset ที่ถูกต้อง",
+            "เลือก Crop",
+            "เลือก Ratio เมื่อมี",
+            "เลื่อนและ Scale รูป",
+            "ตรวจขอบและ Subject สำคัญ",
+            "ยืนยัน Crop",
+            "ตรวจ Content ปลายทางบน Desktop และ Mobile",
+          ],
+        },
+      },
+
+      {
+        id: "delete-media",
+
+        title: {
+          en: "11. Delete media safely",
+          th: "11. Delete Media อย่างปลอดภัย",
+        },
+
+        paragraphs: {
+          en: [
+            "Deleting an asset can break covers, galleries, slideshows, SEO images or other content that still references it.",
+            "Before confirming deletion, inspect the asset carefully and verify whether it is still used.",
+            "When usage cannot be confirmed, replace references first or ask the responsible administrator.",
+          ],
+
+          th: [
+            "การ Delete Asset อาจทำให้ Cover, Gallery, Slideshow, SEO image หรือ Content ที่อ้างอิงอยู่แสดงผิด",
+            "ก่อนยืนยัน ต้องตรวจ Asset และตรวจว่ายังถูกใช้งานหรือไม่",
+            "หากยืนยัน Usage ไม่ได้ ให้เปลี่ยน Reference ก่อนหรือสอบถามผู้ดูแล",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-media-delete",
+            number: "10",
+            src: "/docs/assets/media-library/media-delete.png",
+
+            title: {
+              en: "Delete media confirmation",
+              th: "ยืนยัน Delete Media",
+            },
+
+            alt: {
+              en: "Media deletion confirmation dialog",
+              th: "Dialog ยืนยัน Delete Media",
+            },
+
+            caption: {
+              en: "Confirm the exact asset and its usage before deletion.",
+              th: "ยืนยัน Asset และ Usage ก่อน Delete",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Open Media Detail.",
+            "Verify filename, dimensions and preview.",
+            "Check known content references.",
+            "Replace active references when necessary.",
+            "Confirm that deletion is authorized.",
+            "Open Delete.",
+            "Read the warning and confirm the exact asset.",
+            "Verify affected public pages after removal.",
+          ],
+
+          th: [
+            "เปิด Media Detail",
+            "ตรวจ Filename, Dimension และ Preview",
+            "ตรวจ Content reference",
+            "เปลี่ยน Active reference เมื่อจำเป็น",
+            "ยืนยันว่าได้รับอนุมัติให้ลบ",
+            "เปิด Delete",
+            "อ่านคำเตือนและยืนยัน Asset",
+            "ตรวจ Public page ที่เกี่ยวข้องหลังลบ",
+          ],
+        },
+      },
+
+      {
+        id: "media-rights",
+
+        title: {
+          en: "12. Copyright, privacy and sensitive images",
+          th: "12. ลิขสิทธิ์ Privacy และรูปสำคัญ",
+        },
+
+        paragraphs: {
+          en: [
+            "Media must be reviewed for copyright, consent and confidentiality before upload and again before publication.",
+            "Architecture and interior images may reveal occupants, client possessions, security systems, addresses or private areas.",
+            "Do not remove watermarks, alter copyright notices or transform another party's work to make it appear company-owned.",
+          ],
+
+          th: [
+            "Media ต้องผ่านการตรวจลิขสิทธิ์ Consent และ Confidentiality ก่อน Upload และก่อน Publish",
+            "ภาพ Architecture และ Interior อาจเปิดเผยผู้อยู่อาศัย ทรัพย์สินลูกค้า Security system, Address หรือพื้นที่ส่วนตัว",
+            "ห้ามลบ Watermark แก้ Copyright notice หรือดัดแปลงผลงานผู้อื่นให้ดูเหมือนบริษัทเป็นเจ้าของ",
+          ],
+        },
+
+        items: {
+          en: [
+            "Confirm the copyright owner.",
+            "Confirm client and subject permission.",
+            "Remove location and device metadata when required.",
+            "Check the image for personal or confidential information.",
+            "Preserve required attribution.",
+            "Retain permission evidence according to company procedure.",
+            "Do not upload when rights cannot be verified.",
+          ],
+
+          th: [
+            "ตรวจเจ้าของลิขสิทธิ์",
+            "ตรวจ Permission จากลูกค้าและบุคคลในภาพ",
+            "นำ Location และ Device metadata ออกเมื่อจำเป็น",
+            "ตรวจ Personal หรือ Confidential information ในภาพ",
+            "เก็บ Attribution ที่บังคับ",
+            "เก็บหลักฐาน Permission ตามขั้นตอนบริษัท",
+            "ไม่ Upload หากตรวจสิทธิ์ไม่ได้",
+          ],
+        },
+      },
+
+      {
+        id: "media-library-mobile",
+
+        title: {
+          en: "13. Media Library on mobile",
+          th: "13. Media Library บนมือถือ",
+        },
+
+        paragraphs: {
+          en: [
+            "On mobile, media cards and controls are arranged for a narrow viewport. Search, inspect and select assets carefully.",
+            "Batch uploads, detailed cropping and comparison of similar images are generally easier on desktop.",
+            "Do not close the mobile browser or allow it to suspend while an upload is running.",
+          ],
+
+          th: [
+            "บน Mobile, Media card และ Control จะจัดสำหรับ Viewport แคบ ต้อง Search, ตรวจ และเลือก Asset อย่างระมัดระวัง",
+            "Batch upload, Crop แบบละเอียด และเปรียบเทียบรูปคล้ายกันมักง่ายกว่าบน Desktop",
+            "ไม่ปิด Browser หรือปล่อยให้ระบบพักหน้าขณะ Upload",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-media-library-mobile",
+            number: "11",
+            src: "/docs/assets/media-library/media-library-mobile.png",
+
+            title: {
+              en: "Responsive Media Library",
+              th: "Media Library แบบ Responsive",
+            },
+
+            alt: {
+              en: "Junsekino CMS Media Library arranged for a mobile screen",
+              th: "Media Library ที่จัดเรียงสำหรับ Mobile",
+            },
+
+            caption: {
+              en: "Media cards stack for mobile use while retaining the same company and permission rules.",
+              th: "Media card เรียงสำหรับ Mobile โดยยังใช้ Company และ Permission rule เดิม",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Confirm the active company.",
+            "Use Search to reduce the visible list.",
+            "Open Detail before selecting similar images.",
+            "characters",
+            "Avoid large batch uploads over an unstable connection.",
+            "Keep the browser active until uploads finish.",
+            "Use desktop for precise cropping when practical.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัท",
+            "ใช้ Search ลดจำนวนรายการ",
+            "เปิด Detail ก่อนเลือกรูปที่คล้ายกัน",
+            "หลีกเลี่ยง Batch ใหญ่เมื่อ Internet ไม่เสถียร",
+            "เปิด Browser ค้างไว้จน Upload เสร็จ",
+            "ใช้ Desktop สำหรับ Crop แบบละเอียด",
+          ],
+        },
+      },
+
+      {
+        id: "media-troubleshooting",
+
+        title: {
+          en: "14. Common Media problems",
+          th: "14. ปัญหาที่พบบ่อย",
+        },
+
+        paragraphs: {
+          en: [
+            "When an asset cannot be uploaded, found or displayed, identify whether the issue concerns company selection, file validation, optimization, transfer, processing, reference or public delivery.",
+          ],
+
+          th: [
+            "เมื่อ Upload, ค้นหา หรือแสดง Asset ไม่ได้ ให้แยกสาเหตุจาก Company, File validation, Optimization, Transfer, Processing, Reference หรือ Public delivery",
+          ],
+        },
+
+        items: {
+          en: [
+            "File rejected: review supported type and displayed size limits.",
+            "Optimization fails: verify that the source file is a valid image.",
+            "Upload appears stuck: wait, check connection and avoid duplicate submission.",
+            "Only one file appears complete: inspect every item in the batch.",
+            "Asset not found: clear filters and verify the active company.",
+            "Image appears slowly: use an appropriate source size and public variant.",
+            "Wrong crop: reopen the source and prepare a suitable composition.",
+            "Image missing publicly: verify the content's Media reference.",
+            "Delete blocked or unsafe: inspect usage before retrying.",
+            "Action denied: review membership and Media permissions.",
+          ],
+
+          th: [
+            "File rejected: ตรวจ Type และ Size limit",
+            "Optimize ไม่สำเร็จ: ตรวจว่า Source เป็นรูปที่ถูกต้อง",
+            "Upload ค้าง: รอ ตรวจ Internet และไม่กดส่งซ้ำ",
+            "เห็นเพียงไฟล์แรกเสร็จ: ตรวจทุก Item ใน Batch",
+            "ไม่พบ Asset: Clear filter และตรวจบริษัท",
+            "รูปโหลดช้า: ใช้ Source size และ Public variant ที่เหมาะสม",
+            "Crop ผิด: เปิด Source และเตรียม Composition ใหม่",
+            "Public ไม่แสดงรูป: ตรวจ Media reference ของ Content",
+            "Delete ไม่ปลอดภัย: ตรวจ Usage ก่อนลองใหม่",
+            "ไม่มีสิทธิ์: ตรวจ Membership และ Media permission",
+          ],
+        },
+      },
+
+      {
+        id: "media-checklist",
+
+        title: {
+          en: "15. Media checklist",
+          th: "15. Checklist Media",
+        },
+
+        paragraphs: {
+          en: [
+            "Use this checklist before uploading, selecting or deleting production media.",
+          ],
+
+          th: [
+            "ใช้ Checklist นี้ก่อน Upload, Select หรือ Delete Production media",
+          ],
+        },
+
+        items: {
+          en: [
+            "The correct company is selected.",
+            "The company owns or is authorized to use the file.",
+            "The image contains no unauthorized personal or confidential information.",
+            "The source dimensions and file size are appropriate.",
+            "TheThe filename is meaningful and does not expose private information.",
+            "Every batch item has finished processing.",
+            "Failed files are retried without duplicating successful files.",
+            "The correct asset is selected in the destination editor.",
+            "Alternative text is meaningful and localized when required.",
+            "The appropriate public variant is used.",
+            "Crop and responsive presentation have been reviewed.",
+            "Asset usage is checked before deletion.",
+            "Affected public pages are verified after a media change.",
+          ],
+
+          th: [
+            "เลือกบริษัทถูกต้อง",
+            "บริษัทเป็นเจ้าของหรือมีสิทธิ์ใช้ไฟล์",
+            "รูปไม่มี Personal หรือ Confidential information ที่ไม่ได้รับอนุญาต",
+            "Dimension และ File size เหมาะสม",
+            "Filename มีความหมายและไม่เปิดเผยข้อมูลส่วนตัว",
+            "ทุก Item ใน Batch ประมวลผลเสร็จ",
+            "ลองใหม่เฉพาะ Failed file โดยไม่สร้างไฟล์สำเร็จซ้ำ",
+            "เลือก Asset ถูกต้องใน Editor ปลายทาง",
+            "Alternative text มีความหมายและแยกภาษาเมื่อจำเป็น",
+            "ใช้ Public variant ที่เหมาะสม",
+            "ตรวจ Crop และ Responsive",
+            "ตรวจ Usage ก่อน Delete",
+            "ตรวจ Public page หลังเปลี่ยน Media",
+          ],
+        },
+      },
+    ],
+  },
+  "assets/image-guidelines": {
+    eyebrow: {
+      en: "MEDIA AND ASSETS",
+      th: "สื่อและไฟล์",
+    },
+
+    title: {
+      en: "Image Guidelines",
+      th: "คำแนะนำการเตรียมรูปภาพ",
+    },
+
+    description: {
+      en: "Prepare images with suitable dimensions, file sizes, formats, and usage rights before uploading them to the CMS.",
+      th: "เตรียมรูปภาพให้มีขนาดไฟล์ มิติ อัตราส่วน รูปแบบไฟล์ และสิทธิ์การใช้งานที่เหมาะสมก่อนอัปโหลดเข้าสู่ CMS",
+    },
+
+    introduction: {
+      en: [
+        "Correctly prepared images help the public website load faster, remain visually consistent, and display clearly across desktop, tablet, and mobile devices.",
+        "The CMS optimizes uploaded images and generates multiple variants for different display sizes. However, preparing the source image correctly remains important because unnecessarily large files take longer to upload and process.",
+        "This guide provides practical recommendations. Exact dimensions are not mandatory unless a particular design requires them, but using the recommended aspect ratio prevents unexpected cropping.",
+      ],
+
+      th: [
+        "การเตรียมรูปภาพอย่างเหมาะสมช่วยให้เว็บไซต์สาธารณะโหลดเร็วขึ้น มีรูปแบบสม่ำเสมอ และแสดงผลได้ชัดเจนทั้งบนคอมพิวเตอร์ แท็บเล็ต และโทรศัพท์มือถือ",
+        "CMS จะปรับแต่งรูปที่อัปโหลดและสร้างรูปหลายขนาดสำหรับตำแหน่งแสดงผลต่าง ๆ แต่การเตรียมไฟล์ต้นฉบับให้เหมาะสมยังคงสำคัญ เพราะไฟล์ที่ใหญ่เกินความจำเป็นจะใช้เวลาอัปโหลดและประมวลผลนานขึ้น",
+        "ขนาดในคู่มือนี้เป็นคำแนะนำสำหรับการใช้งานทั่วไป ไม่จำเป็นต้องตรงทุกพิกเซล เว้นแต่การออกแบบกำหนดไว้โดยเฉพาะ แต่ควรรักษาอัตราส่วนภาพตามที่แนะนำเพื่อป้องกันการตัดภาพผิดตำแหน่ง",
+      ],
+    },
+
+    highlights: [
+      {
+        title: {
+          en: "Use the correct aspect ratio",
+          th: "ใช้อัตราส่วนภาพให้ถูกต้อง",
+        },
+
+        description: {
+          en: "The correct ratio reduces unwanted cropping and keeps layouts consistent.",
+          th: "อัตราส่วนที่ถูกต้องช่วยลดการตัดส่วนสำคัญของภาพและทำให้หน้าตาเว็บไซต์สม่ำเสมอ",
+        },
+      },
+
+      {
+        title: {
+          en: "Keep files reasonably small",
+          th: "ควบคุมขนาดไฟล์ให้เหมาะสม",
+        },
+
+        description: {
+          en: "Most website images should be between 1 MB and 3 MB before uploading.",
+          th: "รูปภาพสำหรับเว็บไซต์ส่วนใหญ่ควรมีขนาดประมาณ 1–3 MB ก่อนอัปโหลด",
+        },
+      },
+
+      {
+        title: {
+          en: "Use only authorized images",
+          th: "ใช้เฉพาะรูปที่ได้รับอนุญาต",
+        },
+
+        description: {
+          en: "Upload only company-owned images or files that the company has permission to publish.",
+          th: "อัปโหลดเฉพาะรูปที่บริษัทเป็นเจ้าของหรือได้รับสิทธิ์ให้นำมาเผยแพร่เท่านั้น",
+        },
+      },
+    ],
+
+    sections: [
+      {
+        id: "recommended-sizes",
+
+        title: {
+          en: "Recommended image sizes",
+          th: "ขนาดรูปภาพที่แนะนำ",
+        },
+
+        paragraphs: {
+          en: [
+            "Use the following dimensions as a practical starting point. Images can be larger when a high-resolution archive is required, but the file uploaded for website use should remain optimized.",
+            "The long edge means the longest side of the image. For example, a portrait image may be 1333 × 2000 pixels while a landscape image may be 2000 × 1333 pixels.",
+          ],
+
+          th: [
+            "ใช้ขนาดต่อไปนี้เป็นแนวทางเริ่มต้น รูปต้นฉบับสามารถมีขนาดใหญ่กว่านี้ได้หากบริษัทต้องเก็บไฟล์ความละเอียดสูง แต่ไฟล์ที่นำมาใช้บนเว็บไซต์ควรผ่านการลดขนาดอย่างเหมาะสม",
+            "ด้านยาวหมายถึงด้านที่มีความยาวมากที่สุดของรูป เช่น รูปแนวตั้งอาจมีขนาด 1333 × 2000 พิกเซล ส่วนรูปแนวนอนอาจมีขนาด 2000 × 1333 พิกเซล",
+          ],
+        },
+
+        tables: [
+          {
+            id: "recommended-image-dimensions",
+
+            title: {
+              en: "Image recommendation table",
+              th: "ตารางแนะนำขนาดรูปภาพ",
+            },
+
+            description: {
+              en: "The maximum file size is a recommended target before uploading, not a reason to reduce visible image quality excessively.",
+              th: "ขนาดไฟล์สูงสุดเป็นเป้าหมายที่แนะนำก่อนอัปโหลด ไม่ควรลดคุณภาพของรูปจนเห็นความเสียหายอย่างชัดเจน",
+            },
+
+            columns: [
+              {
+                id: "usage",
+
+                label: {
+                  en: "Usage",
+                  th: "ตำแหน่งใช้งาน",
+                },
+              },
+
+              {
+                id: "dimensions",
+
+                label: {
+                  en: "Recommended size",
+                  th: "ขนาดที่แนะนำ",
+                },
+              },
+
+              {
+                id: "ratio",
+
+                label: {
+                  en: "Aspect ratio",
+                  th: "อัตราส่วน",
+                },
+              },
+
+              {
+                id: "fileSize",
+
+                label: {
+                  en: "Target file size",
+                  th: "ขนาดไฟล์เป้าหมาย",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "home-slideshow",
+
+                usage: {
+                  en: "Home slideshow",
+                  th: "สไลด์หน้าแรก",
+                },
+
+                dimensions: "2000 × 1125 px",
+
+                ratio: "16:9",
+
+                fileSize: "≤ 3 MB",
+              },
+
+              {
+                id: "project-cover",
+
+                usage: {
+                  en: "Project cover",
+                  th: "รูปหน้าปกโครงการ",
+                },
+
+                dimensions: "2000 × 1125 px",
+
+                ratio: "16:9",
+
+                fileSize: "≤ 3 MB",
+              },
+
+              {
+                id: "project-gallery",
+
+                usage: {
+                  en: "Project gallery",
+                  th: "แกลเลอรีโครงการ",
+                },
+
+                dimensions: {
+                  en: "2000 px on the long edge",
+                  th: "ด้านยาว 2000 px",
+                },
+
+                ratio: {
+                  en: "Original ratio",
+                  th: "ตามอัตราส่วนต้นฉบับ",
+                },
+
+                fileSize: "≤ 3 MB",
+              },
+
+              {
+                id: "about-cover",
+
+                usage: {
+                  en: "About cover",
+                  th: "รูปหน้าปก About",
+                },
+
+                dimensions: "2000 × 1125 px",
+
+                ratio: "16:9",
+
+                fileSize: "≤ 3 MB",
+              },
+
+              {
+                id: "award-cover",
+
+                usage: {
+                  en: "Award cover",
+                  th: "รูปหน้าปกรางวัล",
+                },
+
+                dimensions: "1600 × 1200 px",
+
+                ratio: "4:3",
+
+                fileSize: "≤ 2 MB",
+              },
+
+              {
+                id: "public-content-cover",
+
+                usage: {
+                  en: "Public Content cover",
+                  th: "รูปหน้าปก Public Content",
+                },
+
+                dimensions: "1600 × 900 px",
+
+                ratio: "16:9",
+
+                fileSize: "≤ 2 MB",
+              },
+
+              {
+                id: "company-logo",
+
+                usage: {
+                  en: "Company logo",
+                  th: "โลโก้บริษัท",
+                },
+
+                dimensions: {
+                  en: "800–1200 px wide",
+                  th: "กว้าง 800–1200 px",
+                },
+
+                ratio: {
+                  en: "Original logo ratio",
+                  th: "ตามอัตราส่วนโลโก้",
+                },
+
+                fileSize: "≤ 1 MB",
+              },
+
+              {
+                id: "open-graph",
+
+                usage: {
+                  en: "Social / Open Graph",
+                  th: "Social / Open Graph",
+                },
+
+                dimensions: "1200 × 630 px",
+
+                ratio: "1.91:1",
+
+                fileSize: "≤ 1 MB",
+              },
+            ],
+          },
+        ],
+
+        notes: {
+          en: [
+            "Avoid uploading 18 MB or larger camera files directly when a smaller web-ready copy can be prepared.",
+            "Do not enlarge a small image to the recommended size because enlargement cannot restore missing detail.",
+            "Keep the original high-resolution files in the company archive separately from CMS files.",
+          ],
+
+          th: [
+            "หลีกเลี่ยงการนำไฟล์จากกล้องขนาด 18 MB หรือใหญ่กว่าอัปโหลดโดยตรง หากสามารถเตรียมสำเนาสำหรับเว็บไซต์ให้มีขนาดเล็กลงได้",
+            "ไม่ควรขยายรูปขนาดเล็กให้เท่าขนาดที่แนะนำ เพราะการขยายไม่สามารถสร้างรายละเอียดของภาพที่หายไปกลับมาได้",
+            "ควรจัดเก็บไฟล์ต้นฉบับความละเอียดสูงไว้ในพื้นที่จัดเก็บของบริษัทแยกจากไฟล์ที่ใช้ใน CMS",
+          ],
+        },
+      },
+
+      {
+        id: "aspect-ratio",
+
+        title: {
+          en: "Understand aspect ratios",
+          th: "ทำความเข้าใจอัตราส่วนภาพ",
+        },
+
+        paragraphs: {
+          en: [
+            "An aspect ratio describes the relationship between image width and height. Two images can have different pixel dimensions while sharing the same ratio.",
+            "For example, 2000 × 1125 pixels and 1600 × 900 pixels are both 16:9. They can fit into the same layout shape with less unexpected cropping.",
+          ],
+
+          th: [
+            "อัตราส่วนภาพคือความสัมพันธ์ระหว่างความกว้างและความสูง รูปสองรูปสามารถมีจำนวนพิกเซลต่างกันแต่มีอัตราส่วนเดียวกันได้",
+            "ตัวอย่างเช่น 2000 × 1125 พิกเซล และ 1600 × 900 พิกเซล เป็นอัตราส่วน 16:9 เหมือนกัน จึงสามารถแสดงในพื้นที่รูปทรงเดียวกันโดยมีโอกาสถูกตัดผิดตำแหน่งน้อยลง",
+          ],
+        },
+
+        items: {
+          en: [
+            "16:9 — wide landscape format suitable for slideshows, project covers, and Public Content covers.",
+            "4:3 — balanced landscape format suitable for Award covers and documentary photographs.",
+            "1.91:1 — social sharing format commonly used for Open Graph preview images.",
+            "Original ratio — retains the photographer's intended composition and is suitable for project galleries.",
+          ],
+
+          th: [
+            "16:9 — ภาพแนวนอนแบบกว้าง เหมาะสำหรับสไลด์ รูปหน้าปกโครงการ และหน้าปก Public Content",
+            "4:3 — ภาพแนวนอนที่มีสัดส่วนสมดุล เหมาะสำหรับหน้าปกรางวัลและภาพเชิงสารคดี",
+            "1.91:1 — รูปสำหรับการแชร์บน Social Media และภาพตัวอย่าง Open Graph",
+            "อัตราส่วนต้นฉบับ — รักษาองค์ประกอบภาพตามที่ช่างภาพกำหนด เหมาะสำหรับแกลเลอรีโครงการ",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Important subjects should not be placed too close to the image edges because responsive layouts may crop a small area on some screens.",
+          ],
+
+          th: [
+            "ไม่ควรวางบุคคล อาคาร ข้อความ หรือส่วนสำคัญไว้ชิดขอบรูปมากเกินไป เพราะหน้าจอบางขนาดอาจตัดพื้นที่บริเวณขอบออกเล็กน้อย",
+          ],
+        },
+      },
+
+      {
+        id: "file-format",
+
+        title: {
+          en: "Choose an appropriate file format",
+          th: "เลือกรูปแบบไฟล์ให้เหมาะสม",
+        },
+
+        paragraphs: {
+          en: [
+            "The best format depends on the type of image. The CMS may create optimized WebP variants for public display while preserving the uploaded media record.",
+          ],
+
+          th: [
+            "รูปแบบไฟล์ที่เหมาะสมขึ้นอยู่กับประเภทของภาพ CMS อาจสร้างไฟล์ WebP ที่ผ่านการปรับแต่งสำหรับหน้าเว็บไซต์ โดยยังคงเก็บข้อมูลของสื่อที่อัปโหลดไว้",
+          ],
+        },
+
+        items: {
+          en: [
+            "JPEG or JPG — recommended for photographs, architecture, interiors, landscapes, and images with many colors.",
+            "PNG — recommended for logos, graphics, diagrams, or images that require transparency.",
+            "WebP — suitable for optimized website images and generally provides a smaller file size.",
+            "SVG — use only for trusted vector artwork when the relevant upload field supports it.",
+          ],
+
+          th: [
+            "JPEG หรือ JPG — แนะนำสำหรับภาพถ่าย สถาปัตยกรรม งานตกแต่งภายใน ภูมิทัศน์ และรูปที่มีสีจำนวนมาก",
+            "PNG — แนะนำสำหรับโลโก้ กราฟิก แผนภาพ หรือรูปที่ต้องใช้พื้นหลังโปร่งใส",
+            "WebP — เหมาะสำหรับรูปที่ปรับแต่งเพื่อใช้งานบนเว็บไซต์และมักมีขนาดไฟล์เล็กกว่า",
+            "SVG — ใช้เฉพาะไฟล์เวกเตอร์จากแหล่งที่เชื่อถือได้ และเฉพาะช่องอัปโหลดที่รองรับเท่านั้น",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Do not rename a file extension to another format. Convert or export the image correctly using image-editing software.",
+            "Avoid animated or unusual file formats unless the page and CMS field explicitly support them.",
+          ],
+
+          th: [
+            "ห้ามเปลี่ยนนามสกุลไฟล์ด้วยการแก้ชื่อเพียงอย่างเดียว ควรแปลงหรือ Export รูปผ่านโปรแกรมจัดการรูปภาพอย่างถูกต้อง",
+            "หลีกเลี่ยงไฟล์ภาพเคลื่อนไหวหรือรูปแบบไฟล์พิเศษ หากหน้าและช่องอัปโหลดนั้นไม่ได้ระบุว่ารองรับ",
+          ],
+        },
+      },
+
+      {
+        id: "prepare-image",
+
+        title: {
+          en: "Prepare an image before uploading",
+          th: "ขั้นตอนเตรียมรูปก่อนอัปโหลด",
+        },
+
+        paragraphs: {
+          en: [
+            "Prepare a web-ready copy instead of modifying the only original image. This protects the company archive and allows the source file to be reused later.",
+          ],
+
+          th: [
+            "ควรสร้างสำเนาสำหรับเว็บไซต์แทนการแก้ไขไฟล์ต้นฉบับเพียงไฟล์เดียว เพื่อรักษาคลังภาพของบริษัทและสามารถนำไฟล์ต้นฉบับกลับมาใช้ในอนาคตได้",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Select the final approved photograph or artwork from the company archive.",
+            "Create a copy for website use and keep the original file unchanged.",
+            "Crop the copy to the recommended aspect ratio for its intended placement.",
+            "Resize the image to the recommended dimensions or long-edge length.",
+            "Export photographs as high-quality JPEG or WebP, and use PNG when transparency is required.",
+            "Check that the exported file meets the target file size without visible quality loss.",
+            "Give the file a meaningful name before uploading it to Media Library.",
+            "Open the exported image and inspect important details before uploading.",
+          ],
+
+          th: [
+            "เลือกรูปถ่ายหรือ Artwork ฉบับที่ผ่านการอนุมัติจากคลังภาพของบริษัท",
+            "สร้างสำเนาสำหรับเว็บไซต์และเก็บไฟล์ต้นฉบับไว้โดยไม่แก้ไข",
+            "Crop สำเนาให้ตรงกับอัตราส่วนที่แนะนำสำหรับตำแหน่งที่จะนำไปใช้",
+            "Resize รูปให้มีมิติหรือความยาวด้านยาวตามคำแนะนำ",
+            "Export ภาพถ่ายเป็น JPEG หรือ WebP คุณภาพสูง และใช้ PNG เมื่อต้องการพื้นหลังโปร่งใส",
+            "ตรวจสอบว่าไฟล์ที่ Export มีขนาดตามเป้าหมายโดยไม่เห็นความเสียหายของภาพอย่างชัดเจน",
+            "ตั้งชื่อไฟล์ให้สื่อความหมายก่อนนำเข้าสู่ Media Library",
+            "เปิดไฟล์ที่ Export แล้วตรวจสอบรายละเอียดสำคัญก่อนอัปโหลด",
+          ],
+        },
+      },
+
+      {
+        id: "file-naming",
+
+        title: {
+          en: "Name files clearly",
+          th: "ตั้งชื่อไฟล์ให้ชัดเจน",
+        },
+
+        paragraphs: {
+          en: [
+            "A meaningful filename makes Media Library search easier and helps other users understand an image without opening every file.",
+          ],
+
+          th: [
+            "ชื่อไฟล์ที่สื่อความหมายช่วยให้ค้นหาใน Media Library ได้ง่าย และทำให้ผู้ใช้อื่นเข้าใจรูปโดยไม่ต้องเปิดดูทุกไฟล์",
+          ],
+        },
+
+        items: {
+          en: [
+            "Use short descriptive English words separated by hyphens.",
+            "Include a project name, location, view, or year when useful.",
+            "Use consistent terms across photographs from the same project.",
+            "Example: t-n-house-living-room-01.jpg",
+            "Example: junsekino-id-logo-red.png",
+            "Example: architecture-award-2026-cover.jpg",
+          ],
+
+          th: [
+            "ใช้คำภาษาอังกฤษสั้น ๆ ที่อธิบายรูปและคั่นแต่ละคำด้วยเครื่องหมายขีดกลาง",
+            "ระบุชื่อโครงการ สถานที่ มุมภาพ หรือปี เมื่อข้อมูลดังกล่าวช่วยในการค้นหา",
+            "ใช้รูปแบบคำที่สม่ำเสมอกันสำหรับรูปจากโครงการเดียวกัน",
+            "ตัวอย่าง: t-n-house-living-room-01.jpg",
+            "ตัวอย่าง: junsekino-id-logo-red.png",
+            "ตัวอย่าง: architecture-award-2026-cover.jpg",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Do not include customer phone numbers, email addresses, identification numbers, passwords, or other confidential information in filenames.",
+            "Avoid names such as IMG_001, final-final, new-image, or untitled when a meaningful name can be provided.",
+          ],
+
+          th: [
+            "ห้ามใส่เบอร์โทรศัพท์ อีเมล เลขประจำตัว รหัสผ่าน หรือข้อมูลลับของลูกค้าไว้ในชื่อไฟล์",
+            "หลีกเลี่ยงชื่ออย่าง IMG_001, final-final, new-image หรือ untitled หากสามารถตั้งชื่อที่สื่อความหมายได้",
+          ],
+        },
+      },
+
+      {
+        id: "quality-check",
+
+        title: {
+          en: "Check image quality",
+          th: "ตรวจสอบคุณภาพของรูป",
+        },
+
+        paragraphs: {
+          en: [
+            "Always inspect the image at normal size after resizing or compression. File size should be reduced without making the website appear unprofessional.",
+          ],
+
+          th: [
+            "ตรวจสอบรูปในขนาดปกติทุกครั้งหลัง Resize หรือบีบอัด เป้าหมายคือการลดขนาดไฟล์โดยไม่ทำให้เว็บไซต์ดูไม่มีคุณภาพ",
+          ],
+        },
+
+        items: {
+          en: [
+            "The image is sharp enough for its intended display size.",
+            "Straight architectural lines do not appear accidentally distorted.",
+            "Brightness, contrast, and color are suitable for publication.",
+            "No important subject has been cropped out.",
+            "Compression does not create visible blocks, color bands, or blurred details.",
+            "Logos and text remain readable.",
+            "The image orientation is correct.",
+          ],
+
+          th: [
+            "รูปมีความคมชัดเพียงพอกับขนาดที่จะแสดงผล",
+            "เส้นของอาคารไม่บิดเบี้ยวโดยไม่ได้ตั้งใจ",
+            "ความสว่าง ความคมชัด และสีเหมาะสมสำหรับการเผยแพร่",
+            "ส่วนสำคัญของภาพไม่ถูกตัดออก",
+            "การบีบอัดไม่ทำให้เกิดภาพแตก แถบสี หรือรายละเอียดเบลออย่างชัดเจน",
+            "โลโก้และข้อความภายในรูปยังอ่านได้",
+            "ทิศทางของรูปถูกต้องและไม่หมุนผิดด้าน",
+          ],
+        },
+      },
+
+      {
+        id: "copyright-privacy",
+
+        title: {
+          en: "Copyright, permission, and privacy",
+          th: "ลิขสิทธิ์ การอนุญาต และความเป็นส่วนตัว",
+        },
+
+        paragraphs: {
+          en: [
+            "Uploading an image to the CMS does not create permission to use it. The company must already own the image or have appropriate authorization from the copyright owner.",
+            "Architecture and interior photographs may also contain people, artwork, furniture, logos, documents, computer screens, addresses, or private areas. Review every image before publication.",
+          ],
+
+          th: [
+            "การอัปโหลดรูปเข้าสู่ CMS ไม่ได้ทำให้บริษัทได้รับสิทธิ์ใช้งานรูปโดยอัตโนมัติ บริษัทต้องเป็นเจ้าของรูปหรือได้รับอนุญาตอย่างเหมาะสมจากเจ้าของลิขสิทธิ์ก่อน",
+            "ภาพสถาปัตยกรรมและงานตกแต่งภายในอาจมีบุคคล งานศิลปะ เฟอร์นิเจอร์ โลโก้ เอกสาร หน้าจอคอมพิวเตอร์ ที่อยู่ หรือพื้นที่ส่วนตัวอยู่ภายในภาพ จึงต้องตรวจสอบทุกรูปก่อนเผยแพร่",
+          ],
+        },
+
+        items: {
+          en: [
+            "Use company-owned photographs or images covered by a valid written license or permission.",
+            "Confirm whether photographer credit is required and display it where appropriate.",
+            "Obtain required approval before publishing identifiable people or private property.",
+            "Remove or blur confidential documents, access codes, security systems, license plates, and personal information.",
+            "Do not copy images from another website, social account, publication, search engine, or competitor without permission.",
+            "Do not crop, recolor, retouch, remove watermarks, or otherwise modify another party's copyrighted work to make it appear original.",
+            "Keep evidence of licenses, permissions, model releases, and photographer agreements in the company records.",
+          ],
+
+          th: [
+            "ใช้รูปที่บริษัทเป็นเจ้าของหรือมีใบอนุญาตหรือหนังสือยินยอมที่ยังมีผล",
+            "ตรวจสอบว่าต้องระบุเครดิตช่างภาพหรือไม่ และแสดงเครดิตในตำแหน่งที่เหมาะสม",
+            "ขออนุญาตที่จำเป็นก่อนเผยแพร่ภาพบุคคลที่สามารถระบุตัวตนได้หรือทรัพย์สินส่วนบุคคล",
+            "ลบหรือเบลอเอกสารลับ รหัสผ่าน ระบบรักษาความปลอดภัย ป้ายทะเบียนรถ และข้อมูลส่วนบุคคล",
+            "ห้ามคัดลอกรูปจากเว็บไซต์ Social Media สิ่งพิมพ์ Search Engine หรือคู่แข่งมาใช้โดยไม่ได้รับอนุญาต",
+            "ห้าม Crop เปลี่ยนสี Retouch ลบลายน้ำ หรือดัดแปลงผลงานที่มีลิขสิทธิ์ของผู้อื่นเพื่อทำให้ดูเหมือนเป็นผลงานใหม่",
+            "จัดเก็บหลักฐานใบอนุญาต หนังสือยินยอม Model Release และข้อตกลงกับช่างภาพไว้ในเอกสารของบริษัท",
+          ],
+        },
+
+        notes: {
+          en: [
+            "If ownership or permission cannot be confirmed, do not upload or publish the image.",
+            "When uncertain, ask an authorized manager or legal adviser before publication.",
+          ],
+
+          th: [
+            "หากไม่สามารถยืนยันเจ้าของหรือสิทธิ์การใช้งานได้ ห้ามอัปโหลดหรือเผยแพร่รูปนั้น",
+            "หากไม่แน่ใจ ควรสอบถามผู้จัดการที่มีอำนาจหรือที่ปรึกษากฎหมายก่อนเผยแพร่",
+          ],
+        },
+      },
+
+      {
+        id: "upload-checklist",
+
+        title: {
+          en: "Checklist before upload",
+          th: "รายการตรวจสอบก่อนอัปโหลด",
+        },
+
+        paragraphs: {
+          en: [
+            "Complete this checklist before adding an image to Media Library.",
+          ],
+
+          th: ["ตรวจสอบรายการต่อไปนี้ก่อนเพิ่มรูปเข้าสู่ Media Library"],
+        },
+
+        items: {
+          en: [
+            "The image is approved for publication.",
+            "Copyright ownership or permission has been confirmed.",
+            "People and private property have the necessary consent.",
+            "Confidential and personal information is not visible.",
+            "The aspect ratio matches the intended placement.",
+            "The dimensions are suitable for website use.",
+            "The file size is within the recommended target.",
+            "The format is appropriate for the image type.",
+            "The filename is meaningful and contains no private information.",
+            "The final exported file has been opened and visually inspected.",
+          ],
+
+          th: [
+            "รูปผ่านการอนุมัติให้นำไปเผยแพร่แล้ว",
+            "ยืนยันเจ้าของลิขสิทธิ์หรือสิทธิ์การใช้งานแล้ว",
+            "บุคคลและทรัพย์สินส่วนบุคคลภายในรูปได้รับความยินยอมที่จำเป็นแล้ว",
+            "ไม่มีข้อมูลลับหรือข้อมูลส่วนบุคคลปรากฏอยู่ในรูป",
+            "อัตราส่วนภาพเหมาะกับตำแหน่งที่จะนำไปใช้",
+            "มิติของรูปเหมาะสมสำหรับเว็บไซต์",
+            "ขนาดไฟล์อยู่ภายในเป้าหมายที่แนะนำ",
+            "รูปแบบไฟล์เหมาะกับประเภทของภาพ",
+            "ชื่อไฟล์สื่อความหมายและไม่มีข้อมูลส่วนตัว",
+            "เปิดและตรวจสอบไฟล์ฉบับสุดท้ายด้วยสายตาแล้ว",
+          ],
+        },
+      },
+
+      {
+        id: "when-upload-is-slow",
+
+        title: {
+          en: "When uploading or loading is slow",
+          th: "เมื่ออัปโหลดหรือเปิดเว็บไซต์ช้า",
+        },
+
+        paragraphs: {
+          en: [
+            "Large images require more time for browser optimization, network transfer, server processing, and variant generation. Upload duration also depends on the internet connection.",
+            "The CMS can optimize images, but it cannot completely remove the cost of processing an unnecessarily large source file.",
+          ],
+
+          th: [
+            "รูปขนาดใหญ่ต้องใช้เวลาเพิ่มขึ้นทั้งในการปรับแต่งบน Browser การส่งข้อมูลผ่านเครือข่าย การประมวลผลบน Server และการสร้างรูปหลายขนาด ระยะเวลายังขึ้นอยู่กับความเร็วอินเทอร์เน็ตด้วย",
+            "CMS สามารถปรับแต่งรูปได้ แต่ไม่สามารถขจัดเวลาและทรัพยากรที่ต้องใช้กับไฟล์ต้นฉบับขนาดใหญ่เกินความจำเป็นได้ทั้งหมด",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Check the image dimensions and file size on your computer.",
+            "Create a smaller web-ready copy using the recommendation table.",
+            "Use JPEG or WebP for photographic images.",
+            "Upload the optimized copy and wait until the complete batch reports completion.",
+            "Open the public page and confirm that the correct image variant loads clearly.",
+          ],
+
+          th: [
+            "ตรวจสอบมิติและขนาดไฟล์ของรูปในคอมพิวเตอร์",
+            "สร้างสำเนาสำหรับเว็บไซต์โดยใช้ตารางคำแนะนำ",
+            "ใช้ JPEG หรือ WebP สำหรับภาพถ่าย",
+            "อัปโหลดไฟล์ที่ปรับแต่งแล้วและรอจนรูปทั้งชุดแสดงสถานะเสร็จสมบูรณ์",
+            "เปิดหน้าสาธารณะและตรวจสอบว่ารูปแสดงผลชัดเจนและโหลดได้ถูกต้อง",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Do not repeatedly upload the same file while the first upload is still processing.",
+            "If one item completes before the others, wait for the entire batch before selecting or closing Media Picker.",
+          ],
+
+          th: [
+            "อย่าอัปโหลดไฟล์เดิมซ้ำในขณะที่การอัปโหลดครั้งแรกยังประมวลผลอยู่",
+            "หากรูปหนึ่งเสร็จก่อนรูปอื่น ให้รอรูปทั้งชุดเสร็จก่อนเลือกภาพหรือปิด Media Picker",
+          ],
+        },
+      },
+    ],
+  },
 };
 
 export function getDocsContent({
