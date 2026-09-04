@@ -3765,6 +3765,9086 @@ export const DOCS_CONTENT = {
       },
     ],
   },
+  "workspace/dashboard": {
+    eyebrow: {
+      en: "Workspace",
+      th: "พื้นที่ทำงาน",
+    },
+
+    title: {
+      en: "Dashboard",
+      th: "แดชบอร์ด",
+    },
+
+    description: {
+      en: "Monitor website activity, visitor trends, messages, popular content and recent operational events for the active company.",
+      th: "ติดตามกิจกรรมเว็บไซต์ แนวโน้มผู้เข้าชม ข้อความ เนื้อหายอดนิยม และเหตุการณ์ล่าสุดของบริษัทปัจจุบัน",
+    },
+
+    introduction: {
+      en: [
+        "The Dashboard provides a summary of the active company's website and CMS activity. It is intended to help users identify trends, new messages and content requiring attention.",
+        "Dashboard information is company-specific. Always confirm the selected company and reporting period before interpreting or sharing any figures.",
+        "Dashboard metrics are operational summaries rather than formal financial or regulatory reports. Some values may be delayed by aggregation, caching, visitor consent or data-retention rules.",
+      ],
+
+      th: [
+        "Dashboard แสดงข้อมูลสรุปของเว็บไซต์และกิจกรรมใน CMS สำหรับบริษัทที่กำลังเลือก เพื่อช่วยให้ผู้ใช้เห็นแนวโน้ม ข้อความใหม่ และเนื้อหาที่ควรให้ความสนใจ",
+        "ข้อมูลใน Dashboard แยกตามบริษัท ควรตรวจสอบบริษัทและช่วงเวลาของรายงานก่อนวิเคราะห์หรือส่งต่อตัวเลข",
+        "ตัวเลขบน Dashboard เป็นข้อมูลสรุปเพื่อการปฏิบัติงาน ไม่ใช่รายงานทางการเงินหรือรายงานตามกฎหมาย ข้อมูลบางรายการอาจล่าช้าจากการ Aggregate, Cache, Visitor consent หรือ Retention policy",
+      ],
+    },
+
+    highlights: [
+      {
+        title: {
+          en: "Company-specific",
+          th: "แยกข้อมูลตามบริษัท",
+        },
+
+        description: {
+          en: "All dashboard information belongs to the currently selected company.",
+          th: "ข้อมูลทั้งหมดเป็นของบริษัทที่กำลังเลือกอยู่",
+        },
+      },
+
+      {
+        title: {
+          en: "Date-aware",
+          th: "เลือกช่วงเวลาได้",
+        },
+
+        description: {
+          en: "Traffic and activity summaries reflect the selected reporting range.",
+          th: "ข้อมูล Traffic และ Activity อ้างอิงตามช่วงเวลาที่เลือก",
+        },
+      },
+
+      {
+        title: {
+          en: "Privacy-aware",
+          th: "คำนึงถึง Privacy",
+        },
+
+        description: {
+          en: "Visitor measurement respects consent and configured retention controls.",
+          th: "การวัดผลผู้เข้าชมทำงานตาม Consent และ Retention ที่กำหนด",
+        },
+      },
+
+      {
+        title: {
+          en: "Responsive",
+          th: "รองรับหลายหน้าจอ",
+        },
+
+        description: {
+          en: "Dashboard panels rearrange for desktop, tablet and mobile use.",
+          th: "Panel จะจัดเรียงใหม่ให้เหมาะกับ Desktop, Tablet และ Mobile",
+        },
+      },
+    ],
+
+    sections: [
+      {
+        id: "dashboard-overview",
+
+        title: {
+          en: "1. Dashboard overview",
+          th: "1. ภาพรวม Dashboard",
+        },
+
+        paragraphs: {
+          en: [
+            "The Dashboard combines summary cards and detailed panels in one workspace. Summary cards provide quick totals, while the panels below provide trends, categories and recent events.",
+            "The exact cards displayed may depend on available data, enabled modules and the signed-in user's permissions.",
+          ],
+
+          th: [
+            "Dashboard รวม Summary card และ Panel รายละเอียดไว้ใน Workspace เดียว Summary card ใช้ดูตัวเลขอย่างรวดเร็ว ส่วน Panel ด้านล่างใช้ดูแนวโน้ม ประเภทข้อมูล และเหตุการณ์ล่าสุด",
+            "Card ที่แสดงอาจแตกต่างกันตามข้อมูลที่มี โมดูลที่เปิดใช้งาน และ Permission ของผู้ใช้",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-dashboard-overview",
+
+            number: "1",
+
+            src: "/docs/workspace/dashboard/dashboard-overview.png",
+
+            title: {
+              en: "Dashboard workspace",
+              th: "หน้า Dashboard",
+            },
+
+            alt: {
+              en: "Junsekino CMS Dashboard showing summary cards, traffic, messages, top content and recent activity",
+              th: "Dashboard ของ Junsekino CMS แสดง Summary card, Traffic, Message, Top content และ Recent activity",
+            },
+
+            caption: {
+              en: "The Dashboard summarizes the active company's public website and CMS activity.",
+              th: "Dashboard สรุปกิจกรรมของเว็บไซต์ Public และ CMS สำหรับบริษัทปัจจุบัน",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Confirm the active company in the header.",
+            "Review the reporting period.",
+            "Read the summary cards for immediate status.",
+            "Review Website Traffic for visitor trends.",
+            "Check Message Summary for incoming submissions.",
+            "Review Top Content for content performance.",
+            "Check Recent Activity for operational events.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัทปัจจุบันจาก Header",
+            "ตรวจสอบช่วงเวลาของรายงาน",
+            "ดู Summary card เพื่อทราบสถานะเบื้องต้น",
+            "ดู Website Traffic เพื่อวิเคราะห์แนวโน้มผู้เข้าชม",
+            "ตรวจสอบ Message Summary สำหรับข้อความที่ส่งเข้ามา",
+            "ดู Top Content เพื่อประเมินเนื้อหา",
+            "ตรวจสอบ Recent Activity สำหรับเหตุการณ์ล่าสุด",
+          ],
+        },
+      },
+
+      {
+        id: "summary-cards",
+
+        title: {
+          en: "2. Summary cards",
+          th: "2. Summary Cards",
+        },
+
+        paragraphs: {
+          en: [
+            "Summary cards display key values that require quick attention. Depending on the current Dashboard configuration, these may include views, visitors, messages, notifications or other operational totals.",
+            "A value should always be interpreted together with its label, reporting period and company. Similar-looking cards may measure different events.",
+          ],
+
+          th: [
+            "Summary card แสดงข้อมูลสำคัญที่ควรตรวจสอบอย่างรวดเร็ว โดยอาจประกอบด้วย Views, Visitors, Messages, Notifications หรือตัวเลขการทำงานอื่นตาม Dashboard ปัจจุบัน",
+            "ต้องอ่านตัวเลขร่วมกับชื่อ Card, ช่วงเวลา และบริษัทเสมอ เพราะ Card ที่มีลักษณะคล้ายกันอาจวัดคนละเหตุการณ์",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-dashboard-summary-cards",
+
+            number: "2",
+
+            src: "/docs/workspace/dashboard/dashboard-summary-cards.png",
+
+            title: {
+              en: "Dashboard summary cards",
+              th: "การ์ดข้อมูลสรุป",
+            },
+
+            alt: {
+              en: "Dashboard summary cards displaying key website and workspace metrics",
+              th: "Summary card แสดงตัวเลขสำคัญของเว็บไซต์และ Workspace",
+            },
+
+            caption: {
+              en: "Use summary cards for a quick status check, then open the related panel or module for details.",
+              th: "ใช้ Summary card เพื่อตรวจสถานะเบื้องต้น แล้วเปิด Panel หรือโมดูลที่เกี่ยวข้องเพื่อดูรายละเอียด",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Views: recorded page or content view events.",
+            "Visitors: distinct visitors measured within the available privacy controls.",
+            "Messages: form submissions received by the company.",
+            "Notifications: workspace events that may require review.",
+            "Zero: no eligible records were found for that metric and reporting period.",
+          ],
+
+          th: [
+            "Views: จำนวน Event การเปิดหน้าเว็บหรือเนื้อหา",
+            "Visitors: จำนวนผู้เข้าชมที่แตกต่างกันภายใต้การควบคุมด้าน Privacy",
+            "Messages: ข้อมูลแบบฟอร์มที่บริษัทได้รับ",
+            "Notifications: เหตุการณ์ใน Workspace ที่อาจต้องตรวจสอบ",
+            "ค่า 0: ไม่พบข้อมูลที่เข้าเงื่อนไขของตัวชี้วัดในช่วงเวลานั้น",
+          ],
+        },
+      },
+
+      {
+        id: "views-and-visitors",
+
+        title: {
+          en: "3. Views and unique visitors",
+          th: "3. Views และ Unique Visitors",
+        },
+
+        paragraphs: {
+          en: [
+            "A View represents an eligible viewing event. The same visitor may generate more than one View by opening multiple pages or revisiting content.",
+            "A Unique Visitor represents a distinct visitor within the measurement method and selected period. It should not be interpreted as an exact count of individual people.",
+            "Browser restrictions, deleted cookies, multiple devices, private browsing and consent choices can affect visitor measurement.",
+          ],
+
+          th: [
+            "View หมายถึง Event การเปิดดูที่เข้าเงื่อนไข ผู้เข้าชมคนเดิมสามารถสร้างหลาย View ได้จากการเปิดหลายหน้า หรือกลับมาเปิดเนื้อหาอีกครั้ง",
+            "Unique Visitor หมายถึงผู้เข้าชมที่ระบบแยกได้ภายใต้วิธีวัดผลและช่วงเวลาที่เลือก ไม่ควรตีความว่าเป็นจำนวนบุคคลจริงแบบแม่นยำทั้งหมด",
+            "ข้อจำกัดของ Browser, การลบ Cookie, การใช้หลายอุปกรณ์, Private browsing และตัวเลือก Consent สามารถส่งผลต่อตัวเลขผู้เข้าชม",
+          ],
+        },
+
+        items: {
+          en: [
+            "One visitor may produce multiple Views.",
+            "One person using multiple browsers or devices may appear as multiple visitors.",
+            "Several people using the same browser may appear as one visitor.",
+            "Deleting storage or using private browsing may create a new visitor identity.",
+            "Analytics consent affects persistent visitor measurement.",
+          ],
+
+          th: [
+            "ผู้เข้าชมหนึ่งรายสามารถสร้างหลาย View",
+            "บุคคลเดียวที่ใช้หลาย Browser หรืออุปกรณ์อาจถูกนับเป็นหลาย Visitor",
+            "หลายคนที่ใช้ Browser เดียวกันอาจถูกนับเป็น Visitor เดียว",
+            "การลบ Storage หรือใช้ Private browsing อาจสร้าง Visitor identity ใหม่",
+            "Analytics consent ส่งผลต่อการวัดผู้เข้าชมแบบต่อเนื่อง",
+          ],
+        },
+      },
+
+      {
+        id: "website-traffic",
+
+        title: {
+          en: "4. Website Traffic",
+          th: "4. Website Traffic",
+        },
+
+        paragraphs: {
+          en: [
+            "Website Traffic displays activity over the selected date range. Use the chart to identify increases, decreases and unusual gaps rather than evaluating only one total number.",
+            "The chart legend identifies each series. Views and Unique Visitors use different definitions and should not be expected to have identical values.",
+            "A flat line may be valid when the website received little eligible traffic, when analytics consent was unavailable or when aggregate records have not yet been produced.",
+          ],
+
+          th: [
+            "Website Traffic แสดงกิจกรรมตามช่วงวันที่ที่เลือก ควรใช้กราฟเพื่อดูแนวโน้มเพิ่ม ลด หรือช่วงที่ผิดปกติ ไม่ควรพิจารณาเฉพาะยอดรวมตัวเดียว",
+            "Legend ของกราฟใช้ระบุข้อมูลแต่ละเส้น Views และ Unique Visitors มีความหมายต่างกัน จึงไม่จำเป็นต้องมีค่าเท่ากัน",
+            "กราฟเส้นตรงอาจเป็นข้อมูลที่ถูกต้องเมื่อเว็บไซต์มี Traffic น้อย ไม่มี Analytics consent หรือ Aggregate record ยังไม่ถูกสร้าง",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-website-traffic",
+
+            number: "3",
+
+            src: "/docs/workspace/dashboard/website-traffic.png",
+
+            title: {
+              en: "Website Traffic chart",
+              th: "กราฟ Website Traffic",
+            },
+
+            alt: {
+              en: "Website Traffic panel displaying Views and Unique Visitors over a selected date range",
+              th: "Panel Website Traffic แสดง Views และ Unique Visitors ตามช่วงวันที่",
+            },
+
+            caption: {
+              en: "Compare the chart series across the selected dates to understand changes in website activity.",
+              th: "เปรียบเทียบเส้นกราฟในช่วงวันที่ที่เลือกเพื่อดูการเปลี่ยนแปลงของกิจกรรมเว็บไซต์",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Check the date range displayed by the panel.",
+            "Read the legend to identify each line.",
+            "Move across the chart to compare daily values when interactive details are available.",
+            "Compare Views with Unique Visitors.",
+            "Look for sudden increases, decreases or missing dates.",
+            "Change the reporting period when a broader comparison is required.",
+          ],
+
+          th: [
+            "ตรวจสอบช่วงวันที่ของ Panel",
+            "อ่าน Legend เพื่อแยกแต่ละเส้น",
+            "เลื่อนตามกราฟเพื่อเปรียบเทียบค่ารายวันเมื่อมีรายละเอียดแบบ Interactive",
+            "เปรียบเทียบ Views กับ Unique Visitors",
+            "ตรวจสอบค่าที่เพิ่มหรือลดผิดปกติ รวมถึงวันที่ไม่มีข้อมูล",
+            "เปลี่ยนช่วงเวลาเมื่อต้องการเปรียบเทียบภาพรวมที่กว้างขึ้น",
+          ],
+        },
+      },
+
+      {
+        id: "reporting-range",
+
+        title: {
+          en: "5. Reporting period",
+          th: "5. ช่วงเวลาของรายงาน",
+        },
+
+        paragraphs: {
+          en: [
+            "The selected reporting period determines which records are included in time-based Dashboard metrics. A seven-day range is useful for recent activity, while a longer range is more useful for identifying broader trends.",
+            "Changing the range should reload the relevant Dashboard data. Wait until loading completes before comparing values.",
+            "Date labels follow the Dashboard's formatting and timezone rules. Consider timezone boundaries when activity occurs near midnight.",
+          ],
+
+          th: [
+            "ช่วงเวลาที่เลือกกำหนดว่าข้อมูลใดจะถูกรวมในตัวเลข Dashboard แบบอ้างอิงเวลา ช่วง 7 วันเหมาะกับกิจกรรมล่าสุด ส่วนช่วงที่ยาวกว่าเหมาะกับการดูแนวโน้ม",
+            "เมื่อเปลี่ยนช่วงเวลา ระบบจะโหลดข้อมูล Dashboard ที่เกี่ยวข้องใหม่ ควรรอให้ Loading เสร็จก่อนเปรียบเทียบ",
+            "ชื่อวันที่จะแสดงตามรูปแบบวันที่และ Timezone ของ Dashboard จึงควรคำนึงถึงช่วงเปลี่ยนวันสำหรับกิจกรรมที่เกิดใกล้เที่ยงคืน",
+          ],
+        },
+
+        items: {
+          en: [
+            "Use a short range for daily operational checks.",
+            "Use a longer range for trend comparison.",
+            "Compare equivalent periods when evaluating improvement.",
+            "Do not compare a partial current day directly with a complete previous day.",
+            "Record the company and date range when sharing Dashboard figures.",
+          ],
+
+          th: [
+            "ใช้ช่วงสั้นสำหรับตรวจสอบการทำงานประจำวัน",
+            "ใช้ช่วงยาวสำหรับเปรียบเทียบแนวโน้ม",
+            "เปรียบเทียบช่วงเวลาที่มีจำนวนวันเท่ากัน",
+            "ไม่ควรเปรียบเทียบวันปัจจุบันที่ยังไม่จบกับวันก่อนหน้าที่ครบทั้งวันโดยตรง",
+            "ระบุบริษัทและช่วงวันที่เมื่อส่งต่อตัวเลข Dashboard",
+          ],
+        },
+      },
+
+      {
+        id: "consent-and-analytics",
+
+        title: {
+          en: "6. Consent and analytics",
+          th: "6. Consent และ Analytics",
+        },
+
+        paragraphs: {
+          en: [
+            "Website analytics must respect the visitor's cookie preferences. Necessary functionality can operate without optional Analytics consent, but persistent visitor measurement should not be created before consent.",
+            "When Analytics consent is unavailable, some privacy-preserving aggregate activity may still be handled according to the system configuration, while persistent Unique Visitor measurement may be limited.",
+            "Dashboard figures should therefore be treated as measured eligible activity rather than a complete record of every human visitor.",
+          ],
+
+          th: [
+            "Website Analytics ต้องทำงานตาม Cookie preference ของผู้เข้าชม Function ที่จำเป็นสามารถทำงานได้โดยไม่ต้องใช้ Optional analytics แต่ระบบไม่ควรสร้างตัวระบุผู้เข้าชมแบบถาวรก่อนได้รับ Consent",
+            "เมื่อไม่มี Analytics consent ระบบอาจประมวลผลเฉพาะกิจกรรม Aggregate ที่คำนึงถึง Privacy ตามการตั้งค่า ส่วนการวัด Unique Visitor แบบต่อเนื่องอาจถูกจำกัด",
+            "ดังนั้นตัวเลข Dashboard ควรตีความว่าเป็นกิจกรรมที่ระบบวัดได้และเข้าเงื่อนไข ไม่ใช่จำนวนผู้เข้าชมจริงทั้งหมดแบบสมบูรณ์",
+          ],
+        },
+
+        items: {
+          en: [
+            "Necessary consent is always enabled for essential website operation.",
+            "Analytics consent is optional and controlled by the visitor.",
+            "Rejecting optional cookies should not block essential public-site access.",
+            "Consent changes may affect future measurement.",
+            "Retention settings determine how long eligible analytics records are retained.",
+          ],
+
+          th: [
+            "Necessary consent เปิดใช้งานเสมอสำหรับ Function ที่จำเป็น",
+            "Analytics consent เป็นตัวเลือกของผู้เข้าชม",
+            "การปฏิเสธ Optional cookie ต้องไม่ปิดกั้นการใช้งานเว็บไซต์ที่จำเป็น",
+            "การเปลี่ยน Consent อาจส่งผลต่อการวัดผลในอนาคต",
+            "Retention setting กำหนดระยะเวลาที่เก็บ Analytics record ซึ่งเข้าเงื่อนไข",
+          ],
+        },
+      },
+
+      {
+        id: "message-summary",
+
+        title: {
+          en: "7. Message Summary",
+          th: "7. Message Summary",
+        },
+
+        paragraphs: {
+          en: [
+            "Message Summary groups form submissions by their configured type. This helps users identify which business areas are receiving enquiries without opening every submission.",
+            "Common groups may include Contact, Survey, Career and Custom forms. The available categories depend on the forms configured for the company.",
+            "Message totals do not replace the Messages workspace. Open that module to read, assign and manage individual submissions.",
+          ],
+
+          th: [
+            "Message Summary แบ่ง Form submission ตามประเภท เพื่อช่วยให้ผู้ใช้เห็นว่าธุรกิจส่วนใดได้รับข้อความโดยไม่ต้องเปิดทุก Submission",
+            "ประเภททั่วไปอาจประกอบด้วย Contact, Survey, Career และ Custom form โดยรายการจริงขึ้นอยู่กับ Form ที่บริษัทกำหนดไว้",
+            "ยอดรวมข้อความไม่สามารถใช้แทนหน้า Messages ได้ เมื่อต้องอ่าน มอบหมาย หรือจัดการแต่ละ Submission ให้เปิดโมดูล Messages",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-message-summary",
+
+            number: "4",
+
+            src: "/docs/workspace/dashboard/message-summary.png",
+
+            title: {
+              en: "Message Summary",
+              th: "ข้อมูลสรุปข้อความ",
+            },
+
+            alt: {
+              en: "Dashboard Message Summary showing form submissions grouped by type",
+              th: "Message Summary แสดงจำนวน Form submission แยกตามประเภท",
+            },
+
+            caption: {
+              en: "Use the summary to identify incoming message categories, then open Messages for submission details.",
+              th: "ใช้ข้อมูลสรุปเพื่อดูประเภทข้อความ แล้วเปิด Messages เพื่อจัดการรายละเอียด",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Contact: general contact-page enquiries.",
+            "Survey: submissions from survey forms.",
+            "Career: job or recruitment-related submissions.",
+            "Custom: submissions from other configured form types.",
+            "A zero value means no eligible submission was found for that category and range.",
+          ],
+
+          th: [
+            "Contact: ข้อความทั่วไปจากหน้า Contact",
+            "Survey: ข้อมูลจากแบบสำรวจ",
+            "Career: ข้อมูลเกี่ยวกับการสมัครงานหรือการสรรหา",
+            "Custom: ข้อมูลจาก Form ประเภทอื่นที่กำหนดไว้",
+            "ค่า 0 หมายถึงไม่พบ Submission ที่เข้าเงื่อนไขของประเภทและช่วงเวลานั้น",
+          ],
+        },
+      },
+
+      {
+        id: "top-content",
+
+        title: {
+          en: "8. Top Content",
+          th: "8. Top Content",
+        },
+
+        paragraphs: {
+          en: [
+            "Top Content identifies records receiving notable engagement. The ranking may use available Views, Likes, Shares or other supported engagement values.",
+            "Use this panel as a starting point for content analysis. A high ranking does not by itself explain why the content performed well.",
+            "Consider publication date, promotion, page placement and reporting period before comparing records.",
+          ],
+
+          th: [
+            "Top Content แสดงรายการที่ได้รับ Engagement เด่น โดยอันดับอาจอ้างอิงจาก Views, Likes, Shares หรือค่าที่ระบบรองรับ",
+            "ควรใช้ Panel นี้เป็นจุดเริ่มต้นในการวิเคราะห์ เพราะอันดับสูงเพียงอย่างเดียวไม่ได้อธิบายสาเหตุที่เนื้อหาได้รับความสนใจ",
+            "ควรพิจารณาวัน Publish, การประชาสัมพันธ์ ตำแหน่งบนเว็บไซต์ และช่วงเวลารายงานก่อนเปรียบเทียบ",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-top-content",
+
+            number: "5",
+
+            src: "/docs/workspace/dashboard/top-content.png",
+
+            title: {
+              en: "Top Content ranking",
+              th: "อันดับ Top Content",
+            },
+
+            alt: {
+              en: "Dashboard Top Content panel listing highly engaged public content",
+              th: "Panel Top Content แสดงรายการเนื้อหาที่ได้รับ Engagement",
+            },
+
+            caption: {
+              en: "Review popular content together with its type, age and promotion context.",
+              th: "วิเคราะห์เนื้อหายอดนิยมร่วมกับประเภท อายุของเนื้อหา และบริบทการประชาสัมพันธ์",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Ranking: position within the currently available Dashboard data.",
+            "Title: content title from the active company.",
+            "Type: the module or content type associated with the record.",
+            "Engagement: Views, Likes, Shares or other supported values.",
+            "Open the related module when content needs to be reviewed or updated.",
+          ],
+
+          th: [
+            "Ranking: ลำดับจากข้อมูล Dashboard ที่มีอยู่ในขณะนั้น",
+            "Title: ชื่อเนื้อหาของบริษัทปัจจุบัน",
+            "Type: โมดูลหรือประเภทของรายการ",
+            "Engagement: Views, Likes, Shares หรือค่าที่ระบบรองรับ",
+            "เปิดโมดูลที่เกี่ยวข้องเมื่อต้องตรวจสอบหรือแก้ไขเนื้อหา",
+          ],
+        },
+      },
+
+      {
+        id: "recent-activity",
+
+        title: {
+          en: "9. Recent Activity",
+          th: "9. Recent Activity",
+        },
+
+        paragraphs: {
+          en: [
+            "Recent Activity displays the latest operational events available to the Dashboard, such as a new contact message or form submission.",
+            "It provides awareness rather than a complete audit history. Use the relevant module or Audit Log when a detailed investigation is required.",
+            "The displayed time should be read together with the system timezone and current date.",
+          ],
+
+          th: [
+            "Recent Activity แสดงเหตุการณ์การทำงานล่าสุดที่ Dashboard รองรับ เช่น ข้อความ Contact ใหม่หรือ Form submission",
+            "Panel นี้ใช้แจ้งให้ทราบ ไม่ใช่ Audit history แบบสมบูรณ์ เมื่อต้องตรวจสอบรายละเอียดให้เปิดโมดูลที่เกี่ยวข้องหรือ Audit Log",
+            "ควรอ่านเวลาที่แสดงร่วมกับ Timezone และวันที่ปัจจุบันของระบบ",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-recent-activity",
+
+            number: "6",
+
+            src: "/docs/workspace/dashboard/recent-activity.png",
+
+            title: {
+              en: "Recent Activity",
+              th: "กิจกรรมล่าสุด",
+            },
+
+            alt: {
+              en: "Dashboard Recent Activity panel showing recent website and CMS events",
+              th: "Panel Recent Activity แสดงเหตุการณ์ล่าสุดของเว็บไซต์และ CMS",
+            },
+
+            caption: {
+              en: "Use Recent Activity to identify new events, then open the related workspace for details.",
+              th: "ใช้ Recent Activity เพื่อดูเหตุการณ์ใหม่ แล้วเปิด Workspace ที่เกี่ยวข้องเพื่อดูรายละเอียด",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Activity type identifies what occurred.",
+            "Supporting text provides a brief event summary.",
+            "The timestamp indicates when the event was recorded.",
+            "Open the related module before taking action.",
+            "Use Audit Logs for detailed administrative change history.",
+          ],
+
+          th: [
+            "Activity type ระบุประเภทเหตุการณ์",
+            "ข้อความประกอบสรุปเหตุการณ์แบบย่อ",
+            "Timestamp ระบุเวลาที่ระบบบันทึกเหตุการณ์",
+            "เปิดโมดูลที่เกี่ยวข้องก่อนดำเนินการ",
+            "ใช้ Audit Log เมื่อต้องการประวัติการเปลี่ยนแปลงของ Admin แบบละเอียด",
+          ],
+        },
+      },
+
+      {
+        id: "activity-and-notifications",
+
+        title: {
+          en: "10. Recent Activity and Notifications",
+          th: "10. Recent Activity และ Notifications",
+        },
+
+        paragraphs: {
+          en: [
+            "Recent Activity is a Dashboard summary of recent operational events. Notifications are user-facing alerts delivered through the Admin notification interface.",
+            "The same underlying event may appear in both areas, but the two features serve different purposes. Activity provides overview context, while Notifications help the user notice and manage alerts.",
+          ],
+
+          th: [
+            "Recent Activity เป็นข้อมูลสรุปเหตุการณ์ล่าสุดบน Dashboard ส่วน Notifications เป็นการแจ้งเตือนสำหรับผู้ใช้ผ่านระบบ Notification ของ Admin",
+            "เหตุการณ์เดียวกันอาจปรากฏในทั้งสองส่วน แต่มีวัตถุประสงค์ต่างกัน Activity ใช้ดูภาพรวม ส่วน Notifications ช่วยให้ผู้ใช้เห็นและจัดการการแจ้งเตือน",
+          ],
+        },
+
+        items: {
+          en: [
+            "Recent Activity: company-level operational overview.",
+            "Notifications: alerts intended for the signed-in user's attention.",
+            "Reading a notification does not delete the underlying message or submission.",
+            "Opening Recent Activity does not necessarily mark a notification as read.",
+          ],
+
+          th: [
+            "Recent Activity: ภาพรวมเหตุการณ์ของบริษัท",
+            "Notifications: การแจ้งเตือนที่ต้องการให้ผู้ใช้ปัจจุบันรับทราบ",
+            "การอ่าน Notification ไม่ได้ลบ Message หรือ Submission ต้นทาง",
+            "การเปิด Recent Activity ไม่จำเป็นต้องเปลี่ยน Notification เป็นสถานะอ่านแล้ว",
+          ],
+        },
+      },
+
+      {
+        id: "mobile-dashboard",
+
+        title: {
+          en: "11. Dashboard on mobile",
+          th: "11. Dashboard บนมือถือ",
+        },
+
+        paragraphs: {
+          en: [
+            "On smaller screens, Dashboard cards and panels are arranged vertically. This prevents wide desktop panels from forcing the entire page beyond the viewport.",
+            "Charts may use reduced labels or horizontal space on mobile. Rotate the device or use a larger screen when detailed comparison is required.",
+            "The information and permissions remain the same; only the presentation changes.",
+          ],
+
+          th: [
+            "บนหน้าจอขนาดเล็ก Card และ Panel ของ Dashboard จะเรียงลงมาในแนวตั้ง เพื่อป้องกัน Panel แบบ Desktop ทำให้หน้าเว็บล้นออกจาก Viewport",
+            "กราฟอาจลด Label หรือพื้นที่แสดงผลบนมือถือ เมื่อต้องเปรียบเทียบข้อมูลอย่างละเอียดสามารถหมุนอุปกรณ์หรือใช้จอขนาดใหญ่ขึ้น",
+            "ข้อมูลและ Permission ยังคงเหมือนเดิม เปลี่ยนเฉพาะรูปแบบการแสดงผล",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-dashboard-mobile",
+
+            number: "7",
+
+            src: "/docs/workspace/dashboard/dashboard-mobile.png",
+
+            title: {
+              en: "Responsive Dashboard",
+              th: "Dashboard บน Mobile",
+            },
+
+            alt: {
+              en: "Junsekino CMS Dashboard panels arranged for a mobile screen",
+              th: "Panel ของ Junsekino CMS Dashboard จัดเรียงสำหรับหน้าจอมือถือ",
+            },
+
+            caption: {
+              en: "Dashboard panels stack vertically on mobile while preserving access to the same information.",
+              th: "Panel จะเรียงในแนวตั้งบนมือถือ โดยยังแสดงข้อมูลชุดเดียวกับ Desktop",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Use the mobile menu to navigate between Admin modules.",
+            "Scroll vertically through the Dashboard panels.",
+            "Confirm that cards and charts do not overflow the viewport.",
+            "Use desktop view for detailed chart analysis when practical.",
+            "Do not assume missing off-screen content has been removed; continue scrolling.",
+          ],
+
+          th: [
+            "ใช้ Mobile menu เพื่อเปลี่ยนโมดูล Admin",
+            "เลื่อนลงในแนวตั้งเพื่อดู Panel ทั้งหมด",
+            "ตรวจสอบว่า Card และกราฟไม่ล้นออกจาก Viewport",
+            "ใช้ Desktop เมื่อต้องวิเคราะห์กราฟอย่างละเอียด",
+            "อย่าถือว่าเนื้อหาที่อยู่นอกหน้าจอถูกนำออก ให้เลื่อนลงเพื่อตรวจสอบ",
+          ],
+        },
+      },
+
+      {
+        id: "dashboard-refresh",
+
+        title: {
+          en: "12. Data refresh and update timing",
+          th: "12. การ Refresh และเวลาอัปเดตข้อมูล",
+        },
+
+        paragraphs: {
+          en: [
+            "Dashboard data is loaded when the workspace opens and when supported filters change. Some metrics may be calculated from aggregate records rather than directly from every raw event.",
+            "New events may therefore require a short period before appearing in every panel. Repeatedly refreshing the page does not accelerate server-side aggregation.",
+            "If data remains unchanged, verify the company, date range, consent conditions and source module before reporting an error.",
+          ],
+
+          th: [
+            "ระบบโหลดข้อมูล Dashboard เมื่อเปิด Workspace และเมื่อเปลี่ยน Filter ที่รองรับ ตัวเลขบางรายการอาจคำนวณจาก Aggregate record แทนการอ่าน Raw event ทั้งหมดโดยตรง",
+            "เหตุการณ์ใหม่จึงอาจใช้เวลาสั้น ๆ ก่อนปรากฏครบทุก Panel การ Refresh ซ้ำต่อเนื่องไม่ได้ทำให้ Server aggregate ข้อมูลเร็วขึ้น",
+            "หากข้อมูลยังไม่เปลี่ยน ให้ตรวจสอบบริษัท ช่วงเวลา Consent และโมดูลต้นทางก่อนรายงานว่าเป็น Error",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Confirm the selected company.",
+            "Confirm that the reporting period includes the event date.",
+            "Refresh the Dashboard once.",
+            "Wait for loading to complete.",
+            "Check the source module for the original event.",
+            "Review consent and retention conditions when investigating analytics.",
+            "Report the company, range, metric and expected event if the issue continues.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัทที่เลือก",
+            "ตรวจสอบว่าช่วงรายงานครอบคลุมวันที่ของ Event",
+            "Refresh Dashboard หนึ่งครั้ง",
+            "รอ Loading ให้เสร็จ",
+            "ตรวจสอบ Event ต้นทางในโมดูลที่เกี่ยวข้อง",
+            "ตรวจสอบ Consent และ Retention เมื่อเป็นปัญหา Analytics",
+            "หากยังมีปัญหา ให้ระบุบริษัท ช่วงเวลา Metric และ Event ที่คาดว่าจะพบ",
+          ],
+        },
+      },
+
+      {
+        id: "zero-and-missing-data",
+
+        title: {
+          en: "13. Why a value may be zero",
+          th: "13. เหตุผลที่ข้อมูลอาจเป็น 0",
+        },
+
+        paragraphs: {
+          en: [
+            "A zero value is not automatically an error. It means that the Dashboard did not find an eligible record for the metric under the current conditions.",
+            "Investigate context before changing code or data. Creating artificial production activity solely to make a Dashboard card non-zero is not recommended.",
+          ],
+
+          th: [
+            "ค่า 0 ไม่ได้หมายความว่าเกิด Error เสมอ แต่หมายถึง Dashboard ไม่พบ Record ที่เข้าเงื่อนไขของ Metric ภายใต้การตั้งค่าปัจจุบัน",
+            "ควรตรวจสอบบริบทก่อนแก้ Code หรือ Data และไม่ควรสร้างกิจกรรมปลอมบน Production เพียงเพื่อให้ Card แสดงค่ามากกว่า 0",
+          ],
+        },
+
+        items: {
+          en: [
+            "No eligible activity occurred during the selected period.",
+            "The wrong company is selected.",
+            "The reporting range excludes the event date.",
+            "The related content or form is not published or active.",
+            "The visitor did not provide optional Analytics consent.",
+            "Aggregate data has not yet been updated.",
+            "Retention cleanup removed records beyond the configured period.",
+            "The signed-in user cannot access the related data.",
+          ],
+
+          th: [
+            "ไม่มีกิจกรรมที่เข้าเงื่อนไขในช่วงเวลาที่เลือก",
+            "เลือกบริษัทไม่ถูกต้อง",
+            "ช่วงรายงานไม่ครอบคลุมวันที่ของ Event",
+            "Content หรือ Form ที่เกี่ยวข้องยังไม่ Publish หรือไม่ Active",
+            "ผู้เข้าชมไม่ได้ให้ Optional Analytics consent",
+            "Aggregate data ยังไม่อัปเดต",
+            "Retention cleanup ลบข้อมูลที่เกินระยะเวลาแล้ว",
+            "ผู้ใช้ปัจจุบันไม่มี Permission เข้าถึงข้อมูลที่เกี่ยวข้อง",
+          ],
+        },
+      },
+
+      {
+        id: "dashboard-checklist",
+
+        title: {
+          en: "14. Dashboard checklist",
+          th: "14. Checklist การใช้งาน Dashboard",
+        },
+
+        paragraphs: {
+          en: [
+            "Use this checklist before sharing Dashboard figures or reporting a data problem.",
+          ],
+
+          th: [
+            "ใช้ Checklist นี้ก่อนส่งต่อตัวเลข Dashboard หรือรายงานปัญหาข้อมูล",
+          ],
+        },
+
+        items: {
+          en: [
+            "The correct company is selected.",
+            "The reporting period is correct.",
+            "The Dashboard has finished loading.",
+            "Views and Unique Visitors are interpreted differently.",
+            "Consent and privacy limitations have been considered.",
+            "Message totals have been verified in the Messages workspace when necessary.",
+            "Top Content has been interpreted in its publication context.",
+            "Recent Activity has not been treated as a complete Audit Log.",
+            "Mobile panels display within the viewport.",
+            "The source event has been checked before reporting missing data.",
+            "Shared figures include the company, date range and metric definition.",
+          ],
+
+          th: [
+            "เลือกบริษัทถูกต้อง",
+            "เลือกช่วงเวลาถูกต้อง",
+            "Dashboard โหลดเสร็จแล้ว",
+            "แยกความหมายของ Views และ Unique Visitors",
+            "พิจารณาผลของ Consent และ Privacy แล้ว",
+            "ตรวจสอบยอดข้อความใน Messages เมื่อจำเป็น",
+            "วิเคราะห์ Top Content ร่วมกับบริบทการ Publish",
+            "ไม่ใช้ Recent Activity แทน Audit Log ทั้งหมด",
+            "Panel บน Mobile ไม่ล้นออกจาก Viewport",
+            "ตรวจสอบ Source event ก่อนรายงานว่าข้อมูลหาย",
+            "เมื่อนำตัวเลขไปใช้ ต้องระบุบริษัท ช่วงเวลา และความหมายของ Metric",
+          ],
+        },
+      },
+    ],
+  },
+  "workspace/company": {
+    eyebrow: {
+      en: "Workspace",
+      th: "พื้นที่ทำงาน",
+    },
+
+    title: {
+      en: "Company",
+      th: "ข้อมูลบริษัท",
+    },
+
+    description: {
+      en: "Manage company information, public identity, branding, website address and social-media links.",
+      th: "จัดการข้อมูลบริษัท ตัวตนสาธารณะ Branding, ที่อยู่เว็บไซต์ และ Social Media",
+    },
+
+    introduction: {
+      en: [
+        "The Company workspace stores the identity and presentation settings of the active company. These values may be used throughout the Admin interface, public website, contact information and metadata.",
+        "Company records are separate from user accounts and company memberships. A company contains business and website information, while a membership grants a user permission to manage that company.",
+        "Changes to the company name, slug, logo or colors can affect many public and Admin components. Review these changes carefully before saving.",
+      ],
+
+      th: [
+        "หน้า Company ใช้เก็บข้อมูลตัวตนและการแสดงผลของบริษัทปัจจุบัน ซึ่งอาจถูกนำไปใช้ในหน้า Admin, เว็บไซต์ Public, ข้อมูลติดต่อ และ Metadata",
+        "Company record แยกจาก User account และ Company membership โดย Company เก็บข้อมูลธุรกิจและเว็บไซต์ ส่วน Membership ใช้ให้สิทธิ์ผู้ใช้ในการจัดการบริษัท",
+        "การเปลี่ยนชื่อบริษัท Slug, Logo หรือสีอาจส่งผลต่อหลายส่วนของ Public และ Admin จึงควรตรวจสอบให้ละเอียดก่อน Save",
+      ],
+    },
+
+    highlights: [
+      {
+        title: {
+          en: "Company-specific",
+          th: "ข้อมูลแยกตามบริษัท",
+        },
+
+        description: {
+          en: "Every company has its own profile, branding and public configuration.",
+          th: "แต่ละบริษัทมี Profile, Branding และ Public configuration แยกกัน",
+        },
+      },
+
+      {
+        title: {
+          en: "Public identity",
+          th: "ตัวตนบนเว็บไซต์",
+        },
+
+        description: {
+          en: "Names, logos, colors and links help identify the company publicly.",
+          th: "ชื่อ Logo, สี และ Link ใช้แสดงตัวตนของบริษัทต่อสาธารณะ",
+        },
+      },
+
+      {
+        title: {
+          en: "Permission protected",
+          th: "ควบคุมด้วย Permission",
+        },
+
+        description: {
+          en: "Only authorized users can change company-level information.",
+          th: "เฉพาะผู้ใช้ที่ได้รับอนุญาตจึงสามารถแก้ข้อมูลระดับบริษัท",
+        },
+      },
+
+      {
+        title: {
+          en: "Immediate impact",
+          th: "ส่งผลหลายส่วน",
+        },
+
+        description: {
+          en: "Saved branding changes may affect Admin controls and public pages.",
+          th: "Branding ที่บันทึกอาจส่งผลต่อหน้า Admin และ Public",
+        },
+      },
+    ],
+
+    sections: [
+      {
+        id: "company-overview",
+
+        title: {
+          en: "1. Company workspace overview",
+          th: "1. ภาพรวมหน้า Company",
+        },
+
+        paragraphs: {
+          en: [
+            "The Company workspace combines the active company's general information, branding, social links and public website settings.",
+            "Before editing any value, confirm the active company in the header. Saving information under the wrong company can change another public website.",
+            "The sections available on the page may depend on the signed-in user's role and permissions.",
+          ],
+
+          th: [
+            "หน้า Company รวมข้อมูลทั่วไป Branding, Social link และการตั้งค่าเว็บไซต์ Public ของบริษัทปัจจุบัน",
+            "ก่อนแก้ไขทุกครั้ง ให้ตรวจสอบบริษัทจาก Header เพราะการ Save ขณะเลือกบริษัทผิดอาจเปลี่ยนข้อมูลของเว็บไซต์อื่น",
+            "Section และคำสั่งที่แสดงอาจแตกต่างกันตาม Role และ Permission ของผู้ใช้",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-company-overview",
+
+            number: "1",
+
+            src: "/docs/workspace/company/company-overview.png",
+
+            title: {
+              en: "Company workspace",
+              th: "หน้า Company",
+            },
+
+            alt: {
+              en: "Junsekino CMS Company workspace displaying general information, branding and company settings",
+              th: "หน้า Company ของ Junsekino CMS แสดงข้อมูลทั่วไป Branding และการตั้งค่าบริษัท",
+            },
+
+            caption: {
+              en: "Use the Company workspace to manage the active company's business and public identity.",
+              th: "ใช้หน้า Company เพื่อจัดการข้อมูลธุรกิจและตัวตนสาธารณะของบริษัทปัจจุบัน",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Confirm the active company.",
+            "Open Company from the Admin sidebar.",
+            "Review the existing information before editing.",
+            "Update only the required fields.",
+            "Review public-facing values carefully.",
+            "Save and wait for confirmation.",
+            "Verify the affected Admin and public pages.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัทปัจจุบัน",
+            "เปิด Company จาก Sidebar",
+            "ตรวจสอบข้อมูลเดิมก่อนแก้ไข",
+            "เปลี่ยนเฉพาะช่องที่จำเป็น",
+            "ตรวจสอบข้อมูลที่จะแสดงต่อสาธารณะ",
+            "กด Save และรอข้อความยืนยัน",
+            "ตรวจสอบหน้า Admin และ Public ที่ได้รับผลกระทบ",
+          ],
+        },
+      },
+
+      {
+        id: "company-and-membership",
+
+        title: {
+          en: "2. Company and membership",
+          th: "2. Company และ Membership",
+        },
+
+        paragraphs: {
+          en: [
+            "A Company record represents an organization or brand managed by the CMS. It contains information such as the company name, slug, branding and public contact details.",
+            "A Company membership connects a user account to a company and defines the user's role, status and permissions.",
+            "Editing company information does not edit the personal profile of its members. Similarly, editing a member does not normally change the company's public identity.",
+          ],
+
+          th: [
+            "Company record แทนองค์กรหรือ Brand ที่จัดการใน CMS และเก็บข้อมูล เช่น ชื่อบริษัท Slug, Branding และข้อมูลติดต่อสาธารณะ",
+            "Company membership ใช้เชื่อม User account เข้ากับบริษัท และกำหนด Role, Status และ Permission",
+            "การแก้ข้อมูล Company จะไม่แก้ Profile ส่วนบุคคลของสมาชิก และการแก้สมาชิกจะไม่เปลี่ยนตัวตนสาธารณะของบริษัทตามปกติ",
+          ],
+        },
+
+        items: {
+          en: [
+            "Company: organization, brand and website identity.",
+            "User: account used by a person to sign in.",
+            "Membership: relationship between a user and a company.",
+            "Role and permissions: actions allowed through the membership.",
+            "Company switcher: changes the active company workspace.",
+          ],
+
+          th: [
+            "Company: องค์กร Brand และตัวตนของเว็บไซต์",
+            "User: บัญชีที่บุคคลใช้เข้าสู่ระบบ",
+            "Membership: ความสัมพันธ์ระหว่างผู้ใช้กับบริษัท",
+            "Role และ Permission: คำสั่งที่ Membership ได้รับอนุญาต",
+            "Company switcher: ใช้เปลี่ยนบริษัทที่กำลังจัดการ",
+          ],
+        },
+      },
+
+      {
+        id: "company-information",
+
+        title: {
+          en: "3. General company information",
+          th: "3. ข้อมูลทั่วไปของบริษัท",
+        },
+
+        paragraphs: {
+          en: [
+            "General information identifies the company inside the CMS and may also be displayed on the public website.",
+            "Use official and approved information. Confirm spelling, capitalization, legal naming and contact details before saving.",
+            "Some fields may be used by the Contact page, SEO metadata, legal documents or notification templates.",
+          ],
+
+          th: [
+            "ข้อมูลทั่วไปใช้ระบุบริษัทภายใน CMS และบางรายการอาจนำไปแสดงบนเว็บไซต์ Public",
+            "ควรใช้ข้อมูลทางการที่ได้รับอนุมัติ และตรวจสอบการสะกด ตัวพิมพ์ ชื่อทางกฎหมาย และข้อมูลติดต่อก่อน Save",
+            "บางช่องอาจถูกนำไปใช้ในหน้า Contact, SEO metadata, Legal document หรือ Notification template",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-company-information",
+
+            number: "2",
+
+            src: "/docs/workspace/company/company-information.png",
+
+            title: {
+              en: "Company information",
+              th: "ข้อมูลบริษัท",
+            },
+
+            alt: {
+              en: "Company information fields in Junsekino CMS",
+              th: "ช่องข้อมูลบริษัทใน Junsekino CMS",
+            },
+
+            caption: {
+              en: "Review whether each value is internal or publicly displayed before entering sensitive information.",
+              th: "ตรวจสอบว่าช่องใดเป็นข้อมูลภายในหรือแสดงสาธารณะก่อนกรอกข้อมูลสำคัญ",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Company name: the primary name used throughout the CMS.",
+            "Legal name: the registered name used where legal identification is required.",
+            "Email: approved company contact address.",
+            "Phone: approved public or operational contact number.",
+            "Address: company address appropriate for the intended public or legal use.",
+            "Description: approved summary of the company when supported.",
+          ],
+
+          th: [
+            "Company name: ชื่อหลักที่ใช้ใน CMS",
+            "Legal name: ชื่อจดทะเบียนสำหรับส่วนที่ต้องระบุตัวตนทางกฎหมาย",
+            "Email: อีเมลติดต่อของบริษัทที่ได้รับอนุมัติ",
+            "Phone: เบอร์ติดต่อสาธารณะหรือเบอร์สำหรับการดำเนินงาน",
+            "Address: ที่อยู่ที่เหมาะกับวัตถุประสงค์ด้าน Public หรือ Legal",
+            "Description: ข้อความสรุปบริษัทเมื่อระบบรองรับ",
+          ],
+        },
+      },
+
+      {
+        id: "public-and-private-information",
+
+        title: {
+          en: "4. Public and internal information",
+          th: "4. ข้อมูล Public และข้อมูลภายใน",
+        },
+
+        paragraphs: {
+          en: [
+            "Do not assume that every Company field is private. Values may be reused by public pages, metadata, legal documents, emails or other modules.",
+            "Enter only information approved for the purpose of that field. Do not place passwords, API keys, private personal data or confidential notes in company profile fields.",
+          ],
+
+          th: [
+            "ไม่ควรถือว่าทุกช่องใน Company เป็นข้อมูลภายใน เพราะข้อมูลอาจถูกนำไปใช้ใน Public page, Metadata, Legal document, Email หรือโมดูลอื่น",
+            "กรอกเฉพาะข้อมูลที่ได้รับอนุมัติให้ใช้ตามวัตถุประสงค์ของช่อง ห้ามใส่ Password, API key, ข้อมูลส่วนบุคคลที่เป็นความลับ หรือบันทึกภายในใน Company profile",
+          ],
+        },
+
+        items: {
+          en: [
+            "Public information: approved names, website contact details and brand links.",
+            "Operational information: values used by Admin workflows or notifications.",
+            "Legal information: official identity and contact details used in policies.",
+            "Secret information: must be stored only through approved protected configuration.",
+          ],
+
+          th: [
+            "Public information: ชื่อ ข้อมูลติดต่อ และ Brand link ที่อนุญาตให้เผยแพร่",
+            "Operational information: ข้อมูลสำหรับ Workflow หรือ Notification",
+            "Legal information: ตัวตนและข้อมูลติดต่อทางการสำหรับ Policy",
+            "Secret information: ต้องจัดเก็บผ่าน Configuration ที่มีการป้องกันเท่านั้น",
+          ],
+        },
+      },
+
+      {
+        id: "company-slug",
+
+        title: {
+          en: "5. Company slug and public URL",
+          th: "5. Company Slug และ Public URL",
+        },
+
+        paragraphs: {
+          en: [
+            "The company slug is the readable identifier used in the public website path. For example, a company with the slug junsekino-id may be available under /junsekino-id.",
+            "Use lowercase letters, numbers and hyphens according to the validation shown by the form. Spaces and unsupported symbols should not be used.",
+            "Changing a published company slug can affect bookmarks, external links, search-engine indexing and shared URLs. Existing slug history may provide a redirect, but every important link should still be verified.",
+          ],
+
+          th: [
+            "Company slug คือชื่ออ้างอิงที่อ่านได้และใช้ใน Path ของเว็บไซต์ เช่น บริษัทที่ใช้ Slug `junsekino-id` อาจเปิดผ่าน `/junsekino-id`",
+            "ใช้ตัวอักษรภาษาอังกฤษพิมพ์เล็ก ตัวเลข และเครื่องหมายขีดกลางตาม Validation ของ Form ไม่ควรใช้ Space หรือ Symbol ที่ระบบไม่รองรับ",
+            "การเปลี่ยน Slug ที่ Publish แล้วอาจกระทบ Bookmark, External link, Search engine และ URL ที่เคย Share แม้ระบบอาจเก็บประวัติ Slug สำหรับ Redirect แต่ยังต้องตรวจสอบ Link สำคัญทั้งหมด",
+          ],
+        },
+
+        items: {
+          en: [
+            "Keep the slug short and recognizable.",
+            "Do not include confidential internal codes.",
+            "Avoid changing a production slug without approval.",
+            "Verify redirects from the previous slug.",
+            "Update controlled external links when necessary.",
+            "Check sitemap and canonical URLs after a production change.",
+          ],
+
+          th: [
+            "ใช้ Slug ที่สั้นและจดจำได้",
+            "ไม่ใส่รหัสภายในที่เป็นความลับ",
+            "ไม่เปลี่ยน Production slug โดยไม่ได้รับอนุมัติ",
+            "ตรวจสอบ Redirect จาก Slug เดิม",
+            "อัปเดต External link ที่บริษัทควบคุมเมื่อจำเป็น",
+            "ตรวจสอบ Sitemap และ Canonical URL หลังเปลี่ยน Production",
+          ],
+        },
+      },
+
+      {
+        id: "company-branding",
+
+        title: {
+          en: "6. Logo and branding",
+          th: "6. Logo และ Branding",
+        },
+
+        paragraphs: {
+          en: [
+            "Branding settings control the visual identity used by company-aware parts of the CMS and public website.",
+            "Use approved brand assets only. A logo should have clear edges, an appropriate transparent background where required and enough surrounding space to remain readable.",
+            "Before replacing a production logo, verify its appearance on light and dark surfaces and on both desktop and mobile screens.",
+          ],
+
+          th: [
+            "Branding setting ควบคุมตัวตนด้านภาพของบริษัทในส่วนต่าง ๆ ของ CMS และ Public site",
+            "ใช้เฉพาะ Brand asset ที่ได้รับอนุมัติ Logo ควรคมชัด มีพื้นหลังโปร่งใสเมื่อเหมาะสม และมีพื้นที่รอบ Logo เพียงพอให้อ่านได้",
+            "ก่อนเปลี่ยน Logo บน Production ให้ตรวจสอบทั้งพื้นหลังสว่าง พื้นหลังเข้ม Desktop และ Mobile",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-company-branding",
+
+            number: "3",
+
+            src: "/docs/workspace/company/company-branding.png",
+
+            title: {
+              en: "Company branding",
+              th: "Branding ของบริษัท",
+            },
+
+            alt: {
+              en: "Junsekino CMS branding settings showing company logo and color controls",
+              th: "Branding settings แสดง Logo และเครื่องมือเลือกสีของบริษัท",
+            },
+
+            caption: {
+              en: "Logo and color settings may affect Admin controls and public website presentation.",
+              th: "การตั้งค่า Logo และสีอาจส่งผลต่อปุ่มใน Admin และการแสดงผลของเว็บไซต์",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Use PNG, WebP or another format supported by the uploader.",
+            "Preserve the logo's original aspect ratio.",
+            "Use a recommended width of approximately 800–1200 pixels.",
+            "Keep the source file at or below approximately 1 MB when practical.",
+            "Do not stretch, recreate or modify a protected company logo without approval.",
+            "Provide meaningful alternative text when the field is available.",
+          ],
+
+          th: [
+            "ใช้ PNG, WebP หรือ Format ที่ระบบ Upload รองรับ",
+            "รักษา Aspect ratio เดิมของ Logo",
+            "แนะนำความกว้างประมาณ 800–1200 Pixels",
+            "ควรเตรียมไฟล์ไม่เกินประมาณ 1 MB เมื่อทำได้",
+            "ห้ามยืด วาดใหม่ หรือดัดแปลง Logo ที่มีลิขสิทธิ์โดยไม่ได้รับอนุมัติ",
+            "กรอก Alternative text ที่มีความหมายเมื่อมีช่องรองรับ",
+          ],
+        },
+      },
+
+      {
+        id: "company-colors",
+
+        title: {
+          en: "7. Company colors and contrast",
+          th: "7. สีบริษัทและ Contrast",
+        },
+
+        paragraphs: {
+          en: [
+            "Primary and secondary colors may be used for buttons, active states, highlights, links and other branded elements.",
+            "A brand color must remain readable when combined with foreground text. A dark background normally requires light text, while a light background normally requires dark text.",
+            "Do not select color combinations based only on appearance in the color picker. Test real buttons, labels and public components after saving.",
+          ],
+
+          th: [
+            "Primary และ Secondary color อาจถูกใช้กับ Button, Active state, Highlight, Link และส่วนประกอบที่แสดง Brand",
+            "สีพื้นหลังต้องมี Contrast กับข้อความเพียงพอ โดยสีพื้นเข้มควรใช้ข้อความสว่าง และสีพื้นอ่อนควรใช้ข้อความเข้ม",
+            "ไม่ควรเลือกสีจาก Color picker เพียงอย่างเดียว ต้องตรวจสอบ Button, Label และ Public component จริงหลัง Save",
+          ],
+        },
+
+        items: {
+          en: [
+            "Use the approved company color values.",
+            "Check text placed on the primary-color background.",
+            "Check hover, focus, active and disabled states.",
+            "Verify Admin and public-site use.",
+            "Review desktop and mobile presentation.",
+            "Correct unreadable combinations before production use.",
+          ],
+
+          th: [
+            "ใช้ค่าสีที่บริษัทอนุมัติ",
+            "ตรวจสอบข้อความบนพื้น Primary color",
+            "ตรวจสอบ Hover, Focus, Active และ Disabled state",
+            "ตรวจสอบทั้ง Admin และ Public site",
+            "ตรวจสอบ Desktop และ Mobile",
+            "แก้สีที่อ่านยากก่อนใช้บน Production",
+          ],
+        },
+      },
+
+      {
+        id: "company-social-links",
+
+        title: {
+          en: "8. Social-media links",
+          th: "8. Social Media",
+        },
+
+        paragraphs: {
+          en: [
+            "Social-media settings connect public company icons to approved official profiles. Only enter links controlled or authorized by the company.",
+            "Use the complete HTTPS URL where applicable. After saving, test every icon from the public website.",
+            "Leave an unsupported or unused channel empty rather than linking it to an unrelated personal account.",
+          ],
+
+          th: [
+            "Social Media setting ใช้เชื่อม Icon บนหน้า Public ไปยัง Official profile ที่บริษัทอนุมัติ ควรใส่เฉพาะ Link ที่บริษัทควบคุมหรืออนุญาต",
+            "ควรใช้ HTTPS URL แบบเต็มเมื่อช่องทางนั้นรองรับ และทดสอบ Icon ทุกอันจากหน้า Public หลัง Save",
+            "หากบริษัทไม่ใช้ช่องทางใด ให้เว้นว่างแทนการเชื่อมไปยังบัญชีส่วนบุคคลหรือบัญชีที่ไม่เกี่ยวข้อง",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-company-social-links",
+
+            number: "4",
+
+            src: "/docs/workspace/company/company-social-links.png",
+
+            title: {
+              en: "Social-media settings",
+              th: "การตั้งค่า Social Media",
+            },
+
+            alt: {
+              en: "Company social-media fields for Facebook Instagram YouTube LinkedIn Pinterest and LINE",
+              th: "ช่อง Social Media สำหรับ Facebook, Instagram, YouTube, LinkedIn, Pinterest และ LINE",
+            },
+
+            caption: {
+              en: "Enter approved official links and verify every public icon after saving.",
+              th: "กรอก Official link ที่ได้รับอนุมัติและทดสอบ Public icon ทุกช่องทางหลัง Save",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Facebook: official company page URL.",
+            "Instagram: official company profile URL.",
+            "YouTube: official channel or approved profile URL.",
+            "LinkedIn: official company page URL.",
+            "Pinterest: official profile or approved board URL.",
+            "LINE: approved official account or public contact link.",
+          ],
+
+          th: [
+            "Facebook: URL ของ Official company page",
+            "Instagram: URL ของ Official company profile",
+            "YouTube: Official channel หรือ Profile ที่ได้รับอนุมัติ",
+            "LinkedIn: URL ของ Official company page",
+            "Pinterest: Official profile หรือ Board ที่ได้รับอนุมัติ",
+            "LINE: Official account หรือ Public contact link ที่ได้รับอนุมัติ",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Open the official social-media profile.",
+            "Copy its public URL.",
+            "Paste the URL into the matching company field.",
+            "Repeat for each supported channel.",
+            "Save the Company settings.",
+            "Open the public website.",
+            "Select every displayed social icon and verify its destination.",
+          ],
+
+          th: [
+            "เปิด Official social profile",
+            "คัดลอก Public URL",
+            "วาง URL ในช่องของ Platform ที่ตรงกัน",
+            "ทำซ้ำสำหรับทุกช่องทาง",
+            "Save Company settings",
+            "เปิดเว็บไซต์ Public",
+            "กด Social icon ทุกอันและตรวจสอบปลายทาง",
+          ],
+        },
+      },
+
+      {
+        id: "public-website",
+
+        title: {
+          en: "9. Public website and View Website",
+          th: "9. Public Website และ View Website",
+        },
+
+        paragraphs: {
+          en: [
+            "The public website section identifies where the active company's website can be opened. Use View Website to verify saved content and branding without manually constructing a URL.",
+            "The public page should normally open in a separate browser tab so the Admin workspace remains available.",
+            "View Website displays the public result; it does not automatically publish Draft content.",
+          ],
+
+          th: [
+            "ส่วน Public website ใช้ระบุ URL ของเว็บไซต์บริษัทปัจจุบัน ใช้ปุ่ม View Website เพื่อตรวจสอบข้อมูลและ Branding โดยไม่ต้องประกอบ URL เอง",
+            "หน้า Public ควรเปิดใน Browser tab ใหม่เพื่อให้หน้า Admin ที่กำลังทำงานยังคงอยู่",
+            "View Website ใช้เปิดผลลัพธ์ Public แต่ไม่ได้ Publish เนื้อหา Draft โดยอัตโนมัติ",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-company-public-website",
+
+            number: "5",
+
+            src: "/docs/workspace/company/company-public-website.png",
+
+            title: {
+              en: "Public website access",
+              th: "การเปิดเว็บไซต์ Public",
+            },
+
+            alt: {
+              en: "Company public website settings and View Website action",
+              th: "การตั้งค่า Public website และปุ่ม View Website",
+            },
+
+            caption: {
+              en: "Use View Website to inspect the active company's current public presentation.",
+              th: "ใช้ View Website เพื่อตรวจสอบหน้า Public ปัจจุบันของบริษัทที่เลือก",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Confirm the active company before opening the website.",
+            "Verify the company slug in the public URL.",
+            "Open the website in a new tab.",
+            "Check the logo, colors, navigation and social links.",
+            "Use a private browser window when testing first-visit behavior such as Cookie consent.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัทก่อนเปิดเว็บไซต์",
+            "ตรวจสอบ Company slug ใน Public URL",
+            "เปิดเว็บไซต์ใน Tab ใหม่",
+            "ตรวจสอบ Logo, สี, Navigation และ Social link",
+            "ใช้ Private browser เมื่อต้องทดสอบ First visit เช่น Cookie consent",
+          ],
+        },
+      },
+
+      {
+        id: "save-company",
+
+        title: {
+          en: "10. Save and verify company changes",
+          th: "10. Save และตรวจสอบข้อมูลบริษัท",
+        },
+
+        paragraphs: {
+          en: [
+            "Review the complete form before saving because company settings may be used by multiple modules.",
+            "Wait for the success confirmation before leaving the page. If saving fails, keep the page open and correct the reported fields.",
+            "After a successful save, verify both the Admin interface and public website according to the fields changed.",
+          ],
+
+          th: [
+            "ตรวจสอบ Form ทั้งหมดก่อน Save เพราะ Company setting อาจถูกนำไปใช้ในหลายโมดูล",
+            "รอข้อความยืนยันว่าบันทึกสำเร็จก่อนออกจากหน้า หาก Save ไม่ผ่าน ให้เปิดหน้าค้างไว้และแก้ช่องที่ระบบแจ้ง",
+            "หลัง Save สำเร็จ ให้ตรวจสอบทั้ง Admin และ Public ตามข้อมูลที่เปลี่ยน",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Confirm the active company.",
+            "Review all modified fields.",
+            "Check public contact information.",
+            "Check the slug before changing it.",
+            "Review logo and color previews.",
+            "Validate every social URL.",
+            "Select Save.",
+            "Wait for the success confirmation.",
+            "Refresh the Company workspace once.",
+            "Open View Website and verify the public result.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัทปัจจุบัน",
+            "ตรวจสอบทุกช่องที่แก้ไข",
+            "ตรวจสอบข้อมูลติดต่อ Public",
+            "ตรวจสอบ Slug ก่อนเปลี่ยน",
+            "ตรวจสอบ Preview ของ Logo และสี",
+            "ตรวจสอบ Social URL ทุกช่อง",
+            "กด Save",
+            "รอข้อความยืนยัน",
+            "Refresh หน้า Company หนึ่งครั้ง",
+            "เปิด View Website และตรวจสอบ Public",
+          ],
+        },
+      },
+
+      {
+        id: "create-company",
+
+        title: {
+          en: "11. Create a company",
+          th: "11. สร้างบริษัทใหม่",
+        },
+
+        paragraphs: {
+          en: [
+            "Creating a company is a platform-level action intended for an authorized Superadmin. It creates a separate company workspace and prepares the initial records required by the CMS.",
+            "A new company should not be created merely to test a form or temporary design. Use an approved development process for testing.",
+            "Company creation and content publication are separate. A newly created company still requires configuration, content, legal review and public verification.",
+          ],
+
+          th: [
+            "การสร้าง Company เป็นคำสั่งระดับ Platform สำหรับ Superadmin ที่ได้รับอนุญาต ระบบจะสร้าง Workspace แยกและเตรียมข้อมูลเริ่มต้นที่ CMS ต้องใช้",
+            "ไม่ควรสร้างบริษัทใหม่เพียงเพื่อทดสอบ Form หรือ Design ชั่วคราว ควรใช้กระบวนการ Development ที่บริษัทอนุมัติ",
+            "การสร้าง Company ไม่เท่ากับการ Publish เว็บไซต์ บริษัทใหม่ยังต้องตั้งค่า เพิ่มเนื้อหา ตรวจสอบกฎหมาย และทดสอบ Public site",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-create-company",
+
+            number: "6",
+
+            src: "/docs/workspace/company/create-company.png",
+
+            title: {
+              en: "Create Company",
+              th: "สร้าง Company",
+            },
+
+            alt: {
+              en: "Junsekino CMS form used by a Superadmin to create a company",
+              th: "Form ใน Junsekino CMS สำหรับ Superadmin สร้างบริษัท",
+            },
+
+            caption: {
+              en: "Only an authorized Superadmin should create a new company workspace.",
+              th: "เฉพาะ Superadmin ที่ได้รับอนุญาตควรสร้าง Company workspace ใหม่",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Receive approval to create the company.",
+            "Confirm the official company name and intended public slug.",
+            "Open the Create Company action as Superadmin.",
+            "Enter the required initial information.",
+            "Review the company identity and slug.",
+            "Create the company and wait for bootstrap completion.",
+            "Select the new company from the company switcher.",
+            "Configure localization, branding, navigation, SEO, email and privacy.",
+            "Add authorized members.",
+            "Prepare and review content before public release.",
+          ],
+
+          th: [
+            "รับอนุมัติให้สร้างบริษัท",
+            "ยืนยันชื่อบริษัทและ Public slug",
+            "เปิด Create Company ด้วย Superadmin",
+            "กรอกข้อมูลเริ่มต้นที่บังคับ",
+            "ตรวจสอบตัวตนบริษัทและ Slug",
+            "สร้าง Company และรอ Bootstrap ให้เสร็จ",
+            "เลือกบริษัทใหม่จาก Company switcher",
+            "ตั้งค่า Localization, Branding, Navigation, SEO, Email และ Privacy",
+            "เพิ่มสมาชิกที่ได้รับอนุญาต",
+            "จัดเตรียมและตรวจสอบเนื้อหาก่อนเปิด Public",
+          ],
+        },
+      },
+
+      {
+        id: "company-mobile",
+
+        title: {
+          en: "12. Company workspace on mobile",
+          th: "12. หน้า Company บนมือถือ",
+        },
+
+        paragraphs: {
+          en: [
+            "On mobile screens, Company sections and fields are arranged vertically. Scroll through the complete form before saving.",
+            "Color controls, media selectors and long URLs may require more attention on a narrow screen. Use a desktop when precise visual comparison is required.",
+            "The same company and permission rules apply on mobile.",
+          ],
+
+          th: [
+            "บน Mobile ส่วนต่าง ๆ และช่องของหน้า Company จะเรียงในแนวตั้ง ควรเลื่อนตรวจสอบ Form ทั้งหมดก่อน Save",
+            "Color control, Media selector และ URL ยาวอาจตรวจสอบยากขึ้นบนจอแคบ ควรใช้ Desktop เมื่อต้องเปรียบเทียบด้านภาพอย่างละเอียด",
+            "กฎเรื่อง Company และ Permission บน Mobile เหมือน Desktop",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-company-mobile",
+
+            number: "7",
+
+            src: "/docs/workspace/company/company-mobile.png",
+
+            title: {
+              en: "Responsive Company workspace",
+              th: "หน้า Company แบบ Responsive",
+            },
+
+            alt: {
+              en: "Junsekino CMS Company workspace arranged for a mobile screen",
+              th: "หน้า Company ของ Junsekino CMS ที่จัดเรียงสำหรับ Mobile",
+            },
+
+            caption: {
+              en: "Company fields stack vertically on mobile while preserving the same functionality.",
+              th: "ช่อง Company จะเรียงในแนวตั้งบน Mobile โดยยังใช้ Function ชุดเดียวกัน",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Confirm the active company in the mobile header.",
+            "Scroll through every section before saving.",
+            "Open selectors and dialogs carefully.",
+            "Check that long URLs do not contain missing characters.",
+            "Use desktop view for detailed branding review when practical.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัทจาก Mobile header",
+            "เลื่อนตรวจสอบทุก Section ก่อน Save",
+            "เปิด Selector และ Dialog อย่างระมัดระวัง",
+            "ตรวจสอบ URL ยาวว่าไม่มีตัวอักษรตกหล่น",
+            "ใช้ Desktop เมื่อต้องตรวจ Branding อย่างละเอียด",
+          ],
+        },
+      },
+
+      {
+        id: "company-troubleshooting",
+
+        title: {
+          en: "13. Common company problems",
+          th: "13. ปัญหาที่พบบ่อย",
+        },
+
+        paragraphs: {
+          en: [
+            "When Company changes do not appear as expected, verify the active company and the specific location where the value should be used before editing again.",
+            "Avoid repeatedly saving different values while investigating. Record the expected result and identify whether the issue is in Admin data, public rendering or caching.",
+          ],
+
+          th: [
+            "เมื่อข้อมูล Company ไม่แสดงตามที่คาด ให้ตรวจสอบบริษัทและตำแหน่งที่ควรนำข้อมูลไปใช้ก่อนแก้ซ้ำ",
+            "ไม่ควร Save ค่าหลายแบบต่อเนื่องระหว่างตรวจสอบ ให้ระบุผลลัพธ์ที่คาดหวังและแยกว่าเป็นปัญหาของ Admin data, Public rendering หรือ Cache",
+          ],
+        },
+
+        items: {
+          en: [
+            "Wrong company changed: verify the company switcher before every edit.",
+            "Logo not updated: confirm upload completion, save status and public refresh.",
+            "Unreadable button text: review the primary color and foreground contrast.",
+            "Social icon missing: confirm that a valid URL is saved for that platform.",
+            "Social link opens incorrectly: use the complete approved public URL.",
+            "Old public information: refresh the page and allow cache revalidation.",
+            "Save denied: review membership, role and company-update permission.",
+            "Slug page not found: confirm the saved slug and publication configuration.",
+          ],
+
+          th: [
+            "แก้ผิดบริษัท: ตรวจสอบ Company switcher ก่อนแก้ทุกครั้ง",
+            "Logo ไม่เปลี่ยน: ตรวจสอบ Upload, Save และ Refresh หน้า Public",
+            "ข้อความบนปุ่มอ่านไม่ออก: ตรวจสอบ Primary color และ Foreground contrast",
+            "Social icon ไม่แสดง: ตรวจสอบว่า Platform นั้นมี URL ที่ถูกต้อง",
+            "Social link เปิดผิด: ใช้ Public URL แบบเต็มที่ได้รับอนุมัติ",
+            "หน้า Public ยังเป็นข้อมูลเดิม: Refresh และรอ Cache revalidation",
+            "Save ไม่ได้: ตรวจสอบ Membership, Role และ Company update permission",
+            "เปิด Slug ไม่พบ: ตรวจสอบ Slug ที่ Save และ Public configuration",
+          ],
+        },
+      },
+
+      {
+        id: "company-checklist",
+
+        title: {
+          en: "14. Company settings checklist",
+          th: "14. Checklist ข้อมูลบริษัท",
+        },
+
+        paragraphs: {
+          en: [
+            "Use this checklist before saving significant Company changes or preparing a new company for public release.",
+          ],
+
+          th: [
+            "ใช้ Checklist นี้ก่อน Save การเปลี่ยนแปลงสำคัญ หรือก่อนเปิดเว็บไซต์ของบริษัทใหม่",
+          ],
+        },
+
+        items: {
+          en: [
+            "The correct company is selected.",
+            "The user is authorized to make the change.",
+            "Company and legal names are accurate.",
+            "Public email, phone and address are approved.",
+            "The company slug is correct and stable.",
+            "The logo is approved, clear and correctly proportioned.",
+            "Company colors provide readable contrast.",
+            "Every configured social URL opens the official profile.",
+            "No passwords, secrets or unnecessary personal data are entered.",
+            "Localization and public content remain correct.",
+            "The changes were saved successfully.",
+            "Admin and public presentation were verified on desktop and mobile.",
+          ],
+
+          th: [
+            "เลือกบริษัทถูกต้อง",
+            "ผู้ใช้ได้รับอนุญาตให้แก้ข้อมูล",
+            "Company name และ Legal name ถูกต้อง",
+            "Email, Phone และ Address สำหรับ Public ได้รับอนุมัติ",
+            "Company slug ถูกต้องและไม่ควรเปลี่ยนบ่อย",
+            "Logo ได้รับอนุมัติ คมชัด และมีสัดส่วนถูกต้อง",
+            "สีบริษัทมี Contrast ที่อ่านได้",
+            "Social URL ทุกช่องเปิด Official profile ถูกต้อง",
+            "ไม่มี Password, Secret หรือข้อมูลส่วนบุคคลเกินจำเป็น",
+            "Localization และ Public content ยังถูกต้อง",
+            "Save สำเร็จ",
+            "ตรวจสอบ Admin และ Public ทั้ง Desktop และ Mobile",
+          ],
+        },
+      },
+    ],
+  },
+  "workspace/members": {
+    eyebrow: {
+      en: "Workspace",
+      th: "พื้นที่ทำงาน",
+    },
+
+    title: {
+      en: "Members",
+      th: "สมาชิก",
+    },
+
+    description: {
+      en: "Add, find, update, suspend, reset and remove company members safely.",
+      th: "เพิ่ม ค้นหา แก้ไข ระงับ Reset Password และนำสมาชิกบริษัทออกอย่างปลอดภัย",
+    },
+
+    introduction: {
+      en: [
+        "The Members workspace manages user access to the active company. A member combines a platform user account with a company-specific role, status and permissions.",
+        "Member management is security-sensitive. Always verify the active company, target account and intended access level before saving.",
+        "The actions available depend on the signed-in administrator's role and permissions. Server-side authorization remains enforced even when a page is opened directly by URL.",
+      ],
+
+      th: [
+        "หน้า Members ใช้จัดการสิทธิ์ของผู้ใช้ในบริษัทปัจจุบัน โดย Member เป็นการเชื่อม Platform user เข้ากับ Role, Status และ Permission ของบริษัท",
+        "การจัดการสมาชิกเกี่ยวข้องกับความปลอดภัย ต้องตรวจสอบบริษัท บัญชีเป้าหมาย และระดับสิทธิ์ก่อน Save ทุกครั้ง",
+        "คำสั่งที่ใช้งานได้ขึ้นอยู่กับ Role และ Permission ของผู้ดูแล และ Server จะตรวจสอบสิทธิ์เสมอแม้เปิดหน้าด้วย URL โดยตรง",
+      ],
+    },
+
+    highlights: [
+      {
+        title: {
+          en: "Company membership",
+          th: "สมาชิกแยกตามบริษัท",
+        },
+
+        description: {
+          en: "Membership grants an account access to one specific company.",
+          th: "Membership ให้บัญชีเข้าถึงบริษัทที่กำหนด",
+        },
+      },
+
+      {
+        title: {
+          en: "Existing or new user",
+          th: "ผู้ใช้ใหม่หรือผู้ใช้เดิม",
+        },
+
+        description: {
+          en: "A membership may connect an existing account or create a new user.",
+          th: "สามารถเชื่อมบัญชีเดิมหรือสร้างผู้ใช้ใหม่พร้อม Membership",
+        },
+      },
+
+      {
+        title: {
+          en: "Recoverable access control",
+          th: "ควบคุมสิทธิ์อย่างปลอดภัย",
+        },
+
+        description: {
+          en: "Suspend access temporarily or remove membership when access must end.",
+          th: "ระงับชั่วคราวหรือนำ Membership ออกเมื่อสิทธิ์ต้องสิ้นสุด",
+        },
+      },
+
+      {
+        title: {
+          en: "Protected administrators",
+          th: "ป้องกันบัญชีผู้ดูแล",
+        },
+
+        description: {
+          en: "Additional restrictions protect Superadmin accounts and platform access.",
+          th: "ระบบมีข้อจำกัดเพิ่มเติมเพื่อป้องกัน Superadmin และ Platform",
+        },
+      },
+    ],
+
+    sections: [
+      {
+        id: "members-overview",
+
+        title: {
+          en: "1. Members workspace overview",
+          th: "1. ภาพรวมหน้า Members",
+        },
+
+        paragraphs: {
+          en: [
+            "The Members workspace lists accounts associated with the active company. Authorized Superadmins may also see eligible platform users who are not yet assigned to the company.",
+            "Use the list to review identity, role, membership status and available account actions.",
+            "Changing the company switcher reloads the member list for the newly selected company.",
+          ],
+
+          th: [
+            "หน้า Members แสดงบัญชีที่เกี่ยวข้องกับบริษัทปัจจุบัน และ Superadmin ที่ได้รับอนุญาตอาจเห็น Platform user ที่ยังไม่ได้เพิ่มเข้าเป็นสมาชิกบริษัท",
+            "ใช้รายการนี้เพื่อตรวจสอบตัวตน Role, Membership status และคำสั่งจัดการบัญชี",
+            "เมื่อเปลี่ยน Company switcher ระบบจะโหลดรายชื่อสมาชิกของบริษัทที่เลือกใหม่",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-members-workspace",
+
+            number: "1",
+
+            src: "/docs/getting-started/roles-permissions/members-overview.png",
+
+            title: {
+              en: "Members workspace",
+              th: "หน้า Members",
+            },
+
+            alt: {
+              en: "Junsekino CMS Members workspace showing company accounts, roles and statuses",
+              th: "หน้า Members แสดงบัญชี Role และ Status ของบริษัท",
+            },
+
+            caption: {
+              en: "Confirm the active company before searching, adding or editing a member.",
+              th: "ตรวจสอบบริษัทปัจจุบันก่อนค้นหา เพิ่ม หรือแก้ไขสมาชิก",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Identity: identifies the platform user.",
+            "Role: standard access level for the company.",
+            "Status: indicates whether the membership is active or suspended.",
+            "Permissions: determine allowed modules and actions.",
+            "Actions: provide editing and account-management commands.",
+          ],
+
+          th: [
+            "Identity: ใช้ระบุ Platform user",
+            "Role: ระดับสิทธิ์มาตรฐานสำหรับบริษัท",
+            "Status: ระบุว่า Membership เป็น Active หรือ Suspended",
+            "Permission: กำหนดโมดูลและคำสั่งที่ใช้งานได้",
+            "Actions: คำสั่งสำหรับแก้ไขและจัดการบัญชี",
+          ],
+        },
+      },
+
+      {
+        id: "find-member",
+
+        title: {
+          en: "2. Find and review a member",
+          th: "2. ค้นหาและตรวจสอบสมาชิก",
+        },
+
+        paragraphs: {
+          en: [
+            "Use search and available filters to locate the required account. Verify more than one identity value when users have similar names.",
+            "Before opening an action, confirm the active company, member name, email or username, role and status.",
+          ],
+
+          th: [
+            "ใช้ Search และ Filter ที่มีเพื่อค้นหาบัญชี หากผู้ใช้มีชื่อคล้ายกันควรตรวจสอบข้อมูลระบุตัวตนมากกว่าหนึ่งรายการ",
+            "ก่อนเปิดคำสั่ง ให้ตรวจสอบบริษัท ชื่อสมาชิก Email หรือ Username, Role และ Status",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Select the required company.",
+            "Open Members.",
+            "Enter the available name, email or account information in search.",
+            "Apply a role or status filter when available.",
+            "Review the matching records.",
+            "Confirm the exact target before opening the member editor.",
+          ],
+
+          th: [
+            "เลือกบริษัทที่ต้องการ",
+            "เปิด Members",
+            "กรอกชื่อ Email หรือข้อมูลบัญชีในช่อง Search",
+            "ใช้ Filter ของ Role หรือ Status เมื่อมี",
+            "ตรวจสอบรายการที่ค้นพบ",
+            "ยืนยันบัญชีเป้าหมายก่อนเปิด Editor",
+          ],
+        },
+      },
+
+      {
+        id: "member-statuses",
+
+        title: {
+          en: "3. Member and account statuses",
+          th: "3. สถานะสมาชิกและบัญชี",
+        },
+
+        paragraphs: {
+          en: [
+            "Membership status controls access to a particular company. Platform account status and company membership status are related but separate controls.",
+            "A user may have an active platform account but a suspended membership in one company.",
+            "An unassigned platform user is not yet an active member of the selected company.",
+          ],
+
+          th: [
+            "Membership status ใช้ควบคุมสิทธิ์ในบริษัทหนึ่ง ส่วน Platform account status และ Company membership status เป็นการควบคุมที่เกี่ยวข้องกันแต่แยกจากกัน",
+            "ผู้ใช้อาจมี Platform account เป็น Active แต่ Membership ของบริษัทหนึ่งเป็น Suspended",
+            "Platform user ที่เป็น Unassigned ยังไม่ถือเป็นสมาชิกที่ใช้งานได้ของบริษัทปัจจุบัน",
+          ],
+        },
+
+        items: {
+          en: [
+            "Active: membership can be used subject to role and permissions.",
+            "Suspended: company access is temporarily blocked.",
+            "Unassigned: platform user is visible for assignment but is not a company member.",
+            "Removed: membership is no longer available for normal company access.",
+            "Deleted account: platform-level account state handled only by authorized administrators.",
+          ],
+
+          th: [
+            "Active: ใช้ Membership ได้ภายใต้ Role และ Permission",
+            "Suspended: ระงับสิทธิ์เข้าบริษัทชั่วคราว",
+            "Unassigned: Platform user ที่สามารถเลือกเพิ่มได้ แต่ยังไม่เป็นสมาชิกบริษัท",
+            "Removed: Membership ไม่สามารถใช้เข้าบริษัทตามปกติแล้ว",
+            "Deleted account: สถานะบัญชีระดับ Platform ซึ่งจัดการโดยผู้ดูแลที่ได้รับอนุญาตเท่านั้น",
+          ],
+        },
+      },
+
+      {
+        id: "add-member",
+
+        title: {
+          en: "4. Add a member",
+          th: "4. เพิ่มสมาชิก",
+        },
+
+        paragraphs: {
+          en: [
+            "Add Member connects a user to the active company. Depending on the supplied identity, the service may create a new platform account or assign an existing user.",
+            "Use a unique and verified email or account identity. Confirm the role and status before submitting.",
+            "Do not create duplicate accounts when the person already has a Junsekino CMS account.",
+          ],
+
+          th: [
+            "Add Member ใช้เชื่อมผู้ใช้เข้ากับบริษัทปัจจุบัน โดยระบบอาจสร้าง Platform account ใหม่หรือเพิ่มผู้ใช้เดิมตามข้อมูลที่กรอก",
+            "ใช้ Email หรือข้อมูลบัญชีที่ไม่ซ้ำและตรวจสอบแล้ว พร้อมตรวจสอบ Role และ Status ก่อนบันทึก",
+            "ไม่ควรสร้างบัญชีซ้ำหากบุคคลนั้นมีบัญชี Junsekino CMS อยู่แล้ว",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-add-company-member",
+
+            number: "2",
+
+            src: "/docs/getting-started/roles-permissions/add-member.png",
+
+            title: {
+              en: "Add Member",
+              th: "เพิ่มสมาชิก",
+            },
+
+            alt: {
+              en: "Junsekino CMS Add Member form for account and company access information",
+              th: "แบบฟอร์ม Add Member สำหรับข้อมูลบัญชีและสิทธิ์บริษัท",
+            },
+
+            caption: {
+              en: "Review the identity, company, role and status before creating the membership.",
+              th: "ตรวจสอบตัวตน บริษัท Role และ Status ก่อนสร้าง Membership",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Confirm the active company.",
+            "Select Add Member.",
+            "Search or enter the user's approved identity information.",
+            "Use the existing account when a matching platform user is found.",
+            "Enter the required new-account information only when no account exists.",
+            "Select the minimum appropriate role.",
+            "Review permissions when they are configurable.",
+            "Set the membership status.",
+            "Submit and wait for confirmation.",
+            "Verify that the member appears in the company list.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัทปัจจุบัน",
+            "กด Add Member",
+            "ค้นหาหรือกรอกข้อมูลระบุตัวตนที่ได้รับอนุมัติ",
+            "ใช้บัญชีเดิมเมื่อพบ Platform user ที่ตรงกัน",
+            "กรอกข้อมูลสร้างบัญชีเมื่อยืนยันแล้วว่ายังไม่มีบัญชี",
+            "เลือก Role ต่ำสุดที่เพียงพอต่อหน้าที่",
+            "ตรวจสอบ Permission เมื่อสามารถกำหนดได้",
+            "กำหนด Membership status",
+            "บันทึกและรอข้อความยืนยัน",
+            "ตรวจสอบว่าสมาชิกแสดงในรายการบริษัท",
+          ],
+        },
+      },
+
+      {
+        id: "new-and-existing-users",
+
+        title: {
+          en: "5. New users and existing platform users",
+          th: "5. ผู้ใช้ใหม่และ Platform User เดิม",
+        },
+
+        paragraphs: {
+          en: [
+            "A platform user account should normally be created only once. Memberships then connect that account to the companies the person is authorized to access.",
+            "When assigning an existing user, do not overwrite their personal profile or credentials unnecessarily.",
+            "Access in one company does not automatically grant access to another company.",
+          ],
+
+          th: [
+            "โดยปกติควรสร้าง Platform user account เพียงครั้งเดียว จากนั้นใช้ Membership เชื่อมบัญชีเข้ากับบริษัทที่บุคคลได้รับอนุญาต",
+            "เมื่อเพิ่มผู้ใช้เดิม ไม่ควรแก้ Profile หรือ Credential ของผู้ใช้นั้นโดยไม่จำเป็น",
+            "การมีสิทธิ์ในบริษัทหนึ่งไม่ได้ให้สิทธิ์อีกบริษัทโดยอัตโนมัติ",
+          ],
+        },
+
+        items: {
+          en: [
+            "New user: create an account and its first company membership.",
+            "Existing user: assign an additional company membership.",
+            "Unassigned user: existing platform account without active membership in the selected company.",
+            "Superadmin: may access platform-level company management without ordinary membership in every company.",
+          ],
+
+          th: [
+            "New user: สร้างบัญชีและ Company membership แรก",
+            "Existing user: เพิ่ม Membership ของบริษัทให้บัญชีเดิม",
+            "Unassigned user: มี Platform account แต่ยังไม่มี Active membership ในบริษัทที่เลือก",
+            "Superadmin: สามารถจัดการระดับ Platform ได้โดยไม่ต้องมี Membership ปกติในทุกบริษัท",
+          ],
+        },
+      },
+
+      {
+        id: "edit-member",
+
+        title: {
+          en: "6. Edit a member",
+          th: "6. แก้ไขสมาชิก",
+        },
+
+        paragraphs: {
+          en: [
+            "Use the member editor to update approved membership information. Changing access may affect the user immediately or from their next authenticated request.",
+            "Do not increase a role solely to troubleshoot a missing menu. Determine the required permission and obtain approval first.",
+          ],
+
+          th: [
+            "ใช้ Member editor เพื่อแก้ Membership ตามที่ได้รับอนุมัติ การเปลี่ยนสิทธิ์อาจมีผลทันทีหรือในการตรวจสอบ Session ครั้งถัดไป",
+            "ไม่ควรเพิ่ม Role เพียงเพื่อแก้ปัญหาเมนูไม่แสดง ต้องตรวจสอบ Permission ที่จำเป็นและรับอนุมัติก่อน",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-edit-company-member",
+
+            number: "3",
+
+            src: "/docs/getting-started/roles-permissions/edit-member-role.png",
+
+            title: {
+              en: "Edit member access",
+              th: "แก้ไขสิทธิ์สมาชิก",
+            },
+
+            alt: {
+              en: "Junsekino CMS member editor showing role status and permissions",
+              th: "Member editor แสดง Role, Status และ Permission",
+            },
+
+            caption: {
+              en: "Review the complete access configuration before saving.",
+              th: "ตรวจสอบการตั้งค่าสิทธิ์ทั้งหมดก่อน Save",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Find and verify the target member.",
+            "Open Edit Member.",
+            "Confirm the company shown by the editor.",
+            "Review the existing role, status and permissions.",
+            "Apply the approved changes.",
+            "Save and wait for confirmation.",
+            "Reopen the member to verify saved values.",
+            "Ask the user to sign in again if their existing session still shows old access.",
+          ],
+
+          th: [
+            "ค้นหาและยืนยันสมาชิกเป้าหมาย",
+            "เปิด Edit Member",
+            "ตรวจสอบบริษัทใน Editor",
+            "ตรวจสอบ Role, Status และ Permission เดิม",
+            "เปลี่ยนเฉพาะข้อมูลที่ได้รับอนุมัติ",
+            "Save และรอข้อความยืนยัน",
+            "เปิดสมาชิกอีกครั้งเพื่อตรวจค่าที่บันทึก",
+            "ให้ผู้ใช้ออกจากระบบและเข้าสู่ระบบใหม่หาก Session เดิมยังแสดงสิทธิ์เก่า",
+          ],
+        },
+      },
+
+      {
+        id: "suspend-member",
+
+        title: {
+          en: "7. Suspend and reactivate access",
+          th: "7. Suspend และเปิดสิทธิ์อีกครั้ง",
+        },
+
+        paragraphs: {
+          en: [
+            "Use Suspended when company access must be blocked temporarily while preserving the membership and its historical references.",
+            "Suspension may be appropriate during an investigation, extended leave, temporary contract interruption or pending access review.",
+            "Reactivate access only after receiving approval and confirming that the existing role and permissions remain appropriate.",
+          ],
+
+          th: [
+            "ใช้ Suspended เมื่อต้องปิดสิทธิ์เข้าบริษัทชั่วคราว โดยยังเก็บ Membership และข้อมูลอ้างอิงในประวัติ",
+            "การ Suspend อาจใช้ระหว่างตรวจสอบเหตุการณ์ การลาระยะยาว การหยุดสัญญาชั่วคราว หรือรอทบทวนสิทธิ์",
+            "เปิดสิทธิ์อีกครั้งหลังได้รับอนุมัติและตรวจสอบว่า Role กับ Permission เดิมยังเหมาะสม",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Verify the target member.",
+            "Review current responsibilities and pending work.",
+            "Open the member editor.",
+            "Change the membership status to Suspended.",
+            "Save and verify that access is blocked.",
+            "Document the reason according to company procedure.",
+            "Before reactivation, review role and permissions again.",
+          ],
+
+          th: [
+            "ตรวจสอบสมาชิกเป้าหมาย",
+            "ตรวจสอบความรับผิดชอบและงานที่ค้างอยู่",
+            "เปิด Member editor",
+            "เปลี่ยน Membership status เป็น Suspended",
+            "Save และตรวจสอบว่าสิทธิ์ถูกระงับ",
+            "บันทึกเหตุผลตามขั้นตอนของบริษัท",
+            "ก่อน Reactivate ให้ตรวจสอบ Role และ Permission อีกครั้ง",
+          ],
+        },
+      },
+
+      {
+        id: "member-actions",
+
+        title: {
+          en: "8. Member actions",
+          th: "8. คำสั่งจัดการสมาชิก",
+        },
+
+        paragraphs: {
+          en: [
+            "The action menu provides commands appropriate for the selected account and the administrator's permission level.",
+            "Read confirmation messages carefully. Member actions may affect authentication, company access and ongoing work.",
+          ],
+
+          th: [
+            "Action menu แสดงคำสั่งที่เหมาะกับบัญชีเป้าหมายและระดับ Permission ของผู้ดูแล",
+            "อ่านข้อความยืนยันให้ละเอียด เพราะคำสั่งอาจส่งผลต่อ Authentication, สิทธิ์บริษัท และงานที่กำลังดำเนินการ",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-company-member-actions",
+
+            number: "4",
+
+            src: "/docs/getting-started/roles-permissions/member-actions.png",
+
+            title: {
+              en: "Member action menu",
+              th: "เมนูคำสั่งสมาชิก",
+            },
+
+            alt: {
+              en: "Junsekino CMS member menu containing account management actions",
+              th: "เมนูสมาชิกใน Junsekino CMS แสดงคำสั่งจัดการบัญชี",
+            },
+
+            caption: {
+              en: "Verify the target account before selecting an account-management action.",
+              th: "ตรวจสอบบัญชีเป้าหมายก่อนเลือกคำสั่งจัดการสมาชิก",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Edit: update member information and approved access.",
+            "Reset Password: begin the password-reset process.",
+            "Suspend: temporarily block company access.",
+            "Reactivate: restore an approved suspended membership.",
+            "Remove: end the membership's access to the selected company.",
+          ],
+
+          th: [
+            "Edit: แก้ไขข้อมูลสมาชิกและสิทธิ์ที่ได้รับอนุมัติ",
+            "Reset Password: เริ่มกระบวนการกำหนดรหัสผ่านใหม่",
+            "Suspend: ระงับสิทธิ์เข้าบริษัทชั่วคราว",
+            "Reactivate: เปิด Membership ที่ได้รับอนุมัติอีกครั้ง",
+            "Remove: สิ้นสุดสิทธิ์ของ Membership ในบริษัทที่เลือก",
+          ],
+        },
+      },
+
+      {
+        id: "reset-password",
+
+        title: {
+          en: "9. Reset a member password",
+          th: "9. Reset Password",
+        },
+
+        paragraphs: {
+          en: [
+            "Reset a password only after verifying the account owner and confirming that the request is legitimate.",
+            "Administrators should never request or record the user's existing password. A reset process should replace the old credential without revealing it.",
+            "If a temporary password is created, deliver it through an approved secure channel and require the account owner to change it.",
+          ],
+
+          th: [
+            "Reset Password หลังจากตรวจสอบเจ้าของบัญชีและยืนยันว่าคำขอถูกต้องแล้วเท่านั้น",
+            "ผู้ดูแลต้องไม่ขอหรือบันทึกรหัสผ่านเดิมของผู้ใช้ กระบวนการ Reset ควรแทนที่รหัสเดิมโดยไม่เปิดเผย",
+            "หากสร้างรหัสผ่านชั่วคราว ต้องส่งผ่านช่องทางปลอดภัยที่ได้รับอนุมัติ และให้เจ้าของบัญชีเปลี่ยนรหัสผ่าน",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Verify the requester's identity.",
+            "Find and confirm the correct account.",
+            "Select Reset Password.",
+            "Read the confirmation and security instructions.",
+            "Complete the supported reset process.",
+            "Deliver temporary instructions securely when required.",
+            "Ask the user to sign in and change the temporary password.",
+            "Suspend and investigate the account if the request appears suspicious.",
+          ],
+
+          th: [
+            "ตรวจสอบตัวตนของผู้ร้องขอ",
+            "ค้นหาและยืนยันบัญชีที่ถูกต้อง",
+            "เลือก Reset Password",
+            "อ่าน Confirmation และคำแนะนำด้าน Security",
+            "ดำเนินการตาม Reset process ที่ระบบรองรับ",
+            "ส่งข้อมูลชั่วคราวผ่านช่องทางปลอดภัยเมื่อจำเป็น",
+            "ให้ผู้ใช้เข้าสู่ระบบและเปลี่ยนรหัสผ่านชั่วคราว",
+            "Suspend และตรวจสอบบัญชีหากคำขอดูน่าสงสัย",
+          ],
+        },
+      },
+
+      {
+        id: "remove-member",
+
+        title: {
+          en: "10. Remove a member",
+          th: "10. นำสมาชิกออก",
+        },
+
+        paragraphs: {
+          en: [
+            "Removing a membership ends the account's normal access to the selected company. It should not erase historical content, submissions or audit references created by that user.",
+            "Use Suspend first when access may need to be restored or when approval is still pending.",
+            "Before removal, transfer responsibility for drafts, scheduled content, messages and other unfinished work.",
+          ],
+
+          th: [
+            "การ Remove membership จะยุติสิทธิ์ปกติของบัญชีในบริษัทที่เลือก แต่ไม่ควรลบ Content, Submission หรือ Audit reference ที่ผู้ใช้เคยสร้าง",
+            "ใช้ Suspend ก่อนเมื่ออาจต้องคืนสิทธิ์ หรือยังรอการอนุมัติ",
+            "ก่อน Remove ให้โอน Draft, Scheduled content, Message และงานที่ยังไม่เสร็จให้ผู้รับผิดชอบคนใหม่",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Confirm the active company and member.",
+            "Check pending responsibilities.",
+            "Transfer required work and ownership.",
+            "Confirm that removal has been approved.",
+            "Open the member action menu.",
+            "Select Remove or Delete Membership.",
+            "Read and confirm the warning.",
+            "Verify that the member no longer has company access.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัทและสมาชิก",
+            "ตรวจสอบความรับผิดชอบที่ค้างอยู่",
+            "โอนงานและ Ownership ที่จำเป็น",
+            "ยืนยันว่าได้รับอนุมัติให้ Remove",
+            "เปิด Member action menu",
+            "เลือก Remove หรือ Delete Membership",
+            "อ่านและยืนยันคำเตือน",
+            "ตรวจสอบว่าสมาชิกไม่สามารถเข้าบริษัทได้แล้ว",
+          ],
+        },
+      },
+
+      {
+        id: "superadmin-protection",
+
+        title: {
+          en: "11. Superadmin protection",
+          th: "11. การป้องกัน Superadmin",
+        },
+
+        paragraphs: {
+          en: [
+            "Superadmin is a protected platform-level role. Additional restrictions reduce the risk of accidental platform lockout or unauthorized privilege changes.",
+            "A Superadmin cannot remove their own Superadmin role, delete their own account or disable their own status through normal management actions.",
+            "An Admin is limited to their assigned company and cannot modify a Superadmin account.",
+          ],
+
+          th: [
+            "Superadmin เป็น Role ระดับ Platform ที่ได้รับการป้องกัน ระบบมีข้อจำกัดเพื่อลดความเสี่ยงจากการล็อกผู้ดูแลทั้งหมดออกจากระบบหรือเปลี่ยนสิทธิ์โดยไม่ได้รับอนุญาต",
+            "Superadmin ไม่สามารถถอด Role ของตนเอง ลบบัญชีตนเอง หรือปิดสถานะตนเองผ่านคำสั่งจัดการตามปกติ",
+            "Admin ถูกจำกัดให้อยู่ในบริษัทที่ได้รับมอบหมายและไม่สามารถแก้บัญชี Superadmin",
+          ],
+        },
+
+        items: {
+          en: [
+            "Do not attempt to bypass a disabled protected action.",
+            "Use another authorized Superadmin for an approved protected-account change.",
+            "Review platform users and company memberships separately.",
+            "Report unexpected privilege changes immediately.",
+          ],
+
+          th: [
+            "ไม่ควรหลีกเลี่ยงคำสั่งป้องกันที่ระบบปิดไว้",
+            "ใช้ Superadmin คนอื่นเมื่อได้รับอนุมัติให้แก้ Protected account",
+            "ตรวจสอบ Platform user และ Company membership แยกกัน",
+            "รายงานการเปลี่ยนสิทธิ์ผิดปกติทันที",
+          ],
+        },
+      },
+
+      {
+        id: "members-troubleshooting",
+
+        title: {
+          en: "12. Common member-management problems",
+          th: "12. ปัญหาที่พบบ่อย",
+        },
+
+        paragraphs: {
+          en: [
+            "When a member cannot access the expected workspace, investigate the complete access chain instead of repeatedly changing the role.",
+          ],
+
+          th: [
+            "เมื่อสมาชิกเข้า Workspace ที่ต้องการไม่ได้ ให้ตรวจสอบลำดับสิทธิ์ทั้งหมดแทนการเปลี่ยน Role ซ้ำไปมา",
+          ],
+        },
+
+        items: {
+          en: [
+            "Member not listed: confirm the active company and search filters.",
+            "Existing email rejected: check whether a platform account already exists.",
+            "Menu missing: review company membership, role and permissions.",
+            "Access denied: confirm that the membership and account are Active.",
+            "Old permissions remain: sign out and sign in again.",
+            "Reset fails: confirm authorization and the target account.",
+            "Cannot edit Superadmin: the action is intentionally protected.",
+            "Removed user still appears in history: audit references are retained intentionally.",
+          ],
+
+          th: [
+            "ไม่พบสมาชิก: ตรวจสอบบริษัทและ Search filter",
+            "Email เดิมใช้ไม่ได้: ตรวจสอบว่ามี Platform account อยู่แล้วหรือไม่",
+            "เมนูไม่แสดง: ตรวจสอบ Company membership, Role และ Permission",
+            "Access denied: ตรวจสอบ Membership และ Account ว่าเป็น Active",
+            "ยังเห็นสิทธิ์เดิม: ออกจากระบบและเข้าสู่ระบบใหม่",
+            "Reset ไม่สำเร็จ: ตรวจสอบ Permission และบัญชีเป้าหมาย",
+            "แก้ Superadmin ไม่ได้: เป็นข้อจำกัดด้าน Security ของระบบ",
+            "ผู้ใช้ที่ Remove แล้วยังอยู่ในประวัติ: ระบบตั้งใจเก็บ Audit reference",
+          ],
+        },
+      },
+
+      {
+        id: "members-checklist",
+
+        title: {
+          en: "13. Member-management checklist",
+          th: "13. Checklist การจัดการสมาชิก",
+        },
+
+        paragraphs: {
+          en: [
+            "Use this checklist whenever adding, editing, suspending, resetting or removing a member.",
+          ],
+
+          th: [
+            "ใช้ Checklist นี้ทุกครั้งเมื่อเพิ่ม แก้ไข Suspend, Reset หรือ Remove สมาชิก",
+          ],
+        },
+
+        items: {
+          en: [
+            "The correct company is selected.",
+            "The target identity is verified.",
+            "An existing platform account is reused when appropriate.",
+            "The role matches actual responsibilities.",
+            "Only necessary permissions are assigned.",
+            "The membership status is correct.",
+            "Protected administrator rules are respected.",
+            "No existing password is requested or recorded.",
+            "Temporary credentials are handled securely.",
+            "Pending work is transferred before removal.",
+            "The member verifies access after the change.",
+            "The action completed successfully and appears correctly in the list.",
+          ],
+
+          th: [
+            "เลือกบริษัทถูกต้อง",
+            "ตรวจสอบตัวตนของบัญชีเป้าหมายแล้ว",
+            "ใช้ Platform account เดิมเมื่อเหมาะสม",
+            "Role ตรงกับหน้าที่จริง",
+            "ให้เฉพาะ Permission ที่จำเป็น",
+            "Membership status ถูกต้อง",
+            "ปฏิบัติตามข้อจำกัดของ Protected administrator",
+            "ไม่ขอหรือบันทึกรหัสผ่านเดิม",
+            "จัดการ Credential ชั่วคราวอย่างปลอดภัย",
+            "โอนงานที่ค้างอยู่ก่อน Remove",
+            "ให้สมาชิกตรวจสอบสิทธิ์หลังการเปลี่ยนแปลง",
+            "คำสั่งสำเร็จและรายการแสดงถูกต้อง",
+          ],
+        },
+      },
+    ],
+  },
+  "content/home": {
+    eyebrow: {
+      en: "Content Management",
+      th: "การจัดการเนื้อหา",
+    },
+
+    title: {
+      en: "Home",
+      th: "หน้าแรก",
+    },
+
+    description: {
+      en: "Manage the public home slideshow, images, slide order and homepage presentation.",
+      th: "จัดการ Slideshow, รูปภาพ ลำดับ Slide และการแสดงผลของหน้าแรก",
+    },
+
+    introduction: {
+      en: [
+        "The Home module controls the primary visual presentation shown when visitors open a company's public website.",
+        "The current public Home page is centered around a project slideshow. Each slide references a Media Library asset and participates in an ordered collection.",
+        "Large homepage images have a significant effect on loading performance. Use appropriate source dimensions and allow media optimization to finish before saving.",
+      ],
+
+      th: [
+        "โมดูล Home ใช้ควบคุมภาพหลักที่ผู้เข้าชมเห็นเมื่อเปิดเว็บไซต์ Public ของบริษัท",
+        "หน้า Home ปัจจุบันแสดงผลหลักเป็น Project slideshow โดยแต่ละ Slide อ้างอิงรูปจาก Media Library และเรียงตามลำดับที่กำหนด",
+        "รูปหน้าแรกมีผลต่อเวลาโหลดเว็บไซต์อย่างมาก ควรใช้ขนาดต้นฉบับที่เหมาะสมและรอ Media optimization ให้เสร็จก่อน Save",
+      ],
+    },
+
+    highlights: [
+      {
+        title: {
+          en: "Visual-first",
+          th: "เน้นการแสดงภาพ",
+        },
+
+        description: {
+          en: "The homepage slideshow is a primary part of the public brand experience.",
+          th: "Slideshow หน้าแรกเป็นส่วนสำคัญของภาพลักษณ์เว็บไซต์",
+        },
+      },
+
+      {
+        title: {
+          en: "Media Library",
+          th: "ใช้ Media Library",
+        },
+
+        description: {
+          en: "Slides reference managed assets instead of embedding uncontrolled files.",
+          th: "Slide เลือกรูปจาก Media Library แทนการฝังไฟล์ที่ควบคุมไม่ได้",
+        },
+      },
+
+      {
+        title: {
+          en: "Ordered presentation",
+          th: "ควบคุมลำดับ",
+        },
+
+        description: {
+          en: "Slide order determines the sequence visitors see.",
+          th: "ลำดับ Slide กำหนดภาพที่ผู้เข้าชมเห็นก่อนและหลัง",
+        },
+      },
+
+      {
+        title: {
+          en: "Performance-aware",
+          th: "คำนึงถึง Performance",
+        },
+
+        description: {
+          en: "Optimized dimensions and variants reduce public loading time.",
+          th: "ขนาดและ Variant ที่เหมาะสมช่วยลดเวลาโหลดหน้า Public",
+        },
+      },
+    ],
+
+    sections: [
+      {
+        id: "home-overview",
+
+        title: {
+          en: "1. Home workspace overview",
+          th: "1. ภาพรวมหน้า Home",
+        },
+
+        paragraphs: {
+          en: [
+            "The Home workspace provides the controls required to manage the active company's homepage slideshow.",
+            "Always confirm the selected company before making changes. Home configurations and media references are isolated by company.",
+            "Available actions may include adding slides, editing their information, selecting media, changing order, enabling or disabling items, previewing and publishing.",
+          ],
+
+          th: [
+            "หน้า Home มีเครื่องมือสำหรับจัดการ Homepage slideshow ของบริษัทปัจจุบัน",
+            "ตรวจสอบบริษัทก่อนแก้ไขเสมอ เพราะ Home configuration และ Media reference แยกตามบริษัท",
+            "คำสั่งอาจประกอบด้วย Add slide, Edit, เลือก Media, เปลี่ยนลำดับ เปิดหรือปิด Slide, Preview และ Publish",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-home-overview",
+
+            number: "1",
+
+            src: "/docs/content/home/home-overview.png",
+
+            title: {
+              en: "Home workspace",
+              th: "หน้า Home",
+            },
+
+            alt: {
+              en: "Junsekino CMS Home workspace showing homepage slideshow controls",
+              th: "หน้า Home ของ Junsekino CMS แสดงเครื่องมือจัดการ Slideshow",
+            },
+
+            caption: {
+              en: "Use the Home workspace to prepare and control the active company's public slideshow.",
+              th: "ใช้หน้า Home เพื่อจัดเตรียมและควบคุม Public slideshow ของบริษัทปัจจุบัน",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Confirm the active company.",
+            "Open Home from the Admin sidebar.",
+            "Review the current status and slide list.",
+            "Add, edit or reorder slides.",
+            "Save the latest changes.",
+            "Preview the public presentation.",
+            "Publish only after review.",
+            "Verify the public homepage.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัทปัจจุบัน",
+            "เปิด Home จาก Sidebar",
+            "ตรวจสอบ Status และรายการ Slide",
+            "เพิ่ม แก้ไข หรือเรียงลำดับ Slide",
+            "Save การเปลี่ยนแปลง",
+            "Preview การแสดงผล",
+            "Publish หลังตรวจสอบแล้ว",
+            "ตรวจสอบหน้า Home บนเว็บไซต์ Public",
+          ],
+        },
+      },
+
+      {
+        id: "slides-and-media",
+
+        title: {
+          en: "2. Slides, media and the Home page",
+          th: "2. Slide, Media และหน้า Home",
+        },
+
+        paragraphs: {
+          en: [
+            "A Slide is an ordered homepage item. It stores the information required to present one image in the slideshow.",
+            "Media is the managed image asset referenced by the Slide. Removing or replacing the Media reference changes the image presented by that Slide.",
+            "The Home page reads the configured slide collection and renders the enabled public items in their saved order.",
+          ],
+
+          th: [
+            "Slide คือรายการหน้าแรกที่มีลำดับ และเก็บข้อมูลสำหรับแสดงรูปหนึ่งรูปใน Slideshow",
+            "Media คือไฟล์รูปที่ Slide อ้างอิงจาก Media Library การนำ Reference ออกหรือเปลี่ยน Media จะเปลี่ยนรูปของ Slide",
+            "หน้า Home จะอ่าน Slide collection และแสดงรายการที่เปิดใช้ตามลำดับที่ Save",
+          ],
+        },
+
+        items: {
+          en: [
+            "Slide: homepage presentation record.",
+            "Media asset: uploaded and managed source image.",
+            "Order: position of the Slide in the slideshow.",
+            "Enabled state: whether the Slide is available for display.",
+            "Home status: controls whether the approved configuration is publicly available.",
+          ],
+
+          th: [
+            "Slide: Record สำหรับแสดงบนหน้า Home",
+            "Media asset: ไฟล์ต้นฉบับที่ Upload และจัดการใน Media Library",
+            "Order: ตำแหน่งของ Slide ใน Slideshow",
+            "Enabled state: กำหนดว่า Slide สามารถแสดงได้หรือไม่",
+            "Home status: ควบคุมว่า Configuration ที่อนุมัติแล้วแสดงบน Public หรือไม่",
+          ],
+        },
+      },
+
+      {
+        id: "slideshow-list",
+
+        title: {
+          en: "3. Review the slideshow",
+          th: "3. ตรวจสอบรายการ Slideshow",
+        },
+
+        paragraphs: {
+          en: [
+            "The slideshow list displays the items currently configured for the Home page. Review thumbnails, enabled states and order before making changes.",
+            "A missing or unsuitable thumbnail may indicate an invalid media reference or an image that should be replaced.",
+          ],
+
+          th: [
+            "รายการ Slideshow แสดง Slide ที่กำหนดสำหรับหน้า Home ควรตรวจสอบ Thumbnail, สถานะเปิดใช้งาน และลำดับก่อนแก้ไข",
+            "Thumbnail ที่หายหรือไม่เหมาะสมอาจหมายถึง Media reference มีปัญหา หรือควรเปลี่ยนรูป",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-slideshow-list",
+
+            number: "2",
+
+            src: "/docs/content/home/slideshow-list.png",
+
+            title: {
+              en: "Slideshow list",
+              th: "รายการ Slideshow",
+            },
+
+            alt: {
+              en: "Home slideshow list showing images, order and management actions",
+              th: "รายการ Home slideshow แสดงรูป ลำดับ และคำสั่งจัดการ",
+            },
+
+            caption: {
+              en: "Review the complete slide list before adding, removing or changing its order.",
+              th: "ตรวจสอบรายการทั้งหมดก่อนเพิ่ม ลบ หรือเปลี่ยนลำดับ",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Thumbnail: confirms which image is selected.",
+            "Order: indicates where the Slide appears.",
+            "Status: identifies whether the Slide is enabled.",
+            "Edit: opens the Slide configuration.",
+            "Remove: removes the Slide from the configured list after confirmation.",
+          ],
+
+          th: [
+            "Thumbnail: ใช้ตรวจสอบรูปที่เลือก",
+            "Order: ระบุตำแหน่งของ Slide",
+            "Status: ระบุว่า Slide เปิดใช้งานหรือไม่",
+            "Edit: เปิดการตั้งค่า Slide",
+            "Remove: นำ Slide ออกจากรายการหลังยืนยัน",
+          ],
+        },
+      },
+
+      {
+        id: "add-slide",
+
+        title: {
+          en: "4. Add a slide",
+          th: "4. เพิ่ม Slide",
+        },
+
+        paragraphs: {
+          en: [
+            "Add a Slide when a new image should participate in the homepage slideshow. Select an approved image and complete the available presentation information.",
+            "Do not create multiple Slides that reference the same image unless the duplication is intentional.",
+            "A newly added Slide should be reviewed in context with the existing sequence.",
+          ],
+
+          th: [
+            "เพิ่ม Slide เมื่อต้องการนำรูปใหม่มาแสดงใน Homepage slideshow โดยเลือกรูปที่ได้รับอนุมัติและกรอกข้อมูลการแสดงผลที่มี",
+            "ไม่ควรสร้างหลาย Slide ที่อ้างอิงรูปเดียวกัน เว้นแต่ต้องการให้ซ้ำจริง",
+            "หลังเพิ่ม Slide ต้องตรวจสอบร่วมกับลำดับเดิมทั้งหมด",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-add-slide",
+
+            number: "3",
+
+            src: "/docs/content/home/add-slide.png",
+
+            title: {
+              en: "Add a Home slide",
+              th: "เพิ่ม Home Slide",
+            },
+
+            alt: {
+              en: "Junsekino CMS controls for adding a slide to the homepage",
+              th: "เครื่องมือใน Junsekino CMS สำหรับเพิ่ม Slide หน้า Home",
+            },
+
+            caption: {
+              en: "Select approved media and review the new Slide before saving it into the sequence.",
+              th: "เลือก Media ที่ได้รับอนุมัติและตรวจสอบ Slide ก่อน Save เข้ารายการ",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Select Add Slide.",
+            "Open the Media Picker.",
+            "Select an existing approved image or upload a new one.",
+            "Wait for upload and optimization to finish.",
+            "Complete the available Slide information.",
+            "Add meaningful alternative text when supported.",
+            "Choose whether the Slide should be enabled.",
+            "Save the Slide.",
+            "Review its position in the slideshow list.",
+          ],
+
+          th: [
+            "กด Add Slide",
+            "เปิด Media Picker",
+            "เลือกรูปที่มีอยู่หรือ Upload รูปใหม่",
+            "รอ Upload และ Optimization ให้เสร็จ",
+            "กรอกข้อมูล Slide ที่มี",
+            "กรอก Alternative text ที่มีความหมายเมื่อรองรับ",
+            "กำหนดว่าจะเปิด Slide หรือไม่",
+            "Save Slide",
+            "ตรวจสอบตำแหน่งในรายการ Slideshow",
+          ],
+        },
+      },
+
+      {
+        id: "edit-slide",
+
+        title: {
+          en: "5. Edit a slide",
+          th: "5. แก้ไข Slide",
+        },
+
+        paragraphs: {
+          en: [
+            "Use the Slide editor to replace an image or update the available information without creating a duplicate item.",
+            "Replacing the image changes the homepage presentation. Confirm that the new crop and orientation work with the slideshow layout.",
+            "If the Slide is already public, treat the edit as a production content change and verify the website after saving or publishing.",
+          ],
+
+          th: [
+            "ใช้ Slide editor เพื่อเปลี่ยนรูปหรือแก้ข้อมูลโดยไม่ต้องสร้างรายการซ้ำ",
+            "การเปลี่ยนรูปจะส่งผลต่อหน้า Home ต้องตรวจสอบ Crop และแนวรูปใหม่กับ Layout ของ Slideshow",
+            "หาก Slide แสดงบน Public อยู่แล้ว ให้ถือว่าเป็นการแก้ Production content และตรวจสอบเว็บไซต์หลัง Save หรือ Publish",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-slide-editor",
+
+            number: "4",
+
+            src: "/docs/content/home/slide-editor.png",
+
+            title: {
+              en: "Slide editor",
+              th: "หน้าแก้ไข Slide",
+            },
+
+            alt: {
+              en: "Home Slide editor showing the selected image and slide fields",
+              th: "หน้าแก้ไข Home Slide แสดงรูปและช่องข้อมูล",
+            },
+
+            caption: {
+              en: "Review the image, enabled state and available descriptive information before saving.",
+              th: "ตรวจสอบรูป สถานะเปิดใช้งาน และข้อมูลประกอบก่อน Save",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Open the required Slide.",
+            "Confirm the current image and position.",
+            "Update only the required information.",
+            "Replace the media only when necessary.",
+            "Review alternative text.",
+            "Save the Slide.",
+            "Preview the complete Home page.",
+          ],
+
+          th: [
+            "เปิด Slide ที่ต้องการ",
+            "ตรวจสอบรูปและตำแหน่งปัจจุบัน",
+            "แก้เฉพาะข้อมูลที่จำเป็น",
+            "เปลี่ยน Media เมื่อจำเป็น",
+            "ตรวจสอบ Alternative text",
+            "Save Slide",
+            "Preview หน้า Home ทั้งหมด",
+          ],
+        },
+      },
+
+      {
+        id: "select-or-upload-media",
+
+        title: {
+          en: "6. Select or upload an image",
+          th: "6. เลือกหรือ Upload รูป",
+        },
+
+        paragraphs: {
+          en: [
+            "The Media Picker provides access to existing company assets and the upload workflow. Reuse an existing approved asset when the same image is already available.",
+            "When uploading, keep the picker open until every file has completed optimization and upload. Do not select a partially processed asset.",
+            "Media is isolated by company. Verify the active company if an expected image cannot be found.",
+          ],
+
+          th: [
+            "Media Picker ใช้เลือก Asset เดิมของบริษัทหรือเปิด Upload workflow ควรใช้ Asset ที่มีอยู่แล้วเมื่อเป็นรูปเดียวกันและได้รับอนุมัติ",
+            "ขณะ Upload ให้เปิด Picker ค้างไว้จนทุกไฟล์ Optimize และ Upload เสร็จ ไม่ควรเลือกรูปที่ยังประมวลผลไม่ครบ",
+            "Media แยกตามบริษัท หากค้นหารูปไม่พบให้ตรวจสอบบริษัทปัจจุบัน",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-home-media-picker",
+
+            number: "5",
+
+            src: "/docs/content/home/home-media-picker.png",
+
+            title: {
+              en: "Home Media Picker",
+              th: "Media Picker ของหน้า Home",
+            },
+
+            alt: {
+              en: "Media Picker used to select or upload a homepage slideshow image",
+              th: "Media Picker สำหรับเลือกหรือ Upload รูป Slideshow หน้า Home",
+            },
+
+            caption: {
+              en: "Wait until the complete upload batch finishes before selecting an uploaded image.",
+              th: "รอให้ Upload batch เสร็จทั้งหมดก่อนเลือกรูปที่เพิ่ง Upload",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Select tab: choose an existing company asset.",
+            "Upload tab: add a new image to the Media Library.",
+            "Optimizing: the browser is reducing the image before upload.",
+            "Uploading: the optimized file is being transferred.",
+            "Completed: the asset is ready for selection.",
+            "Failed: review the error and retry only the affected file.",
+          ],
+
+          th: [
+            "Select tab: เลือก Asset ที่มีอยู่แล้ว",
+            "Upload tab: เพิ่มรูปใหม่เข้า Media Library",
+            "Optimizing: Browser กำลังลดขนาดรูปก่อน Upload",
+            "Uploading: กำลังส่งไฟล์ที่ Optimize แล้ว",
+            "Completed: Asset พร้อมให้เลือก",
+            "Failed: ตรวจสอบ Error และลองใหม่เฉพาะไฟล์ที่มีปัญหา",
+          ],
+        },
+      },
+
+      {
+        id: "image-guidelines",
+
+        title: {
+          en: "7. Homepage image guidelines",
+          th: "7. คำแนะนำรูปหน้า Home",
+        },
+
+        paragraphs: {
+          en: [
+            "Homepage slideshow images should be prepared for a wide display area. Consistent dimensions reduce unexpected cropping and visual movement between Slides.",
+            "The recommended source is 2000 × 1125 pixels with a 16:9 aspect ratio and a file size of approximately 3 MB or less.",
+            "The upload workflow may resize large files and convert them to WebP, but correct source preparation still provides faster uploads and more predictable quality.",
+          ],
+
+          th: [
+            "รูป Homepage slideshow ควรเตรียมสำหรับพื้นที่แสดงผลแนวกว้าง การใช้ขนาดสม่ำเสมอช่วยลดการ Crop ที่คาดไม่ถึงและการขยับของ Layout ระหว่าง Slide",
+            "แนะนำขนาดต้นฉบับ 2000 × 1125 Pixels อัตราส่วน 16:9 และ File size ไม่เกินประมาณ 3 MB",
+            "ระบบ Upload อาจ Resize รูปใหญ่และแปลงเป็น WebP แต่การเตรียมต้นฉบับให้เหมาะสมยังช่วยให้อัปโหลดเร็วและควบคุมคุณภาพได้ดีกว่า",
+          ],
+        },
+
+        items: {
+          en: [
+            "Recommended dimensions: 2000 × 1125 pixels.",
+            "Recommended aspect ratio: 16:9.",
+            "Recommended source size: approximately 3 MB or less.",
+            "Preferred content: sharp, professionally approved horizontal imagery.",
+            "Keep important subjects away from extreme edges.",
+            "Do not upscale a small image until it becomes visibly blurred.",
+            "Do not use copyrighted material without authorization.",
+          ],
+
+          th: [
+            "ขนาดแนะนำ: 2000 × 1125 Pixels",
+            "อัตราส่วนแนะนำ: 16:9",
+            "File size แนะนำ: ไม่เกินประมาณ 3 MB",
+            "เนื้อหารูป: ภาพแนวนอนคมชัดและผ่านการอนุมัติ",
+            "ไม่วางส่วนสำคัญของภาพชิดขอบมากเกินไป",
+            "ไม่ขยายรูปเล็กจนแตกหรือเบลอ",
+            "ไม่ใช้ผลงานที่มีลิขสิทธิ์โดยไม่ได้รับอนุญาต",
+          ],
+        },
+      },
+
+      {
+        id: "alternative-text",
+
+        title: {
+          en: "8. Alternative text and accessibility",
+          th: "8. Alternative Text และ Accessibility",
+        },
+
+        paragraphs: {
+          en: [
+            "Alternative text describes meaningful images for people who cannot see them and for situations where the image cannot be loaded.",
+            "Describe the visible subject and its relevant context briefly. Do not use a filename as alternative text.",
+            "If localized alternative-text fields are available, complete every enabled language.",
+          ],
+
+          th: [
+            "Alternative text ใช้อธิบายรูปที่มีความหมายสำหรับผู้ที่มองไม่เห็นรูป หรือกรณีที่รูปโหลดไม่สำเร็จ",
+            "เขียนคำอธิบายสั้น ๆ เกี่ยวกับสิ่งที่มองเห็นและบริบริบทที่สำคัญ ไม่ควรใช้ชื่อไฟล์แทนคำอธิบาย",
+            "หาก Alternative text รองรับหลายภาษา ให้กรอกทุกภาษาที่เปิดใช้งาน",
+          ],
+        },
+
+        items: {
+          en: [
+            "Describe what the image communicates.",
+            "Keep the description concise.",
+            "Include a project or location name only when relevant.",
+            "Avoid phrases such as image of when they add no meaning.",
+            "Do not repeat surrounding text unnecessarily.",
+            "Do not enter photographer credits in the alternative-text field unless required by its purpose.",
+          ],
+
+          th: [
+            "อธิบายความหมายของภาพ",
+            "ใช้ข้อความกระชับ",
+            "ระบุชื่อ Project หรือสถานที่เมื่อเกี่ยวข้อง",
+            "หลีกเลี่ยงคำขึ้นต้นที่ไม่เพิ่มความหมาย เช่น รูปภาพของ",
+            "ไม่เขียนซ้ำกับข้อความรอบรูปโดยไม่จำเป็น",
+            "ไม่ใส่เครดิตช่างภาพในช่อง Alternative text เว้นแต่ช่องนั้นกำหนดไว้",
+          ],
+        },
+      },
+
+      {
+        id: "reorder-slides",
+
+        title: {
+          en: "9. Reorder slides",
+          th: "9. เรียงลำดับ Slide",
+        },
+
+        paragraphs: {
+          en: [
+            "Slide order determines the initial and subsequent images displayed to visitors. Place the strongest or most important approved image first.",
+            "Use the available drag-and-drop or ordering controls. After moving an item, save the order and confirm that it remains correct after reloading.",
+            "Avoid very similar images next to each other unless they are intentionally part of a sequence.",
+          ],
+
+          th: [
+            "ลำดับ Slide กำหนดรูปแรกและรูปถัดไปที่ผู้เข้าชมเห็น ควรวางรูปที่สำคัญหรือสื่อภาพลักษณ์ได้ดีที่สุดไว้ก่อน",
+            "ใช้ Drag and Drop หรือเครื่องมือจัดลำดับที่ระบบมี หลังย้ายให้ Save และตรวจสอบอีกครั้งหลัง Reload",
+            "หลีกเลี่ยงการวางรูปที่คล้ายกันมากติดกัน เว้นแต่ต้องการเล่าเป็นลำดับ",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-reorder-slides",
+
+            number: "6",
+
+            src: "/docs/content/home/reorder-slides.png",
+
+            title: {
+              en: "Reorder homepage slides",
+              th: "เรียงลำดับ Homepage Slide",
+            },
+
+            alt: {
+              en: "Home editor showing controls used to reorder slideshow items",
+              th: "Home editor แสดงเครื่องมือจัดลำดับ Slideshow",
+            },
+
+            caption: {
+              en: "Save and reload after reordering to confirm the final public sequence.",
+              th: "Save และ Reload หลังเรียงลำดับเพื่อยืนยัน Sequence สุดท้าย",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Review the existing sequence.",
+            "Move the required Slide to its new position.",
+            "Repeat until the complete order is correct.",
+            "Save the order.",
+            "Reload the Home workspace.",
+            "Confirm that the order was preserved.",
+            "Preview the public slideshow from its first Slide.",
+          ],
+
+          th: [
+            "ตรวจสอบลำดับเดิม",
+            "ย้าย Slide ไปตำแหน่งใหม่",
+            "ทำซ้ำจนลำดับทั้งหมดถูกต้อง",
+            "Save ลำดับ",
+            "Reload หน้า Home",
+            "ตรวจสอบว่าลำดับยังถูกเก็บไว้",
+            "Preview Slideshow ตั้งแต่ Slide แรก",
+          ],
+        },
+      },
+
+      {
+        id: "enable-disable-slide",
+
+        title: {
+          en: "10. Enable, disable or remove a slide",
+          th: "10. เปิด ปิด หรือนำ Slide ออก",
+        },
+
+        paragraphs: {
+          en: [
+            "Disable a Slide when it should temporarily stop appearing but may be used again. Remove it when it is no longer part of the homepage configuration.",
+            "Disabling or removing a Slide does not necessarily delete its underlying Media Library asset.",
+            "Before deleting a Media asset, verify whether it is referenced by other modules.",
+          ],
+
+          th: [
+            "ปิด Slide เมื่อต้องการหยุดแสดงชั่วคราวแต่ยังอาจนำกลับมาใช้ และ Remove เมื่อต้องการนำออกจาก Home configuration",
+            "การปิดหรือ Remove Slide ไม่จำเป็นต้องลบ Media asset ต้นทางออกจาก Media Library",
+            "ก่อนลบ Media ต้องตรวจสอบว่ารูปถูกอ้างอิงจากโมดูลอื่นหรือไม่",
+          ],
+        },
+
+        items: {
+          en: [
+            "Enable: include the Slide in the eligible public sequence.",
+            "Disable: retain the Slide configuration without displaying it normally.",
+            "Remove: remove the Slide record from the Home configuration.",
+            "Delete Media: separate action affecting the underlying asset.",
+          ],
+
+          th: [
+            "Enable: ให้ Slide อยู่ใน Public sequence",
+            "Disable: เก็บ Configuration แต่หยุดแสดงตามปกติ",
+            "Remove: นำ Slide record ออกจาก Home configuration",
+            "Delete Media: เป็นอีกคำสั่งที่มีผลกับไฟล์ Asset ต้นทาง",
+          ],
+        },
+      },
+
+      {
+        id: "preview-home",
+
+        title: {
+          en: "11. Preview the Home page",
+          th: "11. Preview หน้า Home",
+        },
+
+        paragraphs: {
+          en: [
+            "Preview the complete homepage after changing images or order. A good individual image may not work well when placed beside other Slides.",
+            "Check initial loading, image crop, navigation arrows, indicators and thumbnails where they are part of the public design.",
+            "Review both desktop and mobile presentation before publishing.",
+          ],
+
+          th: [
+            "Preview หน้า Home ทั้งหมดหลังเปลี่ยนรูปหรือลำดับ เพราะรูปที่ดีเพียงรูปเดียวอาจไม่เหมาะเมื่อแสดงร่วมกับ Slide อื่น",
+            "ตรวจสอบ Initial loading, Image crop, ลูกศร, Indicator และ Thumbnail ตาม Design ของ Public site",
+            "ตรวจสอบทั้ง Desktop และ Mobile ก่อน Publish",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-home-preview",
+
+            number: "7",
+
+            src: "/docs/content/home/home-preview.png",
+
+            title: {
+              en: "Public Home preview",
+              th: "Preview หน้า Public Home",
+            },
+
+            alt: {
+              en: "Public Junsekino homepage showing the project image slideshow",
+              th: "หน้า Public Home ของ Junsekino แสดง Project slideshow",
+            },
+
+            caption: {
+              en: "Review the complete slideshow sequence and controls before publishing.",
+              th: "ตรวจสอบลำดับ Slideshow และเครื่องมือควบคุมทั้งหมดก่อน Publish",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "The first Slide is the intended lead image.",
+            "Every image loads successfully.",
+            "Images use a consistent visual ratio.",
+            "Important subjects are not cropped incorrectly.",
+            "Previous and next controls work.",
+            "Indicators and thumbnails match the active Slide.",
+            "The layout remains within the viewport.",
+            "Mobile controls remain usable by touch.",
+          ],
+
+          th: [
+            "Slide แรกเป็น Lead image ที่ต้องการ",
+            "รูปทุกภาพโหลดสำเร็จ",
+            "รูปมีสัดส่วนการแสดงผลสม่ำเสมอ",
+            "ส่วนสำคัญของภาพไม่ถูก Crop ผิด",
+            "ปุ่ม Previous และ Next ทำงาน",
+            "Indicator และ Thumbnail ตรงกับ Active slide",
+            "Layout ไม่ล้น Viewport",
+            "เครื่องมือบน Mobile กดด้วย Touch ได้",
+          ],
+        },
+      },
+
+      {
+        id: "save-publish-home",
+
+        title: {
+          en: "12. Save and publish",
+          th: "12. Save และ Publish",
+        },
+
+        paragraphs: {
+          en: [
+            "Save preserves the latest Home configuration in the CMS. Publish makes the approved version available to the public delivery layer.",
+            "Do not assume that saving automatically publishes a Draft configuration. Confirm the displayed status.",
+            "After publication, open the production public homepage and verify the real result.",
+          ],
+
+          th: [
+            "Save ใช้เก็บ Home configuration ล่าสุดใน CMS ส่วน Publish ใช้นำ Version ที่อนุมัติไปยัง Public",
+            "ไม่ควรถือว่า Save แล้ว Draft จะ Publish อัตโนมัติ ต้องตรวจสอบ Status ที่แสดง",
+            "หลัง Publish ให้เปิดหน้า Home ของ Production และตรวจสอบผลลัพธ์จริง",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Confirm all upload processes are complete.",
+            "Review the Slide list and order.",
+            "Confirm enabled and disabled items.",
+            "Save the Home configuration.",
+            "Wait for confirmation.",
+            "Preview desktop and mobile layouts.",
+            "Publish the approved version.",
+            "Open the public website in a new tab.",
+            "Refresh once and test the complete slideshow.",
+          ],
+
+          th: [
+            "ตรวจสอบว่า Upload ทุกไฟล์เสร็จ",
+            "ตรวจสอบรายการและลำดับ Slide",
+            "ตรวจสอบรายการ Enabled และ Disabled",
+            "Save Home configuration",
+            "รอข้อความยืนยัน",
+            "Preview ทั้ง Desktop และ Mobile",
+            "Publish Version ที่ได้รับอนุมัติ",
+            "เปิด Public site ใน Tab ใหม่",
+            "Refresh หนึ่งครั้งและทดสอบ Slideshow ทั้งหมด",
+          ],
+        },
+      },
+
+      {
+        id: "home-mobile",
+
+        title: {
+          en: "13. Home editor on mobile",
+          th: "13. Home Editor บนมือถือ",
+        },
+
+        paragraphs: {
+          en: [
+            "On mobile screens, editor sections and Slide cards are arranged vertically. Scroll through the complete list before saving.",
+            "Drag-and-drop ordering and detailed image comparison may be easier on desktop. Use mobile for appropriate operational updates and desktop for extensive visual changes.",
+            "The same company, validation and permission rules apply on every screen size.",
+          ],
+
+          th: [
+            "บน Mobile ส่วน Editor และ Slide card จะเรียงในแนวตั้ง ควรเลื่อนตรวจสอบรายการทั้งหมดก่อน Save",
+            "Drag and Drop และการเปรียบเทียบรูปอย่างละเอียดอาจทำได้ง่ายกว่าบน Desktop ควรใช้ Mobile กับงานที่เหมาะสม และใช้ Desktop เมื่อต้องแก้ภาพจำนวนมาก",
+            "กฎเรื่อง Company, Validation และ Permission เหมือนกันทุกขนาดหน้าจอ",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-home-mobile",
+
+            number: "8",
+
+            src: "/docs/content/home/home-mobile.png",
+
+            title: {
+              en: "Responsive Home editor",
+              th: "Home Editor แบบ Responsive",
+            },
+
+            alt: {
+              en: "Junsekino CMS Home editor arranged for a mobile screen",
+              th: "Home editor ของ Junsekino CMS ที่จัดเรียงสำหรับ Mobile",
+            },
+
+            caption: {
+              en: "Slide controls stack vertically on mobile while preserving the same workflow.",
+              th: "เครื่องมือ Slide เรียงในแนวตั้งบน Mobile โดยยังใช้ Workflow เดียวกัน",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Confirm the active company from the mobile header.",
+            "Review every Slide by scrolling vertically.",
+            "Wait for Media Picker operations to complete.",
+            "Avoid leaving the page while uploads are running.",
+            "Use desktop for precise ordering when practical.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัทจาก Mobile header",
+            "เลื่อนตรวจสอบ Slide ทุกอัน",
+            "รอ Media Picker ทำงานให้เสร็จ",
+            "ไม่ออกจากหน้าขณะ Upload",
+            "ใช้ Desktop เพื่อจัดลำดับอย่างละเอียดเมื่อทำได้",
+          ],
+        },
+      },
+
+      {
+        id: "home-troubleshooting",
+
+        title: {
+          en: "14. Common Home problems",
+          th: "14. ปัญหาที่พบบ่อย",
+        },
+
+        paragraphs: {
+          en: [
+            "When the public homepage does not match the editor, identify whether the issue concerns upload, media selection, saved order, publication or public caching.",
+          ],
+
+          th: [
+            "เมื่อหน้า Public ไม่ตรงกับ Editor ให้ตรวจสอบแยกว่าสาเหตุอยู่ที่ Upload, Media selection, ลำดับที่ Save, Publication หรือ Public cache",
+          ],
+        },
+
+        items: {
+          en: [
+            "Image not available: confirm upload and optimization completion.",
+            "Wrong image selected: reopen the Slide and verify its Media reference.",
+            "Order returns to the previous state: save after reordering and reload.",
+            "Slide not displayed: check its enabled state and Home publication status.",
+            "Public page shows old images: refresh and allow cache revalidation.",
+            "Image is slow: use the recommended dimensions and optimized variants.",
+            "Image is cropped poorly: replace it with an appropriate 16:9 composition.",
+            "Save denied: review company membership and content permissions.",
+          ],
+
+          th: [
+            "รูปไม่พร้อมใช้: ตรวจสอบว่า Upload และ Optimization เสร็จ",
+            "เลือกรูปผิด: เปิด Slide และตรวจ Media reference",
+            "ลำดับกลับเป็นแบบเดิม: Save หลังเรียงและ Reload",
+            "Slide ไม่แสดง: ตรวจ Enabled state และ Home publication status",
+            "Public ยังแสดงรูปเดิม: Refresh และรอ Cache revalidation",
+            "รูปโหลดช้า: ใช้ขนาดแนะนำและ Optimized variant",
+            "รูปถูก Crop ไม่เหมาะสม: เปลี่ยนเป็น Composition อัตราส่วน 16:9",
+            "Save ไม่ได้: ตรวจสอบ Membership และ Content permission",
+          ],
+        },
+      },
+
+      {
+        id: "home-checklist",
+
+        title: {
+          en: "15. Home publishing checklist",
+          th: "15. Checklist หน้า Home",
+        },
+
+        paragraphs: {
+          en: [
+            "Complete this checklist before publishing a homepage slideshow change.",
+          ],
+
+          th: ["ใช้ Checklist นี้ก่อน Publish การเปลี่ยน Homepage slideshow"],
+        },
+
+        items: {
+          en: [
+            "The correct company is selected.",
+            "Every image is owned or properly licensed.",
+            "Uploads and optimization are complete.",
+            "Images use appropriate dimensions and file sizes.",
+            "Every Slide references the correct Media asset.",
+            "Alternative text is meaningful.",
+            "Enabled and disabled states are correct.",
+            "The Slide order is correct and saved.",
+            "The first Slide is the intended lead image.",
+            "Desktop and mobile previews have been reviewed.",
+            "Navigation controls and thumbnails work.",
+            "The approved Home version is published.",
+            "The production homepage has been verified.",
+          ],
+
+          th: [
+            "เลือกบริษัทถูกต้อง",
+            "บริษัทเป็นเจ้าของรูปหรือมี License ถูกต้อง",
+            "Upload และ Optimization เสร็จ",
+            "รูปมีขนาดและ File size เหมาะสม",
+            "ทุก Slide อ้างอิง Media ถูกต้อง",
+            "Alternative text มีความหมาย",
+            "Enabled และ Disabled state ถูกต้อง",
+            "ลำดับ Slide ถูกต้องและ Save แล้ว",
+            "Slide แรกเป็น Lead image ที่ต้องการ",
+            "ตรวจ Preview บน Desktop และ Mobile",
+            "Navigation control และ Thumbnail ทำงาน",
+            "Publish Home version ที่อนุมัติแล้ว",
+            "ตรวจสอบหน้า Production Home แล้ว",
+          ],
+        },
+      },
+    ],
+  },
+  "content/about": {
+    eyebrow: {
+      en: "Content Management",
+      th: "การจัดการเนื้อหา",
+    },
+
+    title: {
+      en: "About",
+      th: "เกี่ยวกับบริษัท",
+    },
+
+    description: {
+      en: "Manage the company's public introduction, localized content, Rich Text, media, page sections and SEO.",
+      th: "จัดการข้อมูลแนะนำบริษัท เนื้อหาหลายภาษา Rich Text, Media, Section และ SEO",
+    },
+
+    introduction: {
+      en: [
+        "The About module controls the public page used to introduce the active company, its identity, background, approach and other approved organizational information.",
+        "About content may be displayed for a long period and may be referenced by customers, partners and search engines. Use accurate, approved and regularly reviewed information.",
+        "The page supports localized content according to the company's Localization settings. English is currently the default language of the public website.",
+      ],
+
+      th: [
+        "โมดูล About ใช้ควบคุมหน้า Public สำหรับแนะนำบริษัท ตัวตน ประวัติ แนวคิด และข้อมูลองค์กรอื่นที่ได้รับอนุมัติ",
+        "เนื้อหา About อาจแสดงเป็นเวลานานและถูกอ้างอิงโดยลูกค้า Partner และ Search engine จึงควรใช้ข้อมูลที่ถูกต้อง ได้รับอนุมัติ และทบทวนเป็นประจำ",
+        "หน้ารองรับข้อมูลหลายภาษาตาม Localization ของบริษัท โดยเว็บไซต์ Public ปัจจุบันใช้ภาษาอังกฤษเป็นค่าเริ่มต้น",
+      ],
+    },
+
+    highlights: [
+      {
+        title: {
+          en: "Company story",
+          th: "เรื่องราวบริษัท",
+        },
+
+        description: {
+          en: "Present approved information about the company and its work.",
+          th: "นำเสนอข้อมูลบริษัทและแนวทางการทำงานที่ได้รับอนุมัติ",
+        },
+      },
+
+      {
+        title: {
+          en: "Rich Text",
+          th: "เนื้อหา Rich Text",
+        },
+
+        description: {
+          en: "Structure long-form content with headings, paragraphs, lists and links.",
+          th: "จัดโครงสร้างเนื้อหาด้วย Heading, Paragraph, List และ Link",
+        },
+      },
+
+      {
+        title: {
+          en: "Localized content",
+          th: "รองรับหลายภาษา",
+        },
+
+        description: {
+          en: "Editors display language fields based on company Localization settings.",
+          th: "Editor แสดงช่องภาษาตาม Localization ของบริษัท",
+        },
+      },
+
+      {
+        title: {
+          en: "Search-ready",
+          th: "รองรับ SEO",
+        },
+
+        description: {
+          en: "Review editable SEO and Open Graph information before publishing.",
+          th: "ตรวจสอบ SEO และ Open Graph ที่แก้ไขได้ก่อน Publish",
+        },
+      },
+    ],
+
+    sections: [
+      {
+        id: "about-overview",
+
+        title: {
+          en: "1. About workspace overview",
+          th: "1. ภาพรวมหน้า About",
+        },
+
+        paragraphs: {
+          en: [
+            "The About workspace contains the content, media, sections, SEO settings and publication controls for the active company's About page.",
+            "Always verify the selected company before editing. Each company has an independent About record and public URL.",
+            "Available actions may depend on the user's role and content permissions.",
+          ],
+
+          th: [
+            "หน้า About รวม Content, Media, Section, SEO และคำสั่ง Publish สำหรับหน้า About ของบริษัทปัจจุบัน",
+            "ตรวจสอบบริษัทก่อนแก้ไขเสมอ เพราะแต่ละบริษัทมี About record และ Public URL แยกกัน",
+            "คำสั่งที่ใช้งานได้อาจแตกต่างกันตาม Role และ Content permission",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-about-overview",
+
+            number: "1",
+
+            src: "/docs/content/about/about-overview.png",
+
+            title: {
+              en: "About workspace",
+              th: "หน้า About",
+            },
+
+            alt: {
+              en: "Junsekino CMS About workspace showing page content, status and management actions",
+              th: "หน้า About ของ Junsekino CMS แสดงเนื้อหา Status และคำสั่งจัดการ",
+            },
+
+            caption: {
+              en: "Use the About workspace to prepare the active company's approved public introduction.",
+              th: "ใช้หน้า About เพื่อจัดเตรียมข้อมูลแนะนำบริษัทสำหรับแสดงบน Public site",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Confirm the active company.",
+            "Open About from the Admin sidebar.",
+            "Review the current status and saved content.",
+            "Complete the required localized fields.",
+            "Edit the Rich Text and media.",
+            "Review sections and SEO.",
+            "Save and preview.",
+            "Publish only after approval.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัทปัจจุบัน",
+            "เปิด About จาก Sidebar",
+            "ตรวจสอบ Status และข้อมูลที่ Save",
+            "กรอก Localized field ที่บังคับ",
+            "แก้ Rich Text และ Media",
+            "ตรวจสอบ Section และ SEO",
+            "Save และ Preview",
+            "Publish หลังได้รับอนุมัติ",
+          ],
+        },
+      },
+
+      {
+        id: "localized-fields",
+
+        title: {
+          en: "2. Localized About fields",
+          th: "2. ช่องข้อมูลหลายภาษา",
+        },
+
+        paragraphs: {
+          en: [
+            "The About editor displays language fields according to the active company's Localization settings. English-only companies see English fields, Thai-only companies see Thai fields and bilingual companies see both.",
+            "Changing the Admin interface language does not change which public-content language is being edited.",
+            "Complete each language independently. The CMS does not automatically translate the company's About content.",
+          ],
+
+          th: [
+            "About editor แสดงช่องภาษาตาม Localization ของบริษัท บริษัทที่เปิด English จะแสดงช่องอังกฤษ บริษัทที่เปิด Thai จะแสดงช่องไทย และบริษัทสองภาษาจะแสดงทั้งสองภาษา",
+            "การเปลี่ยนภาษา Admin ไม่ได้เปลี่ยนภาษาของ Public content ที่กำลังแก้",
+            "ต้องกรอกแต่ละภาษาแยกกัน เพราะ CMS ไม่แปล About content โดยอัตโนมัติ",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-about-localized-fields",
+
+            number: "2",
+
+            src: "/docs/content/about/about-localized-fields.png",
+
+            title: {
+              en: "Localized About fields",
+              th: "ช่องภาษาใน About",
+            },
+
+            alt: {
+              en: "About editor displaying localized title and description fields",
+              th: "About editor แสดงช่อง Title และ Description หลายภาษา",
+            },
+
+            caption: {
+              en: "The available language fields follow the selected company's Localization configuration.",
+              th: "ช่องภาษาที่แสดงจะเป็นไปตาม Localization ของบริษัทปัจจุบัน",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Title: primary heading of the About page.",
+            "Excerpt or description: concise introduction used by the page or metadata.",
+            "Content: complete formatted company information.",
+            "Localized labels: language-specific text used by supported sections.",
+            "SEO fields: search and sharing information for each supported language.",
+          ],
+
+          th: [
+            "Title: Heading หลักของหน้า About",
+            "Excerpt หรือ Description: ข้อความแนะนำแบบย่อสำหรับหน้าเว็บหรือ Metadata",
+            "Content: ข้อมูลบริษัทแบบเต็มที่จัดรูปแบบได้",
+            "Localized label: ข้อความแยกภาษาของ Section ที่รองรับ",
+            "SEO field: ข้อมูลสำหรับ Search และ Sharing ของแต่ละภาษา",
+          ],
+        },
+      },
+
+      {
+        id: "title-and-excerpt",
+
+        title: {
+          en: "3. Title and excerpt",
+          th: "3. Title และ Excerpt",
+        },
+
+        paragraphs: {
+          en: [
+            "The Title identifies the About page to visitors and may also initialize related SEO values when they have not been customized.",
+            "The Excerpt provides a concise summary. It should communicate the company's identity without repeating the complete Rich Text content.",
+            "Keep both values accurate and consistent with approved company language.",
+          ],
+
+          th: [
+            "Title ใช้ระบุหน้า About ต่อผู้เข้าชม และอาจใช้เป็นค่าเริ่มต้นของ SEO เมื่อยังไม่ได้กำหนดค่าเอง",
+            "Excerpt เป็นข้อความสรุปสั้น ควรสื่อถึงตัวตนบริษัทโดยไม่คัดลอก Rich Text ทั้งหมดมาซ้ำ",
+            "ข้อมูลทั้งสองส่วนต้องถูกต้องและใช้ภาษาที่บริษัทอนุมัติ",
+          ],
+        },
+
+        items: {
+          en: [
+            "Use a clear title that identifies the page.",
+            "Keep the excerpt concise and informative.",
+            "Do not insert unsupported formatting into plain-text fields.",
+            "Avoid promotional claims that cannot be verified.",
+            "Review spelling and terminology in every enabled language.",
+          ],
+
+          th: [
+            "ใช้ Title ที่ชัดเจน",
+            "เขียน Excerpt ให้กระชับและให้ข้อมูล",
+            "ไม่ใส่ Formatting ที่ช่อง Plain text ไม่รองรับ",
+            "หลีกเลี่ยงคำโฆษณาที่ไม่สามารถตรวจสอบได้",
+            "ตรวจการสะกดและคำศัพท์ในทุกภาษา",
+          ],
+        },
+      },
+
+      {
+        id: "rich-text",
+
+        title: {
+          en: "4. Write and format Rich Text",
+          th: "4. เขียนและจัดรูปแบบ Rich Text",
+        },
+
+        paragraphs: {
+          en: [
+            "Rich Text is the main long-form content of the About page. Use its formatting tools to create a clear information hierarchy.",
+            "Prefer short paragraphs and meaningful headings. Excessive formatting makes content harder to maintain and may display inconsistently across screen sizes.",
+            "Paste text as clean content when possible. Review formatting after copying from Word, email or another website.",
+          ],
+
+          th: [
+            "Rich Text เป็นเนื้อหาหลักแบบยาวของหน้า About ใช้เครื่องมือจัดรูปแบบเพื่อสร้างลำดับข้อมูลที่อ่านง่าย",
+            "ควรใช้ Paragraph สั้นและ Heading ที่มีความหมาย การจัดรูปแบบมากเกินไปทำให้ดูแลยากและอาจแสดงไม่สม่ำเสมอบนหลายหน้าจอ",
+            "ควรวางข้อความแบบสะอาดและตรวจ Formatting หลัง Copy จาก Word, Email หรือเว็บไซต์อื่น",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-about-rich-text",
+
+            number: "3",
+
+            src: "/docs/content/about/about-rich-text.png",
+
+            title: {
+              en: "About Rich Text editor",
+              th: "Rich Text Editor ของ About",
+            },
+
+            alt: {
+              en: "Junsekino CMS Rich Text editor showing its toolbar and company content",
+              th: "Rich Text editor แสดง Toolbar และพื้นที่เนื้อหาบริษัท",
+            },
+
+            caption: {
+              en: "Use structured headings and simple formatting to keep the About page readable and maintainable.",
+              th: "ใช้ Heading ที่เป็นโครงสร้างและ Formatting ที่เรียบง่ายเพื่อให้อ่านและดูแลได้ง่าย",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Heading: divides content into meaningful topics.",
+            "Paragraph: contains the normal body text.",
+            "Bold: emphasizes a short important phrase.",
+            "Italic: applies limited contextual emphasis.",
+            "List: presents related items or steps.",
+            "Link: connects to an approved safe destination.",
+            "Undo and redo: reverse or restore recent editor operations.",
+          ],
+
+          th: [
+            "Heading: แบ่งเนื้อหาเป็นหัวข้อ",
+            "Paragraph: ใช้สำหรับข้อความเนื้อหาปกติ",
+            "Bold: เน้นข้อความสำคัญสั้น ๆ",
+            "Italic: เน้นข้อความตามบริบท",
+            "List: แสดงรายการหรือขั้นตอน",
+            "Link: เชื่อมไปยังปลายทางที่ปลอดภัยและได้รับอนุมัติ",
+            "Undo และ Redo: ย้อนกลับหรือนำการแก้ไขล่าสุดกลับมา",
+          ],
+        },
+      },
+
+      {
+        id: "rich-text-guidelines",
+
+        title: {
+          en: "5. Rich Text guidelines",
+          th: "5. แนวทางใช้ Rich Text",
+        },
+
+        paragraphs: {
+          en: [
+            "Rich Text should contain the complete About narrative only once. Avoid repeating the same paragraph in the Excerpt and main content when both are displayed together.",
+            "Use links only when they provide useful context. Check every link before publication.",
+            "Do not paste scripts, tracking code, embedded HTML or unsupported content into the editor.",
+          ],
+
+          th: [
+            "Rich Text ควรเก็บเนื้อหา About ฉบับเต็มเพียงครั้งเดียว หลีกเลี่ยงการเขียน Paragraph เดียวกันซ้ำใน Excerpt และ Main content หากหน้า Public แสดงทั้งสองส่วน",
+            "ใช้ Link เมื่อช่วยเพิ่มบริบทและทดสอบทุก Link ก่อน Publish",
+            "ห้ามวาง Script, Tracking code, Embedded HTML หรือข้อมูลที่ระบบไม่รองรับใน Editor",
+          ],
+        },
+
+        items: {
+          en: [
+            "Use one primary page title.",
+            "Begin sections with logical headings.",
+            "Do not skip heading levels without reason.",
+            "Keep paragraphs focused on one subject.",
+            "Use lists for genuinely related items.",
+            "Use descriptive link text instead of Click here.",
+            "Remove duplicated and placeholder content.",
+          ],
+
+          th: [
+            "ใช้ Page title หลักหนึ่งรายการ",
+            "เริ่ม Section ด้วย Heading ที่เป็นลำดับ",
+            "ไม่ข้าม Heading level โดยไม่มีเหตุผล",
+            "หนึ่ง Paragraph ควรเน้นหนึ่งประเด็น",
+            "ใช้ List สำหรับรายการที่เกี่ยวข้องกันจริง",
+            "ใช้ข้อความ Link ที่อธิบายปลายทางแทนคำว่า Click here",
+            "ลบข้อความซ้ำและ Placeholder",
+          ],
+        },
+      },
+
+      {
+        id: "about-media",
+
+        title: {
+          en: "6. Cover and featured media",
+          th: "6. Cover และ Featured Media",
+        },
+
+        paragraphs: {
+          en: [
+            "The About cover or featured image supports the company's public introduction. Select an approved asset that represents the company accurately.",
+            "The recommended source is 2000 × 1125 pixels, a 16:9 aspect ratio and approximately 3 MB or less.",
+            "Wait for optimization and upload to finish before selecting or saving the image.",
+          ],
+
+          th: [
+            "Cover หรือ Featured image ของ About ใช้สนับสนุนการแนะนำบริษัท ควรเลือก Asset ที่ได้รับอนุมัติและสื่อถึงบริษัทอย่างถูกต้อง",
+            "แนะนำขนาดต้นฉบับ 2000 × 1125 Pixels อัตราส่วน 16:9 และ File size ไม่เกินประมาณ 3 MB",
+            "รอ Optimization และ Upload ให้เสร็จก่อนเลือกหรือ Save รูป",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-about-media",
+
+            number: "4",
+
+            src: "/docs/content/about/about-media.png",
+
+            title: {
+              en: "About media",
+              th: "Media ของหน้า About",
+            },
+
+            alt: {
+              en: "About editor showing cover or featured-media controls",
+              th: "About editor แสดงเครื่องมือ Cover หรือ Featured media",
+            },
+
+            caption: {
+              en: "Use an approved, optimized image with an appropriate composition for the public layout.",
+              th: "ใช้รูปที่ได้รับอนุมัติ Optimize แล้ว และมี Composition เหมาะกับ Public layout",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Recommended dimensions: 2000 × 1125 pixels.",
+            "Recommended ratio: 16:9.",
+            "Recommended size: approximately 3 MB or less.",
+            "Use approved company-owned or licensed media.",
+            "Keep important subjects away from likely crop boundaries.",
+            "Add localized alternative text where supported.",
+          ],
+
+          th: [
+            "ขนาดแนะนำ: 2000 × 1125 Pixels",
+            "อัตราส่วนแนะนำ: 16:9",
+            "File size แนะนำ: ไม่เกินประมาณ 3 MB",
+            "ใช้ Media ที่บริษัทเป็นเจ้าของหรือมี License",
+            "ไม่วางส่วนสำคัญไว้ในพื้นที่ที่อาจถูก Crop",
+            "กรอก Alternative text แยกภาษาเมื่อรองรับ",
+          ],
+        },
+      },
+
+      {
+        id: "about-sections",
+
+        title: {
+          en: "7. About page sections",
+          th: "7. Section ของหน้า About",
+        },
+
+        paragraphs: {
+          en: [
+            "Sections allow supported About layouts to divide information into reusable structured blocks.",
+            "Each Section should have a clear purpose. Avoid creating multiple sections with duplicated content solely to adjust spacing.",
+            "When ordering controls are available, arrange sections according to the intended reading sequence and save the order.",
+          ],
+
+          th: [
+            "Section ใช้แบ่งข้อมูล About เป็น Block ที่มีโครงสร้างและนำมาแสดงตาม Layout ที่รองรับ",
+            "แต่ละ Section ควรมีวัตถุประสงค์ชัดเจน ไม่ควรสร้างข้อมูลซ้ำหลาย Section เพียงเพื่อปรับระยะห่าง",
+            "เมื่อมีเครื่องมือเรียงลำดับ ให้จัดตามลำดับการอ่านและ Save ลำดับ",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-about-sections",
+
+            number: "5",
+
+            src: "/docs/content/about/about-sections.png",
+
+            title: {
+              en: "About sections",
+              th: "Section ของ About",
+            },
+
+            alt: {
+              en: "About editor showing structured page sections or primary content controls",
+              th: "About editor แสดง Section หรือเครื่องมือจัดการเนื้อหาหลัก",
+            },
+
+            caption: {
+              en: "Arrange supported sections into a clear reading order and avoid duplicated information.",
+              th: "เรียง Section ให้เป็นลำดับการอ่านที่ชัดเจนและหลีกเลี่ยงเนื้อหาซ้ำ",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Use sections only where the layout supports them.",
+            "Give each section one clear subject.",
+            "Complete every required localized field.",
+            "Review image use and alternative text.",
+            "Save after adding, removing or reordering sections.",
+            "Preview the complete page rather than reviewing blocks separately.",
+          ],
+
+          th: [
+            "ใช้ Section เมื่อ Layout รองรับ",
+            "หนึ่ง Section ควรมีหนึ่งหัวข้อหลัก",
+            "กรอก Localized field ที่บังคับให้ครบ",
+            "ตรวจการใช้รูปและ Alternative text",
+            "Save หลังเพิ่ม ลบ หรือเรียง Section",
+            "Preview ทั้งหน้า ไม่ควรตรวจเฉพาะ Block แยกกัน",
+          ],
+        },
+      },
+
+      {
+        id: "about-seo",
+
+        title: {
+          en: "8. SEO and Open Graph",
+          th: "8. SEO และ Open Graph",
+        },
+
+        paragraphs: {
+          en: [
+            "The editor may initialize SEO values from About content, such as using the page Title for the SEO or Open Graph title and the featured image for the Open Graph image.",
+            "Automatically suggested values remain editable. Customize them when the public search or sharing context requires different wording.",
+            "Avoid changing manually reviewed SEO values unintentionally when editing the main content.",
+          ],
+
+          th: [
+            "Editor อาจกำหนดค่าเริ่มต้น SEO จาก About content เช่น ใช้ Page title เป็น SEO หรือ Open Graph title และใช้ Featured image เป็น Open Graph image",
+            "ค่าที่ระบบแนะนำยังแก้ไขได้ ควรปรับเมื่อบริบทของ Search หรือ Sharing ต้องใช้ข้อความต่างจากหน้าเว็บ",
+            "ระวังไม่ให้การแก้ Main content เขียนทับค่า SEO ที่ผ่านการตรวจสอบแล้วโดยไม่ตั้งใจ",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-about-seo",
+
+            number: "6",
+
+            src: "/docs/content/about/about-seo.png",
+
+            title: {
+              en: "About SEO settings",
+              th: "SEO ของหน้า About",
+            },
+
+            alt: {
+              en: "About editor SEO panel showing title description keywords and Open Graph fields",
+              th: "SEO panel แสดง Title, Description, Keywords และ Open Graph",
+            },
+
+            caption: {
+              en: "Review generated and manually edited SEO values before publication.",
+              th: "ตรวจสอบทั้งค่า SEO อัตโนมัติและค่าที่แก้เองก่อน Publish",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "SEO Title: search-result title for the About page.",
+            "SEO Description: concise search-result summary.",
+            "Keywords: relevant terms without unnecessary repetition.",
+            "Open Graph Title: title used by supported social-sharing previews.",
+            "Open Graph Description: sharing-specific summary.",
+            "Open Graph Image: approved image with an appropriate social crop.",
+            "Index and Follow: search-engine directives that should be changed carefully.",
+          ],
+
+          th: [
+            "SEO Title: ชื่อหน้า About ใน Search result",
+            "SEO Description: ข้อความสรุปสำหรับ Search result",
+            "Keywords: คำที่เกี่ยวข้องและไม่ซ้ำเกินจำเป็น",
+            "Open Graph Title: ชื่อที่ใช้ใน Social sharing preview",
+            "Open Graph Description: ข้อความสรุปสำหรับ Sharing",
+            "Open Graph Image: รูปที่ได้รับอนุมัติและมีสัดส่วนเหมาะสม",
+            "Index และ Follow: คำสั่งสำหรับ Search engine ที่ต้องเปลี่ยนอย่างระมัดระวัง",
+          ],
+        },
+      },
+
+      {
+        id: "save-preview-publish",
+
+        title: {
+          en: "9. Save, preview and publish",
+          th: "9. Save, Preview และ Publish",
+        },
+
+        paragraphs: {
+          en: [
+            "Save stores the latest About information in the CMS. Preview allows review before publication. Publish makes the approved version available to the public website.",
+            "Saving a Draft does not mean it is public. Check the status and complete the publication action when the content has been approved.",
+            "After publishing, verify the production About URL rather than relying only on a success notification.",
+          ],
+
+          th: [
+            "Save เก็บข้อมูล About ล่าสุดไว้ใน CMS, Preview ใช้ตรวจสอบก่อนเผยแพร่ และ Publish นำ Version ที่อนุมัติไปแสดงบนเว็บไซต์",
+            "การ Save Draft ไม่ได้หมายความว่าข้อมูลแสดง Public ต้องตรวจสอบ Status และ Publish หลังอนุมัติ",
+            "หลัง Publish ต้องตรวจสอบ About URL บน Production ไม่ควรดูเฉพาะ Success notification",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-about-preview",
+
+            number: "7",
+
+            src: "/docs/content/about/about-preview.png",
+
+            title: {
+              en: "Public About preview",
+              th: "Preview หน้า About",
+            },
+
+            alt: {
+              en: "Public About page displaying approved company content and media",
+              th: "หน้า Public About แสดงข้อมูลและ Media ของบริษัท",
+            },
+
+            caption: {
+              en: "Review the complete public page on desktop and mobile before publication.",
+              th: "ตรวจสอบหน้า Public ทั้งหมดบน Desktop และ Mobile ก่อน Publish",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Confirm the active company.",
+            "Complete the required localized fields.",
+            "Review Rich Text formatting and links.",
+            "Confirm media ownership, crop and alternative text.",
+            "Review sections and their order.",
+            "Review SEO and Open Graph information.",
+            "Save and wait for confirmation.",
+            "Preview desktop and mobile layouts.",
+            "Publish the approved version.",
+            "Verify the production About page.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัทปัจจุบัน",
+            "กรอก Localized field ที่บังคับ",
+            "ตรวจ Rich Text formatting และ Link",
+            "ตรวจสิทธิ์การใช้รูป Crop และ Alternative text",
+            "ตรวจ Section และลำดับ",
+            "ตรวจ SEO และ Open Graph",
+            "Save และรอข้อความยืนยัน",
+            "Preview บน Desktop และ Mobile",
+            "Publish Version ที่ได้รับอนุมัติ",
+            "ตรวจหน้า About บน Production",
+          ],
+        },
+      },
+
+      {
+        id: "update-about",
+
+        title: {
+          en: "10. Update published About content",
+          th: "10. แก้ไข About ที่ Published แล้ว",
+        },
+
+        paragraphs: {
+          en: [
+            "About information should be reviewed when company details, positioning, services or contact information change.",
+            "Treat changes to published content as production updates. Review every affected language, SEO value and public section.",
+            "For substantial revisions, prepare and approve the complete content before replacing the existing public version.",
+          ],
+
+          th: [
+            "ควรทบทวน About เมื่อข้อมูลบริษัท Positioning, Service หรือข้อมูลติดต่อเปลี่ยน",
+            "การแก้ข้อมูลที่ Published ถือเป็น Production update ต้องตรวจทุกภาษา SEO และ Public section ที่ได้รับผล",
+            "หากแก้ไขครั้งใหญ่ ควรเตรียมและอนุมัติเนื้อหาทั้งหมดก่อนแทนที่ Public version เดิม",
+          ],
+        },
+
+        items: {
+          en: [
+            "Confirm whether the change affects legal company information.",
+            "Review all enabled languages.",
+            "Update related SEO when necessary.",
+            "Check whether the featured image remains appropriate.",
+            "Preview the complete page.",
+            "Verify the production page after saving or publishing.",
+          ],
+
+          th: [
+            "ตรวจว่าการเปลี่ยนแปลงกระทบข้อมูลบริษัททางกฎหมายหรือไม่",
+            "ตรวจทุกภาษาที่เปิดใช้",
+            "อัปเดต SEO ที่เกี่ยวข้อง",
+            "ตรวจว่า Featured image เดิมยังเหมาะสม",
+            "Preview ทั้งหน้า",
+            "ตรวจหน้า Production หลัง Save หรือ Publish",
+          ],
+        },
+      },
+
+      {
+        id: "about-mobile",
+
+        title: {
+          en: "11. About editor on mobile",
+          th: "11. About Editor บนมือถือ",
+        },
+
+        paragraphs: {
+          en: [
+            "On mobile, localized fields and editor panels are arranged vertically. Scroll through the complete editor before saving.",
+            "Long Rich Text editing and detailed media comparison are generally easier on desktop. Use mobile for suitable corrections and reviews.",
+            "The same validation, permissions and publication rules apply on mobile.",
+          ],
+
+          th: [
+            "บน Mobile ช่องภาษาและ Editor panel จะเรียงในแนวตั้ง ควรเลื่อนตรวจสอบทั้งหมดก่อน Save",
+            "การแก้ Rich Text ยาวและเปรียบเทียบ Media อย่างละเอียดมักทำได้ง่ายกว่าบน Desktop ควรใช้ Mobile กับการตรวจหรือแก้ที่เหมาะสม",
+            "Validation, Permission และ Publication rule บน Mobile เหมือน Desktop",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-about-mobile",
+
+            number: "8",
+
+            src: "/docs/content/about/about-mobile.png",
+
+            title: {
+              en: "Responsive About editor",
+              th: "About Editor แบบ Responsive",
+            },
+
+            alt: {
+              en: "Junsekino CMS About editor arranged for a mobile screen",
+              th: "About editor ของ Junsekino CMS ที่จัดเรียงสำหรับ Mobile",
+            },
+
+            caption: {
+              en: "Editor panels stack vertically on mobile while preserving the same content workflow.",
+              th: "Editor panel เรียงในแนวตั้งบน Mobile โดยยังใช้ Workflow เดียวกัน",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Confirm the active company.",
+            "Select the correct language before editing.",
+            "Review the complete Rich Text content.",
+            "Avoid leaving while media is uploading.",
+            "Scroll to the publication controls before confirming an action.",
+            "Use desktop for major structural revisions when practical.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัท",
+            "เลือกภาษาให้ถูกต้องก่อนแก้",
+            "ตรวจ Rich Text ทั้งหมด",
+            "ไม่ออกจากหน้าขณะ Upload Media",
+            "เลื่อนไปยัง Publication control ก่อนยืนยัน",
+            "ใช้ Desktop เมื่อต้องแก้โครงสร้างครั้งใหญ่",
+          ],
+        },
+      },
+
+      {
+        id: "about-troubleshooting",
+
+        title: {
+          en: "12. Common About problems",
+          th: "12. ปัญหาที่พบบ่อย",
+        },
+
+        paragraphs: {
+          en: [
+            "When the public About page does not match the editor, identify whether the issue concerns saved data, language selection, publication status, media or caching.",
+          ],
+
+          th: [
+            "เมื่อหน้า Public About ไม่ตรงกับ Editor ให้ตรวจแยกว่าสาเหตุอยู่ที่ข้อมูลที่ Save, ภาษา, Publication status, Media หรือ Cache",
+          ],
+        },
+
+        items: {
+          en: [
+            "About page not found: confirm that an About version is published.",
+            "Wrong language shown: check company Localization and current public-language behavior.",
+            "Content duplicated: review Excerpt and Rich Text for repeated paragraphs.",
+            "Formatting incorrect: remove unsupported copied formatting and preview again.",
+            "Image missing: verify the Media reference and upload status.",
+            "SEO did not update: inspect manually customized SEO values.",
+            "Old public content: refresh and allow cache revalidation.",
+            "Save denied: review company membership and content permission.",
+          ],
+
+          th: [
+            "ไม่พบหน้า About: ตรวจว่ามี About version ที่ Published",
+            "แสดงผิดภาษา: ตรวจ Company localization และพฤติกรรมภาษาของ Public",
+            "ข้อความซ้ำ: ตรวจ Excerpt และ Rich Text",
+            "Formatting ผิด: ลบ Formatting ที่ Copy มาและ Preview ใหม่",
+            "รูปไม่แสดง: ตรวจ Media reference และ Upload status",
+            "SEO ไม่เปลี่ยน: ตรวจค่า SEO ที่เคยแก้เอง",
+            "Public ยังเป็นข้อมูลเก่า: Refresh และรอ Cache revalidation",
+            "Save ไม่ได้: ตรวจ Membership และ Content permission",
+          ],
+        },
+      },
+
+      {
+        id: "about-checklist",
+
+        title: {
+          en: "13. About publishing checklist",
+          th: "13. Checklist หน้า About",
+        },
+
+        paragraphs: {
+          en: [
+            "Complete this checklist before publishing new or substantially revised About content.",
+          ],
+
+          th: ["ใช้ Checklist นี้ก่อน Publish About ใหม่หรือการแก้ไขครั้งใหญ่"],
+        },
+
+        items: {
+          en: [
+            "The correct company is selected.",
+            "Company information is accurate and approved.",
+            "Required localized fields are complete.",
+            "English content is complete for the current public default.",
+            "Title and Excerpt are concise and not duplicated unnecessarily.",
+            "Rich Text headings, paragraphs, lists and links are correct.",
+            "Media is approved, optimized and properly cropped.",
+            "Alternative text is meaningful.",
+            "Sections are complete and correctly ordered.",
+            "SEO and Open Graph values have been reviewed.",
+            "Desktop and mobile previews are correct.",
+            "No confidential, test or placeholder information remains.",
+            "The approved version is published.",
+            "The production About page has been verified.",
+          ],
+
+          th: [
+            "เลือกบริษัทถูกต้อง",
+            "ข้อมูลบริษัทถูกต้องและได้รับอนุมัติ",
+            "Localized field ที่บังคับครบ",
+            "ภาษาอังกฤษครบสำหรับ Public default ปัจจุบัน",
+            "Title และ Excerpt กระชับและไม่ซ้ำโดยไม่จำเป็น",
+            "Heading, Paragraph, List และ Link ใน Rich Text ถูกต้อง",
+            "Media ได้รับอนุมัติ Optimize และ Crop เหมาะสม",
+            "Alternative text มีความหมาย",
+            "Section ครบและเรียงถูกต้อง",
+            "ตรวจ SEO และ Open Graph แล้ว",
+            "Preview บน Desktop และ Mobile ถูกต้อง",
+            "ไม่มีข้อมูลลับ ข้อมูลทดสอบ หรือ Placeholder",
+            "Publish Version ที่ได้รับอนุมัติ",
+            "ตรวจหน้า About บน Production แล้ว",
+          ],
+        },
+      },
+    ],
+  },
+  "content/projects": {
+    eyebrow: {
+      en: "Content Management",
+      th: "การจัดการเนื้อหา",
+    },
+
+    title: {
+      en: "Projects",
+      th: "โครงการ",
+    },
+
+    description: {
+      en: "Create and manage project information, localized content, cover images, galleries, categories, SEO and publication.",
+      th: "สร้างและจัดการข้อมูลโครงการ เนื้อหาหลายภาษา Cover, Gallery, Category, SEO และการเผยแพร่",
+    },
+
+    introduction: {
+      en: [
+        "The Projects module manages architectural, interior-design, construction and related company work displayed on the public website.",
+        "A Project combines structured information, localized content, Rich Text, a cover image, a gallery, categorization and SEO settings.",
+        "Project information and media may contain confidential client or location details. Publish only approved material and confirm that the company owns or is authorized to use every image.",
+      ],
+
+      th: [
+        "โมดูล Projects ใช้จัดการผลงานด้านสถาปัตยกรรม ออกแบบภายใน ก่อสร้าง และงานอื่นที่เกี่ยวข้องสำหรับแสดงบนเว็บไซต์",
+        "Project หนึ่งรายการประกอบด้วยข้อมูลพื้นฐาน เนื้อหาหลายภาษา Rich Text, Cover, Gallery, Category และ SEO",
+        "ข้อมูลและรูปโครงการอาจมีข้อมูลลูกค้าหรือสถานที่ที่เป็นความลับ ต้อง Publish เฉพาะข้อมูลที่ได้รับอนุมัติ และตรวจสอบว่าบริษัทเป็นเจ้าของหรือมีสิทธิ์ใช้รูปทุกภาพ",
+      ],
+    },
+
+    highlights: [
+      {
+        title: {
+          en: "Structured projects",
+          th: "ข้อมูลเป็นโครงสร้าง",
+        },
+
+        description: {
+          en: "Organize title, location, date, category, content and media consistently.",
+          th: "จัด Title, Location, Date, Category, Content และ Media อย่างเป็นระบบ",
+        },
+      },
+
+      {
+        title: {
+          en: "Visual portfolio",
+          th: "Portfolio ด้วยภาพ",
+        },
+
+        description: {
+          en: "Use approved cover and gallery assets to present completed work.",
+          th: "ใช้ Cover และ Gallery ที่ได้รับอนุมัติเพื่อนำเสนอผลงาน",
+        },
+      },
+
+      {
+        title: {
+          en: "Localized content",
+          th: "รองรับหลายภาษา",
+        },
+
+        description: {
+          en: "Project fields follow the active company's language configuration.",
+          th: "ช่อง Project แสดงตาม Localization ของบริษัท",
+        },
+      },
+
+      {
+        title: {
+          en: "Editable SEO",
+          th: "SEO แก้ไขได้",
+        },
+
+        description: {
+          en: "SEO suggestions start from project data and remain customizable.",
+          th: "ระบบเริ่มค่า SEO จาก Project data และยังแก้ไขได้",
+        },
+      },
+    ],
+
+    sections: [
+      {
+        id: "projects-overview",
+
+        title: {
+          en: "1. Projects workspace overview",
+          th: "1. ภาพรวมหน้า Projects",
+        },
+
+        paragraphs: {
+          en: [
+            "The Projects workspace lists records belonging to the active company. Use it to search, filter, create and manage Project publication states.",
+            "Always confirm the selected company before opening or creating a Project. Projects, categories, media and public URLs are company-specific.",
+            "The available actions depend on the signed-in user's role and permissions.",
+          ],
+
+          th: [
+            "หน้า Projects แสดงรายการของบริษัทปัจจкомуบัน ใช้สำหรับ Search, Filter, Create และจัดการ Publication status",
+            "ตรวจสอบบริษัทก่อนเปิดหรือสร้าง Project เพราะ Project, Category, Media และ Public URL แยกตามบริษัท",
+            "คำสั่งที่แสดงขึ้นอยู่กับ Role และ Permission ของผู้ใช้",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-projects-overview",
+
+            number: "1",
+
+            src: "/docs/content/projects/projects-overview.png",
+
+            title: {
+              en: "Projects workspace",
+              th: "หน้า Projects",
+            },
+
+            alt: {
+              en: "Junsekino CMS Projects workspace showing project records, statuses and actions",
+              th: "หน้า Projects แสดงรายการ Status และคำสั่งจัดการโครงการ",
+            },
+
+            caption: {
+              en: "Use the Projects list to locate records and confirm their current publication state.",
+              th: "ใช้รายการ Projects เพื่อค้นหาและตรวจสอบสถานะการเผยแพร่",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Search: locate a Project using available text fields.",
+            "Filter: limit the list by status, category or other supported values.",
+            "Status: identifies Draft, Scheduled, Published or another supported state.",
+            "Add Project: opens a new Project editor.",
+            "Actions: edit, preview, publish, unpublish or remove according to permission.",
+          ],
+
+          th: [
+            "Search: ค้นหา Project จากข้อมูลที่ระบบรองรับ",
+            "Filter: จำกัดรายการตาม Status, Category หรือค่าอื่น",
+            "Status: แสดง Draft, Scheduled, Published หรือสถานะที่รองรับ",
+            "Add Project: เปิด Editor สำหรับ Project ใหม่",
+            "Actions: Edit, Preview, Publish, Unpublish หรือ Remove ตาม Permission",
+          ],
+        },
+      },
+
+      {
+        id: "create-project",
+
+        title: {
+          en: "2. Create a Project",
+          th: "2. สร้าง Project",
+        },
+
+        paragraphs: {
+          en: [
+            "Create a Project only after confirming that the company has approved the work for CMS preparation.",
+            "The initial record should be saved as a Draft while information and media are still being assembled.",
+            "Do not use a public production Project as a temporary test record.",
+          ],
+
+          th: [
+            "สร้าง Project หลังจากยืนยันว่าบริษัทอนุมัติให้นำผลงานเข้าสู่ CMS แล้ว",
+            "ควร Save รายการเริ่มต้นเป็น Draft ระหว่างรวบรวมข้อมูลและ Media",
+            "ไม่ควรใช้ Project บน Production เป็นรายการทดสอบชั่วคราว",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-create-project",
+
+            number: "2",
+
+            src: "/docs/content/projects/create-project.png",
+
+            title: {
+              en: "Create Project",
+              th: "สร้าง Project",
+            },
+
+            alt: {
+              en: "Junsekino CMS Project editor used to create a new project record",
+              th: "Project editor สำหรับสร้างรายการโครงการใหม่",
+            },
+
+            caption: {
+              en: "Complete the required information and save the new Project as a Draft.",
+              th: "กรอกข้อมูลบังคับและ Save Project ใหม่เป็น Draft",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Confirm the active company.",
+            "Open Projects.",
+            "Select Add Project.",
+            "Enter the required basic information.",
+            "Select the appropriate category.",
+            "Complete the default-language fields.",
+            "Select an approved cover image.",
+            "Save the Project as a Draft.",
+            "Continue with Rich Text, gallery and SEO.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัทปัจจุบัน",
+            "เปิด Projects",
+            "กด Add Project",
+            "กรอกข้อมูลพื้นฐานที่บังคับ",
+            "เลือก Category",
+            "กรอกภาษาเริ่มต้น",
+            "เลือก Cover ที่ได้รับอนุมัติ",
+            "Save เป็น Draft",
+            "จัดทำ Rich Text, Gallery และ SEO ต่อ",
+          ],
+        },
+      },
+
+      {
+        id: "basic-information",
+
+        title: {
+          en: "3. Basic Project information",
+          th: "3. ข้อมูลพื้นฐานของ Project",
+        },
+
+        paragraphs: {
+          en: [
+            "Basic information identifies and organizes the Project throughout the Admin and public website.",
+            "Use approved project names, locations and completion information. Do not publish a private client name or exact address without authorization.",
+            "Field availability may vary according to the current Project schema and company configuration.",
+          ],
+
+          th: [
+            "ข้อมูลพื้นฐานใช้ระบุและจัดกลุ่ม Project ทั้งใน Admin และ Public site",
+            "ใช้ชื่อโครงการ Location และข้อมูลการเสร็จงานที่ได้รับอนุมัติ ห้าม Publish ชื่อลูกค้าหรือที่อยู่แบบละเอียดโดยไม่ได้รับอนุญาต",
+            "ช่องที่แสดงอาจแตกต่างตาม Project schema และการตั้งค่าบริษัท",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-project-basic-information",
+
+            number: "3",
+
+            src: "/docs/content/projects/project-basic-information.png",
+
+            title: {
+              en: "Project information",
+              th: "ข้อมูล Project",
+            },
+
+            alt: {
+              en: "Project editor showing title slug location date category and tags",
+              th: "Project editor แสดง Title, Slug, Location, Date, Category และ Tag",
+            },
+
+            caption: {
+              en: "Verify factual and public-facing information before saving.",
+              th: "ตรวจสอบข้อเท็จจริงและข้อมูลที่จะแสดงสาธารณะก่อน Save",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Title: approved public name of the Project.",
+            "Slug: URL identifier used by the Project detail page.",
+            "Location: public location description approved for display.",
+            "Date: relevant Project year, completion date or supported display date.",
+            "Category: controls organization and may affect public navigation.",
+            "Tags: descriptive terms that may also initialize SEO keywords.",
+            "Status: indicates the Project's workflow stage.",
+          ],
+
+          th: [
+            "Title: ชื่อ Public ของ Project ที่ได้รับอนุมัติ",
+            "Slug: ชื่ออ้างอิงใน URL ของ Project detail",
+            "Location: ข้อมูลสถานที่ที่ได้รับอนุญาตให้แสดง",
+            "Date: ปีโครงการ วันที่เสร็จ หรือวันที่ที่ Schema รองรับ",
+            "Category: ใช้จัดกลุ่มและอาจส่งผลต่อ Public navigation",
+            "Tags: คำอธิบายที่อาจใช้เริ่มต้น SEO keywords",
+            "Status: ขั้นตอนปัจจุบันของ Workflow",
+          ],
+        },
+      },
+
+      {
+        id: "project-slug",
+
+        title: {
+          en: "4. Project slug and URL",
+          th: "4. Project Slug และ URL",
+        },
+
+        paragraphs: {
+          en: [
+            "The Project slug forms part of the public detail URL. Use a short, readable value containing supported lowercase characters, numbers and hyphens.",
+            "Changing a published slug may affect shared links, search indexing and external references. Make the change only after reviewing redirect behavior and obtaining approval.",
+            "Do not place confidential project numbers or customer information in a public slug.",
+          ],
+
+          th: [
+            "Project slug เป็นส่วนหนึ่งของ Public detail URL ควรใช้ข้อความสั้น อ่านได้ และประกอบด้วยตัวอักษรพิมพ์เล็ก ตัวเลข หรือขีดกลางที่ระบบรองรับ",
+            "การเปลี่ยน Slug หลัง Publish อาจกระทบ Link ที่ Share, Search indexing และ External reference ควรตรวจ Redirect และรับอนุมัติก่อน",
+            "ห้ามใส่เลขโครงการภายในหรือข้อมูลลูกค้าที่เป็นความลับใน Public slug",
+          ],
+        },
+
+        items: {
+          en: [
+            "Keep the slug concise.",
+            "Use words related to the Project.",
+            "Avoid spaces and unsupported symbols.",
+            "Avoid unnecessary date or tracking codes.",
+            "Verify the final public URL after publication.",
+          ],
+
+          th: [
+            "ใช้ Slug ที่กระชับ",
+            "ใช้คำที่เกี่ยวข้องกับ Project",
+            "หลีกเลี่ยง Space และ Symbol ที่ไม่รองรับ",
+            "หลีกเลี่ยงวันที่หรือ Tracking code ที่ไม่จำเป็น",
+            "ตรวจ Public URL หลัง Publish",
+          ],
+        },
+      },
+
+      {
+        id: "localized-project-content",
+
+        title: {
+          en: "5. Localized Project content",
+          th: "5. เนื้อหา Project หลายภาษา",
+        },
+
+        paragraphs: {
+          en: [
+            "The Project editor displays language fields according to the active company's Localization settings.",
+            "English-only, Thai-only and bilingual configurations show the corresponding fields. Changing the Admin interface language does not change the content language being edited.",
+            "English is currently the default language of the public website. Complete the English version before publication under the current public configuration.",
+          ],
+
+          th: [
+            "Project editor แสดงช่องภาษาตาม Localization ของบริษัทปัจจุบัน",
+            "การตั้งค่า English only, Thai only หรือสองภาษา จะแสดงช่องที่เกี่ยวข้อง การเปลี่ยนภาษา Admin ไม่ได้เปลี่ยน Content language",
+            "เว็บไซต์ Public ปัจจุบันใช้ภาษาอังกฤษเป็นค่าเริ่มต้น จึงควรกรอก English version ให้ครบก่อน Publish",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-project-localized-content",
+
+            number: "4",
+
+            src: "/docs/content/projects/project-localized-content.png",
+
+            title: {
+              en: "Localized Project fields",
+              th: "ช่องภาษาใน Project",
+            },
+
+            alt: {
+              en: "Project editor displaying English and Thai localized content fields",
+              th: "Project editor แสดงช่องข้อมูลภาษาอังกฤษและภาษาไทย",
+            },
+
+            caption: {
+              en: "Complete and review each enabled language independently.",
+              th: "กรอกและตรวจสอบแต่ละภาษาที่เปิดใช้งานแยกกัน",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Use the correct language field or tab.",
+            "Translate meaning rather than copying text unchanged.",
+            "Keep Project facts consistent across languages.",
+            "Review names and technical terms carefully.",
+            "Complete localized alternative text and SEO values.",
+            "Do not rely on fallback for approved production content.",
+          ],
+
+          th: [
+            "ใช้ช่องหรือ Tab ภาษาที่ถูกต้อง",
+            "แปลความหมาย ไม่คัดลอกข้อความเดิมไปอีกภาษา",
+            "รักษาข้อเท็จจริงของ Project ให้ตรงกันทุกภาษา",
+            "ตรวจชื่อและศัพท์เฉพาะ",
+            "กรอก Alternative text และ SEO แยกภาษา",
+            "ไม่พึ่ง Fallback สำหรับ Production content",
+          ],
+        },
+      },
+
+      {
+        id: "project-rich-text",
+
+        title: {
+          en: "6. Project Rich Text",
+          th: "6. Rich Text ของ Project",
+        },
+
+        paragraphs: {
+          en: [
+            "Rich Text contains the complete narrative of the Project. Use it for the design concept, scope, approach, materials or other approved information.",
+            "Avoid repeating the complete excerpt or summary inside the Rich Text. The public detail page should present one clear main narrative.",
+            "Use structured headings and short paragraphs so the content remains readable when expanded on the public page.",
+          ],
+
+          th: [
+            "Rich Text เก็บเนื้อหา Project ฉบับเต็ม เช่น แนวคิดการออกแบบ ขอบเขต วิธีการ วัสดุ หรือข้อมูลอื่นที่ได้รับอนุมัติ",
+            "หลีกเลี่ยงการคัดลอก Excerpt หรือ Summary ทั้งหมดมาซ้ำใน Rich Text หน้า Detail ควรมี Main narrative ที่ชัดเจนเพียงชุดเดียว",
+            "ใช้ Heading และ Paragraph สั้นเพื่อให้อ่านง่ายเมื่อกด Show more บน Public page",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-project-rich-text",
+
+            number: "5",
+
+            src: "/docs/content/projects/project-rich-text.png",
+
+            title: {
+              en: "Project Rich Text editor",
+              th: "Rich Text Editor ของ Project",
+            },
+
+            alt: {
+              en: "Project Rich Text editor showing formatting controls and project content",
+              th: "Project Rich Text editor แสดง Toolbar และเนื้อหาโครงการ",
+            },
+
+            caption: {
+              en: "Use clear headings, concise paragraphs and approved links in the Project narrative.",
+              th: "ใช้ Heading, Paragraph ที่กระชับ และ Link ที่ได้รับอนุมัติ",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Use headings to divide meaningful subjects.",
+            "Use normal paragraphs for the main narrative.",
+            "Use lists only for genuinely list-based information.",
+            "Use descriptive and verified links.",
+            "Remove unsupported formatting pasted from external applications.",
+            "Do not insert scripts, tracking code or unsupported HTML.",
+          ],
+
+          th: [
+            "ใช้ Heading แบ่งหัวข้อ",
+            "ใช้ Paragraph สำหรับเนื้อหาหลัก",
+            "ใช้ List เมื่อข้อมูลเป็นรายการจริง",
+            "ใช้ Link ที่อธิบายปลายทางและตรวจสอบแล้ว",
+            "ลบ Formatting ที่ไม่รองรับจากโปรแกรมอื่น",
+            "ห้ามใส่ Script, Tracking code หรือ HTML ที่ไม่รองรับ",
+          ],
+        },
+      },
+
+      {
+        id: "project-cover",
+
+        title: {
+          en: "7. Project cover image",
+          th: "7. Cover Image",
+        },
+
+        paragraphs: {
+          en: [
+            "The cover image represents the Project in public lists, detail pages and potentially social-sharing previews.",
+            "The recommended source is 2000 × 1125 pixels, a 16:9 aspect ratio and approximately 3 MB or less.",
+            "Select a clear lead image that remains recognizable when displayed as a card, thumbnail and larger detail image.",
+          ],
+
+          th: [
+            "Cover ใช้แทน Project ในหน้ารวม หน้า Detail และอาจใช้ใน Social sharing preview",
+            "แนะนำขนาด 2000 × 1125 Pixels อัตราส่วน 16:9 และ File size ไม่เกินประมาณ 3 MB",
+            "เลือกรูปหลักที่ชัดเจนและยังสื่อความหมายได้เมื่อแสดงเป็น Card, Thumbnail และภาพขนาดใหญ่",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-project-cover",
+
+            number: "6",
+
+            src: "/docs/content/projects/project-cover.png",
+
+            title: {
+              en: "Project cover",
+              th: "Cover ของ Project",
+            },
+
+            alt: {
+              en: "Project editor showing the selected cover image and media controls",
+              th: "Project editor แสดง Cover และเครื่องมือ Media",
+            },
+
+            caption: {
+              en: "Use an approved 16:9 image that represents the Project clearly.",
+              th: "ใช้รูป 16:9 ที่ได้รับอนุมัติและสื่อถึง Project ได้ชัดเจน",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Recommended dimensions: 2000 × 1125 pixels.",
+            "Recommended ratio: 16:9.",
+            "Recommended size: approximately 3 MB or less.",
+            "Use a company-owned or licensed image.",
+            "Avoid placing the main subject at an extreme crop boundary.",
+            "Add meaningful localized alternative text.",
+          ],
+
+          th: [
+            "ขนาดแนะนำ: 2000 × 1125 Pixels",
+            "อัตราส่วนแนะนำ: 16:9",
+            "File size แนะนำ: ไม่เกินประมาณ 3 MB",
+            "ใช้รูปที่บริษัทเป็นเจ้าของหรือมี License",
+            "ไม่วาง Subject สำคัญไว้ชิดพื้นที่ Crop",
+            "กรอก Alternative text แยกภาษา",
+          ],
+        },
+      },
+
+      {
+        id: "project-gallery",
+
+        title: {
+          en: "8. Project gallery",
+          th: "8. Project Gallery",
+        },
+
+        paragraphs: {
+          en: [
+            "The gallery presents supporting Project images in a controlled sequence. Include only images that add meaningful information to the Project.",
+            "Use a source with a long edge of approximately 2000 pixels, preserve the original aspect ratio and keep each file at approximately 3 MB or less.",
+            "Consistent image quality and intentional ordering provide a better result than uploading every available photograph.",
+          ],
+
+          th: [
+            "Gallery ใช้แสดงรูป Project เพิ่มเติมตาม Sequence ที่ควบคุม ควรเลือกรูปที่เพิ่มข้อมูลหรือช่วยเล่าโครงการจริง",
+            "แนะนำให้ด้านยาวประมาณ 2000 Pixels รักษา Aspect ratio เดิม และ File size ต่อรูปไม่เกินประมาณ 3 MB",
+            "การคัดเลือกรูปคุณภาพและเรียงลำดับอย่างตั้งใจให้ผลดีกว่าการ Upload รูปทั้งหมดที่มี",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-project-gallery",
+
+            number: "7",
+
+            src: "/docs/content/projects/project-gallery.png",
+
+            title: {
+              en: "Project gallery",
+              th: "Gallery ของ Project",
+            },
+
+            alt: {
+              en: "Project editor showing gallery images and gallery management controls",
+              th: "Project editor แสดงรูป Gallery และเครื่องมือจัดการ",
+            },
+
+            caption: {
+              en: "Select, order and review every gallery image before publication.",
+              th: "เลือก เรียง และตรวจสอบรูป Gallery ทุกภาพก่อน Publish",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Recommended long edge: approximately 2000 pixels.",
+            "Preserve each image's intended aspect ratio.",
+            "Recommended size: approximately 3 MB or less per image.",
+            "Avoid duplicate and near-duplicate images.",
+            "Arrange images into a meaningful visual sequence.",
+            "Remove test, blurred or unauthorized images.",
+            "Complete alternative text where supported.",
+          ],
+
+          th: [
+            "ด้านยาวแนะนำ: ประมาณ 2000 Pixels",
+            "รักษา Aspect ratio ที่เหมาะสมของแต่ละรูป",
+            "File size แนะนำ: ไม่เกินประมาณ 3 MB ต่อรูป",
+            "หลีกเลี่ยงรูปซ้ำหรือใกล้เคียงกันมาก",
+            "เรียงรูปให้เป็น Visual sequence",
+            "ลบรูปทดสอบ รูปเบลอ หรือรูปที่ไม่ได้รับอนุญาต",
+            "กรอก Alternative text เมื่อรองรับ",
+          ],
+        },
+      },
+
+      {
+        id: "gallery-upload-and-order",
+
+        title: {
+          en: "9. Upload and order gallery media",
+          th: "9. Upload และเรียง Gallery",
+        },
+
+        paragraphs: {
+          en: [
+            "When uploading multiple files, keep the Media Picker open until the complete batch has finished optimizing and uploading.",
+            "After selecting gallery assets, arrange them according to the intended Project story. Save and reload to verify that the order was preserved.",
+            "Removing an image from a Project gallery does not necessarily delete the Media Library asset.",
+          ],
+
+          th: [
+            "เมื่อ Upload หลายไฟล์ ให้เปิด Media Picker ค้างไว้จนทั้ง Batch Optimize และ Upload เสร็จ",
+            "หลังเลือกรูป ให้เรียงตามเรื่องราวของ Project จากนั้น Save และ Reload เพื่อตรวจว่าลำดับถูกเก็บ",
+            "การนำรูปออกจาก Gallery ไม่จำเป็นต้องลบ Asset ออกจาก Media Library",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Open the gallery Media Picker.",
+            "Select existing assets or upload new approved files.",
+            "Wait for every file to reach the completed state.",
+            "Select the required images.",
+            "Remove duplicates and unsuitable images.",
+            "Arrange the gallery order.",
+            "Save the Project.",
+            "Reload the editor and verify the order.",
+            "Preview the Project detail slideshow.",
+          ],
+
+          th: [
+            "เปิด Media Picker ของ Gallery",
+            "เลือก Asset เดิมหรือ Upload ไฟล์ที่ได้รับอนุมัติ",
+            "รอทุกไฟล์เป็น Completed",
+            "เลือกรูปที่ต้องการ",
+            "นำรูปซ้ำหรือไม่เหมาะสมออก",
+            "เรียงลำดับ Gallery",
+            "Save Project",
+            "Reload และตรวจสอบลำดับ",
+            "Preview Slideshow ใน Project detail",
+          ],
+        },
+      },
+
+      {
+        id: "project-seo",
+
+        title: {
+          en: "10. Project SEO",
+          th: "10. SEO ของ Project",
+        },
+
+        paragraphs: {
+          en: [
+            "The Project editor can initialize SEO values from Project data. The Project title can initialize SEO and Open Graph titles, tags can initialize keywords and the cover can initialize the Open Graph image.",
+            "These values remain editable. Review them for search clarity and social-sharing presentation before publication.",
+            "Manually customized SEO should not be overwritten unintentionally when Project content changes.",
+          ],
+
+          th: [
+            "Project editor สามารถเริ่มค่า SEO จาก Project data โดย Title ใช้เริ่ม SEO และ Open Graph title, Tag ใช้เริ่ม Keywords และ Cover ใช้เริ่ม Open Graph image",
+            "ค่าทั้งหมดยังแก้ไขได้ ต้องตรวจสอบความชัดเจนใน Search และการแสดงผลเวลา Share ก่อน Publish",
+            "ระวังไม่ให้การแก้ Project data เขียนทับ SEO ที่ปรับเองและผ่านการตรวจสอบแล้วโดยไม่ตั้งใจ",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-project-seo",
+
+            number: "8",
+
+            src: "/docs/content/projects/project-seo.png",
+
+            title: {
+              en: "Project SEO settings",
+              th: "SEO ของ Project",
+            },
+
+            alt: {
+              en: "Project SEO panel showing title description keywords and Open Graph information",
+              th: "Project SEO panel แสดง Title, Description, Keywords และ Open Graph",
+            },
+
+            caption: {
+              en: "Review automatically initialized and manually customized SEO values before publishing.",
+              th: "ตรวจทั้ง SEO ที่ระบบเริ่มให้และค่าที่แก้เองก่อน Publish",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Project Title → initial SEO Title.",
+            "Project Title → initial Open Graph Title.",
+            "Project Tags → initial SEO Keywords.",
+            "Project Cover → initial Open Graph Image.",
+            "Project summary may initialize SEO or Open Graph descriptions.",
+            "Every generated value remains editable.",
+            "Review Index and Follow settings carefully.",
+          ],
+
+          th: [
+            "Project Title → ค่าเริ่มต้น SEO Title",
+            "Project Title → ค่าเริ่มต้น Open Graph Title",
+            "Project Tags → ค่าเริ่มต้น SEO Keywords",
+            "Project Cover → ค่าเริ่มต้น Open Graph Image",
+            "Project Summary อาจใช้เริ่ม SEO หรือ Open Graph Description",
+            "ค่าที่สร้างอัตโนมัติยังแก้ไขได้",
+            "ตรวจ Index และ Follow อย่างระมัดระวัง",
+          ],
+        },
+      },
+
+      {
+        id: "preview-project",
+
+        title: {
+          en: "11. Preview the Project",
+          th: "11. Preview Project",
+        },
+
+        paragraphs: {
+          en: [
+            "Preview the Project detail after completing its content and media. Review the relationship between the slideshow and the detail panel.",
+            "The initial detail view should fit its intended viewport where practical. When expanded content exceeds the available space, the page may extend vertically.",
+            "Test Show more and Show less to confirm that Rich Text is displayed once and expands correctly.",
+          ],
+
+          th: [
+            "Preview Project detail หลังกรอก Content และ Media ครบ โดยตรวจความสัมพันธ์ระหว่าง Slideshow กับ Detail panel",
+            "Initial detail ควรพอดีกับ Viewport ตาม Design เมื่อเนื้อหาที่ขยายเกินพื้นที่ หน้าอาจยาวลงในแนวตั้ง",
+            "ทดสอบ Show more และ Show less เพื่อยืนยันว่า Rich Text แสดงเพียงครั้งเดียวและขยายถูกต้อง",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-project-preview",
+
+            number: "9",
+
+            src: "/docs/content/projects/project-preview.png",
+
+            title: {
+              en: "Project detail preview",
+              th: "Preview หน้า Project Detail",
+            },
+
+            alt: {
+              en: "Public Project detail page showing slideshow and project information",
+              th: "หน้า Public Project detail แสดง Slideshow และข้อมูลโครงการ",
+            },
+
+            caption: {
+              en: "Review slideshow controls, detail content and responsive layout before publishing.",
+              th: "ตรวจ Slideshow, Detail content และ Responsive layout ก่อน Publish",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "The correct cover and gallery images appear.",
+            "Slideshow order matches the editor.",
+            "Image controls and thumbnails work.",
+            "Title, location and date are correct.",
+            "Rich Text appears once without duplicated excerpts.",
+            "Show more and Show less work correctly.",
+            "No unintended page overflow appears initially.",
+            "Desktop and mobile layouts remain usable.",
+          ],
+
+          th: [
+            "Cover และ Gallery ถูกต้อง",
+            "ลำดับ Slideshow ตรงกับ Editor",
+            "ปุ่มและ Thumbnail ทำงาน",
+            "Title, Location และ Date ถูกต้อง",
+            "Rich Text แสดงครั้งเดียวโดยไม่มี Excerpt ซ้ำ",
+            "Show more และ Show less ทำงาน",
+            "Initial view ไม่มี Overflow ที่ไม่ตั้งใจ",
+            "Desktop และ Mobile ใช้งานได้",
+          ],
+        },
+      },
+
+      {
+        id: "publish-project",
+
+        title: {
+          en: "12. Publish and update a Project",
+          th: "12. Publish และแก้ไข Project",
+        },
+
+        paragraphs: {
+          en: [
+            "Save the Project as a Draft until content, media, SEO and approvals are complete. Publish only the approved version.",
+            "A published Project may appear in the public Project list, category results and its detail URL.",
+            "Treat edits to published Projects as production changes and verify every affected public location.",
+          ],
+
+          th: [
+            "Save Project เป็น Draft จน Content, Media, SEO และการอนุมัติครบ แล้วจึง Publish",
+            "Project ที่ Publish อาจแสดงในหน้ารวม Project, ผลตาม Category และ Detail URL",
+            "การแก้ Project ที่ Published เป็น Production change ต้องตรวจทุกตำแหน่ง Public ที่ได้รับผล",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Complete required Project information.",
+            "Review all enabled languages.",
+            "Confirm category, tags, location and date.",
+            "Confirm cover and gallery rights.",
+            "Review gallery order and alternative text.",
+            "Review SEO and Open Graph.",
+            "Save and preview.",
+            "Publish the approved version.",
+            "Verify the public list, category and detail page.",
+          ],
+
+          th: [
+            "กรอกข้อมูล Project ที่บังคับ",
+            "ตรวจทุกภาษาที่เปิดใช้",
+            "ตรวจ Category, Tag, Location และ Date",
+            "ตรวจสิทธิ์ Cover และ Gallery",
+            "ตรวจลำดับ Gallery และ Alternative text",
+            "ตรวจ SEO และ Open Graph",
+            "Save และ Preview",
+            "Publish Version ที่ได้รับอนุมัติ",
+            "ตรวจหน้ารวม Category และ Detail",
+          ],
+        },
+      },
+
+      {
+        id: "project-list-result",
+
+        title: {
+          en: "13. Public Project list and categories",
+          th: "13. หน้ารวม Project และ Category",
+        },
+
+        paragraphs: {
+          en: [
+            "Published Projects are presented by the public Project experience according to the current list, date and category behavior.",
+            "Project images may appear in grayscale by default and reveal color, title or location through interaction according to the public design.",
+            "Category assignment may affect submenu navigation and filtered Project results.",
+          ],
+
+          th: [
+            "Project ที่ Published จะแสดงใน Public Project ตามรูปแบบรายการ วันที่ และ Category ปัจจุบัน",
+            "รูปอาจแสดงเป็น Grayscale และเปลี่ยนเป็นสีพร้อม Title หรือ Location เมื่อ Interaction ตาม Design",
+            "Category อาจส่งผลต่อ Submenu และผลการกรอง Project",
+          ],
+        },
+
+        items: {
+          en: [
+            "Confirm the Project appears in the expected list.",
+            "Confirm its date-based position.",
+            "Test hover and focus presentation.",
+            "Open the expected category submenu.",
+            "Confirm the Project detail link.",
+            "Review keyboard and mobile behavior where hover is unavailable.",
+          ],
+
+          th: [
+            "ตรวจว่า Project แสดงในรายการที่ต้องการ",
+            "ตรวจตำแหน่งตามวันที่",
+            "ทดสอบ Hover และ Focus",
+            "เปิด Category submenu ที่เกี่ยวข้อง",
+            "ตรวจ Link ไป Project detail",
+            "ตรวจ Keyboard และ Mobile ซึ่งไม่มี Hover",
+          ],
+        },
+      },
+
+      {
+        id: "project-mobile",
+
+        title: {
+          en: "14. Project editor on mobile",
+          th: "14. Project Editor บนมือถือ",
+        },
+
+        paragraphs: {
+          en: [
+            "On mobile, Project editor panels are arranged vertically. Review the complete form before saving because related fields may be separated by scrolling.",
+            "Large gallery operations and detailed Rich Text editing are generally easier on desktop. Use mobile for appropriate updates and verification.",
+            "The same validation, permissions and publication rules apply on mobile.",
+          ],
+
+          th: [
+            "บน Mobile, Project editor จะเรียง Panel ในแนวตั้ง ต้องเลื่อนตรวจ Form ทั้งหมดก่อน Save เพราะช่องที่เกี่ยวข้องอาจอยู่ห่างกัน",
+            "งาน Gallery จำนวนมากและ Rich Text แบบละเอียดมักทำได้ง่ายกว่าบน Desktop ควรใช้ Mobile กับงานแก้ไขและตรวจสอบที่เหมาะสม",
+            "Validation, Permission และ Publication rule เหมือน Desktop",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-project-mobile",
+
+            number: "10",
+
+            src: "/docs/content/projects/project-mobile.png",
+
+            title: {
+              en: "Responsive Project editor",
+              th: "Project Editor แบบ Responsive",
+            },
+
+            alt: {
+              en: "Junsekino CMS Project editor arranged for a mobile screen",
+              th: "Project editor ของ Junsekino CMS ที่จัดเรียงสำหรับ Mobile",
+            },
+
+            caption: {
+              en: "Project panels stack vertically on mobile while preserving the same workflow.",
+              th: "Project panel เรียงในแนวตั้งบน Mobile โดยยังใช้ Workflow เดียวกัน",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Confirm the active company.",
+            "Confirm the active content language.",
+            "Scroll through every Project section.",
+            "Do not leave while media is uploading.",
+            "Review gallery order carefully.",
+            "Use desktop for major Rich Text or gallery revisions when practical.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัท",
+            "ตรวจสอบ Content language",
+            "เลื่อนตรวจทุก Section",
+            "ไม่ออกจากหน้าขณะ Upload",
+            "ตรวจลำดับ Gallery",
+            "ใช้ Desktop เมื่อต้องแก้ Rich Text หรือ Gallery ครั้งใหญ่",
+          ],
+        },
+      },
+
+      {
+        id: "project-troubleshooting",
+
+        title: {
+          en: "15. Common Project problems",
+          th: "15. ปัญหาที่พบบ่อย",
+        },
+
+        paragraphs: {
+          en: [
+            "When Project saving or public display fails, keep the editor open and identify whether the problem concerns validation, Rich Text, media, localization, publication or caching.",
+          ],
+
+          th: [
+            "เมื่อ Save หรือแสดง Public ไม่สำเร็จ ให้เปิด Editor ค้างไว้และแยกสาเหตุว่าเป็น Validation, Rich Text, Media, Localization, Publication หรือ Cache",
+          ],
+        },
+
+        items: {
+          en: [
+            "Invalid Project data: review required fields and localized values.",
+            "Rich Text error: confirm that content uses the supported editor format.",
+            "Cover or gallery missing: verify Media references and completed uploads.",
+            "Unexpected SEO values: review manually customized SEO fields.",
+            "Project not in category: verify its category and Published status.",
+            "Detail page not found: verify company slug, Project slug and publication.",
+            "Old content displayed: refresh and allow cache revalidation.",
+            "Slow images: use recommended dimensions and optimized variants.",
+            "Save denied: review membership, role and Project permissions.",
+          ],
+
+          th: [
+            "Invalid Project data: ตรวจช่องบังคับและ Localized value",
+            "Rich Text error: ตรวจว่า Content เป็น Format ที่ Editor รองรับ",
+            "Cover หรือ Gallery หาย: ตรวจ Media reference และ Upload",
+            "SEO ผิด: ตรวจช่องที่เคยแก้เอง",
+            "ไม่แสดงใน Category: ตรวจ Category และ Published status",
+            "ไม่พบ Detail: ตรวจ Company slug, Project slug และ Publication",
+            "ยังแสดงข้อมูลเก่า: Refresh และรอ Cache revalidation",
+            "รูปช้า: ใช้ขนาดแนะนำและ Optimized variant",
+            "Save ไม่ได้: ตรวจ Membership, Role และ Project permission",
+          ],
+        },
+      },
+
+      {
+        id: "projects-checklist",
+
+        title: {
+          en: "16. Project publishing checklist",
+          th: "16. Checklist ก่อน Publish Project",
+        },
+
+        paragraphs: {
+          en: [
+            "Complete this checklist before publishing a new Project or a substantial production revision.",
+          ],
+
+          th: [
+            "ใช้ Checklist นี้ก่อน Publish Project ใหม่หรือแก้ Production ครั้งใหญ่",
+          ],
+        },
+
+        items: {
+          en: [
+            "The correct company is selected.",
+            "The Project is approved for public presentation.",
+            "Title, slug, location and date are correct.",
+            "Category and tags are appropriate.",
+            "Required localized fields are complete.",
+            "Rich Text is accurate, formatted and not duplicated.",
+            "The company owns or is authorized to use every image.",
+            "Cover dimensions and composition are suitable.",
+            "Gallery images are optimized and correctly ordered.",
+            "Alternative text is meaningful.",
+            "SEO and Open Graph information has been reviewed.",
+            "Desktop and mobile previews work correctly.",
+            "No confidential client or location information remains.",
+            "The approved version is published.",
+            "The public list, category and detail page have been verified.",
+          ],
+
+          th: [
+            "เลือกบริษัทถูกต้อง",
+            "Project ได้รับอนุมัติให้เผยแพร่",
+            "Title, Slug, Location และ Date ถูกต้อง",
+            "Category และ Tag เหมาะสม",
+            "Localized field ที่บังคับครบ",
+            "Rich Text ถูกต้อง จัดรูปแบบแล้ว และไม่ซ้ำ",
+            "บริษัทเป็นเจ้าของหรือมีสิทธิ์ใช้รูปทุกภาพ",
+            "Cover มีขนาดและ Composition เหมาะสม",
+            "Gallery Optimize และเรียงถูกต้อง",
+            "Alternative text มีความหมาย",
+            "ตรวจ SEO และ Open Graph แล้ว",
+            "Preview บน Desktop และ Mobile ถูกต้อง",
+            "ไม่มีข้อมูลลูกค้าหรือสถานที่ที่เป็นความลับ",
+            "Publish Version ที่ได้รับอนุมัติ",
+            "ตรวจหน้ารวม Category และ Detail แล้ว",
+          ],
+        },
+      },
+    ],
+  },
+  "content/awards": {
+    eyebrow: {
+      en: "Content Management",
+      th: "การจัดการเนื้อหา",
+    },
+
+    title: {
+      en: "Awards",
+      th: "รางวัล",
+    },
+
+    description: {
+      en: "Create and manage awards, localized descriptions, organizations, dates, categories, media, SEO and publication.",
+      th: "สร้างและจัดการรางวัล เนื้อหาหลายภาษา หน่วยงาน วันที่ Category, Media, SEO และการเผยแพร่",
+    },
+
+    introduction: {
+      en: [
+        "The Awards module manages awards and recognitions presented on the active company's public website.",
+        "Award records should use official names, accurate dates and approved information from the awarding organization.",
+        "Logos, certificates, trophies and event photographs may be protected by copyright or usage conditions. Confirm publication rights before uploading or publishing them.",
+      ],
+
+      th: [
+        "โมดูล Awards ใช้จัดการรางวัลและการยอมรับผลงานที่แสดงบนเว็บไซต์ของบริษัทปัจจุบัน",
+        "ข้อมูล Award ต้องใช้ชื่อทางการ วันที่ถูกต้อง และข้อมูลที่ได้รับอนุมัติจากหน่วยงานผู้มอบรางวัล",
+        "Logo, Certificate, Trophy และภาพกิจกรรมอาจมีลิขสิทธิ์หรือเงื่อนไขการใช้งาน ต้องตรวจสอบสิทธิ์ก่อน Upload หรือ Publish",
+      ],
+    },
+
+    highlights: [
+      {
+        title: {
+          en: "Official information",
+          th: "ข้อมูลทางการ",
+        },
+
+        description: {
+          en: "Use verified award names, organizations, dates and project references.",
+          th: "ใช้ชื่อรางวัล หน่วยงาน วันที่ และ Project reference ที่ตรวจสอบแล้ว",
+        },
+      },
+
+      {
+        title: {
+          en: "Localized presentation",
+          th: "รองรับหลายภาษา",
+        },
+
+        description: {
+          en: "Award content follows the active company's Localization settings.",
+          th: "ข้อมูล Award แสดงช่องภาษาตาม Localization ของบริษัท",
+        },
+      },
+
+      {
+        title: {
+          en: "Rights-aware media",
+          th: "ตรวจสอบสิทธิ์ Media",
+        },
+
+        description: {
+          en: "Publish logos, certificates and photographs only when authorized.",
+          th: "เผยแพร่ Logo, Certificate และรูปเฉพาะเมื่อได้รับอนุญาต",
+        },
+      },
+
+      {
+        title: {
+          en: "Search-ready",
+          th: "รองรับ SEO",
+        },
+
+        description: {
+          en: "Review editable SEO and Open Graph information before publication.",
+          th: "ตรวจสอบ SEO และ Open Graph ที่แก้ไขได้ก่อน Publish",
+        },
+      },
+    ],
+
+    sections: [
+      {
+        id: "awards-overview",
+
+        title: {
+          en: "1. Awards workspace overview",
+          th: "1. ภาพรวมหน้า Awards",
+        },
+
+        paragraphs: {
+          en: [
+            "The Awards workspace lists Award records belonging to the active company. Use it to search, filter, create and manage publication states.",
+            "Always verify the active company before opening or creating an Award. Award records, categories, media and public URLs are company-specific.",
+            "Available actions depend on the signed-in user's role and permissions.",
+          ],
+
+          th: [
+            "หน้า Awards แสดงรายการรางวัลของบริษัทปัจจุบัน ใช้สำหรับ Search, Filter, Create และจัดการ Publication status",
+            "ตรวจสอบบริษัทก่อนเปิดหรือสร้าง Award เพราะ Record, Category, Media และ Public URL แยกตามบริษัท",
+            "คำสั่งที่แสดงขึ้นอยู่กับ Role และ Permission ของผู้ใช้",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-awards-overview",
+
+            number: "1",
+
+            src: "/docs/content/awards/awards-overview.png",
+
+            title: {
+              en: "Awards workspace",
+              th: "หน้า Awards",
+            },
+
+            alt: {
+              en: "Junsekino CMS Awards workspace showing award records, statuses and actions",
+              th: "หน้า Awards แสดงรายการ Status และคำสั่งจัดการรางวัล",
+            },
+
+            caption: {
+              en: "Use the Award list to locate records and confirm their current publication state.",
+              th: "ใช้รายการ Awards เพื่อค้นหาและตรวจสอบสถานะการเผยแพร่",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Search: locate an Award using available text fields.",
+            "Filter: limit records by status, category or another supported value.",
+            "Status: identifies Draft, Scheduled, Published or another supported state.",
+            "Add Award: opens the editor for a new record.",
+            "Actions: manage the selected Award according to permission.",
+          ],
+
+          th: [
+            "Search: ค้นหา Award จากข้อมูลที่ระบบรองรับ",
+            "Filter: จำกัดรายการตาม Status, Category หรือค่าอื่น",
+            "Status: แสดง Draft, Scheduled, Published หรือสถานะที่รองรับ",
+            "Add Award: เปิด Editor สำหรับสร้างรายการใหม่",
+            "Actions: จัดการ Award ตาม Permission",
+          ],
+        },
+      },
+
+      {
+        id: "create-award",
+
+        title: {
+          en: "2. Create an Award",
+          th: "2. สร้าง Award",
+        },
+
+        paragraphs: {
+          en: [
+            "Create an Award after the result has been officially announced and the company has approved it for publication preparation.",
+            "Save the initial record as a Draft while verifying information, translations and media.",
+            "Do not create a production Award record to test the editor.",
+          ],
+
+          th: [
+            "สร้าง Award หลังประกาศผลอย่างเป็นทางการและบริษัทอนุมัติให้นำข้อมูลเข้าสู่ระบบแล้ว",
+            "Save รายการเริ่มต้นเป็น Draft ระหว่างตรวจข้อมูล คำแปล และ Media",
+            "ไม่ควรสร้าง Production Award เพื่อทดสอบ Editor",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-create-award",
+
+            number: "2",
+
+            src: "/docs/content/awards/create-award.png",
+
+            title: {
+              en: "Create Award",
+              th: "สร้าง Award",
+            },
+
+            alt: {
+              en: "Junsekino CMS Award editor used to create a new award record",
+              th: "Award editor สำหรับสร้างรายการรางวัลใหม่",
+            },
+
+            caption: {
+              en: "Complete the required official information and save the new Award as a Draft.",
+              th: "กรอกข้อมูลทางการที่บังคับและ Save Award ใหม่เป็น Draft",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Confirm the active company.",
+            "Open Awards.",
+            "Select Add Award.",
+            "Enter the official Award information.",
+            "Complete the default-language fields.",
+            "Select the appropriate category.",
+            "Add an approved cover image.",
+            "Save the Award as a Draft.",
+            "Continue with content, SEO and review.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัทปัจจุบัน",
+            "เปิด Awards",
+            "กด Add Award",
+            "กรอกข้อมูลรางวัลทางการ",
+            "กรอกภาษาเริ่มต้น",
+            "เลือก Category",
+            "เพิ่ม Cover ที่ได้รับอนุมัติ",
+            "Save เป็น Draft",
+            "จัดทำ Content, SEO และตรวจสอบต่อ",
+          ],
+        },
+      },
+
+      {
+        id: "award-basic-information",
+
+        title: {
+          en: "3. Basic Award information",
+          th: "3. ข้อมูลพื้นฐานของ Award",
+        },
+
+        paragraphs: {
+          en: [
+            "Basic information identifies the Award and determines how it is organized in Admin and public views.",
+            "Copy official spelling from an authoritative announcement or certificate where possible.",
+            "Do not publish confidential judging information, private contacts or internal submission notes.",
+          ],
+
+          th: [
+            "ข้อมูลพื้นฐานใช้ระบุ Award และกำหนดการจัดกลุ่มใน Admin กับ Public",
+            "ควรตรวจการสะกดจากประกาศหรือ Certificate ทางการ",
+            "ห้าม Publish ข้อมูลการตัดสินที่เป็นความลับ ข้อมูลติดต่อส่วนตัว หรือ Internal submission note",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-award-basic-information",
+
+            number: "3",
+
+            src: "/docs/content/awards/award-basic-information.png",
+
+            title: {
+              en: "Award information",
+              th: "ข้อมูล Award",
+            },
+
+            alt: {
+              en: "Award editor showing title slug year organization category and related information",
+              th: "Award editor แสดง Title, Slug, Year, Organization, Category และข้อมูลที่เกี่ยวข้อง",
+            },
+
+            caption: {
+              en: "Verify official names, dates and organization details before saving.",
+              th: "ตรวจสอบชื่อ วันที่ และข้อมูลหน่วยงานทางการก่อน Save",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Title: official or approved public Award name.",
+            "Slug: readable identifier used by the supported public URL.",
+            "Year or date: official award year or announcement date.",
+            "Organization: the awarding organization or program.",
+            "Category: the award class or CMS grouping.",
+            "Project reference: related Project when the editor supports it.",
+            "Status: the Award's current content-workflow state.",
+          ],
+
+          th: [
+            "Title: ชื่อ Award ทางการหรือชื่อ Public ที่ได้รับอนุมัติ",
+            "Slug: ชื่ออ้างอิงสำหรับ Public URL ที่รองรับ",
+            "Year หรือ Date: ปีรางวัลหรือวันที่ประกาศทางการ",
+            "Organization: หน่วยงานหรือโครงการผู้มอบรางวัล",
+            "Category: ประเภทรางวัลหรือกลุ่มใน CMS",
+            "Project reference: Project ที่เกี่ยวข้องเมื่อ Editor รองรับ",
+            "Status: ขั้นตอนปัจจุบันของ Content workflow",
+          ],
+        },
+      },
+
+      {
+        id: "award-slug",
+
+        title: {
+          en: "4. Award slug and public URL",
+          th: "4. Award Slug และ Public URL",
+        },
+
+        paragraphs: {
+          en: [
+            "Use a short and readable slug containing supported lowercase characters, numbers and hyphens.",
+            "Changing a published slug may affect external links and search indexing. Review redirect behavior before changing it.",
+            "Do not include private submission numbers or confidential internal references in the slug.",
+          ],
+
+          th: [
+            "ใช้ Slug ที่สั้น อ่านง่าย และประกอบด้วยตัวอักษรพิมพ์เล็ก ตัวเลข หรือขีดกลางที่ระบบรองรับ",
+            "การเปลี่ยน Slug หลัง Publish อาจกระทบ External link และ Search indexing ต้องตรวจ Redirect ก่อนเปลี่ยน",
+            "ไม่ใส่ Submission number หรือ Internal reference ที่เป็นความลับใน Slug",
+          ],
+        },
+
+        items: {
+          en: [
+            "Keep the slug concise.",
+            "Use words related to the Award.",
+            "Avoid unsupported symbols and spaces.",
+            "Avoid unnecessary tracking values.",
+            "Verify the public destination after publication.",
+          ],
+
+          th: [
+            "ใช้ Slug ที่กระชับ",
+            "ใช้คำที่เกี่ยวข้องกับ Award",
+            "หลีกเลี่ยง Symbol และ Space ที่ไม่รองรับ",
+            "ไม่ใส่ Tracking value ที่ไม่จำเป็น",
+            "ตรวจ Public destination หลัง Publish",
+          ],
+        },
+      },
+
+      {
+        id: "award-localization",
+
+        title: {
+          en: "5. Localized Award content",
+          th: "5. เนื้อหา Award หลายภาษา",
+        },
+
+        paragraphs: {
+          en: [
+            "Award language fields follow the active company's Localization settings.",
+            "Translate the meaning while preserving official Award, organization and category names. Do not unofficially translate a protected proper name when the organization provides only one official form.",
+            "English is currently the default public language, so complete the English version before publication under the current configuration.",
+          ],
+
+          th: [
+            "ช่องภาษาของ Award แสดงตาม Localization ของบริษัท",
+            "แปลความหมายโดยรักษาชื่อ Award, Organization และ Category ทางการ ไม่ควรแปล Proper name ที่ได้รับการคุ้มครองเองหากหน่วยงานกำหนดชื่อทางการเพียงรูปแบบเดียว",
+            "เว็บไซต์ปัจจุบันใช้ภาษาอังกฤษเป็นค่าเริ่มต้น จึงต้องกรอก English version ให้ครบก่อน Publish",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-award-localized-content",
+
+            number: "4",
+
+            src: "/docs/content/awards/award-localized-content.png",
+
+            title: {
+              en: "Localized Award fields",
+              th: "ช่องภาษาใน Award",
+            },
+
+            alt: {
+              en: "Award editor displaying English and Thai localized content fields",
+              th: "Award editor แสดงช่องภาษาอังกฤษและภาษาไทย",
+            },
+
+            caption: {
+              en: "Review each language while preserving official names and factual consistency.",
+              th: "ตรวจแต่ละภาษาโดยรักษาชื่อทางการและข้อเท็จจริงให้ตรงกัน",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Use the correct language field or tab.",
+            "Keep official proper names consistent.",
+            "Verify dates and organization names in every language.",
+            "Translate descriptions for meaning and clarity.",
+            "Complete localized SEO and alternative text.",
+            "Do not rely on fallback for final production content.",
+          ],
+
+          th: [
+            "ใช้ช่องหรือ Tab ภาษาที่ถูกต้อง",
+            "รักษา Proper name ทางการให้สม่ำเสมอ",
+            "ตรวจวันที่และชื่อ Organization ทุกภาษา",
+            "แปล Description ให้ได้ความหมายและอ่านชัดเจน",
+            "กรอก SEO และ Alternative text แยกภาษา",
+            "ไม่พึ่ง Fallback สำหรับ Production content",
+          ],
+        },
+      },
+
+      {
+        id: "award-description",
+
+        title: {
+          en: "6. Award description and Rich Text",
+          th: "6. Description และ Rich Text",
+        },
+
+        paragraphs: {
+          en: [
+            "Use the description or Rich Text area to explain what the Award recognizes, which Project received it and why it is relevant to the company.",
+            "Keep the content factual. Do not imply a higher prize level or broader recognition than the official result.",
+            "If the editor provides Rich Text, use headings and paragraphs sparingly. If it provides plain text, do not paste unsupported formatting.",
+          ],
+
+          th: [
+            "ใช้ Description หรือ Rich Text เพื่ออธิบายว่ารางวัลยกย่องเรื่องใด Project ใดได้รับ และเกี่ยวข้องกับบริษัทอย่างไร",
+            "ใช้ข้อมูลตามข้อเท็จจริง ไม่เขียนให้ดูเป็นรางวัลระดับสูงกว่าหรือมีขอบเขตกว้างกว่าผลทางการ",
+            "หากเป็น Rich Text ให้ใช้ Heading และ Paragraph อย่างเหมาะสม หากเป็น Plain text ไม่ควรวาง Formatting ที่ไม่รองรับ",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-award-rich-text",
+
+            number: "5",
+
+            src: "/docs/content/awards/award-rich-text.png",
+
+            title: {
+              en: "Award description",
+              th: "รายละเอียด Award",
+            },
+
+            alt: {
+              en: "Award editor showing its Rich Text or primary description area",
+              th: "Award editor แสดง Rich Text หรือช่อง Description หลัก",
+            },
+
+            caption: {
+              en: "Describe the Award accurately using the formatting supported by the editor.",
+              th: "อธิบายรางวัลตามข้อเท็จจริงด้วย Formatting ที่ Editor รองรับ",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Identify the recognized work.",
+            "State the official Award or category.",
+            "Name the awarding organization accurately.",
+            "Include relevant public context.",
+            "Avoid duplicated summary and detail text.",
+            "Remove placeholder and internal notes.",
+            "Verify links before publication.",
+          ],
+
+          th: [
+            "ระบุผลงานที่ได้รับรางวัล",
+            "ระบุชื่อ Award หรือ Category ทางการ",
+            "เขียนชื่อหน่วยงานผู้มอบให้ถูกต้อง",
+            "เพิ่มบริบท Public ที่เกี่ยวข้อง",
+            "หลีกเลี่ยง Summary และ Detail ซ้ำกัน",
+            "ลบ Placeholder และ Internal note",
+            "ตรวจ Link ก่อน Publish",
+          ],
+        },
+      },
+
+      {
+        id: "award-project-reference",
+
+        title: {
+          en: "7. Link an Award to a Project",
+          th: "7. เชื่อม Award กับ Project",
+        },
+
+        paragraphs: {
+          en: [
+            "When the editor supports a Project reference, select the existing Project that received the Award.",
+            "The related Project must belong to the same active company. Confirm its title carefully when similar Project names exist.",
+            "A Project reference does not replace the Award's own required information and publication review.",
+          ],
+
+          th: [
+            "เมื่อ Editor รองรับ Project reference ให้เลือก Project ที่ได้รับรางวัล",
+            "Project ต้องเป็นของบริษัทเดียวกัน และควรตรวจ Title อย่างละเอียดเมื่อมีชื่อคล้ายกัน",
+            "Project reference ไม่ได้ใช้แทนข้อมูลบังคับและการตรวจ Award ก่อน Publish",
+          ],
+        },
+
+        items: {
+          en: [
+            "Confirm the active company.",
+            "Select the exact Project record.",
+            "Verify that the Project is approved for public reference.",
+            "Check whether both records should be Published.",
+            "Test the public relationship when a link is displayed.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัท",
+            "เลือก Project record ที่ถูกต้อง",
+            "ตรวจว่า Project ได้รับอนุมัติให้อ้างอิง Public",
+            "ตรวจว่าทั้งสอง Record ต้อง Published หรือไม่",
+            "ทดสอบความเชื่อมโยงบน Public เมื่อมี Link",
+          ],
+        },
+      },
+
+      {
+        id: "award-cover",
+
+        title: {
+          en: "8. Award cover image",
+          th: "8. Cover Image ของ Award",
+        },
+
+        paragraphs: {
+          en: [
+            "The Award cover may show the recognized Project, trophy, certificate, event or another approved visual.",
+            "The recommended source is 1600 × 1200 pixels, a 4:3 aspect ratio and approximately 2 MB or less.",
+            "Use an image that remains clear in the centered public Award layout and smaller list presentation.",
+          ],
+
+          th: [
+            "Cover ของ Award อาจเป็นรูป Project, Trophy, Certificate, Event หรือภาพอื่นที่ได้รับอนุมัติ",
+            "แนะนำขนาด 1600 × 1200 Pixels อัตราส่วน 4:3 และ File size ไม่เกินประมาณ 2 MB",
+            "เลือกรูปที่ยังชัดเจนทั้งใน Layout แบบกึ่งกลางของหน้า Public และหน้ารวมขนาดเล็ก",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-award-cover",
+
+            number: "6",
+
+            src: "/docs/content/awards/award-cover.png",
+
+            title: {
+              en: "Award cover",
+              th: "Cover ของ Award",
+            },
+
+            alt: {
+              en: "Award editor showing the selected cover image and media controls",
+              th: "Award editor แสดง Cover และเครื่องมือ Media",
+            },
+
+            caption: {
+              en: "Use an approved 4:3 image and confirm the rights to display every protected visual.",
+              th: "ใช้รูป 4:3 ที่ได้รับอนุมัติและตรวจสิทธิ์ของภาพที่ได้รับการคุ้มครอง",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Recommended dimensions: 1600 × 1200 pixels.",
+            "Recommended ratio: 4:3.",
+            "Recommended size: approximately 2 MB or less.",
+            "Use approved company-owned or licensed media.",
+            "Confirm permission to reproduce logos and certificates.",
+            "Add meaningful localized alternative text.",
+          ],
+
+          th: [
+            "ขนาดแนะนำ: 1600 × 1200 Pixels",
+            "อัตราส่วนแนะนำ: 4:3",
+            "File size แนะนำ: ไม่เกินประมาณ 2 MB",
+            "ใช้ Media ที่บริษัทเป็นเจ้าของหรือมี License",
+            "ตรวจสิทธิ์การทำซ้ำ Logo และ Certificate",
+            "กรอก Alternative text แยกภาษา",
+          ],
+        },
+      },
+
+      {
+        id: "award-media-rights",
+
+        title: {
+          en: "9. Copyright and Award media",
+          th: "9. ลิขสิทธิ์ Media ของ Award",
+        },
+
+        paragraphs: {
+          en: [
+            "Receiving an Award does not automatically transfer copyright in the awarding organization's logo, certificate design, event photography or website material.",
+            "Use files supplied for publicity, files created by the company or files covered by a valid license or written permission.",
+            "Do not remove watermarks, crop ownership notices or modify protected materials to make them appear appear company-owned.",
+          ],
+
+          th: [
+            "การได้รับ Award ไม่ได้โอนลิขสิทธิ์ Logo, Certificate design, Event photography หรือข้อมูลเว็บไซต์ของหน่วยงานผู้มอบให้บริษัทโดยอัตโนมัติ",
+            "ใช้ไฟล์ที่หน่วยงานจัดให้เพื่อประชาสัมพันธ์ ไฟล์ที่บริษัทสร้าง หรือไฟล์ที่มี License หรือหนังสืออนุญาต",
+            "ห้ามลบ Watermark, Crop ข้อความเจ้าของ หรือดัดแปลงผลงานให้ดูเหมือนบริษัทเป็นเจ้าของ",
+          ],
+        },
+
+        items: {
+          en: [
+            "Confirm the copyright owner.",
+            "Confirm the permitted publication channels.",
+            "Preserve required attribution.",
+            "Do not alter protected marks without permission.",
+            "Retain permission records according to company procedure.",
+            "Remove the media if publication rights cannot be verified.",
+          ],
+
+          th: [
+            "ตรวจสอบเจ้าของลิขสิทธิ์",
+            "ตรวจสอบช่องทางที่อนุญาตให้เผยแพร่",
+            "เก็บ Attribution ตามข้อกำหนด",
+            "ไม่ดัดแปลงเครื่องหมายที่ได้รับการคุ้มครอง",
+            "เก็บหลักฐานการอนุญาตตามขั้นตอนบริษัท",
+            "นำ Media ออกหากตรวจสอบสิทธิ์ไม่ได้",
+          ],
+        },
+      },
+
+      {
+        id: "award-seo",
+
+        title: {
+          en: "10. Award SEO",
+          th: "10. SEO ของ Award",
+        },
+
+        paragraphs: {
+          en: [
+            "The editor may initialize SEO values from the Award title, description, tags and cover image.",
+            "Generated values remain editable. Review them for accuracy and ensure they do not overstate the Award.",
+            "Open Graph information should remain clear when the Award is shared outside the website.",
+          ],
+
+          th: [
+            "Editor อาจเริ่มค่า SEO จาก Award title, Description, Tag และ Cover",
+            "ค่าที่ระบบสร้างยังแก้ไขได้ ต้องตรวจความถูกต้องและไม่เขียนให้รางวัลดูสูงกว่าข้อเท็จจริง",
+            "Open Graph ต้องสื่อความหมายได้ชัดเจนเมื่อ Share ออกนอกเว็บไซต์",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-award-seo",
+
+            number: "7",
+
+            src: "/docs/content/awards/award-seo.png",
+
+            title: {
+              en: "Award SEO settings",
+              th: "SEO ของ Award",
+            },
+
+            alt: {
+              en: "Award SEO panel showing search and Open Graph information",
+              th: "Award SEO panel แสดงข้อมูล Search และ Open Graph",
+            },
+
+            caption: {
+              en: "Review generated and customized SEO information before publication.",
+              th: "ตรวจ SEO ทั้งค่าอัตโนมัติและค่าที่แก้เองก่อน Publish",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "SEO Title: accurate Award name and context.",
+            "SEO Description: concise factual summary.",
+            "Keywords: relevant Award, organization, Project and category terms.",
+            "Open Graph Title: clear sharing title.",
+            "Open Graph Description: sharing-specific summary.",
+            "Open Graph Image: approved image with an appropriate crop.",
+            "Index and Follow: search directives changed only when necessary.",
+          ],
+
+          th: [
+            "SEO Title: ชื่อ Award และบริบทที่ถูกต้อง",
+            "SEO Description: สรุปข้อเท็จจริงแบบกระชับ",
+            "Keywords: คำเกี่ยวกับ Award, Organization, Project และ Category",
+            "Open Graph Title: ชื่อสำหรับ Sharing ที่ชัดเจน",
+            "Open Graph Description: ข้อความสรุปสำหรับ Sharing",
+            "Open Graph Image: รูปที่ได้รับอนุมัติและ Crop เหมาะสม",
+            "Index และ Follow: เปลี่ยนเมื่อจำเป็นเท่านั้น",
+          ],
+        },
+      },
+
+      {
+        id: "preview-award",
+
+        title: {
+          en: "11. Preview the Award",
+          th: "11. Preview Award",
+        },
+
+        paragraphs: {
+          en: [
+            "Preview the Award after completing its content, media and SEO. Review both the individual presentation and its placement in the public Award list.",
+            "Check the centered alignment, image crop, typography, official names and responsive layout.",
+            "Preview does not replace verification of the final production page after publication.",
+          ],
+
+          th: [
+            "Preview Award หลังกรอก Content, Media และ SEO ครบ โดยตรวจทั้งการแสดงรายการและตำแหน่งในหน้ารวม Public Award",
+            "ตรวจ Center alignment, Image crop, Typography, ชื่อทางการ และ Responsive layout",
+            "Preview ไม่สามารถแทนการตรวจหน้า Production หลัง Publish",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-award-preview",
+
+            number: "8",
+
+            src: "/docs/content/awards/award-preview.png",
+
+            title: {
+              en: "Public Award preview",
+              th: "Preview หน้า Award",
+            },
+
+            alt: {
+              en: "Public Award page showing award information and approved media",
+              th: "หน้า Public Award แสดงข้อมูลรางวัลและ Media",
+            },
+
+            caption: {
+              en: "Review the Award list presentation and all available public details before publishing.",
+              th: "ตรวจหน้ารวม Award และรายละเอียด Public ก่อน Publish",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Award title and organization are correct.",
+            "Year or date is correct.",
+            "Category placement is correct.",
+            "Related Project is correct where displayed.",
+            "Description is accurate and not duplicated.",
+            "Cover crop and quality are suitable.",
+            "Desktop and mobile alignment are correct.",
+            "Public links work as intended.",
+          ],
+
+          th: [
+            "Award title และ Organization ถูกต้อง",
+            "Year หรือ Date ถูกต้อง",
+            "Category ถูกต้อง",
+            "Related Project ถูกต้องเมื่อแสดง",
+            "Description ถูกต้องและไม่ซ้ำ",
+            "Cover crop และคุณภาพเหมาะสม",
+            "Desktop และ Mobile จัดตำแหน่งถูกต้อง",
+            "Public link ทำงาน",
+          ],
+        },
+      },
+
+      {
+        id: "publish-award",
+
+        title: {
+          en: "12. Publish, schedule and update",
+          th: "12. Publish, Schedule และแก้ไข",
+        },
+
+        paragraphs: {
+          en: [
+            "Keep the Award as a Draft until the official result, translations, media rights and SEO have been reviewed.",
+            "When scheduling is supported, verify the date, time and timezone. Do not schedule an Award before its permitted announcement time.",
+            "Treat updates to Published Awards as production changes and verify every affected public view.",
+          ],
+
+          th: [
+            "เก็บ Award เป็น Draft จนตรวจผลทางการ คำแปล สิทธิ์ Media และ SEO ครบ",
+            "เมื่อรองรับ Schedule ให้ตรวจวันที่ เวลา และ Timezone และห้ามตั้ง Publish ก่อนเวลาที่อนุญาตให้ประกาศ",
+            "การแก้ Published Award เป็น Production change ต้องตรวจ Public view ที่เกี่ยวข้อง",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Confirm the official Award result.",
+            "Complete every required localized field.",
+            "Verify dates, organization, category and Project reference.",
+            "Confirm media rights and alternative text.",
+            "Review SEO and Open Graph.",
+            "Save and preview.",
+            "Publish immediately or schedule the approved release.",
+            "Verify the public Award list and category.",
+            "Confirm the public detail destination when supported.",
+          ],
+
+          th: [
+            "ยืนยันผล Award ทางการ",
+            "กรอก Localized field ที่บังคับ",
+            "ตรวจ Date, Organization, Category และ Project reference",
+            "ตรวจสิทธิ์ Media และ Alternative text",
+            "ตรวจ SEO และ Open Graph",
+            "Save และ Preview",
+            "Publish หรือ Schedule ตามที่อนุมัติ",
+            "ตรวจ Public Award list และ Category",
+            "ตรวจ Public detail destination เมื่อรองรับ",
+          ],
+        },
+      },
+
+      {
+        id: "unpublish-award",
+
+        title: {
+          en: "13. Unpublish or remove an Award",
+          th: "13. Unpublish หรือนำ Award ออก",
+        },
+
+        paragraphs: {
+          en: [
+            "Unpublish an Award when it should no longer be publicly displayed but the record must remain available for correction or review.",
+            "Use removal only after confirming its effect on related Projects, categories, links and search results.",
+            "Do not permanently remove factual or audit information without authorization and retention review.",
+          ],
+
+          th: [
+            "Unpublish Award เมื่อต้องหยุดแสดง Public แต่ยังต้องเก็บ Record ไว้แก้หรือตรวจสอบ",
+            "ใช้ Remove หลังตรวจผลต่อ Related Project, Category, Link และ Search result",
+            "ไม่ควรลบข้อมูลข้อเท็จจริงหรือ Audit อย่างถาวรโดยไม่ได้รับอนุมัติและตรวจ Retention",
+          ],
+        },
+
+        items: {
+          en: [
+            "Unpublish for temporary or corrective removal.",
+            "Archive when an inactive historical record should be retained.",
+            "Use supported soft delete when the record should leave normal Admin use.",
+            "Check related public links after removal.",
+            "Verify that the Award no longer appears publicly.",
+          ],
+
+          th: [
+            "ใช้ Unpublish เมื่อต้องนำออกชั่วคราวหรือแก้ไข",
+            "ใช้ Archive เมื่อต้องเก็บเป็นประวัติ",
+            "ใช้ Soft delete ที่ระบบรองรับเมื่อต้องนำออกจาก Admin ปกติ",
+            "ตรวจ Public link ที่เกี่ยวข้อง",
+            "ตรวจว่า Award ไม่แสดง Public แล้ว",
+          ],
+        },
+      },
+
+      {
+        id: "award-mobile",
+
+        title: {
+          en: "14. Award editor on mobile",
+          th: "14. Award Editor บนมือถือ",
+        },
+
+        paragraphs: {
+          en: [
+            "On mobile, Award fields and panels are arranged vertically. Scroll through the complete editor before saving.",
+            "Long-form editing and detailed media review are normally easier on desktop. Use mobile for appropriate operational changes.",
+            "The same validation, permissions and publication rules apply on mobile.",
+          ],
+
+          th: [
+            "บน Mobile ช่องและ Panel ของ Award จะเรียงในแนวตั้ง ต้องเลื่อนตรวจทั้งหมดก่อน Save",
+            "การแก้ข้อความยาวและตรวจ Media โดยละเอียดมักง่ายกว่าบน Desktop ควรใช้ Mobile กับงานที่เหมาะสม",
+            "Validation, Permission และ Publication rule เหมือน Desktop",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-award-mobile",
+
+            number: "9",
+
+            src: "/docs/content/awards/award-mobile.png",
+
+            title: {
+              en: "Responsive Award editor",
+              th: "Award Editor แบบ Responsive",
+            },
+
+            alt: {
+              en: "Junsekino CMS Award editor arranged for a mobile screen",
+              th: "Award editor ของ Junsekino CMS ที่จัดเรียงสำหรับ Mobile",
+            },
+
+            caption: {
+              en: "Award panels stack vertically on mobile while preserving the same workflow.",
+              th: "Award panel เรียงในแนวตั้งบน Mobile โดยยังใช้ Workflow เดียวกัน",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Confirm the active company.",
+            "Confirm the active content language.",
+            "Scroll through every Award section.",
+            "Do not leave while media is uploading.",
+            "Review publication controls before confirming.",
+            "Use desktop for substantial revisions when practical.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัท",
+            "ตรวจสอบ Content language",
+            "เลื่อนตรวจทุก Section",
+            "ไม่ออกจากหน้าขณะ Upload",
+            "ตรวจ Publication control ก่อนยืนยัน",
+            "ใช้ Desktop เมื่อต้องแก้ไขครั้งใหญ่",
+          ],
+        },
+      },
+
+      {
+        id: "award-troubleshooting",
+
+        title: {
+          en: "15. Common Award problems",
+          th: "15. ปัญหาที่พบบ่อย",
+        },
+
+        paragraphs: {
+          en: [
+            "When Award saving or public display fails, determine whether the problem concerns validation, localization, media, publication or caching.",
+          ],
+
+          th: [
+            "เมื่อ Save หรือแสดง Award ไม่สำเร็จ ให้แยกสาเหตุว่าเป็น Validation, Localization, Media, Publication หรือ Cache",
+          ],
+        },
+
+        items: {
+          en: [
+            "Invalid Award data: review required fields and localized values.",
+            "Incorrect official name: verify the awarding organization's source.",
+            "Image missing: verify Media selection and completed upload.",
+            "Logo or certificate cannot be used: confirm publication rights.",
+            "Award absent from its category: check category and Published status.",
+            "Public page not found: verify slug and publication configuration.",
+            "Old information displayed: refresh and allow cache revalidation.",
+            "Save denied: review membership, role and Award permissions.",
+          ],
+
+          th: [
+            "Invalid Award data: ตรวจช่องบังคับและ Localized value",
+            "ชื่อทางการผิด: ตรวจจากแหล่งข้อมูลของ Organization",
+            "รูปไม่แสดง: ตรวจ Media selection และ Upload",
+            "ใช้ Logo หรือ Certificate ไม่ได้: ตรวจสิทธิ์เผยแพร่",
+            "ไม่แสดงใน Category: ตรวจ Category และ Published status",
+            "ไม่พบ Public page: ตรวจ Slug และ Publication",
+            "ยังแสดงข้อมูลเก่า: Refresh และรอ Cache revalidation",
+            "Save ไม่ได้: ตรวจ Membership, Role และ Award permission",
+          ],
+        },
+      },
+
+      {
+        id: "award-checklist",
+
+        title: {
+          en: "16. Award publishing checklist",
+          th: "16. Checklist ก่อน Publish Award",
+        },
+
+        paragraphs: {
+          en: [
+            "Complete this checklist before publishing an Award or a substantial revision.",
+          ],
+
+          th: ["ใช้ Checklist นี้ก่อน Publish Award หรือแก้ไขรายการสำคัญ"],
+        },
+
+        items: {
+          en: [
+            "The correct company is selected.",
+            "The Award has been officially announced.",
+            "The company has approved publication.",
+            "Title, organization, category and date are accurate.",
+            "The related Project is correct when used.",
+            "Required localized fields are complete.",
+            "Description is factual and not duplicated.",
+            "Media is owned, licensed or authorized.",
+            "Required attribution remains intact.",
+            "Cover dimensions and crop are suitable.",
+            "Alternative text is meaningful.",
+            "SEO and Open Graph have been reviewed.",
+            "Desktop and mobile previews are correct.",
+            "No confidential or placeholder information remains.",
+            "The Award is Published or Scheduled at the permitted time.",
+            "The production Award list and category have been verified.",
+          ],
+
+          th: [
+            "เลือกบริษัทถูกต้อง",
+            "Award ประกาศอย่างเป็นทางการแล้ว",
+            "บริษัทอนุมัติให้ Publish",
+            "Title, Organization, Category และ Date ถูกต้อง",
+            "Related Project ถูกต้องเมื่อใช้งาน",
+            "Localized field ที่บังคับครบ",
+            "Description เป็นข้อเท็จจริงและไม่ซ้ำ",
+            "บริษัทเป็นเจ้าของ มี License หรือได้รับอนุญาตใช้ Media",
+            "Attribution ที่บังคับยังอยู่ครบ",
+            "Cover มีขนาดและ Crop เหมาะสม",
+            "Alternative text มีความหมาย",
+            "ตรวจ SEO และ Open Graph แล้ว",
+            "Preview บน Desktop และ Mobile ถูกต้อง",
+            "ไม่มีข้อมูลลับหรือ Placeholder",
+            "Publish หรือ Schedule ตามเวลาที่อนุญาต",
+            "ตรวจ Award list และ Category บน Production แล้ว",
+          ],
+        },
+      },
+    ],
+  },
+  "content/public-content": {
+    eyebrow: {
+      en: "Content Management",
+      th: "การจัดการเนื้อหา",
+    },
+
+    title: {
+      en: "Public Content",
+      th: "เนื้อหาสาธารณะ",
+    },
+
+    description: {
+      en: "Create Articles, Videos and embedded external content for the active company's Public section.",
+      th: "สร้าง Article, Video และเนื้อหาภายนอกแบบ Embed สำหรับหน้า Public ของบริษัท",
+    },
+
+    introduction: {
+      en: [
+        "The Public Content module manages editorial and external-media content displayed in the Public section of the company website.",
+        "Before creating a record, select the correct Content Type. Article, Video and Embed use different source fields and publication requirements.",
+        "External content remains subject to copyright, privacy, cookie and provider terms. A working URL does not automatically mean that the company has permission to publish it.",
+      ],
+
+      th: [
+        "โมดูล Public Content ใช้จัดการบทความและสื่อภายนอกที่แสดงในส่วน Public ของเว็บไซต์บริษัท",
+        "ก่อนสร้างรายการต้องเลือก Content Type ให้ถูกต้อง เพราะ Article, Video และ Embed ใช้ช่อง Source และเงื่อนไขการ Publish แตกต่างกัน",
+        "เนื้อหาภายนอกยังอยู่ภายใต้ลิขสิทธิ์ Privacy, Cookie และข้อกำหนดของ Provider การที่ URL เปิดได้ไม่ได้หมายความว่าบริษัทได้รับอนุญาตให้เผยแพร่เสมอไป",
+      ],
+    },
+
+    highlights: [
+      {
+        title: {
+          en: "Article",
+          th: "Article",
+        },
+
+        description: {
+          en: "Use Rich Text for content written and controlled by the company.",
+          th: "ใช้ Rich Text สำหรับเนื้อหาที่บริษัทเขียนและควบคุมเอง",
+        },
+      },
+
+      {
+        title: {
+          en: "Video",
+          th: "Video",
+        },
+
+        description: {
+          en: "Reference an approved external video and optionally fetch supported metadata.",
+          th: "อ้างอิง Video ภายนอกและดึง Metadata อัตโนมัติเมื่อรองรับ",
+        },
+      },
+
+      {
+        title: {
+          en: "Embed",
+          th: "Embed",
+        },
+
+        description: {
+          en: "Display approved external interactive content using its source information.",
+          th: "แสดง Interactive content ภายนอกจาก Source ที่ได้รับอนุมัติ",
+        },
+      },
+
+      {
+        title: {
+          en: "Provider-aware",
+          th: "แยกตาม Provider",
+        },
+
+        description: {
+          en: "Provider and Source URL are required for Video and Embed records.",
+          th: "Video และ Embed ต้องกำหนด Provider และ Source URL",
+        },
+      },
+    ],
+
+    sections: [
+      {
+        id: "public-content-overview",
+
+        title: {
+          en: "1. Public Content workspace",
+          th: "1. ภาพรวม Public Content",
+        },
+
+        paragraphs: {
+          en: [
+            "The Public Content workspace lists records belonging to the active company. Use Search and filters to locate records by type, provider or publication status.",
+            "Always confirm the active company before creating or editing content.",
+          ],
+
+          th: [
+            "หน้า Public Content แสดงรายการของบริษัทปัจจุบัน ใช้ Search และ Filter เพื่อค้นหาตาม Type, Provider หรือ Publication status",
+            "ตรวจสอบบริษัทก่อน Create หรือ Edit ทุกครั้ง",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-public-content-overview",
+            number: "1",
+            src: "/docs/content/public-content/public-content-overview.png",
+
+            title: {
+              en: "Public Content workspace",
+              th: "หน้า Public Content",
+            },
+
+            alt: {
+              en: "Public Content list showing types, providers, statuses and actions",
+              th: "รายการ Public Content แสดง Type, Provider, Status และ Action",
+            },
+
+            caption: {
+              en: "Use the list and filters to manage the active company's public records.",
+              th: "ใช้รายการและ Filter เพื่อจัดการเนื้อหาของบริษัทปัจจุบัน",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Type distinguishes Article, Video and Embed records.",
+            "Provider identifies the external platform where applicable.",
+            "Status identifies Draft, Scheduled or Published content.",
+            "Search locates records using supported descriptive fields.",
+            "Actions are limited by the user's role and permissions.",
+          ],
+
+          th: [
+            "Type แยก Article, Video และ Embed",
+            "Provider ระบุ Platform ภายนอก",
+            "Status แสดง Draft, Scheduled หรือ Published",
+            "Search ค้นหาจากข้อมูลที่ระบบรองรับ",
+            "Action ถูกจำกัดตาม Role และ Permission",
+          ],
+        },
+      },
+
+      {
+        id: "choose-content-type",
+
+        title: {
+          en: "2. Choose the correct Content Type",
+          th: "2. เลือก Content Type ให้ถูกต้อง",
+        },
+
+        paragraphs: {
+          en: [
+            "Content Type determines which fields, validation rules and public renderer will be used. Choose the type before entering detailed information.",
+            "Changing the type after entering content may clear or invalidate fields that are not used by the new type.",
+          ],
+
+          th: [
+            "Content Type กำหนดช่องข้อมูล Validation และ Public renderer ควรเลือก Type ก่อนกรอกรายละเอียด",
+            "การเปลี่ยน Type หลังกรอกข้อมูลอาจล้างหรือทำให้ช่องที่ Type ใหม่ไม่ใช้กลายเป็นข้อมูลไม่ถูกต้อง",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-public-content-type",
+            number: "2",
+            src: "/docs/content/public-content/public-content-type.png",
+
+            title: {
+              en: "Content Type selection",
+              th: "การเลือก Content Type",
+            },
+
+            alt: {
+              en: "Public Content editor showing Article Video and Embed options",
+              th: "Public Content editor แสดงตัวเลือก Article, Video และ Embed",
+            },
+
+            caption: {
+              en: "Select the type that matches how the content should be created and displayed.",
+              th: "เลือก Type ให้ตรงกับวิธีสร้างและแสดงเนื้อหา",
+            },
+          },
+
+          {
+            id: "figure-create-public-content",
+            number: "3",
+            src: "/docs/content/public-content/create-public-content.png",
+
+            title: {
+              en: "Create Public Content",
+              th: "สร้าง Public Content",
+            },
+
+            alt: {
+              en: "Editor for creating a new Public Content record",
+              th: "Editor สำหรับสร้าง Public Content ใหม่",
+            },
+
+            caption: {
+              en: "New records should remain Draft until their content and rights are reviewed.",
+              th: "รายการใหม่ควรเป็น Draft จนตรวจ Content และสิทธิ์ครบ",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Article: original written editorial content.",
+            "Video: an external video presented through a supported player or link.",
+            "Embed: approved external interactive or embedded material.",
+            "If written content is the primary value, select Article.",
+            "If a video is the primary value, select Video.",
+            "If an external interactive experience is the primary value, select Embed.",
+          ],
+
+          th: [
+            "Article: บทความที่บริษัทจัดทำและควบคุมเนื้อหา",
+            "Video: Video ภายนอกที่แสดงผ่าน Player หรือ Link ที่รองรับ",
+            "Embed: Interactive material ภายนอกที่ได้รับอนุมัติ",
+            "หากข้อความเป็นเนื้อหาหลัก ให้เลือก Article",
+            "หาก Video เป็นเนื้อหาหลัก ให้เลือก Video",
+            "หาก Interactive experience ภายนอกเป็นเนื้อหาหลัก ให้เลือก Embed",
+          ],
+        },
+      },
+
+      {
+        id: "basic-information",
+
+        title: {
+          en: "3. Basic information",
+          th: "3. ข้อมูลพื้นฐาน",
+        },
+
+        paragraphs: {
+          en: [
+            "Every type requires clear identifying information. Enter approved public values and avoid confidential source notes.",
+            "The exact fields may change according to the selected Content Type.",
+          ],
+
+          th: [
+            "ทุก Type ต้องมีข้อมูลระบุตัวตนที่ชัดเจน ให้กรอกข้อมูล Public ที่ได้รับอนุมัติและไม่ใส่ Source note ที่เป็นความลับ",
+            "ช่องที่แสดงอาจเปลี่ยนตาม Content Type",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-public-content-basic",
+            number: "4",
+            src: "/docs/content/public-content/public-content-basic-information.png",
+
+            title: {
+              en: "Basic content information",
+              th: "ข้อมูลพื้นฐาน",
+            },
+
+            alt: {
+              en: "Public Content editor showing title slug type date category and tags",
+              th: "Editor แสดง Title, Slug, Type, Date, Category และ Tag",
+            },
+
+            caption: {
+              en: "Verify public names, dates, categories and source information before saving.",
+              th: "ตรวจชื่อ วันที่ Category และ Source ก่อน Save",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Title: approved public content name.",
+            "Slug: readable identifier used by the detail URL.",
+            "Type: Article, Video or Embed.",
+            "Date: publication or source date where supported.",
+            "Category: public grouping or navigation classification.",
+            "Tags: descriptive terms that may initialize SEO keywords.",
+            "Status: current content-workflow stage.",
+          ],
+
+          th: [
+            "Title: ชื่อเนื้อหา Public ที่ได้รับอนุมัติ",
+            "Slug: ชื่ออ้างอิงใน Detail URL",
+            "Type: Article, Video หรือ Embed",
+            "Date: วันที่ Publish หรือวันที่ Source ตามที่รองรับ",
+            "Category: กลุ่ม Public หรือ Navigation",
+            "Tags: คำอธิบายที่อาจใช้เริ่ม SEO keywords",
+            "Status: ขั้นตอนปัจจุบันของ Workflow",
+          ],
+        },
+      },
+
+      {
+        id: "localized-fields",
+
+        title: {
+          en: "4. Localized fields",
+          th: "4. ช่องข้อมูลหลายภาษา",
+        },
+
+        paragraphs: {
+          en: [
+            "Localized fields follow the active company's Localization settings. Complete each enabled language independently.",
+            "External metadata may be imported in only one language. Fetching it does not create a verified translation.",
+            "English is currently the default public-site language.",
+          ],
+
+          th: [
+            "ช่องภาษาจะแสดงตาม Localization ของบริษัท และต้องกรอกแต่ละภาษาแยกกัน",
+            "Metadata ภายนอกอาจถูกดึงมาเพียงภาษาเดียว การ Fetch ไม่ได้สร้างคำแปลที่ตรวจสอบแล้ว",
+            "เว็บไซต์ Public ปัจจุบันใช้ภาษาอังกฤษเป็นค่าเริ่มต้น",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-public-content-localized",
+            number: "5",
+            src: "/docs/content/public-content/public-content-localized-fields.png",
+
+            title: {
+              en: "Localized fields",
+              th: "ช่องภาษา",
+            },
+
+            alt: {
+              en: "Public Content editor displaying English and Thai fields",
+              th: "Public Content editor แสดงช่อง English และ Thai",
+            },
+
+            caption: {
+              en: "Review every enabled language before publication.",
+              th: "ตรวจทุกภาษาที่เปิดใช้งานก่อน Publish",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Do not copy one language unchanged into another field.",
+            "Keep names, dates and source facts consistent.",
+            "Review imported external titles before using them.",
+            "Complete localized alternative text and SEO.",
+            "Do not rely on fallback for final content.",
+          ],
+
+          th: [
+            "ไม่คัดลอกภาษาหนึ่งไปใส่อีกภาษาโดยไม่แปล",
+            "รักษาชื่อ วันที่ และข้อเท็จจริงของ Source ให้ตรงกัน",
+            "ตรวจ Title ที่ Import ก่อนใช้",
+            "กรอก Alternative text และ SEO แยกภาษา",
+            "ไม่พึ่ง Fallback สำหรับเนื้อหาสุดท้าย",
+          ],
+        },
+      },
+
+      {
+        id: "article-workflow",
+
+        title: {
+          en: "5. Create an Article",
+          th: "5. สร้าง Article",
+        },
+
+        paragraphs: {
+          en: [
+            "Use Article when the primary content is written and controlled by the company, such as a publication, interview, announcement, press release or design story.",
+            "Article content uses Rich Text as its main body. A Provider and external Source URL are not required in the same way as Video or Embed.",
+          ],
+
+          th: [
+            "ใช้ Article เมื่อเนื้อหาหลักเป็นข้อความที่บริษัทจัดทำและควบคุม เช่น Publication, Interview, Announcement, Press release หรือ Design story",
+            "Article ใช้ Rich Text เป็น Main body และไม่บังคับ Provider กับ External Source URL แบบ Video หรือ Embed",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-article-content-type",
+            number: "6",
+            src: "/docs/content/public-content/article-content-type.png",
+
+            title: {
+              en: "Article fields",
+              th: "ช่องข้อมูล Article",
+            },
+
+            alt: {
+              en: "Public Content editor configured for an Article",
+              th: "Public Content editor ที่เลือก Article",
+            },
+
+            caption: {
+              en: "Choose Article for company-controlled long-form written content.",
+              th: "เลือก Article สำหรับบทความที่บริษัทควบคุมเนื้อหา",
+            },
+          },
+
+          {
+            id: "figure-article-editor",
+            number: "7",
+            src: "/docs/content/public-content/article-editor.png",
+
+            title: {
+              en: "Article editor",
+              th: "Article Editor",
+            },
+
+            alt: {
+              en: "Rich Text editor used to write an Article",
+              th: "Rich Text editor สำหรับเขียน Article",
+            },
+
+            caption: {
+              en: "Write the complete article using clear headings and readable paragraphs.",
+              th: "เขียนบทความเต็มด้วย Heading และ Paragraph ที่อ่านง่าย",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Select Article.",
+            "Enter the title, slug, date, category and tags.",
+            "Complete the default-language summary.",
+            "Select an approved cover image.",
+            "Write the complete content in Rich Text.",
+            "Complete other enabled languages.",
+            "Review SEO and Open Graph information.",
+            "Save as Draft.",
+            "Preview the Article.",
+            "Publish after approval.",
+          ],
+
+          th: [
+            "เลือก Article",
+            "กรอก Title, Slug, Date, Category และ Tag",
+            "กรอก Summary ของภาษาเริ่มต้น",
+            "เลือก Cover ที่ได้รับอนุมัติ",
+            "เขียนเนื้อหาเต็มใน Rich Text",
+            "กรอกภาษาอื่นที่เปิดใช้",
+            "ตรวจ SEO และ Open Graph",
+            "Save เป็น Draft",
+            "Preview Article",
+            "Publish หลังอนุมัติ",
+          ],
+        },
+      },
+
+      {
+        id: "article-rich-text",
+
+        title: {
+          en: "6. Write Article Rich Text",
+          th: "6. เขียน Rich Text ของ Article",
+        },
+
+        paragraphs: {
+          en: [
+            "Rich Text is the single primary body of an Article. Avoid repeating the same complete content in both the summary and Rich Text.",
+            "The public detail page initially limits long content and provides Show more when expansion is required.",
+          ],
+
+          th: [
+            "Rich Text เป็น Main body เพียงชุดเดียวของ Article หลีกเลี่ยงการใส่เนื้อหาเต็มซ้ำทั้ง Summary และ Rich Text",
+            "หน้า Detail จะจำกัดความสูงของเนื้อหาเริ่มต้นและแสดง Show more เมื่อต้องขยาย",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-public-content-rich-text",
+            number: "8",
+            src: "/docs/content/public-content/public-content-rich-text.png",
+
+            title: {
+              en: "Public Content Rich Text",
+              th: "Rich Text ของ Public Content",
+            },
+
+            alt: {
+              en: "Public Content Rich Text editor and formatting toolbar",
+              th: "Rich Text editor และ Formatting toolbar",
+            },
+
+            caption: {
+              en: "Use one structured main body and remove duplicated summary text.",
+              th: "ใช้ Main body ที่มีโครงสร้างเพียงชุดเดียวและลบข้อความซ้ำ",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Use headings to divide topics.",
+            "Keep paragraphs concise.",
+            "Use lists only for list-based information.",
+            "Use descriptive and verified links.",
+            "Remove unsupported pasted formatting.",
+            "Do not insert scripts or tracking code.",
+          ],
+
+          th: [
+            "ใช้ Heading แบ่งหัวข้อ",
+            "ใช้ Paragraph ที่กระชับ",
+            "ใช้ List กับข้อมูลที่เป็นรายการ",
+            "ใช้ Link ที่อธิบายปลายทางและตรวจแล้ว",
+            "ลบ Formatting ที่ไม่รองรับ",
+            "ห้ามใส่ Script หรือ Tracking code",
+          ],
+        },
+      },
+
+      {
+        id: "article-preview",
+
+        title: {
+          en: "7. Preview an Article",
+          th: "7. Preview Article",
+        },
+
+        paragraphs: {
+          en: [
+            "Preview the cover, title, metadata, engagement controls and Rich Text before publication.",
+            "Test Show more and Show less to confirm that the complete article expands without duplicated content.",
+          ],
+
+          th: [
+            "Preview Cover, Title, Metadata, Engagement และ Rich Text ก่อน Publish",
+            "ทดสอบ Show more และ Show less เพื่อให้แน่ใจว่าเนื้อหาขยายครบและไม่ซ้ำ",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-article-preview",
+            number: "9",
+            src: "/docs/content/public-content/article-preview.png",
+
+            title: {
+              en: "Article public preview",
+              th: "Preview หน้า Article",
+            },
+
+            alt: {
+              en: "Example public Article page with cover metadata engagement and expandable content",
+              th: "ตัวอย่างหน้า Article แสดง Cover, Metadata, Engagement และเนื้อหาที่ขยายได้",
+            },
+
+            caption: {
+              en: "The Article presents company-controlled Rich Text below its approved cover and metadata.",
+              th: "Article แสดง Rich Text ที่บริษัทควบคุมใต้ Cover และ Metadata",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Cover and title are correct.",
+            "Metadata is accurate.",
+            "Rich Text appears once.",
+            "Show more expands the content.",
+            "Links and formatting work.",
+            "Desktop and mobile layouts are usable.",
+          ],
+
+          th: [
+            "Cover และ Title ถูกต้อง",
+            "Metadata ถูกต้อง",
+            "Rich Text แสดงครั้งเดียว",
+            "Show more ขยายเนื้อหา",
+            "Link และ Formatting ทำงาน",
+            "Desktop และ Mobile ใช้งานได้",
+          ],
+        },
+      },
+
+      {
+        id: "video-workflow",
+
+        title: {
+          en: "8. Create a Video",
+          th: "8. สร้าง Video",
+        },
+
+        paragraphs: {
+          en: [
+            "Use Video when an approved external video is the primary content.",
+            "Video requires a Provider and Source URL. The Provider tells the system how the external source should be interpreted.",
+            "Supported Provider options include YouTube, Facebook, Vimeo, Instagram, TikTok and Other, but automatic metadata fetching is currently implemented for YouTube.",
+          ],
+
+          th: [
+            "ใช้ Video เมื่อ Video ภายนอกเป็นเนื้อหาหลัก",
+            "Video บังคับ Provider และ Source URL โดย Provider ช่วยให้ระบบตีความ Source",
+            "Provider ที่เลือกได้มี YouTube, Facebook, Vimeo, Instagram, TikTok และ Other แต่การ Fetch Metadata อัตโนมัติปัจจุบันรองรับ YouTube",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-video-content-type",
+            number: "10",
+            src: "/docs/content/public-content/video-content-type.png",
+
+            title: {
+              en: "Video fields",
+              th: "ช่องข้อมูล Video",
+            },
+
+            alt: {
+              en: "Public Content editor configured for a Video",
+              th: "Public Content editor ที่เลือก Video",
+            },
+
+            caption: {
+              en: "Select Video and identify the correct Provider before entering the Source URL.",
+              th: "เลือก Video และ Provider ให้ถูกต้องก่อนใส่ Source URL",
+            },
+          },
+
+          {
+            id: "figure-video-url",
+            number: "11",
+            src: "/docs/content/public-content/video-url.png",
+
+            title: {
+              en: "Video Source URL",
+              th: "Video Source URL",
+            },
+
+            alt: {
+              en: "Video editor showing Provider and Source URL before fetching metadata",
+              th: "Video editor แสดง Provider และ Source URL ก่อน Fetch",
+            },
+
+            caption: {
+              en: "Use the public video-page URL rather than a private management or Studio URL.",
+              th: "ใช้ URL หน้า Video สาธารณะ ไม่ใช้ Private management หรือ Studio URL",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Select Video.",
+            "Select the matching Provider.",
+            "Paste the approved public Source URL.",
+            "For YouTube, select Fetch Video Data.",
+            "Wait for the request to finish.",
+            "Review every imported field.",
+            "Complete missing and localized information.",
+            "Review the thumbnail, Rich Text and SEO.",
+            "Preview the player.",
+            "Publish after approval.",
+          ],
+
+          th: [
+            "เลือก Video",
+            "เลือก Provider ให้ตรง",
+            "วาง Public Source URL ที่ได้รับอนุมัติ",
+            "สำหรับ YouTube ให้กด Fetch Video Data",
+            "รอให้ระบบทำงานเสร็จ",
+            "ตรวจทุกช่องที่ Import",
+            "กรอกข้อมูลที่ขาดและข้อมูลหลายภาษา",
+            "ตรวจ Thumbnail, Rich Text และ SEO",
+            "Preview Player",
+            "Publish หลังอนุมัติ",
+          ],
+        },
+      },
+
+      {
+        id: "fetch-video-data",
+
+        title: {
+          en: "9. Fetch YouTube video data",
+          th: "9. Fetch ข้อมูล YouTube",
+        },
+
+        paragraphs: {
+          en: [
+            "Fetch Video Data asks the server to inspect a supported YouTube URL and return available metadata and an embeddable URL.",
+            "The service currently detects YouTube automatically. Other Provider options should not be assumed to support automatic fetching.",
+            "Fetched information is source metadata, not approved CMS content. Review it before saving.",
+          ],
+
+          th: [
+            "Fetch Video Data ให้ Server ตรวจ YouTube URL ที่รองรับและดึง Metadata พร้อม Embed URL",
+            "Service ปัจจุบันตรวจและ Fetch YouTube อัตโนมัติ ไม่ควรถือว่า Provider อื่น Fetch ได้",
+            "ข้อมูลที่ Fetch เป็น Source metadata ไม่ใช่เนื้อหา CMS ที่อนุมัติแล้ว ต้องตรวจก่อน Save",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-video-fetch-data",
+            number: "12",
+            src: "/docs/content/public-content/video-fetch-data.png",
+
+            title: {
+              en: "Fetched video data",
+              th: "ข้อมูล Video ที่ Fetch",
+            },
+
+            alt: {
+              en: "Video editor after successfully fetching YouTube metadata",
+              th: "Video editor หลัง Fetch YouTube metadata สำเร็จ",
+            },
+
+            caption: {
+              en: "Review fetched title, thumbnail, provider and source information before using them.",
+              th: "ตรวจ Title, Thumbnail, Provider และ Source ที่ Fetch ก่อนใช้งาน",
+            },
+          },
+
+          {
+            id: "figure-video-additional-fields",
+            number: "13",
+            src: "/docs/content/public-content/video-additional-fields.png",
+
+            title: {
+              en: "Complete Video information",
+              th: "กรอกข้อมูล Video เพิ่มเติม",
+            },
+
+            alt: {
+              en: "Additional Video fields requiring review after metadata fetch",
+              th: "ช่อง Video ที่ต้องตรวจและกรอกเพิ่มหลัง Fetch",
+            },
+
+            caption: {
+              en: "Fetching does not complete localization, categorization, rights review or SEO approval.",
+              th: "การ Fetch ไม่ได้ทำ Localization, Category, ตรวจสิทธิ์ หรืออนุมัติ SEO ให้เสร็จ",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Confirm that the fetched video is the intended video.",
+            "Review and edit the title.",
+            "Review the description and remove irrelevant source text.",
+            "Confirm the thumbnail or select an approved cover.",
+            "Add the correct category and tags.",
+            "Complete other enabled languages.",
+            "Add company context in Rich Text when needed.",
+            "Review SEO and Open Graph.",
+            "Confirm permission to display and embed the video.",
+          ],
+
+          th: [
+            "ตรวจว่าเป็น Video ที่ต้องการ",
+            "ตรวจและแก้ Title",
+            "ตรวจ Description และลบข้อความ Source ที่ไม่เกี่ยวข้อง",
+            "ตรวจ Thumbnail หรือเลือก Cover",
+            "เพิ่ม Category และ Tag",
+            "กรอกภาษาอื่น",
+            "เพิ่มบริบทบริษัทใน Rich Text เมื่อจำเป็น",
+            "ตรวจ SEO และ Open Graph",
+            "ตรวจสิทธิ์แสดงและ Embed Video",
+          ],
+        },
+      },
+
+      {
+        id: "video-provider-guidance",
+
+        title: {
+          en: "10. Video Providers",
+          th: "10. Video Provider",
+        },
+
+        paragraphs: {
+          en: [
+            "Select the Provider that owns the Source URL. Do not select YouTube merely to make the Fetch button available.",
+            "For a Provider without automatic metadata support, enter and verify the required content manually.",
+          ],
+
+          th: [
+            "เลือก Provider ให้ตรงกับ Source URL ห้ามเลือก YouTube เพียงเพื่อให้ใช้ปุ่ม Fetch",
+            "Provider ที่ยังไม่รองรับ Metadata อัตโนมัติต้องกรอกและตรวจข้อมูลด้วยตนเอง",
+          ],
+        },
+
+        items: {
+          en: [
+            "YouTube: supported for automatic source detection and metadata fetching.",
+            "Facebook: selectable Provider; verify source and presentation manually.",
+            "Vimeo: selectable Provider; verify source and presentation manually.",
+            "Instagram: selectable Provider; review embedding, privacy and account visibility.",
+            "TikTok: selectable Provider; review embedding, tracking and usage terms.",
+            "Other: use only for an approved source supported by the public renderer.",
+          ],
+
+          th: [
+            "YouTube: รองรับการตรวจ Source และ Fetch Metadata อัตโนมัติ",
+            "Facebook: เลือก Provider ได้ แต่ต้องตรวจ Source และการแสดงผลเอง",
+            "Vimeo: เลือก Provider ได้ แต่ต้องตรวจ Source และการแสดงผลเอง",
+            "Instagram: ตรวจ Embed, Privacy และ Visibility ของบัญชี",
+            "TikTok: ตรวจ Embed, Tracking และข้อกำหนดการใช้",
+            "Other: ใช้เฉพาะ Source ที่ได้รับอนุมัติและ Public renderer รองรับ",
+          ],
+        },
+      },
+
+      {
+        id: "video-preview",
+
+        title: {
+          en: "11. Preview a Video",
+          th: "11. Preview Video",
+        },
+
+        paragraphs: {
+          en: [
+            "Preview the player, source attribution, title, metadata and supporting Rich Text before publication.",
+            "Test playback using a normal browser and a private window where appropriate.",
+          ],
+
+          th: [
+            "Preview Player, Source attribution, Title, Metadata และ Rich Text ก่อน Publish",
+            "ทดสอบ Playback ด้วย Browser ปกติและ Private window เมื่อเหมาะสม",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-video-preview",
+            number: "14",
+            src: "/docs/content/public-content/video-preview.png",
+
+            title: {
+              en: "Video public preview",
+              th: "Preview หน้า Video",
+            },
+
+            alt: {
+              en: "Public Video detail showing media metadata engagement and supporting content",
+              th: "หน้า Video detail แสดง Media, Metadata, Engagement และเนื้อหาประกอบ",
+            },
+
+            caption: {
+              en: "Confirm playback, source attribution and responsive presentation before publishing.",
+              th: "ตรวจ Playback, Source attribution และ Responsive ก่อน Publish",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "The intended Video appears.",
+            "The Player loads without an error.",
+            "Playback controls work.",
+            "The source and Provider are accurate.",
+            "Supporting content is not duplicated.",
+            "Mobile presentation remains usable.",
+          ],
+
+          th: [
+            "แสดง Video ที่ต้องการ",
+            "Player โหลดโดยไม่มี Error",
+            "Playback control ทำงาน",
+            "Source และ Provider ถูกต้อง",
+            "เนื้อหาประกอบไม่ซ้ำ",
+            "Mobile ใช้งานได้",
+          ],
+        },
+      },
+      {
+        id: "embed-workflow",
+
+        title: {
+          en: "12. Create embedded content",
+          th: "12. สร้าง Embed Content",
+        },
+
+        paragraphs: {
+          en: [
+            "Use Embed when the primary content is an approved external interactive experience that is not appropriately represented as an Article or Video.",
+            "Examples may include an interactive presentation, approved visualization, virtual experience or another external resource supported by the public renderer.",
+            "Embed requires a Provider and Source URL. It should not be used as a general method for inserting arbitrary scripts into the website.",
+          ],
+
+          th: [
+            "ใช้ Embed เมื่อเนื้อหาหลักเป็น Interactive experience ภายนอกที่ได้รับอนุมัติ และไม่เหมาะกับ Article หรือ Video",
+            "ตัวอย่างอาจเป็น Interactive presentation, Visualization, Virtual experience หรือ External resource ที่ Public renderer รองรับ",
+            "Embed บังคับ Provider และ Source URL และไม่ควรใช้เป็นช่องทางสำหรับนำ Script ใด ๆ มาใส่ในเว็บไซต์",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-embed-content-type",
+            number: "15",
+            src: "/docs/content/public-content/embed-content-type.png",
+
+            title: {
+              en: "Embed Content Type",
+              th: "Content Type แบบ Embed",
+            },
+
+            alt: {
+              en: "Public Content editor configured for embedded external content",
+              th: "Public Content editor ที่เลือก Embed",
+            },
+
+            caption: {
+              en: "Choose Embed only when the approved external experience requires embedded presentation.",
+              th: "เลือก Embed เมื่อ External content ที่อนุมัติต้องแสดงภายในหน้าเว็บไซต์",
+            },
+          },
+
+          {
+            id: "figure-embed-fields",
+            number: "16",
+            src: "/docs/content/public-content/embed-fields.png",
+
+            title: {
+              en: "Embed source fields",
+              th: "ช่อง Source ของ Embed",
+            },
+
+            alt: {
+              en: "Embed editor showing Provider and Source URL fields",
+              th: "Embed editor แสดง Provider และ Source URL",
+            },
+
+            caption: {
+              en: "Provider and Source URL are required for embedded content.",
+              th: "Embed ต้องระบุ Provider และ Source URL",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Select Embed.",
+            "Select the Provider matching the external source.",
+            "Paste the approved public Source URL.",
+            "Enter the title, slug, date, category and tags.",
+            "Complete the default-language summary.",
+            "Add supporting Rich Text when necessary.",
+            "Select an approved cover or preview image.",
+            "Review SEO and Open Graph information.",
+            "Save the record as a Draft.",
+            "Preview and test the embedded content.",
+            "Publish only after security, privacy and rights review.",
+          ],
+
+          th: [
+            "เลือก Embed",
+            "เลือก Provider ให้ตรงกับ External source",
+            "วาง Public Source URL ที่ได้รับอนุมัติ",
+            "กรอก Title, Slug, Date, Category และ Tag",
+            "กรอก Summary ของภาษาเริ่มต้น",
+            "เพิ่ม Rich Text ประกอบเมื่อจำเป็น",
+            "เลือก Cover หรือ Preview image ที่ได้รับอนุมัติ",
+            "ตรวจ SEO และ Open Graph",
+            "Save เป็น Draft",
+            "Preview และทดสอบ Embed",
+            "Publish หลังตรวจ Security, Privacy และสิทธิ์แล้ว",
+          ],
+        },
+      },
+
+      {
+        id: "embed-source",
+
+        title: {
+          en: "13. Enter an Embed source",
+          th: "13. กรอก Embed Source",
+        },
+
+        paragraphs: {
+          en: [
+            "Use the original public source supplied by an approved Provider. The URL must use HTTPS and must be available to ordinary website visitors.",
+            "Do not enter an Admin, Studio, preview-token, password-protected or internal-network URL.",
+            "If the editor expects a Source URL, paste the URL only. Do not convert it into script or iframe code manually.",
+          ],
+
+          th: [
+            "ใช้ Public source ต้นฉบับจาก Provider ที่ได้รับอนุมัติ URL ต้องใช้ HTTPS และผู้เข้าชมทั่วไปต้องเปิดได้",
+            "ห้ามใช้ Admin URL, Studio URL, Preview token, หน้าที่มี Password หรือ URL ภายใน Network",
+            "หาก Editor รับ Source URL ให้ใส่เฉพาะ URL ไม่ต้องแปลงเป็น Script หรือ iframe code เอง",
+          ],
+        },
+
+        items: {
+          en: [
+            "Provider must match the source domain.",
+            "Source URL must be a complete HTTPS URL.",
+            "The source must allow public access.",
+            "The source must permit embedded presentation.",
+            "Do not include private access tokens in the URL.",
+            "Do not paste JavaScript into a URL field.",
+            "Test the source in a private browser window.",
+          ],
+
+          th: [
+            "Provider ต้องตรงกับ Domain ของ Source",
+            "Source URL ต้องเป็น HTTPS URL แบบเต็ม",
+            "Source ต้องอนุญาต Public access",
+            "Source ต้องอนุญาตให้ Embed",
+            "ห้ามใส่ Private access token ใน URL",
+            "ห้ามวาง JavaScript ในช่อง URL",
+            "ทดสอบ Source ด้วย Private browser",
+          ],
+        },
+      },
+
+      {
+        id: "embed-code-safety",
+
+        title: {
+          en: "14. Embed code and script safety",
+          th: "14. ความปลอดภัยของ Embed Code",
+        },
+
+        paragraphs: {
+          en: [
+            "Use URL-based embedding whenever the editor and Provider support it. This allows the application to validate and normalize the source.",
+            "If a future editor accepts Embed code, use only the exact code generated by a company-approved Provider. Never modify or combine it with unrelated scripts.",
+            "Unknown code can track visitors, steal information, redirect the page or damage website performance.",
+          ],
+
+          th: [
+            "ควรใช้การ Embed จาก URL เมื่อ Editor และ Provider รองรับ เพื่อให้ Application ตรวจสอบและ Normalize Source",
+            "หาก Editor ในอนาคตรับ Embed code ให้ใช้เฉพาะ Code ที่สร้างจาก Provider ซึ่งบริษัทอนุมัติ และห้ามดัดแปลงหรือรวมกับ Script อื่น",
+            "Code ที่ไม่รู้จักอาจ Tracking ผู้เข้าชม ขโมยข้อมูล Redirect หน้าเว็บ หรือทำให้ Performance ลดลง",
+          ],
+        },
+
+        items: {
+          en: [
+            "Do not copy Embed code from an unverified website.",
+            "Do not paste analytics or advertising scripts.",
+            "Do not embed login forms or internal systems.",
+            "Do not disable browser-security controls to make an Embed work.",
+            "Do not remove Provider attribution when it is required.",
+            "Escalate unsupported Embed requirements to the system administrator.",
+          ],
+
+          th: [
+            "ไม่ Copy Embed code จากเว็บไซต์ที่ตรวจสอบไม่ได้",
+            "ไม่ใส่ Analytics หรือ Advertising script",
+            "ไม่ Embed Login form หรือระบบภายใน",
+            "ไม่ปิด Browser security เพื่อทำให้ Embed ใช้งานได้",
+            "ไม่ลบ Provider attribution ที่บังคับ",
+            "แจ้ง System administrator เมื่อต้องใช้ Embed ที่ระบบยังไม่รองรับ",
+          ],
+        },
+      },
+
+      {
+        id: "embed-privacy",
+
+        title: {
+          en: "15. Privacy, cookies and external tracking",
+          th: "15. Privacy, Cookie และ External Tracking",
+        },
+
+        paragraphs: {
+          en: [
+            "Embedded third-party content may contact external servers, store cookies, collect technical information or track visitor interaction.",
+            "Before publication, determine whether the Embed requires Analytics, Functional or Marketing consent and confirm that its loading behavior follows the company's privacy configuration.",
+            "Do not describe third-party processing in the Cookie Policy unless the actual website configuration has been verified.",
+          ],
+
+          th: [
+            "Third-party Embed อาจเชื่อมต่อ Server ภายนอก เก็บ Cookie รวบรวมข้อมูลทางเทคนิค หรือ Tracking Interaction",
+            "ก่อน Publish ต้องตรวจว่า Embed ต้องใช้ Analytics, Functional หรือ Marketing consent หรือไม่ และตรวจว่าการ Load ทำตาม Privacy configuration",
+            "ไม่ควรเขียนการประมวลผลของ Third party ลง Cookie Policy จนกว่าจะตรวจ Configuration จริงของเว็บไซต์แล้ว",
+          ],
+        },
+
+        items: {
+          en: [
+            "Identify the Provider and data recipient.",
+            "Review cookies and tracking initiated by the Embed.",
+            "Confirm the required consent category.",
+            "Test behavior before and after consent.",
+            "Update legal documents when processing changes.",
+            "Avoid embedding services that collect unnecessary personal data.",
+          ],
+
+          th: [
+            "ระบุ Provider และผู้รับข้อมูล",
+            "ตรวจ Cookie และ Tracking จาก Embed",
+            "กำหนด Consent category ที่ต้องใช้",
+            "ทดสอบก่อนและหลังให้ Consent",
+            "อัปเดต Legal document เมื่อการประมวลผลเปลี่ยน",
+            "หลีกเลี่ยง Service ที่เก็บ Personal data เกินจำเป็น",
+          ],
+        },
+      },
+
+      {
+        id: "embed-preview",
+
+        title: {
+          en: "16. Preview embedded content",
+          th: "16. Preview Embed",
+        },
+
+        paragraphs: {
+          en: [
+            "Preview the embedded experience before publication. Confirm that the correct source loads inside its intended container without breaking the surrounding page.",
+            "Test keyboard, touch, fullscreen and any navigation controls provided by the embedded experience.",
+            "Also test the page when optional consent has not yet been granted.",
+          ],
+
+          th: [
+            "Preview Embed ก่อน Publish และตรวจว่า Source ที่ถูกต้องโหลดภายใน Container โดยไม่ทำให้ Layout รอบข้างเสีย",
+            "ทดสอบ Keyboard, Touch, Fullscreen และ Navigation control ภายใน Embed",
+            "ทดสอบหน้าก่อนที่ผู้เข้าชมจะให้ Optional consent ด้วย",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-embed-preview",
+            number: "17",
+            src: "/docs/content/public-content/embed-preview.png",
+
+            title: {
+              en: "Embed public preview",
+              th: "Preview หน้า Embed",
+            },
+
+            alt: {
+              en: "Example public Embed page showing an interactive architectural presentation",
+              th: "ตัวอย่างหน้า Embed แสดง Interactive architectural presentation",
+            },
+
+            caption: {
+              en: "The external experience must remain inside its container and work with the surrounding public layout.",
+              th: "External experience ต้องอยู่ภายใน Container และทำงานร่วมกับ Public layout ได้",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "The intended external content loads.",
+            "No Provider error or access request appears.",
+            "The Embed remains inside its container.",
+            "Controls remain usable.",
+            "Fullscreen can be entered and exited safely when supported.",
+            "The page works on desktop and mobile.",
+            "The page remains usable when the Embed is blocked.",
+            "Consent behavior matches Privacy settings.",
+          ],
+
+          th: [
+            "External content ที่ต้องการโหลดสำเร็จ",
+            "ไม่มี Provider error หรือข้อความขอสิทธิ์ผิดปกติ",
+            "Embed ไม่ล้น Container",
+            "Control ใช้งานได้",
+            "เข้าและออก Fullscreen ได้เมื่อรองรับ",
+            "Desktop และ Mobile ใช้งานได้",
+            "หน้าเว็บยังใช้งานได้เมื่อ Embed ถูก Block",
+            "Consent behavior ตรงกับ Privacy setting",
+          ],
+        },
+      },
+
+      {
+        id: "media-guidelines",
+
+        title: {
+          en: "17. Cover and supporting media",
+          th: "17. Cover และ Media",
+        },
+
+        paragraphs: {
+          en: [
+            "Public Content may use a cover or preview image independently from its Article body, Video thumbnail or embedded experience.",
+            "The recommended Public Content cover is 1600 × 900 pixels, a 16:9 ratio and approximately 2 MB or less.",
+            "Wait for optimization and upload to finish before selecting the asset.",
+          ],
+
+          th: [
+            "Public Content อาจใช้ Cover หรือ Preview image แยกจาก Article body, Video thumbnail หรือ Embed",
+            "แนะนำ Cover ขนาด 1600 × 900 Pixels อัตราส่วน 16:9 และ File size ไม่เกินประมาณ 2 MB",
+            "รอ Optimization และ Upload ให้เสร็จก่อนเลือก Asset",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-public-content-media",
+            number: "18",
+            src: "/docs/content/public-content/public-content-media.png",
+
+            title: {
+              en: "Public Content media",
+              th: "Media ของ Public Content",
+            },
+
+            alt: {
+              en: "Public Content editor showing cover and external-media controls",
+              th: "Public Content editor แสดง Cover และ External media",
+            },
+
+            caption: {
+              en: "Use approved, optimized media appropriate for the selected Content Type.",
+              th: "ใช้ Media ที่ได้รับอนุมัติ Optimize แล้ว และเหมาะกับ Content Type",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Recommended dimensions: 1600 × 900 pixels.",
+            "Recommended ratio: 16:9.",
+            "Recommended size: approximately 2 MB or less.",
+            "Use company-owned or licensed media.",
+            "Confirm rights to external thumbnails and logos.",
+            "Add meaningful localized alternative text.",
+            "Do not upload an external thumbnail merely because it can be downloaded.",
+          ],
+
+          th: [
+            "ขนาดแนะนำ: 1600 × 900 Pixels",
+            "อัตราส่วนแนะนำ: 16:9",
+            "File size แนะนำ: ไม่เกินประมาณ 2 MB",
+            "ใช้ Media ที่บริษัทเป็นเจ้าของหรือมี License",
+            "ตรวจสิทธิ์ของ External thumbnail และ Logo",
+            "กรอก Alternative text แยกภาษา",
+            "ไม่ Upload External thumbnail เพียงเพราะดาวน์โหลดได้",
+          ],
+        },
+      },
+
+      {
+        id: "public-content-seo",
+
+        title: {
+          en: "18. SEO and Open Graph",
+          th: "18. SEO และ Open Graph",
+        },
+
+        paragraphs: {
+          en: [
+            "The editor may initialize SEO values from the title, summary, tags and cover. Generated values remain editable.",
+            "Review imported external metadata carefully. A Provider's video title or description may not be appropriate as the company's search metadata.",
+            "Open Graph information should describe the CMS page and its relationship to the original source accurately.",
+          ],
+
+          th: [
+            "Editor อาจเริ่ม SEO จาก Title, Summary, Tag และ Cover โดยค่าที่สร้างยังแก้ไขได้",
+            "ตรวจ External metadata ที่ Import เพราะ Title หรือ Description ของ Provider อาจไม่เหมาะเป็น Search metadata ของบริษัท",
+            "Open Graph ต้องอธิบายหน้า CMS และความสัมพันธ์กับ Original source อย่างถูกต้อง",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-public-content-seo",
+            number: "19",
+            src: "/docs/content/public-content/public-content-seo.png",
+
+            title: {
+              en: "Public Content SEO",
+              th: "SEO ของ Public Content",
+            },
+
+            alt: {
+              en: "Public Content SEO panel showing search and Open Graph fields",
+              th: "Public Content SEO panel แสดง Search และ Open Graph",
+            },
+
+            caption: {
+              en: "Review both generated and manually customized metadata before publication.",
+              th: "ตรวจทั้ง Metadata อัตโนมัติและค่าที่แก้เองก่อน Publish",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Title may initialize SEO and Open Graph titles.",
+            "Summary may initialize descriptions.",
+            "Tags may initialize keywords.",
+            "Cover may initialize the Open Graph image.",
+            "All initialized values remain editable.",
+            "External source attribution must remain accurate.",
+            "Index and Follow settings should be changed carefully.",
+          ],
+
+          th: [
+            "Title อาจใช้เริ่ม SEO และ Open Graph title",
+            "Summary อาจใช้เริ่ม Description",
+            "Tag อาจใช้เริ่ม Keywords",
+            "Cover อาจใช้เริ่ม Open Graph image",
+            "ค่าที่เริ่มอัตโนมัติยังแก้ไขได้",
+            "External source attribution ต้องถูกต้อง",
+            "เปลี่ยน Index และ Follow อย่างระมัดระวัง",
+          ],
+        },
+      },
+
+      {
+        id: "public-detail",
+
+        title: {
+          en: "19. Public detail and expandable content",
+          th: "19. หน้า Detail และเนื้อหาแบบขยาย",
+        },
+
+        paragraphs: {
+          en: [
+            "The public detail page presents the selected primary media, title, metadata, engagement controls and supporting Rich Text.",
+            "Long Rich Text is limited initially so the primary page can remain within a practical viewport. Show more expands the complete content.",
+            "The main Rich Text should appear only once. Do not duplicate it as a second description block.",
+          ],
+
+          th: [
+            "หน้า Public detail แสดง Primary media, Title, Metadata, Engagement และ Rich Text ประกอบ",
+            "Rich Text ที่ยาวจะถูกจำกัดใน Initial view เพื่อให้หน้าอยู่ใน Viewport ที่เหมาะสม และ Show more ใช้ขยายเนื้อหาทั้งหมด",
+            "Main Rich Text ต้องแสดงเพียงครั้งเดียว ไม่ควรมี Description block ซ้ำ",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-public-content-preview",
+            number: "20",
+            src: "/docs/content/public-content/public-content-preview.png",
+
+            title: {
+              en: "Collapsed public content",
+              th: "เนื้อหาก่อนขยาย",
+            },
+
+            alt: {
+              en: "Public Content detail with limited text and Show more",
+              th: "Public Content detail แสดงข้อความจำกัดและปุ่ม Show more",
+            },
+
+            caption: {
+              en: "The initial view limits long content while keeping the primary media and metadata visible.",
+              th: "Initial view จำกัดข้อความยาวและยังแสดง Media กับ Metadata",
+            },
+          },
+
+          {
+            id: "figure-public-content-expanded",
+            number: "21",
+            src: "/docs/content/public-content/public-content-expanded.png",
+
+            title: {
+              en: "Expanded public content",
+              th: "เนื้อหาหลังขยาย",
+            },
+
+            alt: {
+              en: "Public Content detail after expanding its Rich Text",
+              th: "Public Content detail หลังขยาย Rich Text",
+            },
+
+            caption: {
+              en: "Show more reveals the complete Rich Text and allows the page to extend vertically.",
+              th: "Show more แสดง Rich Text ทั้งหมดและอนุญาตให้หน้ายาวลง",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Primary media matches the selected Content Type.",
+            "Title and metadata are correct.",
+            "Original Source is displayed when required.",
+            "Rich Text appears once.",
+            "Show more and Show less work.",
+            "Engagement actions remain accessible.",
+            "The initial layout avoids unintended page overflow.",
+          ],
+
+          th: [
+            "Primary media ตรงกับ Content Type",
+            "Title และ Metadata ถูกต้อง",
+            "แสดง Original Source เมื่อจำเป็น",
+            "Rich Text แสดงครั้งเดียว",
+            "Show more และ Show less ทำงาน",
+            "Engagement action ใช้งานได้",
+            "Initial layout ไม่มี Overflow ที่ไม่ตั้งใจ",
+          ],
+        },
+      },
+
+      {
+        id: "publish-public-content",
+
+        title: {
+          en: "20. Save and publish",
+          th: "20. Save และ Publish",
+        },
+
+        paragraphs: {
+          en: [
+            "Keep the record as Draft until content, source, rights, localization, media, privacy and SEO have been reviewed.",
+            "Publishing may add the record to the main Public list, a type-specific page and its detail URL.",
+            "When scheduling is supported, confirm the date, time, timezone and any external embargo.",
+          ],
+
+          th: [
+            "เก็บ Record เป็น Draft จนตรวจ Content, Source, สิทธิ์, Localization, Media, Privacy และ SEO ครบ",
+            "การ Publish อาจเพิ่มรายการในหน้า Public รวม หน้าตาม Type และ Detail URL",
+            "เมื่อรองรับ Schedule ให้ตรวจวันที่ เวลา Timezone และ External embargo",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Confirm the active company and Content Type.",
+            "Complete required localized fields.",
+            "Verify Provider and Source URL where required.",
+            "Test Video or Embed presentation.",
+            "Confirm copyright and publication permission.",
+            "Review external cookies and tracking.",
+            "Review cover, alternative text and SEO.",
+            "Save and preview.",
+            "Publish or schedule the approved version.",
+            "Verify the public list, type page and detail page.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัทและ Content Type",
+            "กรอก Localized field ที่บังคับ",
+            "ตรวจ Provider และ Source URL",
+            "ทดสอบ Video หรือ Embed",
+            "ตรวจลิขสิทธิ์และสิทธิ์เผยแพร่",
+            "ตรวจ External cookie และ Tracking",
+            "ตรวจ Cover, Alternative text และ SEO",
+            "Save และ Preview",
+            "Publish หรือ Schedule Version ที่อนุมัติ",
+            "ตรวจหน้ารวม หน้าตาม Type และ Detail",
+          ],
+        },
+      },
+
+      {
+        id: "unpublish-public-content",
+
+        title: {
+          en: "21. Unpublish or remove content",
+          th: "21. Unpublish หรือนำเนื้อหาออก",
+        },
+
+        paragraphs: {
+          en: [
+            "Unpublish content when it must stop appearing publicly but should remain available for correction or review.",
+            "External content may also need to be removed when its source becomes unavailable, its rights expire or its privacy behavior changes.",
+            "Check links, categories, type pages and search results after removal.",
+          ],
+
+          th: [
+            "Unpublish เมื่อต้องหยุดแสดง Public แต่ยังเก็บ Record ไว้แก้หรือตรวจ",
+            "External content อาจต้องนำออกเมื่อ Source ใช้ไม่ได้ สิทธิ์หมดอายุ หรือ Privacy behavior เปลี่ยน",
+            "ตรวจ Link, Category, Type page และ Search result หลังนำออก",
+          ],
+        },
+
+        items: {
+          en: [
+            "Unpublish for temporary or corrective removal.",
+            "Archive an inactive historical record where supported.",
+            "Use soft delete for normal removal.",
+            "Do not permanently delete audit or legal evidence without authorization.",
+            "Verify that the public destination is no longer available.",
+          ],
+
+          th: [
+            "ใช้ Unpublish สำหรับการนำออกชั่วคราวหรือแก้ไข",
+            "ใช้ Archive กับข้อมูลประวัติเมื่อรองรับ",
+            "ใช้ Soft delete สำหรับการนำออกตามปกติ",
+            "ไม่ลบ Audit หรือ Legal evidence ถาวรโดยไม่ได้รับอนุมัติ",
+            "ตรวจว่า Public destination ไม่แสดงแล้ว",
+          ],
+        },
+      },
+
+      {
+        id: "public-content-mobile",
+
+        title: {
+          en: "22. Public Content editor on mobile",
+          th: "22. Public Content Editor บนมือถือ",
+        },
+
+        paragraphs: {
+          en: [
+            "On mobile, editor panels are arranged vertically. Confirm the Content Type and Provider carefully because dependent fields may appear farther down the page.",
+            "Rich Text editing, metadata comparison and Embed testing are normally easier on desktop.",
+            "The same validation, permissions and publication rules apply on mobile.",
+          ],
+
+          th: [
+            "บน Mobile, Editor panel เรียงในแนวตั้ง ต้องตรวจ Content Type และ Provider เพราะช่องที่เกี่ยวข้องอาจอยู่ด้านล่าง",
+            "การแก้ Rich Text, เปรียบเทียบ Metadata และทดสอบ Embed มักง่ายกว่าบน Desktop",
+            "Validation, Permission และ Publication rule เหมือน Desktop",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-public-content-mobile",
+            number: "22",
+            src: "/docs/content/public-content/public-content-mobile.png",
+
+            title: {
+              en: "Responsive Public Content editor",
+              th: "Public Content Editor แบบ Responsive",
+            },
+
+            alt: {
+              en: "Public Content editor arranged for a mobile screen",
+              th: "Public Content editor ที่จัดเรียงสำหรับ Mobile",
+            },
+
+            caption: {
+              en: "Editor sections stack vertically on mobile while preserving the same workflow.",
+              th: "Editor section เรียงในแนวตั้งบน Mobile โดยยังใช้ Workflow เดียวกัน",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Confirm the active company.",
+            "Confirm Content Type before entering dependent fields.",
+            "Verify Provider and Source URL together.",
+            "Do not leave while media or metadata is loading.",
+            "Scroll through the complete editor before saving.",
+            "Use desktop for complex Embed testing when practical.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัท",
+            "ตรวจ Content Type ก่อนกรอกช่องที่เกี่ยวข้อง",
+            "ตรวจ Provider และ Source URL ร่วมกัน",
+            "ไม่ออกจากหน้าขณะโหลด Media หรือ Metadata",
+            "เลื่อนตรวจ Editor ทั้งหมดก่อน Save",
+            "ใช้ Desktop สำหรับทดสอบ Embed ที่ซับซ้อน",
+          ],
+        },
+      },
+
+      {
+        id: "public-content-troubleshooting",
+
+        title: {
+          en: "23. Common Public Content problems",
+          th: "23. ปัญหาที่พบบ่อย",
+        },
+
+        paragraphs: {
+          en: [
+            "When saving or public rendering fails, keep the editor open and identify whether the issue concerns Content Type, validation, Rich Text, Provider, Source URL, media or publication.",
+          ],
+
+          th: [
+            "เมื่อ Save หรือแสดง Public ไม่สำเร็จ ให้เปิด Editor ค้างไว้และแยกสาเหตุจาก Content Type, Validation, Rich Text, Provider, Source URL, Media หรือ Publication",
+          ],
+        },
+
+        items: {
+          en: [
+            "Invalid data: review required fields for the selected Content Type.",
+            "Article fails: verify required Rich Text and localized content.",
+            "Fetch fails: confirm that Provider is YouTube and the URL is a supported public URL.",
+            "Wrong video fetched: verify the complete Source URL.",
+            "Provider required: select the source's actual Provider.",
+            "Embed fails: confirm HTTPS, public access and Provider permission.",
+            "External player blocked: review Provider settings, consent and browser restrictions.",
+            "Duplicate text: keep the complete body in Rich Text only.",
+            "Public detail error: verify localized values are valid strings or supported Rich Text data.",
+            "Old content displayed: refresh and allow cache revalidation.",
+            "Save denied: review membership, role and Public Content permission.",
+          ],
+
+          th: [
+            "Invalid data: ตรวจช่องบังคับของ Content Type",
+            "Article Save ไม่ได้: ตรวจ Rich Text และ Localized content",
+            "Fetch ไม่ได้: ตรวจว่า Provider เป็น YouTube และเป็น Public URL ที่รองรับ",
+            "Fetch ผิด Video: ตรวจ Source URL แบบเต็ม",
+            "Provider required: เลือก Provider ให้ตรงกับ Source",
+            "Embed ไม่แสดง: ตรวจ HTTPS, Public access และ Permission ของ Provider",
+            "Player ถูก Block: ตรวจ Provider setting, Consent และ Browser restriction",
+            "ข้อความซ้ำ: เก็บ Main body ฉบับเต็มไว้ใน Rich Text เท่านั้น",
+            "Public detail Error: ตรวจ Localized value ว่าเป็น String หรือ Rich Text ที่รองรับ",
+            "ยังแสดงข้อมูลเก่า: Refresh และรอ Cache revalidation",
+            "Save ไม่ได้: ตรวจ Membership, Role และ Public Content permission",
+          ],
+        },
+      },
+
+      {
+        id: "public-content-checklist",
+
+        title: {
+          en: "24. Public Content publishing checklist",
+          th: "24. Checklist ก่อน Publish",
+        },
+
+        paragraphs: {
+          en: [
+            "Complete this checklist before publishing an Article, Video or Embed.",
+          ],
+
+          th: ["ใช้ Checklist นี้ก่อน Publish Article, Video หรือ Embed"],
+        },
+
+        items: {
+          en: [
+            "The correct company and Content Type are selected.",
+            "Title, slug, date, category and tags are correct.",
+            "Required localized fields are complete.",
+            "Article Rich Text is complete and not duplicated.",
+            "Video Provider and Source URL match.",
+            "Fetched Video metadata has been reviewed.",
+            "Embed Source uses HTTPS and allows public embedding.",
+            "External tracking and consent behavior have been reviewed.",
+            "The company owns or is authorized to publish all content.",
+            "Cover media is approved and optimized.",
+            "Alternative text is meaningful.",
+            "SEO and Open Graph information has been reviewed.",
+            "Video or Embed works in Preview.",
+            "Show more and Show less work correctly.",
+            "Desktop and mobile layouts are usable.",
+            "No private token, confidential note or placeholder remains.",
+            "The approved version is published.",
+            "The public list, type page and detail page have been verified.",
+          ],
+
+          th: [
+            "เลือกบริษัทและ Content Type ถูกต้อง",
+            "Title, Slug, Date, Category และ Tag ถูกต้อง",
+            "Localized field ที่บังคับครบ",
+            "Article Rich Text ครบและไม่ซ้ำ",
+            "Video Provider และ Source URL ตรงกัน",
+            "ตรวจ Video metadata ที่ Fetch แล้ว",
+            "Embed Source ใช้ HTTPS และอนุญาต Public embedding",
+            "ตรวจ External tracking และ Consent behavior",
+            "บริษัทเป็นเจ้าของหรือได้รับอนุญาตให้เผยแพร่",
+            "Cover ได้รับอนุมัติและ Optimize แล้ว",
+            "Alternative text มีความหมาย",
+            "ตรวจ SEO และ Open Graph แล้ว",
+            "Video หรือ Embed ทำงานใน Preview",
+            "Show more และ Show less ทำงาน",
+            "Desktop และ Mobile ใช้งานได้",
+            "ไม่มี Private token, Confidential note หรือ Placeholder",
+            "Publish Version ที่อนุมัติ",
+            "ตรวจหน้ารวม Type page และ Detail page แล้ว",
+          ],
+        },
+      },
+    ],
+  },
+  "content/contact": {
+    eyebrow: {
+      en: "Content Management",
+      th: "การจัดการเนื้อหา",
+    },
+
+    title: {
+      en: "Contact",
+      th: "ติดต่อ",
+    },
+
+    description: {
+      en: "Manage the public Contact page, company contact information, localized content, form presentation, SEO and publication.",
+      th: "จัดการหน้า Contact ข้อมูลติดต่อบริษัท เนื้อหาหลายภาษา Form, SEO และการเผยแพร่",
+    },
+
+    introduction: {
+      en: [
+        "The Contact module controls the public page visitors use to find company contact information and submit enquiries.",
+        "Contact-page content, Company profile information and Contact Form configuration are related but separate. Edit information in the section that owns the data.",
+        "Form submissions may contain personal data. They must be accessed only by authorized users and handled according to the company's Privacy Notice and retention settings.",
+      ],
+
+      th: [
+        "โมดูล Contact ใช้ควบคุมหน้า Public ที่ผู้เข้าชมใช้ดูข้อมูลติดต่อและส่งข้อความถึงบริษัท",
+        "Contact page content, Company profile และ Contact Form เป็นข้อมูลที่เกี่ยวข้องกันแต่แยกส่วน ต้องแก้ข้อมูลใน Section ที่เป็นเจ้าของข้อมูลนั้น",
+        "Form submission อาจมี Personal data ต้องให้เฉพาะผู้มีสิทธิ์เข้าถึง และจัดการตาม Privacy Notice กับ Retention setting ของบริษัท",
+      ],
+    },
+
+    highlights: [
+      {
+        title: {
+          en: "Company information",
+          th: "ข้อมูลบริษัท",
+        },
+
+        description: {
+          en: "Approved company contact details may be reused by the public Contact page.",
+          th: "หน้า Contact อาจนำข้อมูลติดต่อที่อนุมัติแล้วจาก Company มาใช้",
+        },
+      },
+
+      {
+        title: {
+          en: "Localized page",
+          th: "รองรับหลายภาษา",
+        },
+
+        description: {
+          en: "Page headings and descriptions follow company Localization settings.",
+          th: "Heading และ Description แสดงช่องตาม Localization ของบริษัท",
+        },
+      },
+
+      {
+        title: {
+          en: "Private submissions",
+          th: "Submission เป็นข้อมูลส่วนตัว",
+        },
+
+        description: {
+          en: "Submitted information is managed through the protected Messages workspace.",
+          th: "ข้อมูลที่ส่งเข้ามาจัดการผ่านหน้า Messages ที่ได้รับการป้องกัน",
+        },
+      },
+
+      {
+        title: {
+          en: "Independent email delivery",
+          th: "Email แยกจากการบันทึก",
+        },
+
+        description: {
+          en: "Email notification and stored submissions are separate parts of the workflow.",
+          th: "Email notification และการบันทึก Submission เป็นคนละส่วนของ Workflow",
+        },
+      },
+    ],
+
+    sections: [
+      {
+        id: "contact-overview",
+
+        title: {
+          en: "1. Contact workspace overview",
+          th: "1. ภาพรวมหน้า Contact",
+        },
+
+        paragraphs: {
+          en: [
+            "The Contact workspace contains the active company's public page content, contact presentation, form relationship, SEO and publication controls.",
+            "Always confirm the active company before editing. Contact information and submissions are isolated by company.",
+            "Available actions depend on the signed-in user's role and permissions.",
+          ],
+
+          th: [
+            "หน้า Contact รวม Public page content, การแสดงข้อมูลติดต่อ, Form relationship, SEO และ Publication control ของบริษัทปัจจุบัน",
+            "ตรวจสอบบริษัทก่อนแก้ไข เพราะข้อมูล Contact และ Submission แยกตามบริษัท",
+            "คำสั่งที่แสดงขึ้นอยู่กับ Role และ Permission",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-contact-overview",
+            number: "1",
+            src: "/docs/content/contact/contact-overview.png",
+
+            title: {
+              en: "Contact workspace",
+              th: "หน้า Contact",
+            },
+
+            alt: {
+              en: "Junsekino CMS Contact workspace showing page status and editor sections",
+              th: "หน้า Contact แสดง Status และ Editor section",
+            },
+
+            caption: {
+              en: "Use the Contact workspace to prepare the company's approved public contact experience.",
+              th: "ใช้หน้า Contact เพื่อจัดเตรียมข้อมูลติดต่อ Public ที่ได้รับอนุมัติ",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Confirm the active company.",
+            "Open Contact from the Admin sidebar.",
+            "Review the current page and form status.",
+            "Review company contact information.",
+            "Complete localized page content.",
+            "Review the Contact Form relationship.",
+            "Review SEO and preview.",
+            "Publish after approval.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัท",
+            "เปิด Contact จาก Sidebar",
+            "ตรวจ Page และ Form status",
+            "ตรวจข้อมูลติดต่อบริษัท",
+            "กรอก Localized page content",
+            "ตรวจ Contact Form relationship",
+            "ตรวจ SEO และ Preview",
+            "Publish หลังอนุมัติ",
+          ],
+        },
+      },
+
+      {
+        id: "company-contact-profile",
+
+        title: {
+          en: "2. Company Contact Profile",
+          th: "2. Company Contact Profile",
+        },
+
+        paragraphs: {
+          en: [
+            "The Company Contact Profile summarizes approved company-level information that may be reused by the Contact page.",
+            "If an incorrect value originates from the Company profile, update it in the Company workspace rather than duplicating a different value in Contact.",
+            "Changing company-level information may affect other pages, legal settings or metadata.",
+          ],
+
+          th: [
+            "Company Contact Profile สรุปข้อมูลระดับบริษัทที่ได้รับอนุมัติและอาจนำมาใช้ในหน้า Contact",
+            "หากค่าที่ผิดมาจาก Company profile ให้แก้ในหน้า Company ไม่ควรสร้างค่าที่ต่างกันซ้ำใน Contact",
+            "การแก้ข้อมูลระดับบริษัทอาจส่งผลต่อหน้าอื่น Legal setting หรือ Metadata",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-company-contact-profile",
+            number: "2",
+            src: "/docs/content/contact/company-contact-profile.png",
+
+            title: {
+              en: "Company Contact Profile",
+              th: "ข้อมูลติดต่อจาก Company",
+            },
+
+            alt: {
+              en: "Contact editor showing summarized company contact information",
+              th: "Contact editor แสดงข้อมูลติดต่อที่อ้างอิงจาก Company",
+            },
+
+            caption: {
+              en: "Review the source of each value before deciding whether to edit Company or Contact.",
+              th: "ตรวจ Source ของข้อมูลก่อนเลือกว่าต้องแก้ที่ Company หรือ Contact",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Company name and legal identity belong to Company settings.",
+            "Company email, phone and address should use approved public values.",
+            "Social-media URLs are normally managed in Company settings.",
+            "Contact-page headings and descriptive text belong to Contact content.",
+            "Form fields and submissions belong to the Form and Messages workflow.",
+          ],
+
+          th: [
+            "Company name และ Legal identity จัดการใน Company",
+            "Email, Phone และ Address ใช้ค่า Public ที่ได้รับอนุมัติ",
+            "Social Media URL จัดการใน Company",
+            "Heading และข้อความอธิบายหน้า Contact จัดการใน Contact",
+            "Form field และ Submission อยู่ใน Form กับ Messages workflow",
+          ],
+        },
+      },
+
+      {
+        id: "localized-contact-content",
+
+        title: {
+          en: "3. Localized Contact content",
+          th: "3. เนื้อหา Contact หลายภาษา",
+        },
+
+        paragraphs: {
+          en: [
+            "Contact language fields follow the active company's Localization settings.",
+            "Localized content may include the page title, introduction, contact labels, form headings and success messaging where supported.",
+            "English is currently the default language of the public website.",
+          ],
+
+          th: [
+            "ช่องภาษา Contact แสดงตาม Localization ของบริษัท",
+            "ข้อมูลหลายภาษาอาจประกอบด้วย Page title, Introduction, Contact label, Form heading และ Success message ตามที่ระบบรองรับ",
+            "เว็บไซต์ Public ปัจจุบันใช้ภาษาอังกฤษเป็นค่าเริ่มต้น",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-contact-localized-content",
+            number: "3",
+            src: "/docs/content/contact/contact-localized-content.png",
+
+            title: {
+              en: "Localized Contact fields",
+              th: "ช่องภาษา Contact",
+            },
+
+            alt: {
+              en: "Contact editor displaying English and Thai content fields",
+              th: "Contact editor แสดงช่องภาษาอังกฤษและภาษาไทย",
+            },
+
+            caption: {
+              en: "Complete each enabled language and keep contact facts consistent.",
+              th: "กรอกทุกภาษาที่เปิดใช้และรักษาข้อมูลติดต่อให้ตรงกัน",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Use the correct language field or tab.",
+            "Keep email addresses, phone numbers and factual details consistent.",
+            "Translate instructions for meaning and clarity.",
+            "Review form labels and success messages.",
+            "Do not rely on fallback for production content.",
+          ],
+
+          th: [
+            "ใช้ช่องหรือ Tab ภาษาที่ถูกต้อง",
+            "รักษา Email, Phone และข้อเท็จจริงให้ตรงกัน",
+            "แปลคำแนะนำให้ได้ความหมายและอ่านง่าย",
+            "ตรวจ Form label และ Success message",
+            "ไม่พึ่ง Fallback สำหรับ Production",
+          ],
+        },
+      },
+
+      {
+        id: "contact-information",
+
+        title: {
+          en: "4. Contact information",
+          th: "4. ข้อมูลติดต่อ",
+        },
+
+        paragraphs: {
+          en: [
+            "Enter only contact information approved for public display. Do not use a personal address, private mobile number or individual email without authorization.",
+            "Test links and contact actions after saving, particularly email, telephone, map and social destinations.",
+          ],
+
+          th: [
+            "กรอกเฉพาะข้อมูลที่ได้รับอนุมัติให้แสดง Public ห้ามใช้ที่อยู่ส่วนตัว เบอร์ส่วนตัว หรือ Email บุคคลโดยไม่ได้รับอนุญาต",
+            "ทดสอบ Link และ Contact action หลัง Save โดยเฉพาะ Email, Telephone, Map และ Social destination",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-contact-information",
+            number: "4",
+            src: "/docs/content/contact/contact-information.png",
+
+            title: {
+              en: "Public contact information",
+              th: "ข้อมูลติดต่อ Public",
+            },
+
+            alt: {
+              en: "Contact editor showing address email phone map and related information",
+              th: "Contact editor แสดง Address, Email, Phone, Map และข้อมูลที่เกี่ยวข้อง",
+            },
+
+            caption: {
+              en: "Use accurate company-approved information and test every public destination.",
+              th: "ใช้ข้อมูลบริษัทที่ถูกต้องและทดสอบทุก Public destination",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Address: approved location information.",
+            "Email: monitored company contact address.",
+            "Phone: approved public contact number.",
+            "Map: correct approved location or destination.",
+            "Office hours: current service times where supported.",
+            "Social links: official company profiles managed in the appropriate section.",
+          ],
+
+          th: [
+            "Address: สถานที่ที่ได้รับอนุมัติ",
+            "Email: Email บริษัทที่มีผู้รับผิดชอบตรวจสอบ",
+            "Phone: เบอร์ Public ที่ได้รับอนุมัติ",
+            "Map: Location หรือ Destination ที่ถูกต้อง",
+            "Office hours: เวลาทำการปัจจุบันเมื่อรองรับ",
+            "Social link: Official profile ที่จัดการใน Section ที่เกี่ยวข้อง",
+          ],
+        },
+      },
+
+      {
+        id: "contact-media",
+
+        title: {
+          en: "5. Contact page media",
+          th: "5. Media ของหน้า Contact",
+        },
+
+        paragraphs: {
+          en: [
+            "When the Contact layout supports a Hero, Cover or other media, use an image that helps visitors identify the company or location.",
+            "Use only approved and properly licensed media. Do not expose security-sensitive areas, access controls or private workspaces.",
+            "Wait for upload and optimization to finish before saving.",
+          ],
+
+          th: [
+            "เมื่อ Contact layout รองรับ Hero, Cover หรือ Media อื่น ให้ใช้รูปที่ช่วยให้ผู้เข้าชมระบุบริษัทหรือสถานที่",
+            "ใช้เฉพาะ Media ที่ได้รับอนุมัติและมีสิทธิ์ ห้ามเปิดเผยพื้นที่ Security, Access control หรือพื้นที่ทำงานส่วนตัว",
+            "รอ Upload และ Optimization ให้เสร็จก่อน Save",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-contact-media",
+            number: "5",
+            src: "/docs/content/contact/contact-media.png",
+
+            title: {
+              en: "Contact page media",
+              th: "Media หน้า Contact",
+            },
+
+            alt: {
+              en: "Contact editor showing Hero Cover or supported media controls",
+              th: "Contact editor แสดง Hero, Cover หรือ Media control",
+            },
+
+            caption: {
+              en: "Use approved media that does not reveal confidential or security-sensitive information.",
+              th: "ใช้ Media ที่ได้รับอนุมัติและไม่เปิดเผยข้อมูลสำคัญด้าน Security",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Select media belonging to the active company.",
+            "Use an appropriate aspect ratio for the displayed layout.",
+            "Add meaningful localized alternative text.",
+            "Do not show private documents, access cards or security equipment in detail.",
+            "Preview desktop and mobile crops.",
+          ],
+
+          th: [
+            "เลือก Media ของบริษัทปัจจุบัน",
+            "ใช้ Aspect ratio ให้เหมาะกับ Layout",
+            "กรอก Alternative text แยกภาษา",
+            "ไม่แสดงเอกสาร บัตรเข้าออก หรืออุปกรณ์ Security แบบละเอียด",
+            "Preview Crop บน Desktop และ Mobile",
+          ],
+        },
+      },
+
+      {
+        id: "contact-form",
+
+        title: {
+          en: "6. Contact Form relationship",
+          th: "6. การเชื่อม Contact Form",
+        },
+
+        paragraphs: {
+          en: [
+            "The Contact page is connected to a Contact Form record prepared by the company bootstrap workflow. The page stores the relationship to that form rather than providing a complete general-purpose Form Builder.",
+            "The current Contact editor may show the form relationship, status and supported settings without exposing every Form schema field for editing.",
+            "Do not search for submission or attachment settings on this page when no corresponding control is provided.",
+          ],
+
+          th: [
+            "หน้า Contact เชื่อมกับ Contact Form record ที่ระบบ Company bootstrap เตรียมไว้ โดยหน้า Contact เก็บความสัมพันธ์กับ Form ไม่ใช่ General-purpose Form Builder แบบเต็ม",
+            "Contact editor ปัจจุบันอาจแสดง Form relationship, Status และ Setting ที่รองรับ โดยไม่ได้เปิดทุก Field ของ Form schema ให้แก้",
+            "หากไม่มี Control สำหรับ Submission หรือ Attachment setting ในหน้านี้ ไม่ต้องค้นหาหรือกรอกข้อมูลดังกล่าว",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-contact-form-settings",
+            number: "6",
+            src: "/docs/content/contact/contact-form-settings.png",
+
+            title: {
+              en: "Contact Form settings",
+              th: "การตั้งค่า Contact Form",
+            },
+
+            alt: {
+              en: "Contact editor showing the configured Contact Form relationship and status",
+              th: "Contact editor แสดง Contact Form relationship และ Status",
+            },
+
+            caption: {
+              en: "The Contact page uses the configured form; only controls actually displayed by the editor can be changed here.",
+              th: "หน้า Contact ใช้ Form ที่เชื่อมไว้ และแก้ได้เฉพาะ Control ที่ Editor แสดง",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Form ID identifies the connected Contact Form.",
+            "Form status determines whether the form is available for its supported public use.",
+            "Field definitions belong to the underlying Form configuration.",
+            "Public submissions are sent to the form-submission service.",
+            "Authorized users manage received submissions through Messages.",
+          ],
+
+          th: [
+            "Form ID ระบุ Contact Form ที่เชื่อม",
+            "Form status กำหนดว่า Form พร้อมใช้งาน Public หรือไม่",
+            "Field definition อยู่ใน Form configuration ต้นทาง",
+            "Public submission ส่งผ่าน Form submission service",
+            "ผู้มีสิทธิ์จัดการข้อมูลที่ได้รับผ่าน Messages",
+          ],
+        },
+      },
+
+      {
+        id: "public-form-fields",
+
+        title: {
+          en: "7. Complete the public Contact Form",
+          th: "7. การกรอก Contact Form",
+        },
+
+        paragraphs: {
+          en: [
+            "Visitors must complete the fields displayed by the public Contact Form. Required fields are marked and validated before submission.",
+            "The exact field set comes from the active Contact Form. Typical fields may include a name, contact information and enquiry details.",
+            "Users should not send passwords, financial credentials or unnecessary sensitive personal information through the Contact Form.",
+          ],
+
+          th: [
+            "ผู้เข้าชมต้องกรอกช่องที่แสดงใน Public Contact Form ช่อง Required จะมีเครื่องหมายและถูกตรวจสอบก่อน Submit",
+            "รายการ Field มาจาก Contact Form ที่ Active โดยทั่วไปอาจมีชื่อ ข้อมูลติดต่อ และรายละเอียดที่ต้องการสอบถาม",
+            "ไม่ควรส่ง Password, Financial credential หรือข้อมูลส่วนบุคคลอ่อนไหวที่ไม่จำเป็นผ่าน Contact Form",
+          ],
+        },
+
+        items: {
+          en: [
+            "Complete every required field.",
+            "Use accurate contact information so the company can respond.",
+            "Provide sufficient enquiry details.",
+            "Do not enter credentials or secret information.",
+            "Review the information before selecting Submit.",
+            "Submit once and wait for the result.",
+          ],
+
+          th: [
+            "กรอก Required field ให้ครบ",
+            "ใช้ข้อมูลติดต่อที่ถูกต้องเพื่อให้บริษัทตอบกลับ",
+            "ให้รายละเอียดการสอบถามเพียงพอ",
+            "ไม่กรอก Credential หรือ Secret",
+            "ตรวจข้อมูลก่อนกด Submit",
+            "กด Submit ครั้งเดียวและรอผล",
+          ],
+        },
+      },
+
+      {
+        id: "form-validation",
+
+        title: {
+          en: "8. Form validation",
+          th: "8. Form Validation",
+        },
+
+        paragraphs: {
+          en: [
+            "Validation identifies missing or invalid information before submission. Correct the highlighted field and submit again.",
+            "Validation messages protect data quality but do not confirm that the supplied information belongs to the person entering it.",
+          ],
+
+          th: [
+            "Validation แจ้งช่องที่ว่างหรือข้อมูลไม่ถูกต้องก่อน Submit ให้แก้ช่องที่ Highlight แล้วส่งอีกครั้ง",
+            "Validation ช่วยควบคุมคุณภาพข้อมูล แต่ไม่ได้ยืนยันว่าข้อมูลเป็นของผู้กรอกจริง",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-contact-form-validation",
+            number: "7",
+            src: "/docs/content/contact/contact-form-validation.png",
+
+            title: {
+              en: "Contact Form validation",
+              th: "Validation ของ Contact Form",
+            },
+
+            alt: {
+              en: "Public Contact Form displaying required-field validation messages",
+              th: "Public Contact Form แสดงข้อความ Required field",
+            },
+
+            caption: {
+              en: "Correct every highlighted field before submitting the form again.",
+              th: "แก้ทุกช่องที่ Highlight ก่อน Submit อีกครั้ง",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Required field: information has not been provided.",
+            "Invalid email: review the email format.",
+            "Length error: shorten or complete the value according to the message.",
+            "Submission blocked: wait and avoid repeated rapid attempts.",
+            "Server error: preserve the entered information and retry only after reviewing the message.",
+          ],
+
+          th: [
+            "Required field: ยังไม่ได้กรอกข้อมูล",
+            "Invalid email: ตรวจรูปแบบ Email",
+            "Length error: ลดหรือเพิ่มข้อความตามคำแนะนำ",
+            "Submission blocked: รอและไม่กดซ้ำอย่างรวดเร็ว",
+            "Server error: เก็บข้อมูลที่กรอกไว้และลองใหม่หลังอ่านข้อความ",
+          ],
+        },
+      },
+
+      {
+        id: "privacy-consent",
+
+        title: {
+          en: "9. Privacy consent",
+          th: "9. Privacy Consent",
+        },
+
+        paragraphs: {
+          en: [
+            "A Contact Form may require explicit Privacy Notice consent when that setting is enabled and a suitable consent field is configured.",
+            "The initial bootstrap Contact Form may have Privacy consent disabled until the company has published its Privacy Notice and completed the required configuration.",
+            "Do not claim that a consent checkbox exists when it is not displayed by the active form.",
+          ],
+
+          th: [
+            "Contact Form อาจบังคับ Consent ต่อ Privacy Notice เมื่อเปิด Setting และกำหนด Consent field ที่เหมาะสม",
+            "Contact Form เริ่มต้นจาก Bootstrap อาจปิด Privacy consent ไว้จนกว่าบริษัทจะ Publish Privacy Notice และตั้งค่าที่จำเป็น",
+            "ไม่ควรระบุว่ามี Consent checkbox หาก Active form ไม่ได้แสดงช่องดังกล่าว",
+          ],
+        },
+
+        items: {
+          en: [
+            "Publish an accurate Privacy Notice first.",
+            "Enable Privacy consent only through supported configuration.",
+            "Use clear consent wording.",
+            "Do not preselect optional consent.",
+            "Record the applicable legal-document version when the workflow supports it.",
+            "Verify the public form after changing consent settings.",
+          ],
+
+          th: [
+            "Publish Privacy Notice ที่ถูกต้องก่อน",
+            "เปิด Privacy consent ผ่าน Configuration ที่ระบบรองรับ",
+            "ใช้ข้อความ Consent ที่ชัดเจน",
+            "ไม่เลือก Optional consent ล่วงหน้า",
+            "บันทึก Legal document version เมื่อ Workflow รองรับ",
+            "ตรวจ Public form หลังเปลี่ยน Consent",
+          ],
+        },
+      },
+
+      {
+        id: "submission-success",
+
+        title: {
+          en: "10. Successful submission",
+          th: "10. ส่ง Form สำเร็จ",
+        },
+
+        paragraphs: {
+          en: [
+            "After a successful submission, the public page displays the configured success title or message.",
+            "A success response means the server accepted the submission. It does not guarantee that a notification email has already been delivered.",
+            "Visitors should not repeatedly submit the same enquiry after seeing the success state.",
+          ],
+
+          th: [
+            "หลังส่งสำเร็จ หน้า Public จะแสดง Success title หรือ Message ที่กำหนด",
+            "Success หมายถึง Server รับ Submission แล้ว แต่ไม่ได้รับประกันว่า Notification email ถูกส่งเรียบร้อยในเวลาเดียวกัน",
+            "เมื่อเห็น Success state ผู้เข้าชมไม่ควรส่งข้อความเดิมซ้ำ",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-contact-success",
+            number: "8",
+            src: "/docs/content/contact/contact-success.png",
+
+            title: {
+              en: "Submission successful",
+              th: "ส่งข้อมูลสำเร็จ",
+            },
+
+            alt: {
+              en: "Public Contact Form displaying its successful-submission state",
+              th: "Public Contact Form แสดงสถานะส่งข้อมูลสำเร็จ",
+            },
+
+            caption: {
+              en: "The success state confirms that the submission was accepted by the application.",
+              th: "Success state ยืนยันว่า Application รับ Submission แล้ว",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Do not submit the same enquiry again immediately.",
+            "Authorized staff should check Messages.",
+            "Check email delivery separately when notifications are enabled.",
+            "Use the stored Submission as the primary operational record.",
+          ],
+
+          th: [
+            "ไม่ส่ง Enquiry เดิมซ้ำทันที",
+            "ผู้รับผิดชอบตรวจใน Messages",
+            "ตรวจ Email delivery แยกเมื่อเปิด Notification",
+            "ใช้ Submission ที่บันทึกเป็นข้อมูลหลักของ Workflow",
+          ],
+        },
+      },
+
+      {
+        id: "messages-and-email",
+
+        title: {
+          en: "11. Messages and email notifications",
+          th: "11. Messages และ Email Notification",
+        },
+
+        paragraphs: {
+          en: [
+            "A successful Contact submission is stored for authorized management through Messages.",
+            "Email notification is a separate delivery process controlled by form and communication settings. An email failure should not automatically be interpreted as a missing stored Submission.",
+            "Check Messages before asking the visitor to submit again.",
+          ],
+
+          th: [
+            "Contact submission ที่สำเร็จจะถูกบันทึกเพื่อให้ผู้มีสิทธิ์จัดการผ่าน Messages",
+            "Email notification เป็น Delivery process แยก ซึ่งควบคุมด้วย Form และ Communication setting หาก Email ล้มเหลวไม่ได้หมายความว่า Submission หายเสมอไป",
+            "ตรวจ Messages ก่อนขอให้ผู้เข้าชมส่งซ้ำ",
+          ],
+        },
+
+        items: {
+          en: [
+            "Messages stores and presents authorized Submission records.",
+            "Notification Center informs users of supported workspace activity.",
+            "Email sends configured external notifications.",
+            "Each part can have a different delivery or read state.",
+            "Personal data must not be copied into unapproved channels.",
+          ],
+
+          th: [
+            "Messages เก็บและแสดง Submission ให้ผู้มีสิทธิ์",
+            "Notification Center แจ้งกิจกรรมที่ระบบรองรับ",
+            "Email ส่งการแจ้งเตือนไปภายนอกตาม Configuration",
+            "แต่ละส่วนอาจมี Delivery หรือ Read state ต่างกัน",
+            "ห้าม Copy Personal data ไปช่องทางที่ไม่ได้รับอนุมัติ",
+          ],
+        },
+      },
+
+      {
+        id: "contact-seo",
+
+        title: {
+          en: "12. Contact SEO",
+          th: "12. SEO ของ Contact",
+        },
+
+        paragraphs: {
+          en: [
+            "Contact SEO helps visitors and search engines identify the official contact page.",
+            "The page title and description may initialize editable SEO values. Review them before publication.",
+            "Do not place private contact information in search metadata.",
+          ],
+
+          th: [
+            "Contact SEO ช่วยให้ผู้เข้าชมและ Search engine ระบุ Official contact page",
+            "Page title และ Description อาจใช้เริ่ม SEO ที่ยังแก้ไขได้ ต้องตรวจสอบก่อน Publish",
+            "ไม่ใส่ข้อมูลติดต่อส่วนตัวใน Search metadata",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-contact-seo",
+            number: "9",
+            src: "/docs/content/contact/contact-seo.png",
+
+            title: {
+              en: "Contact SEO settings",
+              th: "SEO ของ Contact",
+            },
+
+            alt: {
+              en: "Contact SEO panel showing search and Open Graph information",
+              th: "Contact SEO panel แสดง Search และ Open Graph",
+            },
+
+            caption: {
+              en: "Use approved public information in search and sharing metadata.",
+              th: "ใช้เฉพาะข้อมูล Public ที่อนุมัติใน Search และ Sharing metadata",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "SEO Title clearly identifies the official Contact page.",
+            "SEO Description summarizes the available contact methods.",
+            "Open Graph information is appropriate when the page is shared.",
+            "Index and Follow settings are changed only when necessary.",
+            "No personal or confidential information appears in metadata.",
+          ],
+
+          th: [
+            "SEO Title ระบุ Official Contact page ชัดเจน",
+            "SEO Description สรุปช่องทางติดต่อ",
+            "Open Graph เหมาะกับการ Share",
+            "เปลี่ยน Index และ Follow เมื่อจำเป็น",
+            "ไม่มีข้อมูลส่วนตัวหรือข้อมูลลับใน Metadata",
+          ],
+        },
+      },
+
+      {
+        id: "preview-contact",
+
+        title: {
+          en: "13. Preview and publish",
+          th: "13. Preview และ Publish",
+        },
+
+        paragraphs: {
+          en: [
+            "Preview the complete Contact page, including company details, localized text, links and the public form.",
+            "Test form validation without submitting personal information. Use an approved test process when a complete submission must be verified.",
+            "After publication, verify the production page and confirm that authorized staff can receive the resulting Message.",
+          ],
+
+          th: [
+            "Preview หน้า Contact ทั้งหมด รวมข้อมูลบริษัท ข้อความหลายภาษา Link และ Public form",
+            "ทดสอบ Validation โดยไม่ส่ง Personal data และใช้กระบวนการทดสอบที่อนุมัติเมื่อต้องตรวจ Submission แบบเต็ม",
+            "หลัง Publish ให้ตรวจ Production page และยืนยันว่าผู้รับผิดชอบเข้าถึง Message ได้",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-contact-preview",
+            number: "10",
+            src: "/docs/content/contact/contact-preview.png",
+
+            title: {
+              en: "Public Contact preview",
+              th: "Preview หน้า Contact",
+            },
+
+            alt: {
+              en: "Public Contact page showing company information and enquiry form",
+              th: "หน้า Public Contact แสดงข้อมูลบริษัทและ Enquiry form",
+            },
+
+            caption: {
+              en: "Review contact actions and form presentation on desktop and mobile before publication.",
+              th: "ตรวจ Contact action และ Form ทั้ง Desktop กับ Mobile ก่อน Publish",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Confirm the active company.",
+            "Review company contact information.",
+            "Complete localized content.",
+            "Confirm the connected Contact Form.",
+            "Review privacy information.",
+            "Review SEO.",
+            "Save and preview.",
+            "Test required-field validation.",
+            "Publish the approved version.",
+            "Verify the production page and Messages workflow.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัท",
+            "ตรวจข้อมูลติดต่อบริษัท",
+            "กรอก Localized content",
+            "ตรวจ Contact Form ที่เชื่อม",
+            "ตรวจข้อมูล Privacy",
+            "ตรวจ SEO",
+            "Save และ Preview",
+            "ทดสอบ Required-field validation",
+            "Publish Version ที่อนุมัติ",
+            "ตรวจ Production page และ Messages workflow",
+          ],
+        },
+      },
+
+      {
+        id: "contact-mobile",
+
+        title: {
+          en: "14. Contact on mobile",
+          th: "14. Contact บนมือถือ",
+        },
+
+        paragraphs: {
+          en: [
+            "On mobile, Contact sections and form fields are arranged vertically. Ensure that long addresses, email links and validation messages remain inside the viewport.",
+            "Form controls must remain large enough for touch interaction, and the submit state must remain visible.",
+            "The same privacy, validation and permission rules apply on mobile.",
+          ],
+
+          th: [
+            "บน Mobile, Contact section และ Form field เรียงในแนวตั้ง ต้องตรวจ Address, Email link และ Validation message ไม่ให้ล้น Viewport",
+            "Form control ต้องมีขนาดเหมาะกับ Touch และมองเห็น Submit state",
+            "Privacy, Validation และ Permission rule เหมือน Desktop",
+          ],
+        },
+
+        images: [
+          {
+            id: "figure-contact-mobile",
+            number: "11",
+            src: "/docs/content/contact/contact-mobile.png",
+
+            title: {
+              en: "Responsive Contact page",
+              th: "Contact แบบ Responsive",
+            },
+
+            alt: {
+              en: "Junsekino CMS Contact editor or public Contact page on a mobile screen",
+              th: "Contact editor หรือ Public Contact บนหน้าจอ Mobile",
+            },
+
+            caption: {
+              en: "Verify contact links, form controls and messages at a mobile viewport.",
+              th: "ตรวจ Contact link, Form control และข้อความบน Mobile",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Contact information remains readable.",
+            "Telephone and email links can be selected.",
+            "Inputs remain inside the viewport.",
+            "Validation messages appear near their fields.",
+            "The Submit button remains accessible.",
+            "Success and error states are readable.",
+          ],
+
+          th: [
+            "ข้อมูลติดต่ออ่านได้",
+            "Telephone และ Email link กดได้",
+            "Input ไม่ล้น Viewport",
+            "Validation message อยู่ใกล้ช่อง",
+            "Submit button เข้าถึงได้",
+            "Success และ Error state อ่านได้",
+          ],
+        },
+      },
+
+      {
+        id: "contact-troubleshooting",
+
+        title: {
+          en: "15. Common Contact problems",
+          th: "15. ปัญหาที่พบบ่อย",
+        },
+
+        paragraphs: {
+          en: [
+            "When Contact data or submissions do not work as expected, identify whether the issue belongs to Company data, Contact content, the Form, Messages or email delivery.",
+          ],
+
+          th: [
+            "เมื่อข้อมูล Contact หรือ Submission มีปัญหา ให้แยกว่าสาเหตุอยู่ที่ Company data, Contact content, Form, Messages หรือ Email delivery",
+          ],
+        },
+
+        items: {
+          en: [
+            "Incorrect company details: update the owning Company profile field.",
+            "Contact page not found: confirm the Contact page is Published.",
+            "Form not displayed: verify the connected Form and its status.",
+            "Validation prevents submission: correct the highlighted fields.",
+            "Success shown but no email: check Messages before investigating email.",
+            "Message not visible: confirm the active company and Message permissions.",
+            "Wrong notification recipient: review form and Email settings.",
+            "Old public content: refresh and allow cache revalidation.",
+            "Save denied: review membership, role and Contact permissions.",
+          ],
+
+          th: [
+            "ข้อมูลบริษัทผิด: แก้ Field ต้นทางใน Company",
+            "ไม่พบ Contact page: ตรวจว่า Page Published",
+            "Form ไม่แสดง: ตรวจ Form ที่เชื่อมและ Status",
+            "Validation ไม่ให้ส่ง: แก้ช่องที่ Highlight",
+            "ขึ้น Success แต่ไม่มี Email: ตรวจ Messages ก่อน",
+            "ไม่เห็น Message: ตรวจบริษัทและ Message permission",
+            "ส่ง Notification ผิดคน: ตรวจ Form และ Email setting",
+            "Public ยังเป็นข้อมูลเก่า: Refresh และรอ Cache",
+            "Save ไม่ได้: ตรวจ Membership, Role และ Contact permission",
+          ],
+        },
+      },
+
+      {
+        id: "contact-checklist",
+
+        _tips: null,
+
+        title: {
+          en: "16. Contact publishing checklist",
+          th: "16. Checklist ก่อน Publish Contact",
+        },
+
+        paragraphs: {
+          en: [
+            "Complete this checklist before publishing or substantially changing the Contact page.",
+          ],
+
+          th: ["ใช้ Checklist นี้ก่อน Publish หรือแก้ Contact page ครั้งใหญ่"],
+        },
+
+        items: {
+          en: [
+            "The correct company is selected.",
+            "Public contact information is accurate and approved.",
+            "No private email, phone number or address is exposed.",
+            "Required localized content is complete.",
+            "The connected Contact Form is correct and active.",
+            "Form labels and required fields are understandable.",
+            "Privacy Notice and consent behavior match the active configuration.",
+            "Validation messages work.",
+            "A successful submission is stored in Messages.",
+            "Email delivery is tested separately when enabled.",
+            "SEO and Open Graph information has been reviewed.",
+            "Desktop and mobile previews are usable.",
+            "The approved version is Published.",
+            "The production Contact page has been verified.",
+          ],
+
+          th: [
+            "เลือกบริษัทถูกต้อง",
+            "ข้อมูลติดต่อ Public ถูกต้องและได้รับอนุมัติ",
+            "ไม่มี Email, Phone หรือ Address ส่วนตัวเปิดเผย",
+            "Localized content ที่บังคับครบ",
+            "Contact Form ที่เชื่อมถูกต้องและ Active",
+            "Form label และ Required field เข้าใจง่าย",
+            "Privacy Notice และ Consent behavior ตรงกับ Configuration",
+            "Validation message ทำงาน",
+            "Submission สำเร็จถูกเก็บใน Messages",
+            "ทดสอบ Email delivery แยกเมื่อเปิดใช้",
+            "ตรวจ SEO และ Open Graph แล้ว",
+            "Preview Desktop และ Mobile ใช้งานได้",
+            "Publish Version ที่ได้รับอนุมัติ",
+            "ตรวจ Production Contact page แล้ว",
+          ],
+        },
+      },
+    ],
+  },
 };
 
 export function getDocsContent({
