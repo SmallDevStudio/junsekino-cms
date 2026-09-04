@@ -14513,6 +14513,6479 @@ export const DOCS_CONTENT = {
       },
     ],
   },
+  "configuration/localization": {
+    eyebrow: {
+      en: "CONFIGURATION",
+      th: "การตั้งค่าระบบ",
+    },
+
+    title: {
+      en: "Localization",
+      th: "การตั้งค่าภาษา",
+    },
+
+    description: {
+      en: "Configure the content languages available to administrators while keeping English as the required primary language.",
+      th: "กำหนดภาษาสำหรับจัดการเนื้อหา โดยภาษาอังกฤษเป็นภาษาหลักที่ระบบกำหนดให้เปิดใช้งานเสมอ",
+    },
+
+    introduction: {
+      en: [
+        "Localization is a core CMS setting that controls which language fields appear when administrators create or edit company information and website content.",
+        "English is the required primary language and cannot be disabled. Thai is an optional additional language that can be enabled when the company is ready to maintain bilingual content.",
+        "The selected content languages affect editors throughout the CMS, including Company, Home, About, Projects, Awards, Public Content, Contact, Navigation, SEO, Privacy, and Legal Documents.",
+      ],
+
+      th: [
+        "Localization เป็นการตั้งค่าหลักของ CMS ซึ่งควบคุมว่าจะแสดงช่องกรอกภาษาใดเมื่อผู้ดูแลสร้างหรือแก้ไขข้อมูลบริษัทและเนื้อหาบนเว็บไซต์",
+        "ภาษาอังกฤษเป็นภาษาหลักที่ระบบกำหนดและไม่สามารถปิดได้ ส่วนภาษาไทยเป็นภาษาเพิ่มเติมที่สามารถเปิดใช้งานเมื่อบริษัทพร้อมดูแลเนื้อหาสองภาษา",
+        "ภาษาของเนื้อหาที่เลือกจะมีผลกับ Editor ต่าง ๆ ทั่วทั้ง CMS เช่น Company, Home, About, Projects, Awards, Public Content, Contact, Navigation, SEO, Privacy และ Legal Documents",
+      ],
+    },
+
+    highlights: [
+      {
+        title: {
+          en: "English is always required",
+          th: "ต้องเปิดภาษาอังกฤษเสมอ",
+        },
+
+        description: {
+          en: "English is the primary language of the current public website and cannot be turned off.",
+          th: "ภาษาอังกฤษเป็นภาษาหลักของ Public Site ปัจจุบันและไม่สามารถปิดใช้งานได้",
+        },
+      },
+
+      {
+        title: {
+          en: "Thai is optional",
+          th: "ภาษาไทยเป็นภาษาเพิ่มเติม",
+        },
+
+        description: {
+          en: "Enable Thai only when the company is ready to enter and maintain Thai content.",
+          th: "เปิดภาษาไทยเมื่อบริษัทพร้อมกรอก ตรวจสอบ และดูแลเนื้อหาภาษาไทยอย่างต่อเนื่อง",
+        },
+      },
+
+      {
+        title: {
+          en: "Content language is separate from interface language",
+          th: "ภาษาของเนื้อหาแยกจากภาษาหน้าจอ",
+        },
+
+        description: {
+          en: "Changing the Admin interface language does not translate or change saved website content.",
+          th: "การเปลี่ยนภาษาเมนู Admin ไม่ได้แปลหรือเปลี่ยนข้อมูลเว็บไซต์ที่บันทึกไว้",
+        },
+      },
+    ],
+
+    sections: [
+      {
+        id: "localization-overview",
+
+        title: {
+          en: "Localization settings overview",
+          th: "ภาพรวมการตั้งค่าภาษา",
+        },
+
+        paragraphs: {
+          en: [
+            "Open Localization from the Admin settings area to review the languages enabled for the selected company.",
+            "Localization settings belong to the currently selected company. If a Superadmin switches to another company, always confirm the company shown in the Admin header before changing its languages.",
+          ],
+
+          th: [
+            "เปิด Localization จากพื้นที่ Settings ของ Admin เพื่อตรวจสอบภาษาที่เปิดใช้งานสำหรับบริษัทที่กำลังเลือกอยู่",
+            "การตั้งค่า Localization แยกตามบริษัท หาก Superadmin สลับไปยังอีกบริษัท ต้องตรวจสอบชื่อบริษัทใน Admin Header ก่อนเปลี่ยนการตั้งค่าภาษาเสมอ",
+          ],
+        },
+
+        images: [
+          {
+            id: "localization-overview-image",
+
+            number: "01",
+
+            src: "/docs/configuration/localization/localization-overview.png",
+
+            title: {
+              en: "Localization settings",
+              th: "หน้าตั้งค่าภาษา",
+            },
+
+            alt: {
+              en: "Localization settings page in Junsekino CMS",
+              th: "หน้าตั้งค่าภาษาใน Junsekino CMS",
+            },
+
+            caption: {
+              en: "Review the primary and additional content languages configured for the selected company.",
+              th: "ตรวจสอบภาษาหลักและภาษาเพิ่มเติมที่กำหนดไว้สำหรับบริษัทที่เลือก",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "English is the required primary language.",
+            "Thai can be enabled as an additional content language.",
+            "The configuration applies to the currently selected company.",
+            "Saving the setting controls the language fields shown in compatible Admin editors.",
+          ],
+
+          th: [
+            "ภาษาอังกฤษเป็นภาษาหลักที่ระบบกำหนด",
+            "ภาษาไทยสามารถเปิดเป็นภาษาเพิ่มเติมของเนื้อหาได้",
+            "การตั้งค่ามีผลกับบริษัทที่กำลังเลือกอยู่",
+            "เมื่อบันทึก ระบบจะควบคุมช่องภาษาที่แสดงใน Admin Editor ที่รองรับ",
+          ],
+        },
+      },
+
+      {
+        id: "english-required",
+
+        title: {
+          en: "English-only configuration",
+          th: "การตั้งค่าเฉพาะภาษาอังกฤษ",
+        },
+
+        paragraphs: {
+          en: [
+            "When Thai is not enabled, content editors display the English fields required for the current website. This is the simplest configuration when the company publishes English content only.",
+            "English remains active at all times. The CMS does not support a Thai-only configuration because English is the primary and fallback language.",
+          ],
+
+          th: [
+            "เมื่อไม่ได้เปิดภาษาไทย Editor จะแสดงช่องภาษาอังกฤษที่จำเป็นสำหรับเว็บไซต์ปัจจุบัน การตั้งค่านี้เหมาะกับบริษัทที่เผยแพร่เฉพาะเนื้อหาภาษาอังกฤษ",
+            "ภาษาอังกฤษจะเปิดใช้งานตลอดเวลา ระบบไม่รองรับการตั้งค่าเฉพาะภาษาไทย เนื่องจากภาษาอังกฤษเป็นทั้งภาษาหลักและภาษาสำรอง",
+          ],
+        },
+
+        images: [
+          {
+            id: "localization-english-only-image",
+
+            number: "02",
+
+            src: "/docs/configuration/localization/localization-english-only.png",
+
+            title: {
+              en: "English-only content fields",
+              th: "ช่องเนื้อหาเฉพาะภาษาอังกฤษ",
+            },
+
+            alt: {
+              en: "An Admin editor displaying English content fields only",
+              th: "Admin Editor ที่แสดงเฉพาะช่องข้อมูลภาษาอังกฤษ",
+            },
+
+            caption: {
+              en: "With Thai disabled, administrators maintain only the required English content.",
+              th: "เมื่อปิดภาษาไทย ผู้ดูแลจะจัดการเฉพาะเนื้อหาภาษาอังกฤษที่ระบบกำหนด",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Open Settings and select Localization.",
+            "Confirm that English is enabled as the primary language.",
+            "Leave the Thai language option disabled.",
+            "Save the Localization settings.",
+            "Open a content editor and confirm that only the English content fields are displayed.",
+          ],
+
+          th: [
+            "เปิด Settings แล้วเลือก Localization",
+            "ตรวจสอบว่าภาษาอังกฤษเปิดอยู่ในฐานะภาษาหลัก",
+            "ปิดตัวเลือกภาษาไทยไว้",
+            "บันทึกการตั้งค่า Localization",
+            "เปิด Content Editor และตรวจสอบว่าแสดงเฉพาะช่องเนื้อหาภาษาอังกฤษ",
+          ],
+        },
+
+        notes: {
+          en: [
+            "English cannot be disabled.",
+            "Selecting English only does not automatically translate or remove previously saved Thai content.",
+          ],
+
+          th: [
+            "ไม่สามารถปิดภาษาอังกฤษได้",
+            "การเลือกเฉพาะภาษาอังกฤษไม่ได้แปลหรือลบข้อมูลภาษาไทยที่เคยบันทึกไว้โดยอัตโนมัติ",
+          ],
+        },
+      },
+
+      {
+        id: "enable-thai",
+
+        title: {
+          en: "Enable English and Thai",
+          th: "เปิดใช้งานภาษาอังกฤษและภาษาไทย",
+        },
+
+        paragraphs: {
+          en: [
+            "Enable Thai when the company intends to maintain both English and Thai versions of its content. Compatible Admin editors will display fields or tabs for both languages.",
+            "Enabling Thai does not translate existing English content. Administrators must enter, review, and maintain the Thai version separately.",
+          ],
+
+          th: [
+            "เปิดภาษาไทยเมื่อบริษัทต้องการดูแลเนื้อหาทั้งภาษาอังกฤษและภาษาไทย Admin Editor ที่รองรับจะแสดงช่องหรือแท็บสำหรับทั้งสองภาษา",
+            "การเปิดภาษาไทยไม่ได้แปลข้อมูลภาษาอังกฤษเดิมโดยอัตโนมัติ ผู้ดูแลต้องกรอก ตรวจสอบ และดูแลข้อมูลภาษาไทยแยกต่างหาก",
+          ],
+        },
+
+        images: [
+          {
+            id: "localization-bilingual-image",
+
+            number: "03",
+
+            src: "/docs/configuration/localization/localization-bilingual.png",
+
+            title: {
+              en: "English and Thai content fields",
+              th: "ช่องเนื้อหาภาษาอังกฤษและภาษาไทย",
+            },
+
+            alt: {
+              en: "An Admin editor displaying English and Thai content fields",
+              th: "Admin Editor ที่แสดงช่องข้อมูลภาษาอังกฤษและภาษาไทย",
+            },
+
+            caption: {
+              en: "When Thai is enabled, maintain both language versions before publishing bilingual content.",
+              th: "เมื่อเปิดภาษาไทย ควรดูแลข้อมูลทั้งสองภาษาให้ครบก่อนเผยแพร่เนื้อหาสองภาษา",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Open Settings and select Localization.",
+            "Confirm that English remains enabled.",
+            "Enable Thai as an additional language.",
+            "Save the Localization settings.",
+            "Open the required content editor.",
+            "Enter the English content in the EN fields.",
+            "Enter the Thai translation in the TH fields.",
+            "Review both versions before saving or publishing.",
+          ],
+
+          th: [
+            "เปิด Settings แล้วเลือก Localization",
+            "ตรวจสอบว่าภาษาอังกฤษยังเปิดใช้งานอยู่",
+            "เปิดภาษาไทยเป็นภาษาเพิ่มเติม",
+            "บันทึกการตั้งค่า Localization",
+            "เปิด Content Editor ที่ต้องการ",
+            "กรอกเนื้อหาภาษาอังกฤษในช่อง EN",
+            "กรอกคำแปลภาษาไทยในช่อง TH",
+            "ตรวจสอบข้อมูลทั้งสองภาษาก่อนบันทึกหรือ Publish",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Do not paste the English text into the Thai field as a permanent substitute for translation.",
+            "Names of projects, people, organizations, and technical terms may remain unchanged when this is the approved presentation.",
+          ],
+
+          th: [
+            "ไม่ควรนำข้อความภาษาอังกฤษใส่ในช่องภาษาไทยเพื่อใช้แทนคำแปลอย่างถาวร",
+            "ชื่อโครงการ ชื่อบุคคล ชื่อองค์กร และศัพท์เฉพาะสามารถใช้รูปเดิมได้ หากเป็นรูปแบบที่บริษัทอนุมัติ",
+          ],
+        },
+      },
+
+      {
+        id: "interface-versus-content",
+
+        title: {
+          en: "Admin interface language and content language",
+          th: "ภาษาหน้าจอ Admin และภาษาของเนื้อหา",
+        },
+
+        paragraphs: {
+          en: [
+            "The CMS contains two separate language concepts: the Admin interface language and the company's content languages.",
+            "The interface language changes labels, menus, buttons, instructions, and messages used by administrators. Content language settings control which website data fields administrators can maintain.",
+          ],
+
+          th: [
+            "CMS แบ่งเรื่องภาษาออกเป็นสองส่วน ได้แก่ ภาษาหน้าจอ Admin และภาษาของเนื้อหาบริษัท",
+            "ภาษาหน้าจอเปลี่ยนข้อความบนเมนู ปุ่ม คำแนะนำ และข้อความแจ้งเตือนสำหรับผู้ดูแล ส่วนการตั้งค่าภาษาของเนื้อหาควบคุมช่องข้อมูลเว็บไซต์ที่ผู้ดูแลสามารถจัดการได้",
+          ],
+        },
+
+        tables: [
+          {
+            id: "language-type-comparison",
+
+            title: {
+              en: "Language setting comparison",
+              th: "เปรียบเทียบการตั้งค่าภาษา",
+            },
+
+            columns: [
+              {
+                id: "setting",
+
+                label: {
+                  en: "Setting",
+                  th: "การตั้งค่า",
+                },
+              },
+
+              {
+                id: "controls",
+
+                label: {
+                  en: "What it controls",
+                  th: "สิ่งที่ควบคุม",
+                },
+              },
+
+              {
+                id: "example",
+
+                label: {
+                  en: "Example",
+                  th: "ตัวอย่าง",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "admin-interface-language",
+
+                setting: {
+                  en: "Admin interface language",
+                  th: "ภาษาหน้าจอ Admin",
+                },
+
+                controls: {
+                  en: "Menus, buttons, labels, instructions, and system messages",
+                  th: "เมนู ปุ่ม ชื่อช่อง คำแนะนำ และข้อความของระบบ",
+                },
+
+                example: {
+                  en: "Save / บันทึก",
+                  th: "Save / บันทึก",
+                },
+              },
+
+              {
+                id: "content-languages",
+
+                setting: {
+                  en: "Company content languages",
+                  th: "ภาษาของเนื้อหาบริษัท",
+                },
+
+                controls: {
+                  en: "EN and TH fields stored for website content",
+                  th: "ช่อง EN และ TH ที่จัดเก็บเป็นเนื้อหาของเว็บไซต์",
+                },
+
+                example: {
+                  en: "Project title and description",
+                  th: "ชื่อและรายละเอียดโครงการ",
+                },
+              },
+
+              {
+                id: "public-language",
+
+                setting: {
+                  en: "Public website language",
+                  th: "ภาษาของ Public Site",
+                },
+
+                controls: {
+                  en: "The language presented to website visitors",
+                  th: "ภาษาที่แสดงให้ผู้เข้าชมเว็บไซต์เห็น",
+                },
+
+                example: {
+                  en: "English is currently the default",
+                  th: "ปัจจุบันใช้ภาษาอังกฤษเป็นค่าเริ่มต้น",
+                },
+              },
+            ],
+          },
+        ],
+
+        notes: {
+          en: [
+            "Changing the Admin interface to Thai does not change English website content into Thai.",
+            "Changing the Admin interface to English does not disable saved Thai content.",
+          ],
+
+          th: [
+            "การเปลี่ยนหน้าจอ Admin เป็นภาษาไทยไม่ได้ทำให้เนื้อหาภาษาอังกฤษบนเว็บไซต์เปลี่ยนเป็นภาษาไทย",
+            "การเปลี่ยนหน้าจอ Admin เป็นภาษาอังกฤษไม่ได้ปิดข้อมูลภาษาไทยที่บันทึกไว้",
+          ],
+        },
+      },
+
+      {
+        id: "affected-modules",
+
+        title: {
+          en: "Modules affected by Localization",
+          th: "โมดูลที่ใช้การตั้งค่า Localization",
+        },
+
+        paragraphs: {
+          en: [
+            "Localization is a shared core setting. After changing it, review the language fields in every module used by the company.",
+          ],
+
+          th: [
+            "Localization เป็นการตั้งค่า Core ที่ใช้ร่วมกัน หลังเปลี่ยนการตั้งค่า ควรตรวจสอบช่องภาษาในทุกโมดูลที่บริษัทใช้งาน",
+          ],
+        },
+
+        items: {
+          en: [
+            "Company — company descriptions and localized profile information.",
+            "Home — slideshow titles, descriptions, and related content.",
+            "About — titles, descriptions, sections, and SEO information.",
+            "Projects — titles, locations, descriptions, rich text, and SEO information.",
+            "Awards — award titles, descriptions, and SEO information.",
+            "Public Content — Article, Video, and Embed titles, descriptions, rich text, and SEO information.",
+            "Contact — page headings, descriptions, contact information, and form labels where supported.",
+            "Navigation — menu labels shown on the public website.",
+            "Privacy — cookie banner labels, descriptions, and consent category information.",
+            "Legal Documents — Privacy Notice, Cookie Policy, and Terms of Use.",
+            "SEO — titles, descriptions, keywords, Open Graph titles, and related metadata.",
+          ],
+
+          th: [
+            "Company — คำอธิบายบริษัทและข้อมูล Profile ที่รองรับหลายภาษา",
+            "Home — ชื่อและคำอธิบายของสไลด์ รวมถึงเนื้อหาที่เกี่ยวข้อง",
+            "About — ชื่อ คำอธิบาย Section และข้อมูล SEO",
+            "Projects — ชื่อ สถานที่ คำอธิบาย Rich Text และข้อมูล SEO",
+            "Awards — ชื่อรางวัล คำอธิบาย และข้อมูล SEO",
+            "Public Content — ชื่อ คำอธิบาย Rich Text และ SEO ของ Article, Video และ Embed",
+            "Contact — หัวข้อ คำอธิบาย ข้อมูลติดต่อ และชื่อช่องของแบบฟอร์มในส่วนที่รองรับ",
+            "Navigation — ชื่อเมนูที่แสดงบน Public Site",
+            "Privacy — ข้อความ Cookie Banner คำอธิบาย และข้อมูลประเภท Consent",
+            "Legal Documents — Privacy Notice, Cookie Policy และ Terms of Use",
+            "SEO — Title, Description, Keyword, Open Graph Title และ Metadata ที่เกี่ยวข้อง",
+          ],
+        },
+      },
+
+      {
+        id: "publishing-bilingual-content",
+
+        title: {
+          en: "Publish bilingual content safely",
+          th: "เผยแพร่เนื้อหาสองภาษาอย่างปลอดภัย",
+        },
+
+        paragraphs: {
+          en: [
+            "When Thai is enabled, treat the English and Thai values as two maintained versions of the same content. Update both whenever facts, dates, project details, legal wording, or contact information change.",
+            "A translation should communicate the same approved meaning as the primary content. Avoid adding important claims to only one language version.",
+          ],
+
+          th: [
+            "เมื่อเปิดภาษาไทย ให้ถือว่าข้อมูลภาษาอังกฤษและภาษาไทยเป็นเนื้อหาเดียวกันสองฉบับ เมื่อข้อเท็จจริง วันที่ รายละเอียดโครงการ ข้อความกฎหมาย หรือข้อมูลติดต่อเปลี่ยน ต้องแก้ไขทั้งสองภาษา",
+            "คำแปลควรสื่อสารความหมายเดียวกับเนื้อหาหลักที่ผ่านการอนุมัติ และไม่ควรเพิ่มข้อความสำคัญไว้เพียงภาษาเดียว",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Complete and review the required English fields.",
+            "Enter the corresponding Thai translation.",
+            "Check names, dates, measurements, addresses, links, and contact details in both versions.",
+            "Review Rich Text formatting separately in each language.",
+            "Review SEO titles and descriptions in both languages.",
+            "Save the draft and use Preview where available.",
+            "Publish only after both versions have been approved.",
+            "Open the public website and verify the published result.",
+          ],
+
+          th: [
+            "กรอกและตรวจสอบช่องภาษาอังกฤษที่จำเป็นให้ครบ",
+            "กรอกคำแปลภาษาไทยที่ตรงกับเนื้อหาภาษาอังกฤษ",
+            "ตรวจชื่อ วันที่ หน่วยวัด ที่อยู่ Link และข้อมูลติดต่อของทั้งสองภาษา",
+            "ตรวจรูปแบบ Rich Text แยกในแต่ละภาษา",
+            "ตรวจ SEO Title และ Description ของทั้งสองภาษา",
+            "บันทึก Draft และใช้ Preview ในโมดูลที่รองรับ",
+            "Publish หลังจากข้อมูลทั้งสองภาษาได้รับการอนุมัติแล้ว",
+            "เปิด Public Site เพื่อตรวจสอบผลลัพธ์ที่เผยแพร่",
+          ],
+        },
+      },
+
+      {
+        id: "disable-thai",
+
+        title: {
+          en: "Disable Thai content fields",
+          th: "การปิดช่องเนื้อหาภาษาไทย",
+        },
+
+        paragraphs: {
+          en: [
+            "If the company temporarily stops maintaining Thai content, Thai can be disabled as an additional language. This simplifies editors by showing the required English fields.",
+            "Disabling a language should be treated as a display and workflow change. Previously saved translations should not be assumed to have been deleted.",
+          ],
+
+          th: [
+            "หากบริษัทหยุดดูแลเนื้อหาภาษาไทยชั่วคราว สามารถปิดภาษาไทยในฐานะภาษาเพิ่มเติมได้ ซึ่งจะทำให้ Editor แสดงเฉพาะช่องภาษาอังกฤษที่จำเป็น",
+            "การปิดภาษาควรถูกมองว่าเป็นการเปลี่ยนการแสดงช่องกรอกและ Workflow ไม่ควรเข้าใจว่าคำแปลที่เคยบันทึกไว้ถูกลบไปแล้ว",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Confirm the decision with the person responsible for website content.",
+            "Review whether any published pages currently depend on Thai content.",
+            "Open Settings and select Localization.",
+            "Disable Thai while keeping English enabled.",
+            "Save the setting.",
+            "Open important editors and confirm that the English fields remain available.",
+            "Check the public website after the change.",
+          ],
+
+          th: [
+            "ยืนยันการตัดสินใจกับผู้รับผิดชอบเนื้อหาเว็บไซต์",
+            "ตรวจสอบว่ามีหน้าที่เผยแพร่อยู่และต้องใช้ข้อมูลภาษาไทยหรือไม่",
+            "เปิด Settings แล้วเลือก Localization",
+            "ปิดภาษาไทยโดยคงภาษาอังกฤษไว้",
+            "บันทึกการตั้งค่า",
+            "เปิด Editor สำคัญและตรวจสอบว่าช่องภาษาอังกฤษยังแสดงตามปกติ",
+            "ตรวจสอบ Public Site หลังเปลี่ยนการตั้งค่า",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Do not repeatedly enable and disable languages while another administrator is editing content.",
+            "Coordinate the change with other administrators to prevent incomplete updates.",
+          ],
+
+          th: [
+            "ไม่ควรเปิดและปิดภาษาซ้ำในขณะที่ผู้ดูแลคนอื่นกำลังแก้ไขเนื้อหา",
+            "ควรแจ้งผู้ดูแลคนอื่นก่อนเปลี่ยนการตั้งค่า เพื่อป้องกันข้อมูลที่แก้ไขค้างหรือไม่ครบถ้วน",
+          ],
+        },
+      },
+
+      {
+        id: "localization-checklist",
+
+        title: {
+          en: "Localization checklist",
+          th: "รายการตรวจสอบ Localization",
+        },
+
+        paragraphs: {
+          en: [
+            "Use this checklist after changing the company's language configuration.",
+          ],
+
+          th: ["ใช้รายการนี้ตรวจสอบหลังเปลี่ยนการตั้งค่าภาษาของบริษัท"],
+        },
+
+        items: {
+          en: [
+            "The correct company is selected.",
+            "English remains enabled as the primary language.",
+            "Thai is enabled only when bilingual content will be maintained.",
+            "The Localization settings were saved successfully.",
+            "Compatible editors show the expected EN or EN and TH fields.",
+            "Existing content was not unintentionally replaced.",
+            "Required language fields are complete before publishing.",
+            "Rich Text and SEO values were reviewed in every enabled language.",
+            "The public website was checked after publishing.",
+          ],
+
+          th: [
+            "เลือกบริษัทที่ถูกต้องแล้ว",
+            "ภาษาอังกฤษยังเปิดเป็นภาษาหลัก",
+            "เปิดภาษาไทยเฉพาะเมื่อจะดูแลเนื้อหาสองภาษา",
+            "บันทึกการตั้งค่า Localization สำเร็จแล้ว",
+            "Editor ที่รองรับแสดงช่อง EN หรือ EN และ TH ตามที่กำหนด",
+            "ข้อมูลเดิมไม่ได้ถูกแทนที่โดยไม่ตั้งใจ",
+            "กรอกช่องภาษาที่จำเป็นครบก่อน Publish",
+            "ตรวจ Rich Text และ SEO ในทุกภาษาที่เปิดใช้งานแล้ว",
+            "ตรวจสอบ Public Site หลังเผยแพร่แล้ว",
+          ],
+        },
+      },
+    ],
+  },
+  "configuration/navigation": {
+    eyebrow: {
+      en: "CONFIGURATION",
+      th: "การตั้งค่าระบบ",
+    },
+
+    title: {
+      en: "Navigation Management",
+      th: "การจัดการเมนูเว็บไซต์",
+    },
+
+    description: {
+      en: "Control the labels, visibility, order, and external links displayed in the public website navigation.",
+      th: "ควบคุมชื่อ การแสดงผล ลำดับ และลิงก์ภายนอกที่ปรากฏในเมนูของ Public Site",
+    },
+
+    introduction: {
+      en: [
+        "Navigation Management controls the main menu of the selected company's public website. Administrators can edit menu labels, show or hide items, change their order, and add external links.",
+        "The six system items—Home, About, Project, Award, Public, and Contact—are required by the CMS. They can be renamed, reordered, or hidden, but they cannot be deleted.",
+        "In Phase 1, administrators may add external links. Custom links to newly created internal pages will be available after Page Management is implemented.",
+      ],
+
+      th: [
+        "Navigation Management ใช้ควบคุมเมนูหลักของ Public Site สำหรับบริษัทที่เลือก ผู้ดูแลสามารถแก้ชื่อ แสดงหรือซ่อน เปลี่ยนลำดับ และเพิ่มลิงก์ภายนอกได้",
+        "เมนูระบบทั้ง 6 รายการ ได้แก่ Home, About, Project, Award, Public และ Contact เป็นรายการที่ CMS กำหนด สามารถเปลี่ยนชื่อ เรียงลำดับ หรือซ่อนได้ แต่ไม่สามารถลบออกจากระบบ",
+        "ใน Phase 1 ผู้ดูแลสามารถเพิ่ม External Link ได้ ส่วนลิงก์ไปยังหน้าภายในที่สร้างเองจะเปิดใช้งานภายหลังเมื่อ Page Management พร้อมใช้งาน",
+      ],
+    },
+
+    highlights: [
+      {
+        title: {
+          en: "System menus are protected",
+          th: "เมนูระบบได้รับการป้องกัน",
+        },
+
+        description: {
+          en: "Required system items cannot be deleted or converted into external links.",
+          th: "รายการเมนูหลักของระบบไม่สามารถลบหรือเปลี่ยนให้เป็น External Link ได้",
+        },
+      },
+
+      {
+        title: {
+          en: "Order with arrow buttons",
+          th: "เรียงลำดับด้วยปุ่มลูกศร",
+        },
+
+        description: {
+          en: "Use Move Up and Move Down. The grip icon is visual and does not currently provide drag-and-drop.",
+          th: "ใช้ปุ่มเลื่อนขึ้นและเลื่อนลง ส่วนสัญลักษณ์จุดจับเป็นองค์ประกอบของ UI และยังไม่รองรับ Drag and Drop",
+        },
+      },
+
+      {
+        title: {
+          en: "Submenus are generated automatically",
+          th: "Submenu ถูกสร้างอัตโนมัติ",
+        },
+
+        description: {
+          en: "Project and Public submenus are generated from their module data, not manually added in Navigation Management.",
+          th: "Submenu ของ Project และ Public สร้างจากข้อมูลในแต่ละโมดูล ไม่ได้เพิ่มด้วยตนเองใน Navigation Management",
+        },
+      },
+    ],
+
+    sections: [
+      {
+        id: "navigation-overview",
+
+        title: {
+          en: "Navigation Management overview",
+          th: "ภาพรวม Navigation Management",
+        },
+
+        paragraphs: {
+          en: [
+            "Open Navigation from the Admin sidebar to manage the selected company's public menu. Always confirm the active company before editing because every company has independent navigation settings.",
+            "The summary panels show the total number of items, the number currently visible, and the number of external links.",
+          ],
+
+          th: [
+            "เปิด Navigation จาก Admin Sidebar เพื่อจัดการเมนูสาธารณะของบริษัทที่เลือก ควรตรวจสอบบริษัทปัจจุบันก่อนแก้ไขเสมอ เพราะแต่ละบริษัทมีการตั้งค่าเมนูแยกจากกัน",
+            "แผงสรุปจะแสดงจำนวนรายการทั้งหมด จำนวนรายการที่กำลังแสดง และจำนวน External Link",
+          ],
+        },
+
+        images: [
+          {
+            id: "navigation-overview-image",
+
+            number: "01",
+
+            src: "/docs/configuration/navigation/navigation-overview.png",
+
+            title: {
+              en: "Navigation Management",
+              th: "หน้าจัดการเมนู",
+            },
+
+            alt: {
+              en: "Navigation Management overview in Junsekino CMS",
+              th: "ภาพรวมหน้า Navigation Management ใน Junsekino CMS",
+            },
+
+            caption: {
+              en: "Review the selected company, summary panels, menu items, and available actions before making changes.",
+              th: "ตรวจสอบบริษัท แผงสรุป รายการเมนู และปุ่มคำสั่งก่อนเริ่มแก้ไข",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Total — all system and external navigation items.",
+            "Visible — items enabled for display on the public website.",
+            "External — links that lead to another website or external service.",
+            "Refresh — reloads the last saved navigation data.",
+            "Reset — restores the default six system items.",
+            "Save — validates and saves the current navigation configuration.",
+          ],
+
+          th: [
+            "Total — จำนวนเมนูระบบและ External Link ทั้งหมด",
+            "Visible — จำนวนรายการที่เปิดให้แสดงบน Public Site",
+            "External — จำนวนลิงก์ที่นำไปยังเว็บไซต์หรือบริการภายนอก",
+            "Refresh — โหลดข้อมูล Navigation ที่บันทึกล่าสุดอีกครั้ง",
+            "Reset — คืนค่าเมนูระบบเริ่มต้นทั้ง 6 รายการ",
+            "Save — ตรวจสอบและบันทึกการตั้งค่า Navigation ปัจจุบัน",
+          ],
+        },
+      },
+
+      {
+        id: "system-items",
+
+        title: {
+          en: "System navigation items",
+          th: "รายการเมนูระบบ",
+        },
+
+        paragraphs: {
+          en: [
+            "A lock icon and System label identify protected system items. Their routes are controlled by the CMS so administrators do not manually edit their paths.",
+            "The following six system items must remain in the saved configuration, although individual items may be hidden from the public menu.",
+          ],
+
+          th: [
+            "รายการเมนูระบบจะแสดงสัญลักษณ์แม่กุญแจและป้าย System เส้นทางของรายการเหล่านี้ถูกควบคุมโดย CMS ผู้ดูแลจึงไม่ต้องแก้ Path ด้วยตนเอง",
+            "รายการระบบทั้ง 6 รายการต่อไปนี้ต้องอยู่ในข้อมูลที่บันทึก แม้ผู้ดูแลจะสามารถซ่อนบางรายการจาก Public Site ได้",
+          ],
+        },
+
+        tables: [
+          {
+            id: "system-navigation-items",
+
+            title: {
+              en: "Default system items",
+              th: "รายการเมนูระบบเริ่มต้น",
+            },
+
+            columns: [
+              {
+                id: "menu",
+
+                label: {
+                  en: "Menu",
+                  th: "เมนู",
+                },
+              },
+
+              {
+                id: "destination",
+
+                label: {
+                  en: "Destination",
+                  th: "ปลายทาง",
+                },
+              },
+
+              {
+                id: "submenu",
+
+                label: {
+                  en: "Submenu",
+                  th: "Submenu",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "home",
+
+                menu: "Home",
+
+                destination: {
+                  en: "Company homepage",
+                  th: "หน้าแรกของบริษัท",
+                },
+
+                submenu: "—",
+              },
+
+              {
+                id: "about",
+
+                menu: "About",
+
+                destination: {
+                  en: "Published About page",
+                  th: "หน้า About ที่ Publish แล้ว",
+                },
+
+                submenu: "—",
+              },
+
+              {
+                id: "project",
+
+                menu: "Project",
+
+                destination: {
+                  en: "Project listing",
+                  th: "หน้ารวมโครงการ",
+                },
+
+                submenu: {
+                  en: "Published project categories",
+                  th: "หมวดหมู่โครงการที่เผยแพร่",
+                },
+              },
+
+              {
+                id: "award",
+
+                menu: "Award",
+
+                destination: {
+                  en: "Award listing",
+                  th: "หน้ารวมรางวัล",
+                },
+
+                submenu: "—",
+              },
+
+              {
+                id: "public",
+
+                menu: "Public",
+
+                destination: {
+                  en: "Public Content listing",
+                  th: "หน้ารวม Public Content",
+                },
+
+                submenu: {
+                  en: "Video and Publication",
+                  th: "Video และ Publication",
+                },
+              },
+
+              {
+                id: "contact",
+
+                menu: "Contact",
+
+                destination: {
+                  en: "Published Contact page",
+                  th: "หน้า Contact ที่ Publish แล้ว",
+                },
+
+                submenu: "—",
+              },
+            ],
+          },
+        ],
+
+        notes: {
+          en: [
+            "System items cannot be deleted.",
+            "Changing a system label does not change its URL.",
+            "A menu may lead to a missing page if the corresponding content has not been published.",
+          ],
+
+          th: [
+            "ไม่สามารถลบเมนูระบบได้",
+            "การเปลี่ยนชื่อเมนูระบบไม่ได้เปลี่ยน URL",
+            "เมนูอาจนำไปยังหน้าที่ไม่พบ หากเนื้อหาของโมดูลนั้นยังไม่ได้ Publish",
+          ],
+        },
+      },
+
+      {
+        id: "edit-menu-item",
+
+        title: {
+          en: "Edit a menu item",
+          th: "แก้ไขรายการเมนู",
+        },
+
+        paragraphs: {
+          en: [
+            "Each card contains its localized label, visibility setting, route or URL, and ordering controls. Changes remain local to the editor until Save is selected.",
+            "English Label is required. The Thai field follows the company's Localization configuration.",
+          ],
+
+          th: [
+            "Card แต่ละรายการประกอบด้วยชื่อหลายภาษา สถานะการแสดงผล Route หรือ URL และปุ่มเรียงลำดับ การเปลี่ยนแปลงจะยังไม่ถูกบันทึกจนกว่าจะกด Save",
+            "English Label เป็นข้อมูลบังคับ ส่วนช่องภาษาไทยจะแสดงตามการตั้งค่า Localization ของบริษัท",
+          ],
+        },
+
+        images: [
+          {
+            id: "navigation-edit-item-image",
+
+            number: "02",
+
+            src: "/docs/configuration/navigation/navigation-edit-item.png",
+
+            title: {
+              en: "Edit a navigation item",
+              th: "แก้ไขรายการ Navigation",
+            },
+
+            alt: {
+              en: "Navigation item fields and controls",
+              th: "ช่องข้อมูลและปุ่มควบคุมรายการ Navigation",
+            },
+
+            caption: {
+              en: "Edit the localized label and visibility, then save the complete navigation configuration.",
+              th: "แก้ชื่อเมนูและสถานะการแสดงผล จากนั้นบันทึกการตั้งค่า Navigation ทั้งชุด",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Confirm the selected company.",
+            "Locate the required menu item.",
+            "Enter or revise the English Label.",
+            "If Thai is enabled, enter or revise the Thai Label.",
+            "Select Visible when the item should appear on the public website.",
+            "Use the arrow buttons if its position must change.",
+            "Select Save.",
+            "Wait for the success message before leaving the page.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัทที่เลือก",
+            "ค้นหารายการเมนูที่ต้องการ",
+            "กรอกหรือแก้ไข English Label",
+            "หากเปิดภาษาไทย ให้กรอกหรือแก้ไข Thai Label",
+            "เลือก Visible เมื่อต้องการให้รายการแสดงบน Public Site",
+            "ใช้ปุ่มลูกศรหากต้องเปลี่ยนตำแหน่ง",
+            "กด Save",
+            "รอข้อความบันทึกสำเร็จก่อนออกจากหน้า",
+          ],
+        },
+      },
+
+      {
+        id: "show-hide-menu",
+
+        title: {
+          en: "Show or hide a menu item",
+          th: "แสดงหรือซ่อนเมนู",
+        },
+
+        paragraphs: {
+          en: [
+            "Use Visible to control whether an item appears in the public navigation. Hiding a system item removes it from the menu but does not delete its page or content.",
+            "This is useful when a module is not ready for Phase 1, its content is being revised, or the company does not currently use that section.",
+          ],
+
+          th: [
+            "ใช้ Visible เพื่อควบคุมว่ารายการจะแสดงใน Public Navigation หรือไม่ การซ่อนเมนูระบบจะนำรายการออกจากเมนูเท่านั้น โดยไม่ได้ลบหน้าและเนื้อหาของโมดูล",
+            "Function นี้เหมาะกับโมดูลที่ยังไม่พร้อมใช้งานใน Phase 1 เนื้อหาที่กำลังปรับปรุง หรือส่วนที่บริษัทยังไม่ได้ใช้งาน",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Locate the required item.",
+            "Clear Visible to hide it or select Visible to show it.",
+            "Select Save.",
+            "Open the public website and confirm the desktop and mobile menus.",
+          ],
+
+          th: [
+            "ค้นหารายการที่ต้องการ",
+            "ยกเลิก Visible เพื่อซ่อน หรือเลือก Visible เพื่อแสดง",
+            "กด Save",
+            "เปิด Public Site และตรวจสอบทั้ง Desktop Menu และ Mobile Menu",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Hiding Project or Public also removes access to its submenu from the main navigation.",
+            "A hidden page may still be reachable through a direct URL unless its content is unpublished or access is otherwise restricted.",
+          ],
+
+          th: [
+            "การซ่อน Project หรือ Public จะนำทางเข้าสู่ Submenu ของรายการนั้นออกจากเมนูหลักด้วย",
+            "หน้าที่ถูกซ่อนอาจยังเปิดผ่าน URL โดยตรงได้ หากเนื้อหายัง Publish อยู่และไม่มีการจำกัดการเข้าถึงด้วยวิธีอื่น",
+          ],
+        },
+      },
+
+      {
+        id: "reorder-items",
+
+        title: {
+          en: "Change the menu order",
+          th: "เปลี่ยนลำดับเมนู",
+        },
+
+        paragraphs: {
+          en: [
+            "Navigation items are ordered with the Move Up and Move Down arrow buttons. The first item cannot move farther up and the final item cannot move farther down.",
+            "The CMS recalculates the internal sort order after every move and saves the resulting sequence when Save is selected.",
+          ],
+
+          th: [
+            "เรียง Navigation ด้วยปุ่มลูกศร Move Up และ Move Down รายการแรกจะไม่สามารถเลื่อนขึ้นได้อีก และรายการสุดท้ายจะไม่สามารถเลื่อนลงได้อีก",
+            "CMS จะคำนวณ Sort Order ใหม่หลังการเลื่อนแต่ละครั้ง และบันทึกลำดับผลลัพธ์เมื่อกด Save",
+          ],
+        },
+
+        images: [
+          {
+            id: "navigation-reorder-image",
+
+            number: "03",
+
+            src: "/docs/configuration/navigation/navigation-reorder.png",
+
+            title: {
+              en: "Reorder navigation items",
+              th: "เรียงลำดับ Navigation",
+            },
+
+            alt: {
+              en: "Move Up and Move Down buttons on navigation items",
+              th: "ปุ่มเลื่อนขึ้นและเลื่อนลงของรายการ Navigation",
+            },
+
+            caption: {
+              en: "Use the arrow controls to place each item in the required public menu position.",
+              th: "ใช้ปุ่มลูกศรเพื่อวางแต่ละรายการในตำแหน่งที่ต้องการบน Public Menu",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Find the item that must move.",
+            "Select Move Up or Move Down.",
+            "Repeat until the items appear in the intended order.",
+            "Review the complete sequence from top to bottom.",
+            "Select Save.",
+            "Confirm the result on the public website.",
+          ],
+
+          th: [
+            "ค้นหารายการที่ต้องการย้าย",
+            "กด Move Up หรือ Move Down",
+            "ทำซ้ำจนรายการอยู่ในลำดับที่ต้องการ",
+            "ตรวจสอบลำดับทั้งหมดจากบนลงล่าง",
+            "กด Save",
+            "ตรวจสอบผลลัพธ์บน Public Site",
+          ],
+        },
+
+        notes: {
+          en: [
+            "The grip icon does not provide drag-and-drop in the current version.",
+          ],
+
+          th: ["สัญลักษณ์จุดจับยังไม่รองรับ Drag and Drop ในเวอร์ชันปัจจุบัน"],
+        },
+      },
+
+      {
+        id: "external-links",
+
+        title: {
+          en: "Add an external link",
+          th: "เพิ่ม External Link",
+        },
+
+        paragraphs: {
+          en: [
+            "An external link leads visitors to another website or online service. Examples may include a partner website, external publication, recruitment portal, or another approved company service.",
+            "External links are the only user-created navigation items supported in Phase 1.",
+          ],
+
+          th: [
+            "External Link ใช้นำผู้เข้าชมไปยังเว็บไซต์หรือบริการออนไลน์ภายนอก เช่น เว็บไซต์พันธมิตร บทความภายนอก ระบบรับสมัครงาน หรือบริการอื่นที่บริษัทอนุมัติ",
+            "ใน Phase 1 ผู้ดูแลสามารถสร้างรายการ Navigation ใหม่ได้เฉพาะ External Link",
+          ],
+        },
+
+        images: [
+          {
+            id: "navigation-add-external-image",
+
+            number: "04",
+
+            src: "/docs/configuration/navigation/navigation-edit-item.png",
+
+            title: {
+              en: "External link fields",
+              th: "ช่องข้อมูล External Link",
+            },
+
+            alt: {
+              en: "External navigation URL and new-tab settings",
+              th: "ช่อง URL และการตั้งค่าเปิดหน้าต่างใหม่ของ External Navigation",
+            },
+
+            caption: {
+              en: "External items include a URL and an optional Open in New Tab setting.",
+              th: "External Item ประกอบด้วย URL และตัวเลือกเปิดในหน้าต่างใหม่",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Select Add External Link at the bottom of Navigation Management.",
+            "Enter the required English Label.",
+            "Enter the Thai Label when Thai is enabled.",
+            "Enter the complete URL beginning with https:// or http://.",
+            "Keep Visible enabled if the link should appear immediately after saving.",
+            "Select Open in New Tab when visitors should keep the company website open.",
+            "Move the new item to the required position with the arrow buttons.",
+            "Select Save.",
+            "Test the link from the public website.",
+          ],
+
+          th: [
+            "กด Add External Link ที่ด้านล่างของหน้า Navigation Management",
+            "กรอก English Label ซึ่งเป็นข้อมูลบังคับ",
+            "กรอก Thai Label เมื่อเปิดใช้ภาษาไทย",
+            "กรอก URL แบบเต็มซึ่งต้องขึ้นต้นด้วย https:// หรือ http://",
+            "เปิด Visible หากต้องการให้ลิงก์แสดงทันทีหลังบันทึก",
+            "เลือก Open in New Tab เมื่อต้องการให้ผู้เข้าชมยังเปิดเว็บไซต์บริษัทไว้",
+            "ใช้ปุ่มลูกศรย้ายรายการใหม่ไปยังตำแหน่งที่ต้องการ",
+            "กด Save",
+            "ทดสอบลิงก์จาก Public Site",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Prefer HTTPS links.",
+            "Do not add links to untrusted, illegal, misleading, or unauthorized websites.",
+            "Test the destination without an administrator session where practical.",
+          ],
+
+          th: [
+            "ควรใช้ลิงก์ HTTPS",
+            "ห้ามเพิ่มลิงก์ไปยังเว็บไซต์ที่ไม่น่าเชื่อถือ ผิดกฎหมาย ทำให้เข้าใจผิด หรือไม่ได้รับอนุญาต",
+            "ควรทดสอบปลายทางในสถานะผู้เข้าชมทั่วไปที่ไม่ได้เข้าสู่ระบบ Admin",
+          ],
+        },
+      },
+
+      {
+        id: "remove-external-link",
+
+        title: {
+          en: "Remove an external link",
+          th: "ลบ External Link",
+        },
+
+        paragraphs: {
+          en: [
+            "Only external items display the Delete button. Deleting an item in the editor changes the current working list; select Save to persist the new configuration.",
+          ],
+
+          th: [
+            "ปุ่ม Delete จะแสดงเฉพาะ External Item การลบใน Editor จะเปลี่ยนรายการที่กำลังแก้ไข และต้องกด Save เพื่อบันทึก Configuration ใหม่",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Locate the external item.",
+            "Select Delete.",
+            "Confirm the deletion message.",
+            "Review the remaining item order.",
+            "Select Save.",
+            "Verify that the link no longer appears on the public website.",
+          ],
+
+          th: [
+            "ค้นหา External Item ที่ต้องการ",
+            "กด Delete",
+            "ยืนยันข้อความการลบ",
+            "ตรวจสอบลำดับของรายการที่เหลือ",
+            "กด Save",
+            "ตรวจสอบว่าลิงก์ไม่แสดงบน Public Site แล้ว",
+          ],
+        },
+
+        notes: {
+          en: [
+            "System items do not have a Delete button.",
+            "If an external link may be needed again, consider hiding it instead of deleting it.",
+          ],
+
+          th: [
+            "เมนูระบบจะไม่มีปุ่ม Delete",
+            "หากอาจต้องใช้ External Link อีกในอนาคต สามารถซ่อนไว้แทนการลบได้",
+          ],
+        },
+      },
+
+      {
+        id: "automatic-submenus",
+
+        title: {
+          en: "Project and Public submenus",
+          th: "Submenu ของ Project และ Public",
+        },
+
+        paragraphs: {
+          en: [
+            "Project and Public are special system items. Their submenus are generated by the public website and are not manually created in Navigation Management.",
+            "Project submenu entries are based on available project categories. Public provides navigation to its supported sections, including Video and Publication.",
+          ],
+
+          th: [
+            "Project และ Public เป็นเมนูระบบรูปแบบพิเศษ Submenu จะถูกสร้างโดย Public Site และไม่ได้เพิ่มด้วยตนเองใน Navigation Management",
+            "รายการภายใต้ Project อ้างอิงจากหมวดหมู่โครงการที่พร้อมใช้งาน ส่วน Public มีเส้นทางไปยังประเภทที่รองรับ เช่น Video และ Publication",
+          ],
+        },
+
+        images: [
+          {
+            id: "navigation-submenu-image",
+
+            number: "05",
+
+            src: "/docs/configuration/navigation/navigation-submenu.png",
+
+            title: {
+              en: "Automatically generated submenu",
+              th: "Submenu ที่สร้างอัตโนมัติ",
+            },
+
+            alt: {
+              en: "Project or Public submenu on the public website",
+              th: "Submenu ของ Project หรือ Public บนเว็บไซต์",
+            },
+
+            caption: {
+              en: "Manage the underlying categories or content when submenu entries need to change.",
+              th: "หากต้องการเปลี่ยนรายการ Submenu ให้จัดการหมวดหมู่หรือเนื้อหาต้นทางของโมดูลนั้น",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Rename the main Project or Public label in Navigation Management.",
+            "Manage Project category names in the Project-related configuration.",
+            "Publish the required categories and content before checking the submenu.",
+            "Do not add duplicate external links to imitate internal submenu entries.",
+          ],
+
+          th: [
+            "เปลี่ยนชื่อเมนูหลัก Project หรือ Public ใน Navigation Management",
+            "จัดการชื่อหมวดหมู่ Project จาก Configuration ที่เกี่ยวข้องกับโครงการ",
+            "Publish หมวดหมู่และเนื้อหาที่จำเป็นก่อนตรวจสอบ Submenu",
+            "ไม่ควรสร้าง External Link ซ้ำเพื่อเลียนแบบรายการภายใน Submenu",
+          ],
+        },
+      },
+
+      {
+        id: "desktop-navigation",
+
+        title: {
+          en: "Desktop navigation result",
+          th: "ผลลัพธ์บน Desktop",
+        },
+
+        paragraphs: {
+          en: [
+            "Desktop navigation displays enabled items in the saved order. The active menu uses the selected company's primary color, and Project or Public may open a dropdown when submenu data is available.",
+            "After selecting a destination, the dropdown closes and the active state follows the current URL.",
+          ],
+
+          th: [
+            "Desktop Navigation จะแสดงรายการที่เปิดใช้งานตามลำดับที่บันทึก เมนูที่กำลังใช้งานจะแสดงด้วยสีหลักของบริษัท และ Project หรือ Public อาจเปิด Dropdown เมื่อมีข้อมูล Submenu",
+            "หลังเลือกปลายทาง Dropdown จะปิด และสถานะ Active จะเปลี่ยนตาม URL ปัจจุบัน",
+          ],
+        },
+
+        images: [
+          {
+            id: "navigation-public-result-image",
+
+            number: "06",
+
+            src: "/docs/configuration/navigation/navigation-public-result.png",
+
+            title: {
+              en: "Public desktop navigation",
+              th: "Public Navigation บน Desktop",
+            },
+
+            alt: {
+              en: "Public website desktop navigation result",
+              th: "ผลลัพธ์ Navigation ของ Public Site บน Desktop",
+            },
+
+            caption: {
+              en: "Check the labels, order, visibility, active color, links, and dropdown behavior.",
+              th: "ตรวจชื่อ ลำดับ การแสดงผล สี Active ลิงก์ และการทำงานของ Dropdown",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Every enabled item appears in the intended order.",
+            "The active item uses the company color.",
+            "Project and Public dropdowns open and close correctly.",
+            "External links lead to the approved destinations.",
+            "Items set to open in a new tab do so correctly.",
+          ],
+
+          th: [
+            "รายการที่เปิดใช้งานแสดงตามลำดับที่ต้องการ",
+            "รายการ Active ใช้สีของบริษัท",
+            "Dropdown ของ Project และ Public เปิดและปิดถูกต้อง",
+            "External Link นำไปยังปลายทางที่บริษัทอนุมัติ",
+            "รายการที่กำหนดให้เปิดหน้าต่างใหม่ทำงานถูกต้อง",
+          ],
+        },
+      },
+
+      {
+        id: "mobile-navigation",
+
+        title: {
+          en: "Mobile navigation result",
+          th: "ผลลัพธ์บนมือถือ",
+        },
+
+        paragraphs: {
+          en: [
+            "The mobile menu initially displays only the main navigation items. Selecting Project or Public opens a dedicated submenu view with a Back control.",
+            "This structure keeps the primary menu clear and prevents long nested lists from crowding a small screen.",
+          ],
+
+          th: [
+            "Mobile Menu จะแสดงเฉพาะรายการเมนูหลักก่อน เมื่อเลือก Project หรือ Public ระบบจะเปิดหน้า Submenu แยกและมีปุ่ม Back",
+            "โครงสร้างนี้ช่วยให้เมนูหลักอ่านง่ายและป้องกันรายการซ้อนจำนวนมากเบียดกันบนหน้าจอขนาดเล็ก",
+          ],
+        },
+
+        images: [
+          {
+            id: "navigation-mobile-result-image",
+
+            number: "07",
+
+            src: "/docs/configuration/navigation/navigation-mobile-result.png",
+
+            title: {
+              en: "Public mobile navigation",
+              th: "Public Navigation บนมือถือ",
+            },
+
+            alt: {
+              en: "Public website mobile menu and submenu navigation",
+              th: "เมนูหลักและ Submenu ของ Public Site บนมือถือ",
+            },
+
+            caption: {
+              en: "Select Project or Public to enter its submenu, then use Back to return to the main menu.",
+              th: "เลือก Project หรือ Public เพื่อเข้าสู่ Submenu และใช้ Back เพื่อกลับไปยังเมนูหลัก",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Open the public website at a mobile screen size.",
+            "Open the mobile menu.",
+            "Check the main menu labels and order.",
+            "Select Project and verify its submenu.",
+            "Use Back to return to the main menu.",
+            "Select Public and verify its submenu.",
+            "Select a submenu destination and confirm that the menu closes.",
+            "Check Social and Company controls at the bottom of the menu.",
+          ],
+
+          th: [
+            "เปิด Public Site ด้วยหน้าจอขนาดมือถือ",
+            "เปิด Mobile Menu",
+            "ตรวจชื่อและลำดับของเมนูหลัก",
+            "เลือก Project และตรวจสอบ Submenu",
+            "ใช้ Back เพื่อกลับสู่เมนูหลัก",
+            "เลือก Public และตรวจสอบ Submenu",
+            "เลือกปลายทางใน Submenu และตรวจสอบว่าเมนูปิด",
+            "ตรวจ Social และ Company Control ที่ด้านล่างของเมนู",
+          ],
+        },
+      },
+
+      {
+        id: "refresh-reset-save",
+
+        title: {
+          en: "Refresh, Reset, and Save",
+          th: "การใช้ Refresh, Reset และ Save",
+        },
+
+        tables: [
+          {
+            id: "navigation-actions",
+
+            columns: [
+              {
+                id: "action",
+
+                label: {
+                  en: "Action",
+                  th: "คำสั่ง",
+                },
+              },
+
+              {
+                id: "result",
+
+                label: {
+                  en: "Result",
+                  th: "ผลลัพธ์",
+                },
+              },
+
+              {
+                id: "warning",
+
+                label: {
+                  en: "Important",
+                  th: "ข้อควรระวัง",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "refresh",
+
+                action: "Refresh",
+
+                result: {
+                  en: "Reloads the saved configuration from the server",
+                  th: "โหลด Configuration ที่บันทึกไว้จาก Server อีกครั้ง",
+                },
+
+                warning: {
+                  en: "Unsaved editor changes may be replaced",
+                  th: "ข้อมูลที่แก้แต่ยังไม่ Save อาจถูกแทนที่",
+                },
+              },
+
+              {
+                id: "reset",
+
+                action: "Reset",
+
+                result: {
+                  en: "Restores the six default system items",
+                  th: "คืนค่าเมนูระบบเริ่มต้นทั้ง 6 รายการ",
+                },
+
+                warning: {
+                  en: "External links and custom ordering may be removed",
+                  th: "External Link และลำดับที่จัดไว้ใหม่อาจถูกลบ",
+                },
+              },
+
+              {
+                id: "save",
+
+                action: "Save",
+
+                result: {
+                  en: "Validates and stores the current complete item list",
+                  th: "ตรวจสอบและบันทึกรายการปัจจุบันทั้งชุด",
+                },
+
+                warning: {
+                  en: "English labels and valid external URLs are required",
+                  th: "ต้องมี English Label และ External URL ที่ถูกต้อง",
+                },
+              },
+            ],
+          },
+        ],
+
+        notes: {
+          en: [
+            "Reset requires confirmation.",
+            "After Reset succeeds, the default configuration is saved immediately.",
+            "Do not use Reset as a way to undo only one small edit.",
+          ],
+
+          th: [
+            "ระบบจะขอให้ยืนยันก่อน Reset",
+            "เมื่อ Reset สำเร็จ ระบบจะบันทึกค่าเริ่มต้นทันที",
+            "ไม่ควรใช้ Reset เพื่อยกเลิกการแก้ไขเพียงจุดเดียว",
+          ],
+        },
+      },
+
+      {
+        id: "navigation-checklist",
+
+        title: {
+          en: "Navigation checklist",
+          th: "รายการตรวจสอบ Navigation",
+        },
+
+        paragraphs: {
+          en: [
+            "Complete this checklist before considering the navigation update finished.",
+          ],
+
+          th: [
+            "ตรวจสอบรายการต่อไปนี้ก่อนถือว่าการแก้ไข Navigation เสร็จสมบูรณ์",
+          ],
+        },
+
+        items: {
+          en: [
+            "The correct company is selected.",
+            "All English Labels are complete.",
+            "Thai Labels are complete when Thai is enabled.",
+            "Only required menu items are marked Visible.",
+            "The order is correct from top to bottom.",
+            "Every external URL begins with https:// or http://.",
+            "Open in New Tab is configured appropriately.",
+            "Save completed successfully.",
+            "Desktop navigation was tested.",
+            "Project and Public submenus were tested.",
+            "Mobile main menu, submenu, and Back navigation were tested.",
+            "Hidden or unpublished pages do not create broken visitor journeys.",
+          ],
+
+          th: [
+            "เลือกบริษัทที่ถูกต้องแล้ว",
+            "กรอก English Label ครบทุกรายการ",
+            "กรอก Thai Label ครบเมื่อเปิดภาษาไทย",
+            "เปิด Visible เฉพาะเมนูที่ต้องการแสดง",
+            "ลำดับจากบนลงล่างถูกต้อง",
+            "External URL ทุกค่าขึ้นต้นด้วย https:// หรือ http://",
+            "กำหนด Open in New Tab อย่างเหมาะสม",
+            "บันทึกสำเร็จแล้ว",
+            "ทดสอบ Desktop Navigation แล้ว",
+            "ทดสอบ Submenu ของ Project และ Public แล้ว",
+            "ทดสอบเมนูหลัก Submenu และปุ่ม Back บนมือถือแล้ว",
+            "เมนูที่ซ่อนหรือหน้าที่ยังไม่ Publish ไม่ทำให้เส้นทางของผู้เข้าชมผิดพลาด",
+          ],
+        },
+      },
+    ],
+  },
+  "configuration/email": {
+    eyebrow: {
+      en: "CONFIGURATION",
+      th: "การตั้งค่าระบบ",
+    },
+
+    title: {
+      en: "Email Settings",
+      th: "การตั้งค่าอีเมล",
+    },
+
+    description: {
+      en: "Configure the email provider, sender identity, reply address, notification recipients, and SMTP credentials for the selected company.",
+      th: "ตั้งค่าผู้ให้บริการอีเมล ข้อมูลผู้ส่ง อีเมลตอบกลับ ผู้รับการแจ้งเตือน และข้อมูล SMTP สำหรับบริษัทที่เลือก",
+    },
+
+    introduction: {
+      en: [
+        "Email Settings controls how the selected company sends system email. The CMS supports the server-configured Resend provider and a company-specific SMTP server.",
+        "Email delivery must be enabled and configured before related modules can send notifications. Individual forms or modules may also have their own notification switch.",
+        "Email configuration is separate for each company. Always confirm the active company before saving sender details, recipients, or SMTP credentials.",
+      ],
+
+      th: [
+        "Email Settings ใช้ควบคุมวิธีที่บริษัทที่เลือกส่งอีเมลจากระบบ CMS รองรับทั้ง Resend ที่ตั้งค่าจาก Server และ SMTP Server เฉพาะของบริษัท",
+        "ต้องเปิดและตั้งค่าระบบอีเมลก่อน โมดูลที่เกี่ยวข้องจึงจะส่งการแจ้งเตือนได้ และแบบฟอร์มหรือโมดูลแต่ละส่วนอาจมีสวิตช์แจ้งเตือนของตนเองเพิ่มเติม",
+        "การตั้งค่าอีเมลแยกตามบริษัท ต้องตรวจสอบบริษัทที่กำลังเลือกก่อนบันทึกข้อมูลผู้ส่ง ผู้รับ หรือ SMTP Credential เสมอ",
+      ],
+    },
+
+    highlights: [
+      {
+        title: {
+          en: "Two provider options",
+          th: "รองรับผู้ให้บริการสองรูปแบบ",
+        },
+
+        description: {
+          en: "Choose Resend for the server-managed provider or SMTP for the company's own mail server.",
+          th: "เลือก Resend สำหรับบริการที่ตั้งค่าจาก Server หรือ SMTP สำหรับ Mail Server ของบริษัท",
+        },
+      },
+
+      {
+        title: {
+          en: "SMTP password is handled separately",
+          th: "SMTP Password ถูกจัดการแยกต่างหาก",
+        },
+
+        description: {
+          en: "The password is not included in ordinary communication settings and is not returned to the browser after saving.",
+          th: "Password จะไม่รวมอยู่ในข้อมูล Communication Settings ทั่วไป และระบบจะไม่ส่งค่ากลับมายัง Browser หลังบันทึก",
+        },
+      },
+
+      {
+        title: {
+          en: "Test before enabling notifications",
+          th: "ทดสอบก่อนเปิดการแจ้งเตือน",
+        },
+
+        description: {
+          en: "Validate the provider and send a test email before relying on automatic notifications.",
+          th: "ตรวจสอบ Provider และส่งอีเมลทดสอบก่อนใช้งานการแจ้งเตือนอัตโนมัติ",
+        },
+      },
+    ],
+
+    sections: [
+      {
+        id: "email-overview",
+
+        title: {
+          en: "Email Settings overview",
+          th: "ภาพรวม Email Settings",
+        },
+
+        paragraphs: {
+          en: [
+            "Open Settings and select Email to configure email delivery for the active company. The page contains the email notification switch, provider selection, sender details, recipients, and provider-specific configuration.",
+            "The company must be selected and the signed-in user must have permission to update company settings.",
+          ],
+
+          th: [
+            "เปิด Settings แล้วเลือก Email เพื่อตั้งค่าการส่งอีเมลสำหรับบริษัทปัจจุบัน หน้านี้ประกอบด้วยสวิตช์การแจ้งเตือน ผู้ให้บริการ ข้อมูลผู้ส่ง รายชื่อผู้รับ และ Configuration เฉพาะของ Provider",
+            "ต้องเลือกบริษัทและผู้ใช้ที่เข้าสู่ระบบต้องมี Permission สำหรับแก้ไข Company Settings",
+          ],
+        },
+
+        images: [
+          {
+            id: "email-settings-overview-image",
+
+            number: "01",
+
+            src: "/docs/configuration/email/email-settings-overview.png",
+
+            title: {
+              en: "Email Settings",
+              th: "หน้าการตั้งค่าอีเมล",
+            },
+
+            alt: {
+              en: "Junsekino CMS Email Settings page",
+              th: "หน้า Email Settings ของ Junsekino CMS",
+            },
+
+            caption: {
+              en: "Configure email delivery independently for the currently selected company.",
+              th: "กำหนดการส่งอีเมลแยกตามบริษัทที่กำลังเลือกอยู่",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Email Notifications — enables or disables company email delivery.",
+            "Provider — selects Resend or SMTP.",
+            "Sender Information — controls the identity shown to recipients.",
+            "Notification Recipients — lists the addresses that receive system notifications.",
+            "SMTP Configuration — appears when SMTP is selected.",
+            "Save — validates and stores the current settings.",
+          ],
+
+          th: [
+            "Email Notifications — เปิดหรือปิดการส่งอีเมลของบริษัท",
+            "Provider — เลือก Resend หรือ SMTP",
+            "Sender Information — กำหนดข้อมูลผู้ส่งที่ผู้รับจะมองเห็น",
+            "Notification Recipients — รายชื่ออีเมลที่รับการแจ้งเตือนจากระบบ",
+            "SMTP Configuration — แสดงเมื่อเลือก SMTP",
+            "Save — ตรวจสอบและบันทึกการตั้งค่าปัจจุบัน",
+          ],
+        },
+      },
+
+      {
+        id: "enable-email",
+
+        title: {
+          en: "Enable email notifications",
+          th: "เปิดใช้งานการแจ้งเตือนทางอีเมล",
+        },
+
+        paragraphs: {
+          en: [
+            "The Email Notifications switch controls whether the company email service is enabled. Keep it disabled while the provider, sender, and recipients are incomplete.",
+            "Enabling company email does not necessarily enable every form notification. A form may also require its own Send Email Notification setting.",
+          ],
+
+          th: [
+            "สวิตช์ Email Notifications ควบคุมการเปิดใช้งาน Email Service ของบริษัท ควรปิดไว้ระหว่างที่ Provider ข้อมูลผู้ส่ง และผู้รับยังตั้งค่าไม่ครบ",
+            "การเปิดอีเมลของบริษัทไม่ได้หมายความว่าแบบฟอร์มทุกตัวจะส่งการแจ้งเตือนทันที แบบฟอร์มอาจต้องเปิด Send Email Notification ของตนเองด้วย",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Configure the selected provider.",
+            "Complete the sender information.",
+            "Add at least one notification recipient when required.",
+            "Save the settings.",
+            "Test the provider and send a test email.",
+            "Return to Email Settings and enable Email Notifications.",
+            "Save again.",
+          ],
+
+          th: [
+            "ตั้งค่า Provider ที่เลือกให้เรียบร้อย",
+            "กรอกข้อมูลผู้ส่ง",
+            "เพิ่มผู้รับการแจ้งเตือนอย่างน้อยหนึ่งรายการเมื่อจำเป็น",
+            "บันทึกการตั้งค่า",
+            "ทดสอบ Provider และส่ง Test Email",
+            "กลับมายัง Email Settings แล้วเปิด Email Notifications",
+            "กด Save อีกครั้ง",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Do not enable production notifications before a successful test.",
+            "If delivery must be stopped temporarily, disable Email Notifications instead of deleting the configuration.",
+          ],
+
+          th: [
+            "ไม่ควรเปิด Production Notification ก่อนทดสอบสำเร็จ",
+            "หากต้องหยุดการส่งชั่วคราว ควรปิด Email Notifications แทนการลบ Configuration",
+          ],
+        },
+      },
+
+      {
+        id: "choose-provider",
+
+        title: {
+          en: "Choose an email provider",
+          th: "เลือกผู้ให้บริการอีเมล",
+        },
+
+        paragraphs: {
+          en: [
+            "Select one provider for the active company. Resend relies on credentials and configuration installed on the application server. SMTP connects to a mail server supplied by the company or its email provider.",
+          ],
+
+          th: [
+            "เลือก Provider หนึ่งรายการสำหรับบริษัทปัจจุบัน Resend ใช้ Credential และ Configuration ที่ติดตั้งไว้บน Application Server ส่วน SMTP จะเชื่อมต่อกับ Mail Server ของบริษัทหรือผู้ให้บริการอีเมล",
+          ],
+        },
+
+        tables: [
+          {
+            id: "email-provider-comparison",
+
+            title: {
+              en: "Provider comparison",
+              th: "เปรียบเทียบ Provider",
+            },
+
+            columns: [
+              {
+                id: "provider",
+
+                label: {
+                  en: "Provider",
+                  th: "Provider",
+                },
+              },
+
+              {
+                id: "configuration",
+
+                label: {
+                  en: "Configuration",
+                  th: "การตั้งค่า",
+                },
+              },
+
+              {
+                id: "recommendedFor",
+
+                label: {
+                  en: "Suitable for",
+                  th: "เหมาะสำหรับ",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "resend",
+
+                provider: "Resend",
+
+                configuration: {
+                  en: "Application server environment and sender settings",
+                  th: "Environment ของ Application Server และข้อมูลผู้ส่ง",
+                },
+
+                recommendedFor: {
+                  en: "Centralized system-managed delivery",
+                  th: "การส่งที่ควบคุมจากระบบส่วนกลาง",
+                },
+              },
+
+              {
+                id: "smtp",
+
+                provider: "SMTP",
+
+                configuration: {
+                  en: "Host, port, security, username, password, and sender settings",
+                  th: "Host, Port, Security, Username, Password และข้อมูลผู้ส่ง",
+                },
+
+                recommendedFor: {
+                  en: "A company-owned or third-party mail server",
+                  th: "Mail Server ของบริษัทหรือผู้ให้บริการภายนอก",
+                },
+              },
+            ],
+          },
+        ],
+
+        notes: {
+          en: [
+            "Selecting Resend does not create a Resend account or server credential.",
+            "Ask the system administrator whether Resend has been configured for the deployment.",
+            "Do not select SMTP unless valid mail server credentials are available.",
+          ],
+
+          th: [
+            "การเลือก Resend ไม่ได้สร้าง Account หรือ Credential บน Server ให้โดยอัตโนมัติ",
+            "ควรสอบถาม System Administrator ว่า Deployment นั้นตั้งค่า Resend แล้วหรือไม่",
+            "ไม่ควรเลือก SMTP หากยังไม่มี Credential ของ Mail Server ที่ถูกต้อง",
+          ],
+        },
+      },
+
+      {
+        id: "sender-information",
+
+        title: {
+          en: "Configure sender information",
+          th: "ตั้งค่าข้อมูลผู้ส่ง",
+        },
+
+        paragraphs: {
+          en: [
+            "Sender Information controls the name and email address recipients see. Reply-To determines where replies are delivered when a recipient selects Reply.",
+            "Use an approved company address and a recognizable sender name so recipients can identify the message.",
+          ],
+
+          th: [
+            "Sender Information ควบคุมชื่อและอีเมลที่ผู้รับมองเห็น ส่วน Reply-To กำหนดปลายทางเมื่อผู้รับกด Reply",
+            "ควรใช้ที่อยู่อีเมลที่บริษัทอนุมัติและชื่อผู้ส่งที่จดจำได้ เพื่อให้ผู้รับทราบว่าอีเมลมาจากระบบใด",
+          ],
+        },
+
+        images: [
+          {
+            id: "email-sender-settings-image",
+
+            number: "02",
+
+            src: "/docs/configuration/email/email-sender-settings.png",
+
+            title: {
+              en: "Sender information",
+              th: "ข้อมูลผู้ส่ง",
+            },
+
+            alt: {
+              en: "Sender name, sender email, and reply-to fields",
+              th: "ช่องชื่อผู้ส่ง อีเมลผู้ส่ง และอีเมลสำหรับตอบกลับ",
+            },
+
+            caption: {
+              en: "Use approved company addresses for Sender Email and Reply-To.",
+              th: "ใช้ Email Address ที่บริษัทอนุมัติสำหรับ Sender Email และ Reply-To",
+            },
+          },
+        ],
+
+        tables: [
+          {
+            id: "sender-field-reference",
+
+            columns: [
+              {
+                id: "field",
+
+                label: {
+                  en: "Field",
+                  th: "ช่องข้อมูล",
+                },
+              },
+
+              {
+                id: "purpose",
+
+                label: {
+                  en: "Purpose",
+                  th: "การใช้งาน",
+                },
+              },
+
+              {
+                id: "example",
+
+                label: {
+                  en: "Example",
+                  th: "ตัวอย่าง",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "sender-name",
+
+                field: {
+                  en: "Sender Name",
+                  th: "ชื่อผู้ส่ง",
+                },
+
+                purpose: {
+                  en: "The display name shown in the recipient's inbox",
+                  th: "ชื่อที่แสดงใน Inbox ของผู้รับ",
+                },
+
+                example: "Junsekino I+D",
+              },
+
+              {
+                id: "sender-email",
+
+                field: {
+                  en: "Sender Email",
+                  th: "อีเมลผู้ส่ง",
+                },
+
+                purpose: {
+                  en: "The address used in the From header",
+                  th: "Email Address ที่ใช้ใน From Header",
+                },
+
+                example: "noreply@example.com",
+              },
+
+              {
+                id: "reply-to",
+
+                field: "Reply-To",
+
+                purpose: {
+                  en: "The address that receives direct replies",
+                  th: "Email Address ที่รับข้อความตอบกลับ",
+                },
+
+                example: "contact@example.com",
+              },
+            ],
+          },
+        ],
+
+        notes: {
+          en: [
+            "Sender Email and Reply-To must be valid email addresses when entered.",
+            "The sender domain may need verification with Resend or the SMTP provider.",
+            "Avoid using a personal email address as the permanent sender.",
+          ],
+
+          th: [
+            "Sender Email และ Reply-To ต้องเป็น Email Address ที่ถูกต้องเมื่อมีการกรอก",
+            "Domain ของผู้ส่งอาจต้องผ่านการยืนยันกับ Resend หรือ SMTP Provider",
+            "หลีกเลี่ยงการใช้อีเมลส่วนบุคคลเป็นผู้ส่งแบบถาวร",
+          ],
+        },
+      },
+
+      {
+        id: "notification-recipients",
+
+        title: {
+          en: "Manage notification recipients",
+          th: "จัดการผู้รับการแจ้งเตือน",
+        },
+
+        paragraphs: {
+          en: [
+            "Notification Recipients are company addresses that may receive automated messages from supported modules. More than one address can be added.",
+            "When Send Test Email is selected, the CMS sends the test to the first configured recipient. Normal notifications may use all configured recipients.",
+          ],
+
+          th: [
+            "Notification Recipients คือ Email Address ของบริษัทที่อาจรับข้อความอัตโนมัติจากโมดูลที่รองรับ สามารถเพิ่มผู้รับได้มากกว่าหนึ่งรายการ",
+            "เมื่อกด Send Test Email ระบบจะส่งอีเมลทดสอบไปยังผู้รับลำดับแรก ส่วนการแจ้งเตือนปกติอาจส่งถึงผู้รับทั้งหมดที่กำหนดไว้",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Enter a valid email address in the recipient field.",
+            "Select the plus button or press Enter.",
+            "Confirm that the address appears in the recipient list.",
+            "Repeat for additional recipients.",
+            "Use the Delete button beside an address to remove it.",
+            "Select Save after making changes.",
+          ],
+
+          th: [
+            "กรอก Email Address ที่ถูกต้องในช่องผู้รับ",
+            "กดปุ่มเครื่องหมายบวกหรือกด Enter",
+            "ตรวจสอบว่าอีเมลปรากฏในรายการผู้รับ",
+            "ทำซ้ำเมื่อต้องการเพิ่มผู้รับรายอื่น",
+            "ใช้ปุ่ม Delete ข้างอีเมลเพื่อนำผู้รับออก",
+            "กด Save หลังแก้ไขรายการ",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Duplicate addresses cannot be added.",
+            "Use shared company mailboxes where appropriate so notifications do not depend on one employee.",
+            "Review recipient access whenever an employee changes role or leaves the company.",
+          ],
+
+          th: [
+            "ไม่สามารถเพิ่ม Email Address ซ้ำได้",
+            "ควรใช้ Shared Mailbox ของบริษัทเมื่อเหมาะสม เพื่อไม่ให้การแจ้งเตือนขึ้นอยู่กับพนักงานเพียงคนเดียว",
+            "ตรวจสอบสิทธิ์ของผู้รับเมื่อพนักงานเปลี่ยนหน้าที่หรือออกจากบริษัท",
+          ],
+        },
+      },
+
+      {
+        id: "smtp-settings",
+
+        title: {
+          en: "Configure SMTP",
+          th: "ตั้งค่า SMTP",
+        },
+
+        paragraphs: {
+          en: [
+            "Select SMTP to display the company mail server configuration. Obtain the exact connection details from the email provider or system administrator.",
+            "Do not guess the port or security method. A mismatch between the port and encryption mode commonly causes connection failures.",
+          ],
+
+          th: [
+            "เลือก SMTP เพื่อแสดง Configuration ของ Mail Server บริษัท ควรขอข้อมูลการเชื่อมต่อที่ถูกต้องจาก Email Provider หรือ System Administrator",
+            "ไม่ควรคาดเดา Port หรือวิธีรักษาความปลอดภัย เพราะ Port และ Encryption ที่ไม่ตรงกันเป็นสาเหตุทั่วไปของการเชื่อมต่อล้มเหลว",
+          ],
+        },
+
+        images: [
+          {
+            id: "email-smtp-settings-image",
+
+            number: "03",
+
+            src: "/docs/configuration/email/email-smtp-settings.png",
+
+            title: {
+              en: "SMTP configuration",
+              th: "การตั้งค่า SMTP",
+            },
+
+            alt: {
+              en: "SMTP host, port, security, username, and password fields",
+              th: "ช่อง SMTP Host, Port, Security, Username และ Password",
+            },
+
+            caption: {
+              en: "Enter only credentials supplied by the approved email provider or system administrator.",
+              th: "ใช้เฉพาะ Credential ที่ได้รับจาก Email Provider หรือ System Administrator ที่ได้รับอนุญาต",
+            },
+          },
+        ],
+
+        tables: [
+          {
+            id: "smtp-field-reference",
+
+            columns: [
+              {
+                id: "field",
+
+                label: {
+                  en: "Field",
+                  th: "ช่องข้อมูล",
+                },
+              },
+
+              {
+                id: "purpose",
+
+                label: {
+                  en: "Purpose",
+                  th: "การใช้งาน",
+                },
+              },
+
+              {
+                id: "example",
+
+                label: {
+                  en: "Example only",
+                  th: "ตัวอย่างเท่านั้น",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "smtp-host",
+
+                field: "Host",
+
+                purpose: {
+                  en: "The hostname of the outgoing mail server",
+                  th: "Hostname ของ Server สำหรับส่งอีเมล",
+                },
+
+                example: "smtp.example.com",
+              },
+
+              {
+                id: "smtp-port",
+
+                field: "Port",
+
+                purpose: {
+                  en: "The network port supplied by the provider",
+                  th: "Network Port ที่ Provider กำหนด",
+                },
+
+                example: "587",
+              },
+
+              {
+                id: "smtp-security",
+
+                field: "Security",
+
+                purpose: {
+                  en: "STARTTLS, SSL / TLS, or None",
+                  th: "STARTTLS, SSL / TLS หรือ None",
+                },
+
+                example: "STARTTLS",
+              },
+
+              {
+                id: "smtp-username",
+
+                field: "Username",
+
+                purpose: {
+                  en: "The SMTP account name",
+                  th: "ชื่อ Account สำหรับ SMTP",
+                },
+
+                example: "mailer@example.com",
+              },
+
+              {
+                id: "smtp-password",
+
+                field: "Password",
+
+                purpose: {
+                  en: "The SMTP password or provider-issued app password",
+                  th: "SMTP Password หรือ App Password ที่ Provider ออกให้",
+                },
+
+                example: {
+                  en: "Never document the real value",
+                  th: "ห้ามบันทึกค่าจริงไว้ในเอกสาร",
+                },
+              },
+            ],
+          },
+        ],
+
+        items: {
+          en: [
+            "The port must be a whole number from 1 to 65535.",
+            "STARTTLS commonly upgrades a standard connection to an encrypted connection.",
+            "SSL / TLS commonly starts with encryption immediately.",
+            "None sends without transport encryption and should be avoided unless explicitly required in a trusted environment.",
+          ],
+
+          th: [
+            "Port ต้องเป็นเลขจำนวนเต็มตั้งแต่ 1 ถึง 65535",
+            "STARTTLS โดยทั่วไปเริ่มจากการเชื่อมต่อปกติแล้วเปลี่ยนเป็นการเชื่อมต่อแบบเข้ารหัส",
+            "SSL / TLS โดยทั่วไปจะเริ่มการเชื่อมต่อแบบเข้ารหัสทันที",
+            "None ไม่มี Transport Encryption และควรหลีกเลี่ยง เว้นแต่ระบบที่เชื่อถือได้กำหนดไว้อย่างชัดเจน",
+          ],
+        },
+      },
+
+      {
+        id: "smtp-password",
+
+        title: {
+          en: "Set or replace the SMTP password",
+          th: "ตั้งค่าหรือเปลี่ยน SMTP Password",
+        },
+
+        paragraphs: {
+          en: [
+            "The SMTP password is saved through a separate protected request. It is not included in the ordinary email configuration payload.",
+            "After saving, the CMS displays whether a password is configured but does not display the saved value. An empty password field means the existing password remains unchanged.",
+          ],
+
+          th: [
+            "SMTP Password ถูกบันทึกผ่าน Request ที่แยกและได้รับการป้องกัน โดยจะไม่รวมอยู่ใน Email Configuration ทั่วไป",
+            "หลังบันทึก CMS จะแสดงเพียงสถานะว่าตั้ง Password แล้ว แต่ไม่แสดงค่าที่บันทึก ช่อง Password ที่ว่างหมายถึงให้คง Password เดิมไว้",
+          ],
+        },
+
+        images: [
+          {
+            id: "email-password-status-image",
+
+            number: "04",
+
+            src: "/docs/configuration/email/email-password-status.png",
+
+            title: {
+              en: "SMTP password status",
+              th: "สถานะ SMTP Password",
+            },
+
+            alt: {
+              en: "SMTP configuration showing that a password is configured",
+              th: "การตั้งค่า SMTP ที่แสดงสถานะว่ากำหนด Password แล้ว",
+            },
+
+            caption: {
+              en: "The status confirms that a credential exists without exposing its saved value.",
+              th: "สถานะยืนยันว่ามี Credential อยู่ โดยไม่เปิดเผยค่าที่บันทึก",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Select SMTP as the provider.",
+            "Complete Host, Port, Security, and Username.",
+            "Enter the new SMTP Password.",
+            "Use the visibility button only when necessary and ensure no unauthorized person can see the screen.",
+            "Select Save.",
+            "Confirm that the password status changes to Configured.",
+            "Leave the password field empty during later edits unless the password must be replaced.",
+          ],
+
+          th: [
+            "เลือก SMTP เป็น Provider",
+            "กรอก Host, Port, Security และ Username",
+            "กรอก SMTP Password ใหม่",
+            "ใช้ปุ่มแสดง Password เฉพาะเมื่อจำเป็น และตรวจว่าไม่มีผู้ที่ไม่ได้รับอนุญาตมองเห็นหน้าจอ",
+            "กด Save",
+            "ตรวจสอบว่าสถานะ Password เปลี่ยนเป็น Configured",
+            "ในการแก้ไขครั้งต่อไป ให้เว้นช่อง Password ว่างไว้หากไม่ต้องการเปลี่ยนค่าเดิม",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Never place the SMTP password in screenshots, chat messages, documentation, source code, or Git commits.",
+            "If a password may have been exposed, revoke or replace it with the provider immediately.",
+            "Use an app password or limited-purpose SMTP credential when supported.",
+          ],
+
+          th: [
+            "ห้ามใส่ SMTP Password ใน Screenshot, Chat, Documentation, Source Code หรือ Git Commit",
+            "หาก Password อาจถูกเปิดเผย ให้ยกเลิกหรือเปลี่ยนกับ Provider ทันที",
+            "ควรใช้ App Password หรือ SMTP Credential ที่จำกัดวัตถุประสงค์ หาก Provider รองรับ",
+          ],
+        },
+      },
+
+      {
+        id: "test-email",
+
+        title: {
+          en: "Test the email configuration",
+          th: "ทดสอบการตั้งค่าอีเมล",
+        },
+
+        paragraphs: {
+          en: [
+            "SMTP provides Test Connection and Send Test Email actions. Test Connection verifies the saved SMTP configuration. Send Test Email verifies the complete delivery flow.",
+            "The CMS saves the latest settings and a newly entered SMTP password before running a test.",
+          ],
+
+          th: [
+            "SMTP มีคำสั่ง Test Connection และ Send Test Email โดย Test Connection ใช้ตรวจ Configuration ของ SMTP ส่วน Send Test Email ใช้ตรวจ Flow การส่งอีเมลจริงให้ครบถ้วน",
+            "CMS จะบันทึกการตั้งค่าล่าสุดและ SMTP Password ที่กรอกใหม่ก่อนเริ่มการทดสอบ",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Add at least one notification recipient.",
+            "Review the SMTP Host, Port, Security, Username, and password status.",
+            "Select Test Connection.",
+            "Wait for the success or error notification.",
+            "Select Send Test Email.",
+            "Check the inbox of the first configured recipient.",
+            "Check Spam or Junk if the message does not appear.",
+            "Confirm the sender name, sender address, Reply-To, and message delivery.",
+          ],
+
+          th: [
+            "เพิ่มผู้รับการแจ้งเตือนอย่างน้อยหนึ่งรายการ",
+            "ตรวจ SMTP Host, Port, Security, Username และสถานะ Password",
+            "กด Test Connection",
+            "รอข้อความแจ้งผลสำเร็จหรือ Error",
+            "กด Send Test Email",
+            "ตรวจ Inbox ของผู้รับลำดับแรก",
+            "ตรวจ Spam หรือ Junk หากยังไม่พบข้อความ",
+            "ตรวจชื่อผู้ส่ง อีเมลผู้ส่ง Reply-To และการส่งถึงปลายทาง",
+          ],
+        },
+
+        notes: {
+          en: [
+            "A successful connection test does not guarantee that every recipient will accept the message.",
+            "A test email requires at least one configured recipient.",
+            "DNS verification, sender-domain policy, spam filtering, or provider limits may still affect delivery.",
+          ],
+
+          th: [
+            "Test Connection สำเร็จไม่ได้รับประกันว่า Mail Server ของผู้รับทุกแห่งจะรับข้อความ",
+            "การส่ง Test Email ต้องมีผู้รับอย่างน้อยหนึ่งรายการ",
+            "DNS Verification, Sender Domain Policy, Spam Filter หรือข้อจำกัดของ Provider อาจมีผลต่อการส่ง",
+          ],
+        },
+      },
+
+      {
+        id: "contact-notifications",
+
+        title: {
+          en: "Contact Form notifications",
+          th: "การแจ้งเตือนจาก Contact Form",
+        },
+
+        paragraphs: {
+          en: [
+            "Email Settings and Contact Form notification settings work together. The company email service determines how messages are sent, while the form setting determines whether a new submission should trigger an email.",
+            "The default Contact Form may have Send Email Notification disabled. Enable it only after Email Settings has been configured and tested.",
+            "Contact submissions remain available in Messages according to the application's workflow even when email delivery is disabled or fails.",
+          ],
+
+          th: [
+            "Email Settings และการแจ้งเตือนของ Contact Form ทำงานร่วมกัน โดย Email Service ของบริษัทกำหนดวิธีส่ง ส่วนการตั้งค่าของ Form กำหนดว่า Submission ใหม่ต้องส่งอีเมลหรือไม่",
+            "Contact Form เริ่มต้นอาจปิด Send Email Notification ไว้ ควรเปิดหลังจากตั้งค่าและทดสอบ Email Settings สำเร็จแล้วเท่านั้น",
+            "Contact Submission ยังคงอยู่ใน Messages ตาม Workflow ของระบบ แม้ปิด Email Notification หรือการส่งอีเมลไม่สำเร็จ",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Configure and test the company Email Settings.",
+            "Confirm the required notification recipients.",
+            "Open the Contact configuration that controls its form notifications.",
+            "Enable Send Email Notification when available.",
+            "Save the Contact settings.",
+            "Submit a test message from the public Contact page.",
+            "Confirm that the submission appears in Admin Messages.",
+            "Confirm that the expected recipients receive the notification email.",
+          ],
+
+          th: [
+            "ตั้งค่าและทดสอบ Email Settings ของบริษัท",
+            "ตรวจสอบรายชื่อผู้รับการแจ้งเตือน",
+            "เปิด Contact Configuration ที่ควบคุมการแจ้งเตือนของ Form",
+            "เปิด Send Email Notification เมื่อมีตัวเลือก",
+            "บันทึก Contact Settings",
+            "ส่งข้อความทดสอบจากหน้า Contact ของ Public Site",
+            "ตรวจสอบว่า Submission ปรากฏใน Admin Messages",
+            "ตรวจสอบว่าผู้รับได้รับ Notification Email",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Email notification is an alert, not the primary storage location for a submission.",
+            "Use Admin Messages to review the original stored submission.",
+          ],
+
+          th: [
+            "Email Notification เป็นเพียงการแจ้งเตือน ไม่ใช่พื้นที่หลักสำหรับจัดเก็บ Submission",
+            "ใช้ Admin Messages เพื่อตรวจสอบ Submission ต้นฉบับที่ระบบจัดเก็บไว้",
+          ],
+        },
+      },
+
+      {
+        id: "email-troubleshooting",
+
+        title: {
+          en: "Troubleshooting",
+          th: "การแก้ปัญหาเบื้องต้น",
+        },
+
+        tables: [
+          {
+            id: "email-troubleshooting-table",
+
+            columns: [
+              {
+                id: "problem",
+
+                label: {
+                  en: "Problem",
+                  th: "ปัญหา",
+                },
+              },
+
+              {
+                id: "check",
+
+                label: {
+                  en: "What to check",
+                  th: "สิ่งที่ต้องตรวจสอบ",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "email-disabled",
+
+                problem: {
+                  en: "No notification is sent",
+                  th: "ไม่มีการส่ง Notification",
+                },
+
+                check: {
+                  en: "Company Email Notifications and the related form notification setting",
+                  th: "Email Notifications ของบริษัทและ Notification Setting ของ Form",
+                },
+              },
+
+              {
+                id: "smtp-connect-failed",
+
+                problem: {
+                  en: "SMTP connection fails",
+                  th: "เชื่อมต่อ SMTP ไม่สำเร็จ",
+                },
+
+                check: {
+                  en: "Host, port, security mode, username, password, firewall, and provider access policy",
+                  th: "Host, Port, Security, Username, Password, Firewall และ Access Policy ของ Provider",
+                },
+              },
+
+              {
+                id: "invalid-sender",
+
+                problem: {
+                  en: "Sender is rejected",
+                  th: "Sender ถูกปฏิเสธ",
+                },
+
+                check: {
+                  en: "Sender address, verified domain, and provider authorization",
+                  th: "Sender Address, Verified Domain และสิทธิ์จาก Provider",
+                },
+              },
+
+              {
+                id: "not-in-inbox",
+
+                problem: {
+                  en: "Test email does not appear",
+                  th: "ไม่พบ Test Email",
+                },
+
+                check: {
+                  en: "First recipient, Spam/Junk, provider logs, suppression list, and rate limits",
+                  th: "ผู้รับลำดับแรก, Spam/Junk, Provider Log, Suppression List และ Rate Limit",
+                },
+              },
+
+              {
+                id: "reply-wrong-address",
+
+                problem: {
+                  en: "Replies go to the wrong address",
+                  th: "ข้อความตอบกลับไปผิดอีเมล",
+                },
+
+                check: {
+                  en: "Reply-To configuration",
+                  th: "การตั้งค่า Reply-To",
+                },
+              },
+            ],
+          },
+        ],
+
+        notes: {
+          en: [
+            "Do not repeatedly send tests in a short period because providers may enforce rate limits.",
+            "Provide error messages to the system administrator without including passwords or secret credentials.",
+          ],
+
+          th: [
+            "ไม่ควรส่ง Test Email ซ้ำจำนวนมากในช่วงเวลาสั้น เพราะ Provider อาจมี Rate Limit",
+            "สามารถส่ง Error Message ให้ System Administrator ตรวจสอบได้ แต่ห้ามแนบ Password หรือ Secret Credential",
+          ],
+        },
+      },
+
+      {
+        id: "email-checklist",
+
+        title: {
+          en: "Email configuration checklist",
+          th: "รายการตรวจสอบการตั้งค่าอีเมล",
+        },
+
+        items: {
+          en: [
+            "The correct company is selected.",
+            "The intended provider is selected.",
+            "Sender Name is recognizable.",
+            "Sender Email is valid and approved.",
+            "Reply-To is valid and monitored.",
+            "Notification recipients are correct and current.",
+            "SMTP connection details came from an authorized source.",
+            "The SMTP password is configured without being exposed.",
+            "Settings were saved successfully.",
+            "SMTP Test Connection succeeded when SMTP is used.",
+            "A test email reached the first configured recipient.",
+            "The sender identity and Reply-To were verified.",
+            "Company Email Notifications are enabled only after testing.",
+            "The related Contact Form notification setting was reviewed.",
+          ],
+
+          th: [
+            "เลือกบริษัทที่ถูกต้องแล้ว",
+            "เลือก Provider ที่ต้องการแล้ว",
+            "Sender Name เป็นชื่อที่ผู้รับจดจำได้",
+            "Sender Email ถูกต้องและได้รับอนุมัติ",
+            "Reply-To ถูกต้องและมีผู้ดูแล Inbox",
+            "รายชื่อผู้รับการแจ้งเตือนถูกต้องและเป็นปัจจุบัน",
+            "ข้อมูล SMTP มาจากแหล่งที่ได้รับอนุญาต",
+            "ตั้ง SMTP Password แล้วโดยไม่มีการเปิดเผยค่า",
+            "บันทึก Settings สำเร็จแล้ว",
+            "SMTP Test Connection สำเร็จเมื่อใช้ SMTP",
+            "Test Email ส่งถึงผู้รับลำดับแรกแล้ว",
+            "ตรวจสอบชื่อผู้ส่งและ Reply-To แล้ว",
+            "เปิด Company Email Notifications หลังทดสอบแล้วเท่านั้น",
+            "ตรวจสอบ Notification Setting ของ Contact Form แล้ว",
+          ],
+        },
+      },
+    ],
+  },
+  "configuration/privacy": {
+    eyebrow: {
+      en: "CONFIGURATION",
+      th: "การตั้งค่าระบบ",
+    },
+
+    title: {
+      en: "Privacy Settings",
+      th: "การตั้งค่าความเป็นส่วนตัว",
+    },
+
+    description: {
+      en: "Configure cookie consent, privacy choices, retention periods, data subject rights, and privacy contact information for the selected company.",
+      th: "ตั้งค่า Cookie Consent ตัวเลือกความเป็นส่วนตัว ระยะเวลาเก็บข้อมูล สิทธิของเจ้าของข้อมูล และข้อมูลติดต่อด้านความเป็นส่วนตัวสำหรับบริษัทที่เลือก",
+    },
+
+    introduction: {
+      en: [
+        "Privacy Settings controls the behavior of the public cookie banner and records the company's operational privacy configuration.",
+        "These settings are separate from the legal wording published in Privacy Notice, Cookie Policy, and Terms of Use. Configuration determines how the system behaves, while Legal Documents explain that behavior to visitors.",
+        "Privacy requirements depend on the company's activities, applicable law, and approved internal policy. An authorized manager or legal adviser should approve production settings and legal wording.",
+      ],
+
+      th: [
+        "Privacy Settings ใช้ควบคุมการทำงานของ Cookie Banner บน Public Site และจัดเก็บ Configuration ด้านความเป็นส่วนตัวของบริษัท",
+        "การตั้งค่านี้แยกจากข้อความทางกฎหมายที่เผยแพร่ใน Privacy Notice, Cookie Policy และ Terms of Use โดย Configuration กำหนดการทำงานของระบบ ส่วน Legal Documents ใช้อธิบายการทำงานดังกล่าวแก่ผู้เข้าชม",
+        "ข้อกำหนดด้านความเป็นส่วนตัวขึ้นอยู่กับกิจกรรมของบริษัท กฎหมายที่ใช้บังคับ และนโยบายภายในที่ได้รับอนุมัติ ผู้มีอำนาจหรือที่ปรึกษากฎหมายควรตรวจสอบค่าที่ใช้จริงและเนื้อหาทางกฎหมายก่อนเผยแพร่",
+      ],
+    },
+
+    highlights: [
+      {
+        title: {
+          en: "Necessary cookies are always enabled",
+          th: "Necessary Cookies เปิดเสมอ",
+        },
+
+        description: {
+          en: "The necessary category is required for essential operation and cannot be disabled through visitor preferences.",
+          th: "Necessary Category จำเป็นต่อการทำงานพื้นฐานและผู้เข้าชมไม่สามารถปิดผ่าน Cookie Preferences ได้",
+        },
+      },
+
+      {
+        title: {
+          en: "Optional processing requires a choice",
+          th: "ข้อมูลทางเลือกต้องมีการตัดสินใจ",
+        },
+
+        description: {
+          en: "Analytics, Functional, and Marketing should run only according to the visitor's recorded choice.",
+          th: "Analytics, Functional และ Marketing ควรทำงานตามตัวเลือก Consent ที่ผู้เข้าชมบันทึกไว้",
+        },
+      },
+
+      {
+        title: {
+          en: "Configuration and legal documents must agree",
+          th: "Configuration ต้องตรงกับเอกสารกฎหมาย",
+        },
+
+        description: {
+          en: "Update the Cookie Policy and Privacy Notice whenever processing purposes or retention practices materially change.",
+          th: "ควรแก้ Cookie Policy และ Privacy Notice เมื่อวัตถุประสงค์หรือระยะเวลาประมวลผลข้อมูลเปลี่ยนอย่างมีนัยสำคัญ",
+        },
+      },
+    ],
+
+    sections: [
+      {
+        id: "privacy-overview",
+
+        title: {
+          en: "Privacy Settings overview",
+          th: "ภาพรวม Privacy Settings",
+        },
+
+        paragraphs: {
+          en: [
+            "Open Settings and select Privacy to configure the active company. Privacy settings are stored independently for each company.",
+            "The page contains Cookie Banner, Cookie Categories, Consent Management, Retention, Data Subject Rights, and Privacy Contact sections.",
+          ],
+
+          th: [
+            "เปิด Settings แล้วเลือก Privacy เพื่อตั้งค่าบริษัทปัจจุบัน ข้อมูล Privacy จะแยกจัดเก็บตามแต่ละบริษัท",
+            "ภายในหน้าประกอบด้วย Cookie Banner, Cookie Categories, Consent Management, Retention, Data Subject Rights และ Privacy Contact",
+          ],
+        },
+
+        images: [
+          {
+            id: "privacy-overview-image",
+
+            number: "01",
+
+            src: "/docs/configuration/privacy/privacy-overview.png",
+
+            title: {
+              en: "Privacy Settings",
+              th: "หน้าการตั้งค่าความเป็นส่วนตัว",
+            },
+
+            alt: {
+              en: "Privacy Settings page in Junsekino CMS",
+              th: "หน้า Privacy Settings ใน Junsekino CMS",
+            },
+
+            caption: {
+              en: "Confirm the active company before changing privacy behavior or retention values.",
+              th: "ตรวจสอบบริษัทปัจจุบันก่อนเปลี่ยนการทำงานด้าน Privacy หรือค่า Retention",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Cookie Banner — controls the visitor consent interface.",
+            "Cookie Categories — describes and enables supported processing categories.",
+            "Consent Management — controls consent version, validity, renewal, and proof.",
+            "Retention — records approved data retention periods.",
+            "Data Subject Rights — defines supported privacy request types.",
+            "Privacy Contact — identifies the organization and privacy contact channels.",
+          ],
+
+          th: [
+            "Cookie Banner — ควบคุมหน้าจอขอ Consent จากผู้เข้าชม",
+            "Cookie Categories — อธิบายและเปิดประเภทการประมวลผลที่รองรับ",
+            "Consent Management — ควบคุม Version อายุ การขอใหม่ และหลักฐาน Consent",
+            "Retention — บันทึกระยะเวลาเก็บข้อมูลที่ได้รับอนุมัติ",
+            "Data Subject Rights — กำหนดประเภทคำขอด้านข้อมูลส่วนบุคคลที่รองรับ",
+            "Privacy Contact — ระบุองค์กรและช่องทางติดต่อด้านความเป็นส่วนตัว",
+          ],
+        },
+      },
+
+      {
+        id: "cookie-banner",
+
+        title: {
+          en: "Configure the Cookie Banner",
+          th: "ตั้งค่า Cookie Banner",
+        },
+
+        paragraphs: {
+          en: [
+            "The Cookie Banner is shown when the public website requires a consent decision and no current valid decision is available.",
+            "Banner text is localized. English remains the primary language, while Thai fields are available when Thai is enabled in Localization.",
+          ],
+
+          th: [
+            "Cookie Banner จะแสดงเมื่อ Public Site ต้องการให้ผู้เข้าชมตัดสินใจเรื่อง Consent และยังไม่มี Consent ปัจจุบันที่ถูกต้อง",
+            "ข้อความ Banner รองรับหลายภาษา โดยภาษาอังกฤษเป็นภาษาหลัก และช่องภาษาไทยจะแสดงเมื่อเปิดภาษาไทยใน Localization",
+          ],
+        },
+
+        images: [
+          {
+            id: "privacy-cookie-banner-image",
+
+            number: "02",
+
+            src: "/docs/configuration/privacy/privacy-cookie-banner.png",
+
+            title: {
+              en: "Cookie Banner configuration",
+              th: "การตั้งค่า Cookie Banner",
+            },
+
+            alt: {
+              en: "Cookie Banner behavior and localized text settings",
+              th: "การตั้งค่าการทำงานและข้อความหลายภาษาของ Cookie Banner",
+            },
+
+            caption: {
+              en: "Configure the available visitor actions and the text displayed by the public banner.",
+              th: "กำหนดตัวเลือกของผู้เข้าชมและข้อความที่แสดงบน Public Banner",
+            },
+          },
+        ],
+
+        tables: [
+          {
+            id: "cookie-banner-options",
+
+            columns: [
+              {
+                id: "option",
+
+                label: {
+                  en: "Option",
+                  th: "ตัวเลือก",
+                },
+              },
+
+              {
+                id: "behavior",
+
+                label: {
+                  en: "Behavior",
+                  th: "การทำงาน",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "show-cookie-banner",
+
+                option: "Show Cookie Banner",
+
+                behavior: {
+                  en: "Allows the public consent banner to be displayed when required",
+                  th: "อนุญาตให้แสดง Consent Banner เมื่อระบบตรวจพบว่าจำเป็น",
+                },
+              },
+
+              {
+                id: "allow-reject-optional",
+
+                option: "Allow Reject Optional",
+
+                behavior: {
+                  en: "Displays a choice that keeps Necessary cookies while rejecting optional categories",
+                  th: "แสดงตัวเลือกที่คง Necessary Cookies และปฏิเสธ Category ทางเลือก",
+                },
+              },
+
+              {
+                id: "show-preferences",
+
+                option: "Show Preferences",
+
+                behavior: {
+                  en: "Allows visitors to choose individual optional categories",
+                  th: "อนุญาตให้ผู้เข้าชมเลือก Category ทางเลือกแต่ละประเภท",
+                },
+              },
+            ],
+          },
+        ],
+
+        items: {
+          en: [
+            "Title — the main banner heading.",
+            "Description — a short explanation of cookie use.",
+            "Accept All — the button that accepts enabled optional categories.",
+            "Reject Optional — the button that keeps only Necessary consent.",
+            "Preferences — opens detailed category choices.",
+            "Save Preferences — records the selected category choices.",
+            "Privacy Link — label for the published Privacy Notice.",
+            "Cookie Link — label for the published Cookie Policy.",
+          ],
+
+          th: [
+            "Title — หัวข้อหลักของ Banner",
+            "Description — คำอธิบายสั้นเกี่ยวกับการใช้ Cookie",
+            "Accept All — ปุ่มยอมรับ Category ทางเลือกที่เปิดใช้งาน",
+            "Reject Optional — ปุ่มเลือกเฉพาะ Necessary",
+            "Preferences — เปิดตัวเลือกรายละเอียดของแต่ละ Category",
+            "Save Preferences — บันทึก Category ที่ผู้เข้าชมเลือก",
+            "Privacy Link — ชื่อ Link ไปยัง Privacy Notice ที่ Publish แล้ว",
+            "Cookie Link — ชื่อ Link ไปยัง Cookie Policy ที่ Publish แล้ว",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Do not use wording that implies optional consent is mandatory.",
+            "Publish the relevant Notice and Cookie Policy before relying on their banner links.",
+            "Disabling the banner may affect compliance and must be approved before use.",
+          ],
+
+          th: [
+            "ไม่ควรใช้ข้อความที่ทำให้เข้าใจว่า Consent ทางเลือกเป็นสิ่งบังคับ",
+            "ควร Publish Privacy Notice และ Cookie Policy ก่อนใช้งาน Link บน Banner",
+            "การปิด Banner อาจมีผลต่อการปฏิบัติตามกฎหมายและต้องได้รับอนุมัติก่อนใช้งาน",
+          ],
+        },
+      },
+
+      {
+        id: "cookie-categories",
+
+        title: {
+          en: "Configure Cookie Categories",
+          th: "ตั้งค่า Cookie Categories",
+        },
+
+        paragraphs: {
+          en: [
+            "Cookie Categories group storage and processing by purpose. Category titles and descriptions should accurately explain what the website actually uses.",
+            "Necessary is permanently enabled. Analytics, Functional, and Marketing can be enabled or disabled by the company and selected by visitors where applicable.",
+          ],
+
+          th: [
+            "Cookie Categories ใช้แบ่ง Storage และการประมวลผลตามวัตถุประสงค์ ชื่อและคำอธิบายของแต่ละ Category ต้องตรงกับสิ่งที่เว็บไซต์ใช้งานจริง",
+            "Necessary จะเปิดใช้งานเสมอ ส่วน Analytics, Functional และ Marketing สามารถเปิดหรือปิดโดยบริษัท และให้ผู้เข้าชมเลือกได้ตามความเหมาะสม",
+          ],
+        },
+
+        images: [
+          {
+            id: "privacy-cookie-categories-image",
+
+            number: "03",
+
+            src: "/docs/configuration/privacy/privacy-cookie-categories.png",
+
+            title: {
+              en: "Cookie Categories",
+              th: "ประเภทของ Cookie",
+            },
+
+            alt: {
+              en: "Necessary, Analytics, Functional, and Marketing cookie settings",
+              th: "การตั้งค่า Necessary, Analytics, Functional และ Marketing Cookies",
+            },
+
+            caption: {
+              en: "Describe every enabled category in language visitors can understand.",
+              th: "อธิบายทุก Category ที่เปิดใช้งานด้วยภาษาที่ผู้เข้าชมเข้าใจได้",
+            },
+          },
+        ],
+
+        tables: [
+          {
+            id: "cookie-category-reference",
+
+            columns: [
+              {
+                id: "category",
+
+                label: {
+                  en: "Category",
+                  th: "Category",
+                },
+              },
+
+              {
+                id: "purpose",
+
+                label: {
+                  en: "Typical purpose",
+                  th: "วัตถุประสงค์ทั่วไป",
+                },
+              },
+
+              {
+                id: "visitorCanDisable",
+
+                label: {
+                  en: "Visitor can disable",
+                  th: "ผู้เข้าชมปิดได้",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "necessary",
+
+                category: "Necessary",
+
+                purpose: {
+                  en: "Essential operation, security, and consent storage",
+                  th: "การทำงานพื้นฐาน ความปลอดภัย และการจัดเก็บ Consent",
+                },
+
+                visitorCanDisable: {
+                  en: "No",
+                  th: "ไม่ได้",
+                },
+              },
+
+              {
+                id: "analytics",
+
+                category: "Analytics",
+
+                purpose: {
+                  en: "Website usage and performance measurement",
+                  th: "การวัดการใช้งานและประสิทธิภาพเว็บไซต์",
+                },
+
+                visitorCanDisable: {
+                  en: "Yes",
+                  th: "ได้",
+                },
+              },
+
+              {
+                id: "functional",
+
+                category: "Functional",
+
+                purpose: {
+                  en: "Remembered preferences and enhanced functionality",
+                  th: "การจดจำการตั้งค่าและ Function เพิ่มเติม",
+                },
+
+                visitorCanDisable: {
+                  en: "Yes",
+                  th: "ได้",
+                },
+              },
+
+              {
+                id: "marketing",
+
+                category: "Marketing",
+
+                purpose: {
+                  en: "Advertising, promotion measurement, or personalization",
+                  th: "โฆษณา การวัดผลประชาสัมพันธ์ หรือ Personalization",
+                },
+
+                visitorCanDisable: {
+                  en: "Yes",
+                  th: "ได้",
+                },
+              },
+            ],
+          },
+        ],
+
+        notes: {
+          en: [
+            "Do not enable Marketing merely because the option exists.",
+            "Review embedded third-party media because it may create cookies or transmit visitor data.",
+            "Update category descriptions when tracking technology changes.",
+          ],
+
+          th: [
+            "ไม่ควรเปิด Marketing เพียงเพราะระบบมีตัวเลือก",
+            "ควรตรวจสอบ Embedded Media จาก Third Party เพราะอาจสร้าง Cookie หรือส่งข้อมูลผู้เข้าชม",
+            "แก้คำอธิบาย Category เมื่อเทคโนโลยี Tracking เปลี่ยนแปลง",
+          ],
+        },
+      },
+
+      {
+        id: "consent-management",
+
+        title: {
+          en: "Consent Management",
+          th: "การจัดการ Consent",
+        },
+
+        paragraphs: {
+          en: [
+            "Consent Management determines how long a choice remains valid, when visitors must decide again, and whether the server records proof of the decision.",
+            "Changing the version can invalidate an older consent when the consent structure or processing purposes have materially changed.",
+          ],
+
+          th: [
+            "Consent Management กำหนดระยะเวลาที่ตัวเลือกยังมีผล เวลาที่ต้องขอให้ผู้เข้าชมตัดสินใจใหม่ และการบันทึกหลักฐานการตัดสินใจบน Server",
+            "การเปลี่ยน Version สามารถทำให้ Consent เดิมไม่ตรงกับเวอร์ชันปัจจุบัน เมื่อโครงสร้าง Consent หรือวัตถุประสงค์การประมวลผลเปลี่ยนอย่างมีนัยสำคัญ",
+          ],
+        },
+
+        images: [
+          {
+            id: "privacy-consent-management-image",
+
+            number: "04",
+
+            src: "/docs/configuration/privacy/privacy-consent-management.png",
+
+            title: {
+              en: "Consent Management",
+              th: "การจัดการ Consent",
+            },
+
+            alt: {
+              en: "Consent version, cookie age, renewal, proof, and anonymization settings",
+              th: "การตั้งค่า Consent Version, Cookie Age, Renewal, Proof และ Anonymization",
+            },
+
+            caption: {
+              en: "Change the consent version only as part of an approved privacy update.",
+              th: "เปลี่ยน Consent Version เมื่อมีการปรับนโยบายที่ได้รับอนุมัติแล้วเท่านั้น",
+            },
+          },
+        ],
+
+        tables: [
+          {
+            id: "consent-setting-reference",
+
+            columns: [
+              {
+                id: "setting",
+
+                label: {
+                  en: "Setting",
+                  th: "การตั้งค่า",
+                },
+              },
+
+              {
+                id: "purpose",
+
+                label: {
+                  en: "Purpose",
+                  th: "การใช้งาน",
+                },
+              },
+
+              {
+                id: "defaultValue",
+
+                label: {
+                  en: "Default",
+                  th: "ค่าเริ่มต้น",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "consent-enabled",
+
+                setting: "Enabled",
+
+                purpose: {
+                  en: "Enables the consent management workflow",
+                  th: "เปิด Consent Management Workflow",
+                },
+
+                defaultValue: {
+                  en: "Enabled",
+                  th: "เปิด",
+                },
+              },
+
+              {
+                id: "consent-version",
+
+                setting: "Version",
+
+                purpose: {
+                  en: "Identifies the current consent configuration",
+                  th: "ระบุเวอร์ชันของ Consent Configuration",
+                },
+
+                defaultValue: "1",
+              },
+
+              {
+                id: "cookie-max-age",
+
+                setting: "Cookie Max Age",
+
+                purpose: {
+                  en: "Number of days the consent cookie remains valid",
+                  th: "จำนวนวันที่ Consent Cookie ยังมีผล",
+                },
+
+                defaultValue: {
+                  en: "180 days",
+                  th: "180 วัน",
+                },
+              },
+
+              {
+                id: "renew-policy-change",
+
+                setting: "Renew on Policy Change",
+
+                purpose: {
+                  en: "Requests consent again when published legal versions change",
+                  th: "ขอ Consent ใหม่เมื่อ Version ของ Legal Document เปลี่ยน",
+                },
+
+                defaultValue: {
+                  en: "Enabled",
+                  th: "เปิด",
+                },
+              },
+
+              {
+                id: "record-proof",
+
+                setting: "Record Proof",
+
+                purpose: {
+                  en: "Stores a server-side record of the visitor decision",
+                  th: "บันทึกหลักฐานการตัดสินใจไว้บน Server",
+                },
+
+                defaultValue: {
+                  en: "Enabled",
+                  th: "เปิด",
+                },
+              },
+
+              {
+                id: "anonymize-technical",
+
+                setting: "Anonymize Technical Data",
+
+                purpose: {
+                  en: "Avoids retaining raw technical identifiers in proof records",
+                  th: "หลีกเลี่ยงการเก็บ Technical Identifier แบบข้อมูลดิบในหลักฐาน",
+                },
+
+                defaultValue: {
+                  en: "Enabled",
+                  th: "เปิด",
+                },
+              },
+            ],
+          },
+        ],
+
+        notes: {
+          en: [
+            "The accepted Cookie Max Age range is 1–365 days.",
+            "Do not increase Version for ordinary spelling or visual changes unless renewed consent is required.",
+            "Coordinate Version and Legal Document updates before publishing.",
+          ],
+
+          th: [
+            "Cookie Max Age กำหนดได้ตั้งแต่ 1–365 วัน",
+            "ไม่ควรเพิ่ม Version เมื่อแก้เพียงคำสะกดหรือรูปแบบ หากไม่จำเป็นต้องขอ Consent ใหม่",
+            "ควรวางแผนการเปลี่ยน Version และ Legal Document ให้สอดคล้องกันก่อน Publish",
+          ],
+        },
+      },
+
+      {
+        id: "retention",
+
+        title: {
+          en: "Data Retention",
+          th: "ระยะเวลาการเก็บข้อมูล",
+        },
+
+        paragraphs: {
+          en: [
+            "Retention values record how long different data classes should be kept. Use periods approved by the company and reflected in its Privacy Notice.",
+            "A configured retention value represents the intended retention policy. Confirm which cleanup jobs are implemented for each data class before promising automatic deletion.",
+          ],
+
+          th: [
+            "Retention ใช้บันทึกระยะเวลาที่ควรเก็บข้อมูลแต่ละประเภท ควรใช้ค่าที่บริษัทอนุมัติและระบุให้สอดคล้องกับ Privacy Notice",
+            "ค่าที่กำหนดแสดงถึงนโยบายระยะเวลาเก็บข้อมูลที่ต้องการ ควรตรวจสอบว่า Data Class ใดมี Cleanup Job รองรับแล้ว ก่อนระบุว่าจะลบอัตโนมัติ",
+          ],
+        },
+
+        images: [
+          {
+            id: "privacy-retention-image",
+
+            number: "05",
+
+            src: "/docs/configuration/privacy/privacy-retention.png",
+
+            title: {
+              en: "Retention periods",
+              th: "ระยะเวลาเก็บข้อมูล",
+            },
+
+            alt: {
+              en: "Consent, analytics, form submission, and security retention settings",
+              th: "การตั้งค่า Retention สำหรับ Consent, Analytics, Form Submission และ Security",
+            },
+
+            caption: {
+              en: "Set retention values according to approved operational and legal requirements.",
+              th: "กำหนดค่า Retention ตามข้อกำหนดการดำเนินงานและกฎหมายที่ได้รับอนุมัติ",
+            },
+          },
+        ],
+
+        tables: [
+          {
+            id: "retention-reference",
+
+            columns: [
+              {
+                id: "data",
+
+                label: {
+                  en: "Data class",
+                  th: "ประเภทข้อมูล",
+                },
+              },
+
+              {
+                id: "defaultValue",
+
+                label: {
+                  en: "Default",
+                  th: "ค่าเริ่มต้น",
+                },
+              },
+
+              {
+                id: "allowedRange",
+
+                label: {
+                  en: "Allowed range",
+                  th: "ช่วงที่กำหนดได้",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "consent-records",
+
+                data: {
+                  en: "Consent records",
+                  th: "Consent Records",
+                },
+
+                defaultValue: {
+                  en: "730 days",
+                  th: "730 วัน",
+                },
+
+                allowedRange: {
+                  en: "30–3650 days",
+                  th: "30–3650 วัน",
+                },
+              },
+
+              {
+                id: "raw-analytics",
+
+                data: {
+                  en: "Raw analytics",
+                  th: "Raw Analytics",
+                },
+
+                defaultValue: {
+                  en: "90 days",
+                  th: "90 วัน",
+                },
+
+                allowedRange: {
+                  en: "1–365 days",
+                  th: "1–365 วัน",
+                },
+              },
+
+              {
+                id: "aggregate-analytics",
+
+                data: {
+                  en: "Aggregated analytics",
+                  th: "Aggregated Analytics",
+                },
+
+                defaultValue: {
+                  en: "25 months",
+                  th: "25 เดือน",
+                },
+
+                allowedRange: {
+                  en: "1–60 months",
+                  th: "1–60 เดือน",
+                },
+              },
+
+              {
+                id: "form-submissions",
+
+                data: {
+                  en: "Form submissions",
+                  th: "Form Submissions",
+                },
+
+                defaultValue: {
+                  en: "730 days",
+                  th: "730 วัน",
+                },
+
+                allowedRange: {
+                  en: "30–3650 days",
+                  th: "30–3650 วัน",
+                },
+              },
+
+              {
+                id: "security-logs",
+
+                data: {
+                  en: "Security logs",
+                  th: "Security Logs",
+                },
+
+                defaultValue: {
+                  en: "365 days",
+                  th: "365 วัน",
+                },
+
+                allowedRange: {
+                  en: "30–3650 days",
+                  th: "30–3650 วัน",
+                },
+              },
+            ],
+          },
+        ],
+
+        notes: {
+          en: [
+            "The current retention cleanup service includes expired form attachments and form submissions.",
+            "Do not assume every displayed retention field already has an automatic cleanup process.",
+            "Retention must also consider legal claims, contracts, accounting, security, backup, and deletion obligations.",
+          ],
+
+          th: [
+            "Retention Cleanup Service ปัจจุบันรองรับ Temporary Form Attachment และ Form Submission ที่หมดอายุ",
+            "ไม่ควรเข้าใจว่าทุก Retention Field ที่แสดงมีระบบลบอัตโนมัติแล้ว",
+            "การกำหนด Retention ต้องพิจารณาข้อพิพาท สัญญา บัญชี ความปลอดภัย Backup และหน้าที่การลบข้อมูลร่วมด้วย",
+          ],
+        },
+      },
+
+      {
+        id: "data-subject-rights",
+
+        title: {
+          en: "Data Subject Rights",
+          th: "สิทธิของเจ้าของข้อมูล",
+        },
+
+        paragraphs: {
+          en: [
+            "This section records the privacy request methods supported by the company. Request Email should be monitored by an authorized person or team.",
+            "Response Days is the company's operational target recorded in the CMS. It must be reviewed against applicable legal requirements.",
+          ],
+
+          th: [
+            "ส่วนนี้บันทึกประเภทคำขอด้านความเป็นส่วนตัวที่บริษัทรองรับ Request Email ควรเป็น Mailbox ที่มีผู้ได้รับอนุญาตตรวจสอบอย่างสม่ำเสมอ",
+            "Response Days เป็นเป้าหมายการดำเนินงานที่บันทึกใน CMS และต้องตรวจสอบให้ตรงกับข้อกำหนดทางกฎหมายที่ใช้บังคับ",
+          ],
+        },
+
+        images: [
+          {
+            id: "privacy-data-subject-rights-image",
+
+            number: "06",
+
+            src: "/docs/configuration/privacy/privacy-data-subject-rights.png",
+
+            title: {
+              en: "Data Subject Rights",
+              th: "สิทธิของเจ้าของข้อมูล",
+            },
+
+            alt: {
+              en: "Privacy request email, response period, and request type settings",
+              th: "การตั้งค่าอีเมล ระยะเวลาตอบกลับ และประเภทคำขอด้าน Privacy",
+            },
+
+            caption: {
+              en: "Enable only the request workflows the company is prepared to receive and process.",
+              th: "เปิดเฉพาะ Request Workflow ที่บริษัทพร้อมรับและดำเนินการ",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Access Request — request a copy or information about personal data.",
+            "Correction Request — request correction of inaccurate data.",
+            "Deletion Request — request deletion where applicable.",
+            "Consent Withdrawal — withdraw previously provided consent.",
+            "Data Portability Request — request data in an applicable portable form.",
+            "Instructions — localized guidance explaining how to submit a request.",
+          ],
+
+          th: [
+            "Access Request — ขอสำเนาหรือข้อมูลเกี่ยวกับข้อมูลส่วนบุคคล",
+            "Correction Request — ขอแก้ไขข้อมูลที่ไม่ถูกต้อง",
+            "Deletion Request — ขอลบข้อมูลในกรณีที่ใช้สิทธิได้",
+            "Consent Withdrawal — ถอน Consent ที่เคยให้ไว้",
+            "Data Portability Request — ขอรับข้อมูลในรูปแบบที่สามารถนำไปใช้ต่อได้ตามกรณี",
+            "Instructions — คำแนะนำหลายภาษาสำหรับการส่งคำขอ",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Do not promise that every request will automatically be granted; identity, exceptions, and legal obligations may need review.",
+            "Do not place sensitive request details in an unsecured public email subject.",
+          ],
+
+          th: [
+            "ไม่ควรรับรองว่าทุกคำขอจะได้รับอนุมัติโดยอัตโนมัติ เพราะอาจต้องตรวจตัวตน ข้อยกเว้น และหน้าที่ตามกฎหมาย",
+            "ไม่ควรใส่รายละเอียด Sensitive ของคำขอไว้ใน Subject ของอีเมลที่ไม่มีการป้องกัน",
+          ],
+        },
+      },
+
+      {
+        id: "privacy-contact",
+
+        title: {
+          en: "Privacy Contact",
+          th: "ข้อมูลติดต่อด้านความเป็นส่วนตัว",
+        },
+
+        paragraphs: {
+          en: [
+            "Privacy Contact identifies the organization responsible for the website's personal data practices and provides channels for privacy questions or requests.",
+            "Company Name and Address support localized values. Email, Phone, and DPO Email are shared contact values.",
+          ],
+
+          th: [
+            "Privacy Contact ใช้ระบุองค์กรที่รับผิดชอบการดำเนินงานด้านข้อมูลส่วนบุคคลของเว็บไซต์ และแสดงช่องทางสำหรับคำถามหรือคำขอด้าน Privacy",
+            "Company Name และ Address รองรับหลายภาษา ส่วน Email, Phone และ DPO Email เป็นข้อมูลติดต่อที่ใช้ร่วมกัน",
+          ],
+        },
+
+        images: [
+          {
+            id: "privacy-contact-image",
+
+            number: "07",
+
+            src: "/docs/configuration/privacy/privacy-contact.png",
+
+            title: {
+              en: "Privacy contact information",
+              th: "ข้อมูลติดต่อด้าน Privacy",
+            },
+
+            alt: {
+              en: "Company identity, address, email, phone, and DPO email settings",
+              th: "การตั้งค่าชื่อบริษัท ที่อยู่ อีเมล โทรศัพท์ และ DPO Email",
+            },
+
+            caption: {
+              en: "Use monitored, approved company contact information.",
+              th: "ใช้ข้อมูลติดต่อของบริษัทที่ได้รับอนุมัติและมีผู้ตรวจสอบอย่างสม่ำเสมอ",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Company Name — the legal or approved organization name.",
+            "Address — the official privacy contact address.",
+            "Email — the general privacy contact mailbox.",
+            "Phone — an approved contact number where applicable.",
+            "DPO Email — the Data Protection Officer contact, when appointed.",
+          ],
+
+          th: [
+            "Company Name — ชื่อนิติบุคคลหรือชื่อองค์กรที่ได้รับอนุมัติ",
+            "Address — ที่อยู่ทางการสำหรับการติดต่อด้าน Privacy",
+            "Email — Mailbox กลางสำหรับเรื่อง Privacy",
+            "Phone — เบอร์ติดต่อที่ได้รับอนุมัติ หากมีการใช้งาน",
+            "DPO Email — อีเมลของ Data Protection Officer เมื่อมีการแต่งตั้ง",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Do not list a DPO unless the organization has actually appointed one.",
+            "Review this information whenever responsible personnel or company details change.",
+          ],
+
+          th: [
+            "ไม่ควรระบุ DPO หากองค์กรยังไม่ได้แต่งตั้งจริง",
+            "ตรวจสอบข้อมูลนี้เมื่อผู้รับผิดชอบหรือข้อมูลบริษัทเปลี่ยนแปลง",
+          ],
+        },
+      },
+
+      {
+        id: "public-cookie-banner",
+
+        title: {
+          en: "Public Cookie Banner",
+          th: "Cookie Banner บน Public Site",
+        },
+
+        paragraphs: {
+          en: [
+            "A visitor without a current valid consent decision sees the Cookie Banner when the feature and Consent Management are enabled.",
+            "The available actions depend on Allow Reject Optional and Show Preferences.",
+          ],
+
+          th: [
+            "ผู้เข้าชมที่ยังไม่มี Consent ปัจจุบันที่ถูกต้องจะเห็น Cookie Banner เมื่อเปิด Function และ Consent Management",
+            "ปุ่มที่แสดงจะขึ้นอยู่กับ Allow Reject Optional และ Show Preferences",
+          ],
+        },
+
+        images: [
+          {
+            id: "privacy-public-banner-image",
+
+            number: "08",
+
+            src: "/docs/configuration/privacy/privacy-public-banner.png",
+
+            title: {
+              en: "Public Cookie Banner",
+              th: "Cookie Banner ที่แสดงแก่ผู้เข้าชม",
+            },
+
+            alt: {
+              en: "Cookie consent banner on the public website",
+              th: "Cookie Consent Banner บน Public Site",
+            },
+
+            caption: {
+              en: "Visitors can accept, reject optional categories, or open detailed preferences according to the configuration.",
+              th: "ผู้เข้าชมสามารถยอมรับ ปฏิเสธ Category ทางเลือก หรือเปิด Preferences ตาม Configuration",
+            },
+          },
+        ],
+
+        tables: [
+          {
+            id: "banner-action-reference",
+
+            columns: [
+              {
+                id: "action",
+
+                label: {
+                  en: "Visitor action",
+                  th: "การเลือกของผู้เข้าชม",
+                },
+              },
+
+              {
+                id: "result",
+
+                label: {
+                  en: "Result",
+                  th: "ผลลัพธ์",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "accept-all",
+
+                action: "Accept All",
+
+                result: {
+                  en: "Accepts Necessary and enabled optional categories",
+                  th: "ยอมรับ Necessary และ Category ทางเลือกที่เปิดใช้งาน",
+                },
+              },
+
+              {
+                id: "necessary-only",
+
+                action: {
+                  en: "Reject Optional / Necessary Only",
+                  th: "Reject Optional / Necessary Only",
+                },
+
+                result: {
+                  en: "Keeps Necessary and rejects optional categories",
+                  th: "คง Necessary และปฏิเสธ Category ทางเลือก",
+                },
+              },
+
+              {
+                id: "preferences",
+
+                action: "Preferences",
+
+                result: {
+                  en: "Opens individual category controls",
+                  th: "เปิดตัวเลือกของแต่ละ Category",
+                },
+              },
+            ],
+          },
+        ],
+      },
+
+      {
+        id: "public-cookie-preferences",
+
+        title: {
+          en: "Cookie Preferences",
+          th: "การตั้งค่า Cookie Preferences",
+        },
+
+        paragraphs: {
+          en: [
+            "Cookie Preferences allows visitors to review category descriptions and change optional consent choices.",
+            "Google Analytics loads only when a Measurement ID is available and Analytics consent is granted. If Analytics consent is withdrawn, the application updates Google consent state and attempts to remove matching Google Analytics cookies.",
+          ],
+
+          th: [
+            "Cookie Preferences ช่วยให้ผู้เข้าชมอ่านคำอธิบาย Category และเปลี่ยนตัวเลือก Consent ทางเลือกได้",
+            "Google Analytics จะโหลดเมื่อมี Measurement ID และผู้เข้าชมยอมรับ Analytics เท่านั้น หากถอน Analytics Consent ระบบจะอัปเดต Google Consent State และพยายามลบ Cookie ของ Google Analytics ที่ตรงกัน",
+          ],
+        },
+
+        images: [
+          {
+            id: "privacy-public-preferences-image",
+
+            number: "09",
+
+            src: "/docs/configuration/privacy/privacy-public-preferences.png",
+
+            title: {
+              en: "Cookie Preferences",
+              th: "หน้าตั้งค่า Cookie Preferences",
+            },
+
+            alt: {
+              en: "Public cookie category preference controls",
+              th: "ตัวเลือก Cookie Category บน Public Site",
+            },
+
+            caption: {
+              en: "Necessary remains enabled while visitors control available optional categories.",
+              th: "Necessary ยังคงเปิดเสมอ ส่วนผู้เข้าชมเลือก Category ทางเลือกที่มีอยู่ได้",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Open Cookie Settings on the public website.",
+            "Review each category and its description.",
+            "Enable or disable available optional categories.",
+            "Select Save Preferences.",
+            "Reopen Cookie Settings to confirm the saved choices.",
+          ],
+
+          th: [
+            "เปิด Cookie Settings บน Public Site",
+            "อ่าน Category และคำอธิบายแต่ละรายการ",
+            "เปิดหรือปิด Category ทางเลือกที่มีอยู่",
+            "กด Save Preferences",
+            "เปิด Cookie Settings อีกครั้งเพื่อตรวจตัวเลือกที่บันทึก",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Necessary cannot be switched off.",
+            "Disabling a category should prevent future optional processing associated with that category; third-party behavior must also be reviewed.",
+          ],
+
+          th: [
+            "ไม่สามารถปิด Necessary ได้",
+            "การปิด Category ควรหยุดการประมวลผลทางเลือกในอนาคตที่เกี่ยวข้อง และต้องตรวจพฤติกรรมของ Third Party เพิ่มเติมด้วย",
+          ],
+        },
+      },
+
+      {
+        id: "policy-change",
+
+        title: {
+          en: "Update privacy settings after a policy change",
+          th: "ปรับ Privacy Settings เมื่อมีการเปลี่ยนนโยบาย",
+        },
+
+        steps: {
+          en: [
+            "Document the approved change and identify affected processing purposes.",
+            "Update the Privacy Notice or Cookie Policy draft.",
+            "Update Cookie Categories, descriptions, and retention values where required.",
+            "Decide whether the change requires a new Consent Version.",
+            "Publish the approved Legal Documents.",
+            "Save the approved Privacy Settings.",
+            "Open the public website in a clean browser session.",
+            "Verify that renewed consent is requested when expected.",
+            "Test Accept All, Necessary Only, Preferences, and Cookie Settings.",
+            "Record the production change according to the company's internal process.",
+          ],
+
+          th: [
+            "บันทึกการเปลี่ยนแปลงที่ได้รับอนุมัติและระบุวัตถุประสงค์ที่ได้รับผลกระทบ",
+            "แก้ Draft ของ Privacy Notice หรือ Cookie Policy",
+            "แก้ Cookie Categories คำอธิบาย และ Retention ตามความจำเป็น",
+            "ตัดสินใจว่าการเปลี่ยนแปลงต้องใช้ Consent Version ใหม่หรือไม่",
+            "Publish Legal Documents ที่ได้รับอนุมัติ",
+            "บันทึก Privacy Settings ที่ได้รับอนุมัติ",
+            "เปิด Public Site ด้วย Browser Session ใหม่",
+            "ตรวจสอบว่าระบบขอ Consent ใหม่ในกรณีที่ควรขอ",
+            "ทดสอบ Accept All, Necessary Only, Preferences และ Cookie Settings",
+            "บันทึกการเปลี่ยนแปลง Production ตามกระบวนการภายในของบริษัท",
+          ],
+        },
+      },
+
+      {
+        id: "privacy-checklist",
+
+        title: {
+          en: "Privacy checklist",
+          th: "รายการตรวจสอบ Privacy",
+        },
+
+        items: {
+          en: [
+            "The correct company is selected.",
+            "Cookie Banner and Consent Management have the intended status.",
+            "English text is complete and Thai text is complete when enabled.",
+            "Necessary is enabled and cannot be disabled.",
+            "Only cookie categories actually used by the website are enabled.",
+            "Consent Version and Cookie Max Age are approved.",
+            "Record Proof and Anonymize Technical Data are reviewed.",
+            "Retention values match approved policy and actual cleanup capability.",
+            "Privacy Request Email is monitored.",
+            "Supported Data Subject Rights are correctly selected.",
+            "Privacy Contact information is current.",
+            "Privacy Notice and Cookie Policy are published and consistent with the configuration.",
+            "The banner and preferences were tested in a clean browser session.",
+            "Optional analytics does not load before Analytics consent.",
+          ],
+
+          th: [
+            "เลือกบริษัทที่ถูกต้องแล้ว",
+            "Cookie Banner และ Consent Management มีสถานะตามที่ต้องการ",
+            "ข้อมูลภาษาอังกฤษครบ และภาษาไทยครบเมื่อเปิดใช้งาน",
+            "Necessary เปิดอยู่และไม่สามารถปิดได้",
+            "เปิดเฉพาะ Cookie Category ที่เว็บไซต์ใช้งานจริง",
+            "Consent Version และ Cookie Max Age ได้รับอนุมัติแล้ว",
+            "ตรวจสอบ Record Proof และ Anonymize Technical Data แล้ว",
+            "Retention ตรงกับนโยบายและความสามารถของ Cleanup ที่มีจริง",
+            "มีผู้ตรวจสอบ Privacy Request Email",
+            "เลือก Data Subject Rights ที่รองรับอย่างถูกต้อง",
+            "Privacy Contact เป็นข้อมูลปัจจุบัน",
+            "Privacy Notice และ Cookie Policy Publish แล้วและตรงกับ Configuration",
+            "ทดสอบ Banner และ Preferences ใน Browser Session ใหม่แล้ว",
+            "Optional Analytics ไม่โหลดก่อนผู้เข้าชมยอมรับ Analytics",
+          ],
+        },
+
+        notes: {
+          en: [
+            "This CMS guide explains system operation and is not a substitute for legal advice.",
+          ],
+
+          th: ["คู่มือ CMS นี้อธิบายการทำงานของระบบและไม่ใช่คำปรึกษาทางกฎหมาย"],
+        },
+      },
+    ],
+  },
+  "configuration/legal-documents": {
+    eyebrow: {
+      en: "CONFIGURATION",
+      th: "การตั้งค่าระบบ",
+    },
+
+    title: {
+      en: "Legal Documents",
+      th: "เอกสารทางกฎหมาย",
+    },
+
+    description: {
+      en: "Create, review, version, and publish the Privacy Notice, Cookie Policy, and Website Terms of Use.",
+      th: "สร้าง ตรวจสอบ จัดการ Version และเผยแพร่ Privacy Notice, Cookie Policy และ Website Terms of Use",
+    },
+
+    introduction: {
+      en: [
+        "Legal Documents contains the public policies and terms used by the selected company. The CMS separates each document into drafts and published versions so changes can be reviewed before they replace the current public version.",
+        "The CMS provides document storage, versioning, publication, and public display. It does not determine whether the wording is legally sufficient for a particular company.",
+        "An authorized manager or qualified legal adviser should approve the content before publication. Do not copy another company's legal documents without reviewing whether they accurately describe this website and its processing activities.",
+      ],
+
+      th: [
+        "Legal Documents ใช้จัดการนโยบายและข้อกำหนดที่เผยแพร่ต่อสาธารณะของบริษัทที่เลือก CMS แยกเอกสารเป็น Draft และ Published Version เพื่อให้ตรวจสอบการแก้ไขก่อนแทนที่ฉบับปัจจุบัน",
+        "CMS ช่วยจัดเก็บ จัดการ Version, Publish และแสดงเอกสารบน Public Site แต่ไม่ได้ตัดสินว่าเนื้อหานั้นเพียงพอทางกฎหมายสำหรับบริษัทแต่ละแห่งหรือไม่",
+        "ผู้มีอำนาจหรือที่ปรึกษากฎหมายที่เหมาะสมควรอนุมัติเนื้อหาก่อน Publish และไม่ควรคัดลอกเอกสารของบริษัทอื่นโดยไม่ตรวจสอบว่าเนื้อหาตรงกับเว็บไซต์และกิจกรรมประมวลผลข้อมูลของบริษัทนี้จริง",
+      ],
+    },
+
+    highlights: [
+      {
+        title: {
+          en: "Published versions are read-only",
+          th: "Published Version แก้ไขโดยตรงไม่ได้",
+        },
+
+        description: {
+          en: "Copy a published or archived version into a new draft before making changes.",
+          th: "ต้อง Copy Published หรือ Archived Version ไปเป็น Draft ใหม่ก่อนแก้ไข",
+        },
+      },
+
+      {
+        title: {
+          en: "Publishing replaces the active version",
+          th: "การ Publish จะแทนที่ Active Version",
+        },
+
+        description: {
+          en: "The newly published draft becomes active and the previous active version is archived.",
+          th: "Draft ที่ Publish ใหม่จะกลายเป็น Active Version และฉบับเดิมจะเปลี่ยนเป็น Archived",
+        },
+      },
+
+      {
+        title: {
+          en: "Legal wording must match system behavior",
+          th: "ข้อความกฎหมายต้องตรงกับระบบ",
+        },
+
+        description: {
+          en: "Privacy Notice and Cookie Policy should agree with Privacy Settings, consent categories, retention, forms, analytics, and embedded services.",
+          th: "Privacy Notice และ Cookie Policy ควรตรงกับ Privacy Settings, Consent Categories, Retention, Form, Analytics และ Embedded Service ที่ใช้งานจริง",
+        },
+      },
+    ],
+
+    sections: [
+      {
+        id: "legal-overview",
+
+        title: {
+          en: "Legal Documents overview",
+          th: "ภาพรวม Legal Documents",
+        },
+
+        paragraphs: {
+          en: [
+            "Open Settings and select Legal Documents. Confirm the active company before creating or publishing a document because legal versions are stored separately for each company.",
+            "Use the document type buttons to switch between Privacy Notice, Cookie Policy, and Terms of Use. Each type has its own version history and active published version.",
+          ],
+
+          th: [
+            "เปิด Settings แล้วเลือก Legal Documents ตรวจสอบบริษัทปัจจุบันก่อนสร้างหรือ Publish เพราะ Legal Version จัดเก็บแยกตามบริษัท",
+            "ใช้ปุ่มประเภทเอกสารเพื่อสลับระหว่าง Privacy Notice, Cookie Policy และ Terms of Use เอกสารแต่ละประเภทมี Version History และ Active Published Version ของตนเอง",
+          ],
+        },
+
+        images: [
+          {
+            id: "legal-overview-image",
+
+            number: "01",
+
+            src: "/docs/configuration/legal-documents/legal-overview.png",
+
+            title: {
+              en: "Legal Documents",
+              th: "หน้าจัดการเอกสารทางกฎหมาย",
+            },
+
+            alt: {
+              en: "Legal Documents settings overview",
+              th: "ภาพรวมหน้า Legal Documents Settings",
+            },
+
+            caption: {
+              en: "Select a document type, review its history, and create or publish a draft.",
+              th: "เลือกประเภทเอกสาร ตรวจสอบ History และสร้างหรือ Publish Draft",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "New Draft — starts a new editable draft, optionally using the selected version as its source.",
+            "Document Type — switches between Privacy, Cookies, and Terms.",
+            "Version History — lists Draft, Published, and Archived entries.",
+            "EN / TH — switches the language currently displayed in the editor.",
+            "Save Draft — creates or updates an editable draft.",
+            "Publish — makes the selected draft the active public version.",
+            "Copy to Draft — copies a read-only version into a new editable draft.",
+          ],
+
+          th: [
+            "New Draft — เริ่ม Draft ใหม่ที่แก้ไขได้ และสามารถใช้ Version ที่เลือกเป็นต้นฉบับ",
+            "Document Type — สลับระหว่าง Privacy, Cookies และ Terms",
+            "Version History — แสดงรายการ Draft, Published และ Archived",
+            "EN / TH — สลับภาษาที่กำลังแสดงใน Editor",
+            "Save Draft — สร้างหรืออัปเดต Draft ที่แก้ไขได้",
+            "Publish — กำหนด Draft ที่เลือกเป็น Active Public Version",
+            "Copy to Draft — คัดลอก Version แบบ Read-only ไปเป็น Draft ใหม่",
+          ],
+        },
+      },
+
+      {
+        id: "document-types",
+
+        title: {
+          en: "Understand the three document types",
+          th: "ทำความเข้าใจเอกสารทั้งสามประเภท",
+        },
+
+        paragraphs: {
+          en: [
+            "Each document has a different purpose. Keep the subjects separated so visitors can find and understand the applicable information.",
+          ],
+
+          th: [
+            "เอกสารแต่ละประเภทมีวัตถุประสงค์ต่างกัน ควรแยกเนื้อหาให้ชัดเจนเพื่อให้ผู้เข้าชมค้นหาและทำความเข้าใจข้อมูลที่เกี่ยวข้องได้",
+          ],
+        },
+
+        tables: [
+          {
+            id: "legal-document-types",
+
+            columns: [
+              {
+                id: "document",
+
+                label: {
+                  en: "Document",
+                  th: "เอกสาร",
+                },
+              },
+
+              {
+                id: "purpose",
+
+                label: {
+                  en: "Primary purpose",
+                  th: "วัตถุประสงค์หลัก",
+                },
+              },
+
+              {
+                id: "publicPath",
+
+                label: {
+                  en: "Public path",
+                  th: "Public Path",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "privacy-notice",
+
+                document: "Privacy Notice",
+
+                purpose: {
+                  en: "Explains personal data collection, purposes, lawful handling, disclosure, retention, rights, and contact channels",
+                  th: "อธิบายการเก็บข้อมูลส่วนบุคคล วัตถุประสงค์ การจัดการ การเปิดเผย Retention สิทธิ และช่องทางติดต่อ",
+                },
+
+                publicPath: "/legal/privacy",
+              },
+
+              {
+                id: "cookie-policy",
+
+                document: "Cookie Policy",
+
+                purpose: {
+                  en: "Explains cookies, similar technologies, categories, purposes, duration, choices, and third parties",
+                  th: "อธิบาย Cookie เทคโนโลยีที่คล้ายกัน Category วัตถุประสงค์ ระยะเวลา ตัวเลือก และ Third Party",
+                },
+
+                publicPath: "/legal/cookies",
+              },
+
+              {
+                id: "terms-of-use",
+
+                document: "Website Terms of Use",
+
+                purpose: {
+                  en: "Defines permitted website use, intellectual property, prohibited conduct, disclaimers, links, and applicable terms",
+                  th: "กำหนดการใช้เว็บไซต์ ทรัพย์สินทางปัญญา ข้อห้าม Disclaimer Link และข้อกำหนดที่เกี่ยวข้อง",
+                },
+
+                publicPath: "/legal/terms",
+              },
+            ],
+          },
+        ],
+
+        notes: {
+          en: [
+            "A Cookie Policy does not replace a Privacy Notice.",
+            "Website Terms of Use does not replace a construction, design, employment, or customer contract.",
+          ],
+
+          th: [
+            "Cookie Policy ไม่สามารถใช้แทน Privacy Notice ได้",
+            "Website Terms of Use ไม่ได้ใช้แทนสัญญาก่อสร้าง ออกแบบ จ้างงาน หรือสัญญากับลูกค้า",
+          ],
+        },
+      },
+
+      {
+        id: "privacy-notice-editor",
+
+        title: {
+          en: "Create a Privacy Notice",
+          th: "สร้าง Privacy Notice",
+        },
+
+        paragraphs: {
+          en: [
+            "The Privacy Notice should describe the personal data activities that actually occur through the website and related company processes.",
+            "Review Contact forms, form submissions, analytics, consent records, email notifications, embedded media, retention periods, and privacy contact details before preparing the notice.",
+          ],
+
+          th: [
+            "Privacy Notice ควรอธิบายกิจกรรมข้อมูลส่วนบุคคลที่เกิดขึ้นจริงผ่านเว็บไซต์และกระบวนการที่เกี่ยวข้องของบริษัท",
+            "ควรตรวจ Contact Form, Submission, Analytics, Consent Record, Email Notification, Embedded Media, Retention และ Privacy Contact ก่อนจัดทำประกาศ",
+          ],
+        },
+
+        images: [
+          {
+            id: "legal-privacy-editor-image",
+
+            number: "02",
+
+            src: "/docs/configuration/legal-documents/legal-privacy-editor.png",
+
+            title: {
+              en: "Privacy Notice editor",
+              th: "Privacy Notice Editor",
+            },
+
+            alt: {
+              en: "Privacy Notice draft editor with document fields",
+              th: "Draft Editor ของ Privacy Notice พร้อมช่องข้อมูลเอกสาร",
+            },
+
+            caption: {
+              en: "Prepare and review the notice as a draft before publishing it.",
+              th: "จัดทำและตรวจสอบประกาศในสถานะ Draft ก่อน Publish",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Identity and contact details of the responsible organization.",
+            "Categories of personal data collected.",
+            "Collection sources and processing purposes.",
+            "Recipients or categories of disclosure.",
+            "Retention periods or selection criteria.",
+            "Data subject rights and request channels.",
+            "Cookies, analytics, embedded services, and technical data.",
+            "Security practices and policy update information.",
+          ],
+
+          th: [
+            "ชื่อและข้อมูลติดต่อขององค์กรที่รับผิดชอบ",
+            "ประเภทข้อมูลส่วนบุคคลที่เก็บ",
+            "แหล่งที่มาและวัตถุประสงค์การประมวลผล",
+            "ผู้รับหรือประเภทของการเปิดเผยข้อมูล",
+            "ระยะเวลาเก็บหรือเกณฑ์ที่ใช้กำหนดระยะเวลา",
+            "สิทธิของเจ้าของข้อมูลและช่องทางส่งคำขอ",
+            "Cookie, Analytics, Embedded Service และ Technical Data",
+            "แนวทางรักษาความปลอดภัยและข้อมูลการแก้นโยบาย",
+          ],
+        },
+      },
+
+      {
+        id: "cookie-policy-editor",
+
+        title: {
+          en: "Create a Cookie Policy",
+          th: "สร้าง Cookie Policy",
+        },
+
+        paragraphs: {
+          en: [
+            "The Cookie Policy should match the categories and choices configured in Privacy Settings.",
+            "Do not list a cookie, provider, duration, or purpose unless it is actually used or supported by the website.",
+          ],
+
+          th: [
+            "Cookie Policy ควรตรงกับ Category และตัวเลือกที่กำหนดใน Privacy Settings",
+            "ไม่ควรระบุ Cookie, Provider, ระยะเวลา หรือวัตถุประสงค์ที่เว็บไซต์ไม่ได้ใช้จริงหรือไม่ได้รองรับ",
+          ],
+        },
+
+        images: [
+          {
+            id: "legal-cookie-editor-image",
+
+            number: "03",
+
+            src: "/docs/configuration/legal-documents/legal-cookie-editor.png",
+
+            title: {
+              en: "Cookie Policy editor",
+              th: "Cookie Policy Editor",
+            },
+
+            alt: {
+              en: "Cookie Policy draft editor",
+              th: "Draft Editor ของ Cookie Policy",
+            },
+
+            caption: {
+              en: "Keep category descriptions and visitor choices consistent with Privacy Settings.",
+              th: "กำหนด Category และตัวเลือกของผู้เข้าชมให้ตรงกับ Privacy Settings",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "What cookies and similar technologies are.",
+            "Necessary, Analytics, Functional, and Marketing categories actually used.",
+            "Purposes and responsible providers.",
+            "Cookie or storage duration where known.",
+            "How visitors accept, reject, customize, or withdraw optional consent.",
+            "Links to third-party information where applicable.",
+            "How and when the policy may change.",
+          ],
+
+          th: [
+            "ความหมายของ Cookie และเทคโนโลยีที่คล้ายกัน",
+            "Necessary, Analytics, Functional และ Marketing ที่ใช้จริง",
+            "วัตถุประสงค์และ Provider ที่เกี่ยวข้อง",
+            "ระยะเวลาของ Cookie หรือ Storage เมื่อทราบ",
+            "วิธียอมรับ ปฏิเสธ ปรับแต่ง หรือถอน Optional Consent",
+            "Link ไปยังข้อมูลของ Third Party เมื่อเกี่ยวข้อง",
+            "วิธีและเวลาที่อาจมีการแก้นโยบาย",
+          ],
+        },
+      },
+
+      {
+        id: "terms-editor",
+
+        title: {
+          en: "Create Website Terms of Use",
+          th: "สร้าง Website Terms of Use",
+        },
+
+        paragraphs: {
+          en: [
+            "Website Terms of Use governs use of the public website and its content. It should be appropriate for an architecture, interior design, construction, and related-services company.",
+            "The Terms should clearly protect company photographs, drawings, plans, designs, text, video, branding, and other materials without claiming ownership of third-party content.",
+          ],
+
+          th: [
+            "Website Terms of Use ใช้กำหนดการใช้งาน Public Site และเนื้อหาบนเว็บไซต์ โดยควรเหมาะกับบริษัทสถาปัตยกรรม ออกแบบภายใน ก่อสร้าง และบริการที่เกี่ยวข้อง",
+            "Terms ควรคุ้มครองภาพถ่าย แบบ แปลน งานออกแบบ ข้อความ Video Branding และ Material ของบริษัทอย่างชัดเจน โดยไม่อ้างสิทธิในเนื้อหาของ Third Party",
+          ],
+        },
+
+        images: [
+          {
+            id: "legal-terms-editor-image",
+
+            number: "04",
+
+            src: "/docs/configuration/legal-documents/legal-terms-editor.png",
+
+            title: {
+              en: "Website Terms of Use editor",
+              th: "Website Terms of Use Editor",
+            },
+
+            alt: {
+              en: "Website Terms of Use draft editor",
+              th: "Draft Editor ของ Website Terms of Use",
+            },
+
+            caption: {
+              en: "Define permitted website use and protection for company content.",
+              th: "กำหนดการใช้เว็บไซต์และการคุ้มครองเนื้อหาของบริษัท",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Permitted personal and informational use of the website.",
+            "Ownership and licensing of company content.",
+            "Prohibition against copying, republishing, selling, scraping, or unauthorized commercial use.",
+            "Prohibition against modifying photographs, removing watermarks or credits, and presenting company work as another party's work.",
+            "Restrictions on reproducing designs, plans, drawings, specifications, and project concepts.",
+            "Accuracy, availability, and professional-service disclaimers.",
+            "Rules for links, embeds, and third-party materials.",
+            "Prohibited security, unlawful, misleading, or abusive activity.",
+            "Applicable contact, amendment, and governing provisions approved by the company.",
+          ],
+
+          th: [
+            "การใช้เว็บไซต์เพื่อการส่วนตัวและเพื่อรับข้อมูลตามที่อนุญาต",
+            "เจ้าของและสิทธิการใช้งานเนื้อหาของบริษัท",
+            "ข้อห้ามคัดลอก เผยแพร่ซ้ำ จำหน่าย Scrape หรือใช้เชิงพาณิชย์โดยไม่ได้รับอนุญาต",
+            "ข้อห้ามดัดแปลงภาพ ลบลายน้ำหรือลบเครดิต และนำผลงานบริษัทไปแสดงเป็นผลงานของผู้อื่น",
+            "ข้อจำกัดการทำซ้ำงานออกแบบ แปลน Drawing Specification และแนวคิดโครงการ",
+            "Disclaimer ด้านความถูกต้อง ความพร้อมใช้งาน และบริการวิชาชีพ",
+            "ข้อกำหนดเกี่ยวกับ Link, Embed และ Material ของ Third Party",
+            "ข้อห้ามด้านความปลอดภัย การกระทำผิดกฎหมาย การทำให้เข้าใจผิด หรือการใช้งานที่ไม่เหมาะสม",
+            "ข้อมูลติดต่อ การแก้ไข และข้อกำหนดกฎหมายที่บริษัทอนุมัติ",
+          ],
+        },
+
+        notes: {
+          en: [
+            "A copyright notice does not replace access controls, evidence of ownership, contracts, or enforcement.",
+            "Do not state that every image belongs to the company when licensed third-party material is also used.",
+          ],
+
+          th: [
+            "Copyright Notice ไม่ได้ใช้แทน Access Control หลักฐานความเป็นเจ้าของ สัญญา หรือการบังคับใช้สิทธิ",
+            "ไม่ควรระบุว่าทุกรูปเป็นของบริษัท หากมีการใช้ Material ของ Third Party ภายใต้ License ด้วย",
+          ],
+        },
+      },
+
+      {
+        id: "markdown-content",
+
+        title: {
+          en: "Format document content with Markdown",
+          th: "จัดรูปแบบเนื้อหาด้วย Markdown",
+        },
+
+        paragraphs: {
+          en: [
+            "The Content field is a Markdown text editor. Enter Markdown syntax directly rather than expecting a visual formatting toolbar.",
+            "Use a consistent heading hierarchy and short sections so visitors can scan a long legal document.",
+          ],
+
+          th: [
+            "ช่อง Content เป็น Markdown Text Editor ผู้ใช้ต้องกรอก Markdown Syntax โดยตรง ไม่ใช่ Visual Rich Text Toolbar",
+            "ควรใช้ลำดับ Heading ที่สม่ำเสมอและแบ่ง Section ให้สั้นพออ่านง่าย เพราะเอกสารกฎหมายมักมีเนื้อหายาว",
+          ],
+        },
+
+        images: [
+          {
+            id: "legal-richtext-image",
+
+            number: "05",
+
+            src: "/docs/configuration/legal-documents/legal-richtext.png",
+
+            title: {
+              en: "Markdown content editor",
+              th: "Markdown Content Editor",
+            },
+
+            alt: {
+              en: "Legal document content written with Markdown syntax",
+              th: "เนื้อหา Legal Document ที่เขียนด้วย Markdown Syntax",
+            },
+
+            caption: {
+              en: "Use headings, paragraphs, lists, emphasis, and links consistently.",
+              th: "ใช้ Heading, Paragraph, List, Emphasis และ Link อย่างสม่ำเสมอ",
+            },
+          },
+        ],
+
+        tables: [
+          {
+            id: "legal-markdown-reference",
+
+            columns: [
+              {
+                id: "purpose",
+
+                label: {
+                  en: "Purpose",
+                  th: "การใช้งาน",
+                },
+              },
+
+              {
+                id: "markdown",
+
+                label: {
+                  en: "Markdown",
+                  th: "Markdown",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "heading",
+
+                purpose: {
+                  en: "Section heading",
+                  th: "หัวข้อ Section",
+                },
+
+                markdown: "## Section title",
+              },
+
+              {
+                id: "subheading",
+
+                purpose: {
+                  en: "Subsection heading",
+                  th: "หัวข้อย่อย",
+                },
+
+                markdown: "### Subsection title",
+              },
+
+              {
+                id: "bullet",
+
+                purpose: {
+                  en: "Bullet list",
+                  th: "รายการแบบ Bullet",
+                },
+
+                markdown: "- List item",
+              },
+
+              {
+                id: "numbered",
+
+                purpose: {
+                  en: "Numbered list",
+                  th: "รายการแบบลำดับเลข",
+                },
+
+                markdown: "1. List item",
+              },
+
+              {
+                id: "bold",
+
+                purpose: {
+                  en: "Strong emphasis",
+                  th: "ข้อความเน้น",
+                },
+
+                markdown: "**Important text**",
+              },
+
+              {
+                id: "link",
+
+                purpose: {
+                  en: "Safe link",
+                  th: "Link",
+                },
+
+                markdown: "[Link label](https://example.com)",
+              },
+            ],
+          },
+        ],
+
+        notes: {
+          en: [
+            "Do not paste executable scripts, iframe code, tracking code, or untrusted HTML into a legal document.",
+            "Check every external link before publishing.",
+          ],
+
+          th: [
+            "ห้ามวาง Script, iframe, Tracking Code หรือ HTML ที่ไม่น่าเชื่อถือใน Legal Document",
+            "ตรวจสอบ External Link ทุกรายการก่อน Publish",
+          ],
+        },
+      },
+
+      {
+        id: "create-draft",
+
+        title: {
+          en: "Create and save a draft",
+          th: "สร้างและบันทึก Draft",
+        },
+
+        paragraphs: {
+          en: [
+            "A draft is an editable working version and is not displayed as the active public document.",
+            "Save Draft creates a new draft when creatingNew is active. Saving an existing draft updates that same draft.",
+          ],
+
+          th: [
+            "Draft คือฉบับทำงานที่แก้ไขได้และยังไม่แสดงเป็น Active Document บน Public Site",
+            "Save Draft จะสร้าง Draft ใหม่เมื่ออยู่ในโหมดสร้างใหม่ แต่หากเลือก Draft เดิม ระบบจะอัปเดต Draft ฉบับนั้น",
+          ],
+        },
+
+        images: [
+          {
+            id: "legal-draft-image",
+
+            number: "06",
+
+            src: "/docs/configuration/legal-documents/legal-draft.png",
+
+            title: {
+              en: "Draft status",
+              th: "สถานะ Draft",
+            },
+
+            alt: {
+              en: "Editable legal document draft",
+              th: "Legal Document Draft ที่แก้ไขได้",
+            },
+
+            caption: {
+              en: "Continue editing and reviewing a draft until it is approved for publication.",
+              th: "แก้ไขและตรวจสอบ Draft ต่อจนกว่าจะได้รับอนุมัติให้ Publish",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Confirm the selected company.",
+            "Select Privacy, Cookies, or Terms.",
+            "Select New Draft.",
+            "Select EN and enter the English Title and Content.",
+            "Select TH and enter the Thai Title and Content when required.",
+            "Enter a Change Summary describing the revision.",
+            "Set Effective Date and Time when applicable.",
+            "Enable Require Re-consent only when the approved change requires a new visitor decision.",
+            "Select Save Draft.",
+            "Confirm that the draft appears in Version History.",
+          ],
+
+          th: [
+            "ตรวจสอบบริษัทที่เลือก",
+            "เลือก Privacy, Cookies หรือ Terms",
+            "กด New Draft",
+            "เลือก EN แล้วกรอก Title และ Content ภาษาอังกฤษ",
+            "เลือก TH แล้วกรอก Title และ Content ภาษาไทยเมื่อจำเป็น",
+            "กรอก Change Summary เพื่ออธิบายการเปลี่ยนแปลง",
+            "กำหนด Effective Date and Time เมื่อเกี่ยวข้อง",
+            "เปิด Require Re-consent เฉพาะเมื่อการเปลี่ยนแปลงที่อนุมัติต้องให้ผู้เข้าชมตัดสินใจใหม่",
+            "กด Save Draft",
+            "ตรวจสอบว่า Draft ปรากฏใน Version History",
+          ],
+        },
+
+        notes: {
+          en: [
+            "At least one Title and one Content language must contain data at service level.",
+            "For the current English-first website, complete and review English before publication.",
+            "Save Draft before attempting to publish a newly created draft.",
+          ],
+
+          th: [
+            "Service กำหนดให้ Title และ Content อย่างน้อยหนึ่งภาษาต้องมีข้อมูล",
+            "สำหรับเว็บไซต์ปัจจุบันที่ใช้ English เป็นหลัก ต้องกรอกและตรวจภาษาอังกฤษก่อน Publish",
+            "ต้อง Save Draft ใหม่ก่อนจึงจะเลือก Publish ได้",
+          ],
+        },
+      },
+
+      {
+        id: "version-history",
+
+        title: {
+          en: "Understand Version History",
+          th: "ทำความเข้าใจ Version History",
+        },
+
+        paragraphs: {
+          en: [
+            "Version History lists the newest records first. Select an entry to inspect its title, content, change summary, effective date, and re-consent setting.",
+            "Published and Archived entries are read-only. Draft entries remain editable.",
+          ],
+
+          th: [
+            "Version History แสดงรายการใหม่ก่อน เลือกรายการเพื่อดู Title, Content, Change Summary, Effective Date และ Require Re-consent",
+            "Published และ Archived เป็น Read-only ส่วน Draft ยังแก้ไขได้",
+          ],
+        },
+
+        images: [
+          {
+            id: "legal-version-history-image",
+
+            number: "07",
+
+            src: "/docs/configuration/legal-documents/legal-version-history.png",
+
+            title: {
+              en: "Legal version history",
+              th: "ประวัติ Version ของเอกสาร",
+            },
+
+            alt: {
+              en: "Draft, Published, and Archived legal versions",
+              th: "Legal Version สถานะ Draft, Published และ Archived",
+            },
+
+            caption: {
+              en: "Select a history entry to inspect it or copy a read-only version into a new draft.",
+              th: "เลือก Version เพื่อดูรายละเอียดหรือ Copy ฉบับ Read-only ไปเป็น Draft ใหม่",
+            },
+          },
+        ],
+
+        tables: [
+          {
+            id: "legal-status-reference",
+
+            columns: [
+              {
+                id: "status",
+
+                label: {
+                  en: "Status",
+                  th: "สถานะ",
+                },
+              },
+
+              {
+                id: "editable",
+
+                label: {
+                  en: "Editable",
+                  th: "แก้ไขได้",
+                },
+              },
+
+              {
+                id: "meaning",
+
+                label: {
+                  en: "Meaning",
+                  th: "ความหมาย",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "draft-status",
+
+                status: "Draft",
+
+                editable: {
+                  en: "Yes",
+                  th: "ได้",
+                },
+
+                meaning: {
+                  en: "Working version not currently active on the public page",
+                  th: "ฉบับทำงานที่ยังไม่เป็น Active Version บน Public Site",
+                },
+              },
+
+              {
+                id: "published-status",
+
+                status: "Published",
+
+                editable: {
+                  en: "No",
+                  th: "ไม่ได้",
+                },
+
+                meaning: {
+                  en: "Current active public version",
+                  th: "Active Version ที่แสดงต่อสาธารณะ",
+                },
+              },
+
+              {
+                id: "archived-status",
+
+                status: "Archived",
+
+                editable: {
+                  en: "No",
+                  th: "ไม่ได้",
+                },
+
+                meaning: {
+                  en: "Previously published version replaced by a newer publication",
+                  th: "ฉบับที่เคย Publish และถูกแทนที่ด้วยฉบับใหม่",
+                },
+              },
+            ],
+          },
+        ],
+      },
+
+      {
+        id: "publish-document",
+
+        title: {
+          en: "Publish a legal document",
+          th: "Publish เอกสารทางกฎหมาย",
+        },
+
+        paragraphs: {
+          en: [
+            "Publishing is a consequential action. The selected draft becomes the public version and receives the next sequential version number.",
+            "If another version is currently active, it is changed to Archived during the same publishing transaction.",
+          ],
+
+          th: [
+            "การ Publish เป็นการเปลี่ยนแปลงสำคัญ Draft ที่เลือกจะกลายเป็น Public Version และได้รับเลข Version ลำดับถัดไป",
+            "หากมี Active Version เดิม ระบบจะเปลี่ยนฉบับเดิมเป็น Archived ภายใน Publishing Transaction เดียวกัน",
+          ],
+        },
+
+        images: [
+          {
+            id: "legal-publish-confirm-image",
+
+            number: "08",
+
+            src: "/docs/configuration/legal-documents/legal-publish-confirm.png",
+
+            title: {
+              en: "Publish confirmation",
+              th: "การยืนยัน Publish",
+            },
+
+            alt: {
+              en: "Confirmation shown before publishing a legal draft",
+              th: "ข้อความยืนยันก่อน Publish Legal Draft",
+            },
+
+            caption: {
+              en: "Confirm only after checking the selected document, version, language content, and effective date.",
+              th: "ยืนยันหลังตรวจประเภทเอกสาร Version เนื้อหาทุกภาษา และ Effective Date แล้วเท่านั้น",
+            },
+          },
+
+          {
+            id: "legal-published-image",
+
+            number: "09",
+
+            src: "/docs/configuration/legal-documents/legal-published.png",
+
+            title: {
+              en: "Published version",
+              th: "Published Version",
+            },
+
+            alt: {
+              en: "Legal document showing Published status",
+              th: "Legal Document ที่แสดงสถานะ Published",
+            },
+
+            caption: {
+              en: "The published entry becomes read-only and is available to the public legal page.",
+              th: "Published Entry จะเป็น Read-only และพร้อมแสดงบน Public Legal Page",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Select the required Draft in Version History.",
+            "Review the EN content from beginning to end.",
+            "Review the TH content when it is intended for publication.",
+            "Check Change Summary, Effective Date, and Require Re-consent.",
+            "Confirm approval from the responsible person.",
+            "Select Publish.",
+            "Read the confirmation message and confirm.",
+            "Wait for the success notification.",
+            "Confirm that the selected entry shows Published.",
+            "Open the public legal page and inspect the result.",
+          ],
+
+          th: [
+            "เลือก Draft ที่ต้องการจาก Version History",
+            "ตรวจเนื้อหา EN ตั้งแต่ต้นจนจบ",
+            "ตรวจเนื้อหา TH เมื่อต้องการเผยแพร่ภาษาไทย",
+            "ตรวจ Change Summary, Effective Date และ Require Re-consent",
+            "ยืนยันว่าได้รับอนุมัติจากผู้รับผิดชอบ",
+            "กด Publish",
+            "อ่านข้อความยืนยันแล้วกดยืนยัน",
+            "รอข้อความสำเร็จ",
+            "ตรวจสอบว่ารายการที่เลือกแสดง Published",
+            "เปิด Public Legal Page และตรวจผลลัพธ์",
+          ],
+        },
+      },
+
+      {
+        id: "accidental-publish",
+
+        title: {
+          en: "Correct an accidentally published document",
+          th: "แก้ไขเมื่อเผลอ Publish",
+        },
+
+        paragraphs: {
+          en: [
+            "The current UI does not provide Unpublish. A published version is read-only and cannot be edited directly.",
+            "To correct it, copy the published version into a new draft, make the correction, and publish the corrected draft. The incorrect version remains in history as Archived after replacement.",
+          ],
+
+          th: [
+            "UI ปัจจุบันไม่มีคำสั่ง Unpublish และ Published Version เป็น Read-only จึงแก้โดยตรงไม่ได้",
+            "ให้ Copy Published Version ไปเป็น Draft ใหม่ แก้ไข แล้ว Publish Draft ที่ถูกต้อง เมื่อแทนที่แล้วฉบับที่ผิดจะยังอยู่ใน History ด้วยสถานะ Archived",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Select the accidentally published version.",
+            "Select Copy to Draft.",
+            "Correct the copied content.",
+            "Describe the correction in Change Summary.",
+            "Review both languages and all metadata.",
+            "Select Save Draft.",
+            "Obtain approval for the corrected draft.",
+            "Publish the corrected draft.",
+            "Open the public page and confirm the correction.",
+          ],
+
+          th: [
+            "เลือก Version ที่เผลอ Publish",
+            "กด Copy to Draft",
+            "แก้เนื้อหาใน Draft ที่ Copy มา",
+            "อธิบายการแก้ไขใน Change Summary",
+            "ตรวจทั้งสองภาษาและ Metadata ทั้งหมด",
+            "กด Save Draft",
+            "ขออนุมัติ Draft ฉบับแก้ไข",
+            "Publish Draft ที่แก้แล้ว",
+            "เปิด Public Page และตรวจสอบความถูกต้อง",
+          ],
+        },
+
+        notes: {
+          en: [
+            "If the publication exposes confidential or harmful information, contact the system administrator immediately in addition to publishing a correction.",
+          ],
+
+          th: [
+            "หากการ Publish เปิดเผยข้อมูลลับหรือก่อให้เกิดความเสียหาย ให้ติดต่อ System Administrator ทันทีควบคู่กับการ Publish ฉบับแก้ไข",
+          ],
+        },
+      },
+
+      {
+        id: "re-consent",
+
+        title: {
+          en: "Require visitor re-consent",
+          th: "การขอ Consent ใหม่",
+        },
+
+        paragraphs: {
+          en: [
+            "Require Re-consent indicates that publishing the version should be treated as a change requiring a new visitor decision.",
+            "When Privacy Settings also has Renew on Policy Change enabled, the consent workflow compares the saved legal version identifiers with the current published versions.",
+          ],
+
+          th: [
+            "Require Re-consent ระบุว่าการ Publish Version นี้ควรถูกมองเป็นการเปลี่ยนแปลงที่ต้องให้ผู้เข้าชมตัดสินใจ Consent ใหม่",
+            "เมื่อ Privacy Settings เปิด Renew on Policy Change ระบบ Consent จะเปรียบเทียบ Legal Version ID ที่บันทึกไว้กับ Published Version ปัจจุบัน",
+          ],
+        },
+
+        items: {
+          en: [
+            "Consider re-consent when processing purposes materially change.",
+            "Consider re-consent when new optional categories or third-party processing are introduced.",
+            "Consider re-consent when a legal or compliance review requires a renewed decision.",
+            "Do not require re-consent for every spelling, formatting, or contact-detail correction unless approved policy requires it.",
+          ],
+
+          th: [
+            "พิจารณาขอ Consent ใหม่เมื่อวัตถุประสงค์การประมวลผลเปลี่ยนอย่างมีนัยสำคัญ",
+            "พิจารณาขอ Consent ใหม่เมื่อเพิ่ม Optional Category หรือ Third-party Processing",
+            "พิจารณาขอ Consent ใหม่เมื่อฝ่ายกฎหมายหรือ Compliance กำหนด",
+            "ไม่จำเป็นต้องขอ Consent ใหม่ทุกครั้งที่แก้คำสะกด รูปแบบ หรือข้อมูลติดต่อ เว้นแต่นโยบายที่อนุมัติกำหนดไว้",
+          ],
+        },
+
+        notes: {
+          en: [
+            "The CMS records configuration and version state; the responsible organization must decide when renewed consent is legally or operationally required.",
+          ],
+
+          th: [
+            "CMS จัดเก็บ Configuration และ Version State ส่วนองค์กรผู้รับผิดชอบต้องตัดสินว่าเมื่อใดจำเป็นต้องขอ Consent ใหม่ตามกฎหมายหรือการดำเนินงาน",
+          ],
+        },
+      },
+
+      {
+        id: "public-legal-page",
+
+        title: {
+          en: "Review the public legal page",
+          th: "ตรวจสอบ Public Legal Page",
+        },
+
+        paragraphs: {
+          en: [
+            "Only the active Published version is returned to the public legal page. If no active published version exists for the requested type, the page returns Not Found.",
+            "English is used by default. Add ?lang=th to request Thai. Metadata includes a canonical URL and alternate English and Thai language URLs.",
+          ],
+
+          th: [
+            "Public Legal Page ใช้เฉพาะ Active Published Version หากประเภทที่เปิดยังไม่มี Active Published Version หน้าจะตอบกลับเป็น Not Found",
+            "ระบบใช้ภาษาอังกฤษเป็นค่าเริ่มต้น และใช้ `?lang=th` เพื่อเปิดภาษาไทย Metadata มี Canonical URL และ Alternate URL สำหรับภาษาอังกฤษและภาษาไทย",
+          ],
+        },
+
+        images: [
+          {
+            id: "legal-public-page-image",
+
+            number: "10",
+
+            src: "/docs/configuration/legal-documents/legal-public-page.png",
+
+            title: {
+              en: "Published legal document",
+              th: "เอกสารกฎหมายบน Public Site",
+            },
+
+            alt: {
+              en: "Published legal document displayed on the public website",
+              th: "Legal Document ที่ Publish และแสดงบน Public Site",
+            },
+
+            caption: {
+              en: "Check headings, paragraphs, lists, links, version information, language, and mobile readability.",
+              th: "ตรวจ Heading, Paragraph, List, Link, Version, ภาษา และการอ่านบนมือถือ",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Privacy Notice: /{companySlug}/legal/privacy",
+            "Cookie Policy: /{companySlug}/legal/cookies",
+            "Terms of Use: /{companySlug}/legal/terms",
+            "Thai version: add ?lang=th",
+            "English version: default or add ?lang=en",
+          ],
+
+          th: [
+            "Privacy Notice: /{companySlug}/legal/privacy",
+            "Cookie Policy: /{companySlug}/legal/cookies",
+            "Terms of Use: /{companySlug}/legal/terms",
+            "ฉบับภาษาไทย: เพิ่ม ?lang=th",
+            "ฉบับภาษาอังกฤษ: ใช้ค่าเริ่มต้นหรือเพิ่ม ?lang=en",
+          ],
+        },
+      },
+
+      {
+        id: "legal-checklist",
+
+        title: {
+          en: "Legal publication checklist",
+          th: "รายการตรวจสอบก่อน Publish",
+        },
+
+        items: {
+          en: [
+            "The correct company and document type are selected.",
+            "The draft contains an approved Title and Content.",
+            "English content is complete and accurate.",
+            "Thai content is reviewed when it will be published.",
+            "Headings, lists, links, dates, addresses, and contact details are correct.",
+            "Change Summary accurately describes the revision.",
+            "Effective Date is correct.",
+            "Require Re-consent has been intentionally selected or cleared.",
+            "Privacy wording matches Privacy Settings and actual system behavior.",
+            "Cookie wording matches the enabled categories and third-party services.",
+            "Terms protect company content without making false ownership claims.",
+            "No confidential information, internal note, password, or personal data is included accidentally.",
+            "The responsible person has approved publication.",
+            "The public page was tested after publishing.",
+            "Cookie Banner and re-consent behavior were tested when affected.",
+          ],
+
+          th: [
+            "เลือกบริษัทและประเภทเอกสารถูกต้อง",
+            "Draft มี Title และ Content ที่ได้รับอนุมัติ",
+            "เนื้อหาภาษาอังกฤษครบและถูกต้อง",
+            "ตรวจเนื้อหาภาษาไทยแล้วเมื่อต้องการเผยแพร่",
+            "Heading, List, Link, วันที่ ที่อยู่ และข้อมูลติดต่อถูกต้อง",
+            "Change Summary อธิบายการเปลี่ยนแปลงตรงตามจริง",
+            "Effective Date ถูกต้อง",
+            "เลือกหรือยกเลิก Require Re-consent โดยตั้งใจ",
+            "ข้อความ Privacy ตรงกับ Privacy Settings และการทำงานจริง",
+            "ข้อความ Cookie ตรงกับ Category และ Third-party Service ที่เปิดใช้งาน",
+            "Terms คุ้มครองเนื้อหาบริษัทโดยไม่อ้างสิทธิที่ไม่เป็นจริง",
+            "ไม่มีข้อมูลลับ Internal Note, Password หรือ Personal Data หลุดเข้าไป",
+            "ผู้รับผิดชอบอนุมัติการ Publish แล้ว",
+            "ทดสอบ Public Page หลัง Publish แล้ว",
+            "ทดสอบ Cookie Banner และ Re-consent เมื่อได้รับผลกระทบ",
+          ],
+        },
+
+        notes: {
+          en: [
+            "This CMS guide explains system operation and is not a substitute for legal advice.",
+          ],
+
+          th: [
+            "คู่มือ CMS นี้อธิบายการใช้งานระบบและไม่ใช้แทนคำปรึกษาทางกฎหมาย",
+          ],
+        },
+      },
+    ],
+  },
+  "configuration/seo": {
+    eyebrow: {
+      en: "CONFIGURATION",
+      th: "การตั้งค่าระบบ",
+    },
+
+    title: {
+      en: "Search Engine Optimization",
+      th: "การตั้งค่า SEO",
+    },
+
+    description: {
+      en: "Help search engines and social platforms understand, display, and discover published website content.",
+      th: "ช่วยให้ Search Engine และ Social Platform เข้าใจ แสดงผล และค้นพบเนื้อหาที่ Publish บนเว็บไซต์",
+    },
+
+    introduction: {
+      en: [
+        "SEO stands for Search Engine Optimization. It is the process of preparing a page so search engines such as Google can understand its subject, decide whether it should be indexed, and present useful information in search results.",
+        "SEO does not guarantee that a page will rank first, and it is not paid advertising. Good SEO provides clear page information, useful content, accessible navigation, suitable images, stable URLs, and technically discoverable pages.",
+        "Junsekino CMS provides SEO fields inside Company and Content editors rather than a separate SEO Settings page. This keeps SEO information close to the content it describes.",
+      ],
+
+      th: [
+        "SEO ย่อมาจาก Search Engine Optimization คือการเตรียมหน้าเว็บไซต์ให้ Search Engine เช่น Google เข้าใจว่าหน้านั้นเกี่ยวกับอะไร ควรนำไปจัดทำดัชนีหรือไม่ และควรแสดงข้อมูลใดในผลการค้นหา",
+        "SEO ไม่ได้รับประกันว่าหน้าจะติดอันดับหนึ่ง และไม่ใช่การซื้อโฆษณา SEO ที่ดีประกอบด้วยข้อมูลหน้าที่ชัดเจน เนื้อหามีประโยชน์ Navigation เข้าถึงได้ รูปเหมาะสม URL มีความเสถียร และระบบเปิดให้ Search Engine ค้นพบหน้าได้",
+        "Junsekino CMS วาง SEO Fields ไว้ภายใน Company และ Content Editor แทนการสร้างหน้า SEO Settings แยก เพื่อให้ข้อมูล SEO อยู่ใกล้กับเนื้อหาที่ใช้อธิบาย",
+      ],
+    },
+
+    highlights: [
+      {
+        title: {
+          en: "SEO describes the page",
+          th: "SEO ใช้อธิบายหน้า",
+        },
+
+        description: {
+          en: "SEO Title, Description, and Keywords summarize the page for search and discovery systems.",
+          th: "SEO Title, Description และ Keywords ใช้สรุปเนื้อหาของหน้าให้ระบบค้นหาและค้นพบข้อมูลเข้าใจ",
+        },
+      },
+
+      {
+        title: {
+          en: "Open Graph controls social sharing",
+          th: "Open Graph ใช้ควบคุมการแชร์",
+        },
+
+        description: {
+          en: "OG Title, Description, and Image help social platforms create a link preview.",
+          th: "OG Title, Description และ Image ช่วยให้ Social Platform สร้าง Link Preview",
+        },
+      },
+
+      {
+        title: {
+          en: "Auto-fill protects custom values",
+          th: "Auto-fill รักษาค่าที่แก้เอง",
+        },
+
+        description: {
+          en: "Content updates synchronize SEO defaults until an editor replaces a field with a custom value.",
+          th: "การแก้ Content จะ Sync ค่า SEO เริ่มต้น จนกว่าผู้ดูแลจะเปลี่ยน SEO Field เป็นค่าเฉพาะ",
+        },
+      },
+    ],
+
+    sections: [
+      {
+        id: "what-is-seo",
+
+        title: {
+          en: "What is SEO?",
+          th: "SEO คืออะไร",
+        },
+
+        paragraphs: {
+          en: [
+            "Search engines use automated programs to discover pages, understand their content, and add eligible pages to an index. When someone searches, the search engine selects and orders pages it considers relevant and useful.",
+            "SEO fields provide structured hints, but search engines may rewrite titles or descriptions and may choose not to index a page. The published page content remains the most important source.",
+            "For an architecture and interior design company, SEO helps people discover projects, services, awards, publications, and company information through relevant searches.",
+          ],
+
+          th: [
+            "Search Engine ใช้ระบบอัตโนมัติค้นหาหน้า ทำความเข้าใจเนื้อหา และเพิ่มหน้าที่เหมาะสมลงใน Index เมื่อมีผู้ค้นหา ระบบจะเลือกและเรียงหน้าที่เห็นว่าเกี่ยวข้องและมีประโยชน์",
+            "SEO Field เป็นข้อมูลช่วยอธิบายหน้า แต่ Search Engine อาจเขียน Title หรือ Description ใหม่ และอาจไม่นำบางหน้าไปจัดทำดัชนี เนื้อหาที่ Publish บนหน้าจริงยังเป็นแหล่งข้อมูลสำคัญที่สุด",
+            "สำหรับบริษัทสถาปัตยกรรมและออกแบบภายใน SEO ช่วยให้ผู้สนใจค้นพบโครงการ บริการ รางวัล สิ่งพิมพ์ และข้อมูลบริษัทผ่านคำค้นที่เกี่ยวข้อง",
+          ],
+        },
+
+        tables: [
+          {
+            id: "seo-and-advertising",
+
+            title: {
+              en: "SEO compared with advertising",
+              th: "เปรียบเทียบ SEO กับโฆษณา",
+            },
+
+            columns: [
+              {
+                id: "subject",
+
+                label: {
+                  en: "Subject",
+                  th: "หัวข้อ",
+                },
+              },
+
+              {
+                id: "seo",
+
+                label: {
+                  en: "SEO",
+                  th: "SEO",
+                },
+              },
+
+              {
+                id: "advertising",
+
+                label: {
+                  en: "Paid advertising",
+                  th: "โฆษณาแบบชำระเงิน",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "payment",
+
+                subject: {
+                  en: "Placement",
+                  th: "การแสดงผล",
+                },
+
+                seo: {
+                  en: "Earned through relevance, quality, and technical accessibility",
+                  th: "เกิดจากความเกี่ยวข้อง คุณภาพ และการเข้าถึงทางเทคนิค",
+                },
+
+                advertising: {
+                  en: "Purchased through an advertising platform",
+                  th: "ซื้อพื้นที่ผ่าน Advertising Platform",
+                },
+              },
+
+              {
+                id: "timing",
+
+                subject: {
+                  en: "Timing",
+                  th: "ระยะเวลา",
+                },
+
+                seo: {
+                  en: "May take time to crawl, index, and rank",
+                  th: "ต้องใช้เวลา Crawl, Index และจัดอันดับ",
+                },
+
+                advertising: {
+                  en: "May appear while an approved campaign is active",
+                  th: "อาจแสดงระหว่างที่ Campaign เปิดใช้งาน",
+                },
+              },
+
+              {
+                id: "guarantee",
+
+                subject: {
+                  en: "Guaranteed first position",
+                  th: "รับประกันอันดับหนึ่ง",
+                },
+
+                seo: {
+                  en: "No",
+                  th: "ไม่รับประกัน",
+                },
+
+                advertising: {
+                  en: "No; depends on bidding, policy, quality, and competition",
+                  th: "ไม่รับประกัน ขึ้นอยู่กับ Bid, Policy, Quality และการแข่งขัน",
+                },
+              },
+            ],
+          },
+        ],
+      },
+
+      {
+        id: "where-seo-is-managed",
+
+        title: {
+          en: "Where SEO is managed",
+          th: "SEO จัดการจากที่ใด",
+        },
+
+        paragraphs: {
+          en: [
+            "The current CMS does not have a separate SEO Settings page. SEO is edited inside the Company or Content editor to prevent users from losing the relationship between a page and its metadata.",
+            "Company SEO provides website-level identity and defaults. Content SEO describes one specific project, award, article, video, embed, news item, or page.",
+          ],
+
+          th: [
+            "CMS ปัจจุบันไม่มีหน้า SEO Settings แยก SEO จะอยู่ภายใน Company หรือ Content Editor เพื่อให้ผู้ใช้เห็นความสัมพันธ์ระหว่างหน้าและ Metadata ของหน้านั้น",
+            "Company SEO ใช้เป็นข้อมูลระดับเว็บไซต์และบริษัท ส่วน Content SEO ใช้อธิบาย Project, Award, Article, Video, Embed, News หรือ Page แต่ละรายการ",
+          ],
+        },
+
+        images: [
+          {
+            id: "seo-company-image",
+
+            number: "01",
+
+            src: "/docs/configuration/seo/seo-company.png",
+
+            title: {
+              en: "Company SEO",
+              th: "SEO ระดับบริษัท",
+            },
+
+            alt: {
+              en: "Company SEO fields in Company Editor",
+              th: "SEO Fields ใน Company Editor",
+            },
+
+            caption: {
+              en: "Use Company SEO for the website and organization identity rather than one individual content item.",
+              th: "ใช้ Company SEO สำหรับข้อมูลเว็บไซต์และตัวองค์กร ไม่ใช่ Content รายการใดรายการหนึ่ง",
+            },
+          },
+
+          {
+            id: "seo-project-overview-image",
+
+            number: "02",
+
+            src: "/docs/configuration/seo/seo-project-overview.png",
+
+            title: {
+              en: "Project SEO",
+              th: "SEO ของ Project",
+            },
+
+            alt: {
+              en: "SEO section in Project Editor",
+              th: "SEO Section ภายใน Project Editor",
+            },
+
+            caption: {
+              en: "Each project maintains SEO information related to that project's content.",
+              th: "แต่ละ Project จัดเก็บ SEO ที่เกี่ยวข้องกับเนื้อหาของ Project นั้น",
+            },
+          },
+
+          {
+            id: "seo-content-overview-image",
+
+            number: "03",
+
+            src: "/docs/configuration/seo/seo-content-overview.png",
+
+            title: {
+              en: "Content SEO",
+              th: "SEO ของ Content",
+            },
+
+            alt: {
+              en: "Shared Content SEO section in a content editor",
+              th: "Content SEO Section ที่ใช้ร่วมกันใน Content Editor",
+            },
+
+            caption: {
+              en: "The shared SEO component provides consistent fields across supported content modules.",
+              th: "SEO Component กลางช่วยให้โมดูล Content ที่รองรับใช้ช่องข้อมูลรูปแบบเดียวกัน",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "Company — website and company-level SEO information.",
+            "About — About page title, description, and cover defaults.",
+            "Project — project title, description, tags, and cover defaults.",
+            "Award — award title, description, and cover defaults.",
+            "Public Content — Article, Video, and Embed metadata.",
+            "News — news title, description, tags, and cover defaults.",
+            "Contact — Contact page title, description, and cover defaults.",
+          ],
+
+          th: [
+            "Company — SEO ระดับเว็บไซต์และบริษัท",
+            "About — ค่าเริ่มต้นจาก Title, Description และ Cover ของหน้า About",
+            "Project — ค่าเริ่มต้นจาก Title, Description, Tags และ Cover ของ Project",
+            "Award — ค่าเริ่มต้นจาก Title, Description และ Cover ของ Award",
+            "Public Content — Metadata ของ Article, Video และ Embed",
+            "News — ค่าเริ่มต้นจาก Title, Description, Tags และ Cover ของ News",
+            "Contact — ค่าเริ่มต้นจาก Title, Description และ Cover ของ Contact",
+          ],
+        },
+      },
+
+      {
+        id: "seo-fields",
+
+        title: {
+          en: "Understand every SEO field",
+          th: "ทำความเข้าใจ SEO Field ทุกช่อง",
+        },
+
+        paragraphs: {
+          en: [
+            "Each field serves a different purpose. Complete it for the page being edited rather than copying identical values across unrelated pages.",
+          ],
+
+          th: [
+            "แต่ละ Field มีหน้าที่ต่างกัน ควรกรอกให้ตรงกับหน้าที่กำลังแก้ไข และไม่ควรคัดลอกค่าเดียวกันไปใช้กับหน้าที่มีเนื้อหาต่างกันทั้งหมด",
+          ],
+        },
+
+        tables: [
+          {
+            id: "seo-field-reference",
+
+            columns: [
+              {
+                id: "field",
+
+                label: {
+                  en: "Field",
+                  th: "Field",
+                },
+              },
+
+              {
+                id: "purpose",
+
+                label: {
+                  en: "What it does",
+                  th: "หน้าที่",
+                },
+              },
+
+              {
+                id: "limit",
+
+                label: {
+                  en: "CMS limit",
+                  th: "ขีดจำกัดใน CMS",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "seo-title",
+
+                field: "SEO Title",
+
+                purpose: {
+                  en: "Suggests the main title for search results and browser metadata",
+                  th: "เสนอชื่อหลักสำหรับผลการค้นหาและ Browser Metadata",
+                },
+
+                limit: {
+                  en: "70 characters",
+                  th: "70 ตัวอักษร",
+                },
+              },
+
+              {
+                id: "seo-description",
+
+                field: "SEO Description",
+
+                purpose: {
+                  en: "Summarizes the page and may be used as the search-result description",
+                  th: "สรุปเนื้อหาของหน้าและอาจถูกใช้เป็นคำอธิบายในผลการค้นหา",
+                },
+
+                limit: {
+                  en: "180 characters",
+                  th: "180 ตัวอักษร",
+                },
+              },
+
+              {
+                id: "keywords",
+
+                field: "Keywords",
+
+                purpose: {
+                  en: "Stores concise topics related to the content and supports internal metadata consistency",
+                  th: "จัดเก็บหัวข้อสั้นที่เกี่ยวข้องกับ Content และช่วยให้ Metadata ภายในสม่ำเสมอ",
+                },
+
+                limit: {
+                  en: "100 characters per keyword",
+                  th: "100 ตัวอักษรต่อ Keyword",
+                },
+              },
+
+              {
+                id: "og-title",
+
+                field: "Open Graph Title",
+
+                purpose: {
+                  en: "Suggests the title displayed when the URL is shared on supported platforms",
+                  th: "เสนอชื่อที่แสดงเมื่อแชร์ URL บน Platform ที่รองรับ",
+                },
+
+                limit: {
+                  en: "100 characters",
+                  th: "100 ตัวอักษร",
+                },
+              },
+
+              {
+                id: "og-description",
+
+                field: "Open Graph Description",
+
+                purpose: {
+                  en: "Suggests the description in a social link preview",
+                  th: "เสนอคำอธิบายใน Social Link Preview",
+                },
+
+                limit: {
+                  en: "200 characters",
+                  th: "200 ตัวอักษร",
+                },
+              },
+
+              {
+                id: "og-image",
+
+                field: "Open Graph Image",
+
+                purpose: {
+                  en: "Provides the image associated with social sharing metadata",
+                  th: "กำหนดรูปที่เชื่อมกับ Metadata สำหรับ Social Sharing",
+                },
+
+                limit: {
+                  en: "Recommended 1200 × 630 px",
+                  th: "แนะนำ 1200 × 630 px",
+                },
+              },
+
+              {
+                id: "index",
+
+                field: "Index",
+
+                purpose: {
+                  en: "Allows the page to be considered for search indexing",
+                  th: "อนุญาตให้ Search Engine พิจารณานำหน้าไปจัดทำดัชนี",
+                },
+
+                limit: "On / Off",
+              },
+
+              {
+                id: "follow",
+
+                field: "Follow",
+
+                purpose: {
+                  en: "Allows crawlers to follow links found on the page",
+                  th: "อนุญาตให้ Crawler ติดตาม Link ที่พบในหน้า",
+                },
+
+                limit: "On / Off",
+              },
+            ],
+          },
+        ],
+
+        notes: {
+          en: [
+            "Search engines and social platforms may choose to display different text or images.",
+            "Character limits prevent excessively long metadata but do not guarantee that every character will be visible in a preview.",
+          ],
+
+          th: [
+            "Search Engine และ Social Platform อาจเลือกแสดงข้อความหรือรูปต่างจากค่าที่กำหนด",
+            "Character Limit ป้องกัน Metadata ที่ยาวเกินไป แต่ไม่ได้รับประกันว่าทุกตัวอักษรจะแสดงครบใน Preview",
+          ],
+        },
+      },
+
+      {
+        id: "write-seo-title",
+
+        title: {
+          en: "Write an effective SEO Title",
+          th: "เขียน SEO Title ให้มีประสิทธิภาพ",
+        },
+
+        paragraphs: {
+          en: [
+            "SEO Title should identify the page clearly and help a person decide whether it matches the search. Use the actual project, article, award, or page name.",
+            "Place the most meaningful subject near the beginning. Add the company name only when it improves identification and does not make every title unnecessarily repetitive.",
+          ],
+
+          th: [
+            "SEO Title ควรระบุหน้าให้ชัดและช่วยให้ผู้ค้นหาตัดสินใจได้ว่าหน้าตรงกับสิ่งที่ต้องการหรือไม่ ใช้ชื่อ Project, Article, Award หรือหน้าตามจริง",
+            "วางหัวข้อสำคัญไว้ใกล้ต้นข้อความ เพิ่มชื่อบริษัทเมื่อช่วยให้ระบุตัวตนชัดขึ้นและไม่ทำให้ทุก Title ซ้ำโดยไม่จำเป็น",
+          ],
+        },
+
+        items: {
+          en: [
+            "Good: T+N House — Interior Design Project in Bangkok",
+            "Too vague: Project",
+            "Too repetitive: Junsekino Project Architecture Design Interior Construction Junsekino",
+            "Do not use claims such as best, number one, or guaranteed unless they are accurate, approved, and supportable.",
+          ],
+
+          th: [
+            "ตัวอย่างที่ดี: T+N House — Interior Design Project in Bangkok",
+            "กว้างเกินไป: Project",
+            "ซ้ำเกินไป: Junsekino Project Architecture Design Interior Construction Junsekino",
+            "ไม่ควรใช้คำอ้างว่า Best, Number One หรือ Guaranteed เว้นแต่ถูกต้อง ได้รับอนุมัติ และมีหลักฐานรองรับ",
+          ],
+        },
+      },
+
+      {
+        id: "write-description",
+
+        title: {
+          en: "Write an effective SEO Description",
+          th: "เขียน SEO Description ให้มีประสิทธิภาพ",
+        },
+
+        paragraphs: {
+          en: [
+            "SEO Description should summarize what a visitor will find on the page. It should be readable as a sentence and should not be only a list of keywords.",
+            "Include useful distinguishing information such as project type, location, design concept, service, award, publication, or subject when appropriate.",
+          ],
+
+          th: [
+            "SEO Description ควรสรุปว่าผู้เข้าชมจะพบอะไรในหน้า ต้องอ่านเป็นประโยคได้ และไม่ควรเป็นเพียงรายการ Keyword",
+            "ใส่ข้อมูลที่ช่วยแยกเนื้อหา เช่น ประเภท Project, Location, Design Concept, Service, Award, Publication หรือ Subject ตามความเหมาะสม",
+          ],
+        },
+
+        items: {
+          en: [
+            "Describe the page accurately.",
+            "Use natural language written for people.",
+            "Keep the important meaning near the beginning.",
+            "Avoid repeating the title without adding information.",
+            "Avoid phone numbers, prices, or temporary information unless intentionally maintained.",
+          ],
+
+          th: [
+            "อธิบายหน้าตามความเป็นจริง",
+            "ใช้ภาษาธรรมชาติที่เขียนให้คนอ่าน",
+            "วางสาระสำคัญไว้ใกล้ต้นข้อความ",
+            "หลีกเลี่ยงการเขียนซ้ำ Title โดยไม่เพิ่มข้อมูล",
+            "หลีกเลี่ยงเบอร์โทร ราคา หรือข้อมูลชั่วคราว เว้นแต่มีผู้รับผิดชอบดูแลให้เป็นปัจจุบัน",
+          ],
+        },
+      },
+
+      {
+        id: "automatic-synchronization",
+
+        title: {
+          en: "How automatic SEO synchronization works",
+          th: "การเติมและ Sync SEO อัตโนมัติ",
+        },
+
+        paragraphs: {
+          en: [
+            "The CMS uses content fields as initial SEO sources. This reduces duplicate typing while allowing an editor to create a better custom search or social description.",
+            "A synchronized SEO field follows its content source only while it is empty or still equals the previous source value. Once its value is customized, later source changes do not overwrite it.",
+          ],
+
+          th: [
+            "CMS ใช้ Content Field เป็นต้นทางเริ่มต้นของ SEO เพื่อลดการกรอกข้อมูลซ้ำ และยังเปิดให้ผู้ดูแลเขียนข้อความสำหรับ Search หรือ Social โดยเฉพาะได้",
+            "SEO Field จะตาม Content Source เมื่อ Field ยังว่างหรือยังเท่ากับ Source เดิม เมื่อผู้ดูแลแก้เป็นค่าเฉพาะแล้ว การแก้ Source ภายหลังจะไม่เขียนทับ",
+          ],
+        },
+
+        images: [
+          {
+            id: "seo-project-auto-fill-image",
+
+            number: "04",
+
+            src: "/docs/configuration/seo/seo-project-auto-fill.png",
+
+            title: {
+              en: "Automatically populated Project SEO",
+              th: "Project SEO ที่เติมอัตโนมัติ",
+            },
+
+            alt: {
+              en: "Project title, description, tags, and cover synchronized with SEO fields",
+              th: "Title, Description, Tags และ Cover ของ Project ที่ Sync กับ SEO Fields",
+            },
+
+            caption: {
+              en: "Review automatic values and customize them only when the page needs different search or sharing text.",
+              th: "ตรวจค่าที่เติมอัตโนมัติและแก้เป็นค่าเฉพาะเมื่อหน้าต้องใช้ข้อความสำหรับ Search หรือ Sharing ที่ต่างออกไป",
+            },
+          },
+        ],
+
+        tables: [
+          {
+            id: "seo-source-mapping",
+
+            title: {
+              en: "Automatic source mapping",
+              th: "การจับคู่ Source อัตโนมัติ",
+            },
+
+            columns: [
+              {
+                id: "contentSource",
+
+                label: {
+                  en: "Content source",
+                  th: "Content Source",
+                },
+              },
+
+              {
+                id: "seoDestination",
+
+                label: {
+                  en: "SEO destination",
+                  th: "SEO Destination",
+                },
+              },
+
+              {
+                id: "behavior",
+
+                label: {
+                  en: "Behavior",
+                  th: "การทำงาน",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "title-mapping",
+
+                contentSource: "Title",
+
+                seoDestination: {
+                  en: "SEO Title and OG Title",
+                  th: "SEO Title และ OG Title",
+                },
+
+                behavior: {
+                  en: "Updates while the destination is empty or still matches the previous title",
+                  th: "อัปเดตเมื่อปลายทางว่างหรือยังตรงกับ Title เดิม",
+                },
+              },
+
+              {
+                id: "description-mapping",
+
+                contentSource: {
+                  en: "Description or excerpt",
+                  th: "Description หรือ Excerpt",
+                },
+
+                seoDestination: {
+                  en: "SEO Description and OG Description",
+                  th: "SEO Description และ OG Description",
+                },
+
+                behavior: {
+                  en: "Updates while the destination is empty or still matches the previous description",
+                  th: "อัปเดตเมื่อปลายทางว่างหรือยังตรงกับ Description เดิม",
+                },
+              },
+
+              {
+                id: "tags-mapping",
+
+                contentSource: "Tags",
+
+                seoDestination: "Keywords",
+
+                behavior: {
+                  en: "Updates while Keywords is empty or still matches the previous Tags",
+                  th: "อัปเดตเมื่อ Keywords ว่างหรือยังตรงกับ Tags เดิม",
+                },
+              },
+
+              {
+                id: "cover-mapping",
+
+                contentSource: "Cover Image",
+
+                seoDestination: "OG Image",
+
+                behavior: {
+                  en: "Updates while OG Image is empty or still uses the previous Cover",
+                  th: "อัปเดตเมื่อ OG Image ว่างหรือยังใช้ Cover เดิม",
+                },
+              },
+            ],
+          },
+        ],
+
+        notes: {
+          en: [
+            "Automatic text is truncated to the maximum length of its destination field.",
+            "Initial defaults are applied independently to English and Thai text.",
+            "Tags synchronize to Keywords for both languages until a language has a custom keyword list.",
+          ],
+
+          th: [
+            "ข้อความอัตโนมัติจะถูกตัดตามความยาวสูงสุดของ Destination Field",
+            "ค่าเริ่มต้นของข้อความจะทำงานแยกตามภาษาอังกฤษและภาษาไทย",
+            "Tags จะ Sync ไปยัง Keywords ของทั้งสองภาษา จนกว่าแต่ละภาษาจะมี Keyword List ที่แก้เอง",
+          ],
+        },
+      },
+
+      {
+        id: "custom-seo-values",
+
+        title: {
+          en: "What happens after editing SEO manually?",
+          th: "เมื่อแก้ SEO ด้วยตนเองจะเกิดอะไรขึ้น",
+        },
+
+        paragraphs: {
+          en: [
+            "A custom value is protected from later automatic updates. This allows the visible content title to remain creative while the SEO Title is written more clearly for search.",
+            "If a custom value should follow Content automatically again, clear that SEO field and then update its source field. Review the result before saving.",
+          ],
+
+          th: [
+            "ค่าที่แก้เองจะได้รับการป้องกันจาก Auto-update ภายหลัง ทำให้ Content Title สามารถใช้ชื่อเชิงสร้างสรรค์ ขณะที่ SEO Title เขียนให้ชัดสำหรับ Search ได้",
+            "หากต้องการให้ค่าที่แก้เองกลับมาตาม Content อัตโนมัติ ให้ล้าง SEO Field นั้นแล้วแก้ Source Field อีกครั้ง จากนั้นตรวจผลก่อน Save",
+          ],
+        },
+
+        tables: [
+          {
+            id: "seo-sync-examples",
+
+            columns: [
+              {
+                id: "currentState",
+
+                label: {
+                  en: "Current state",
+                  th: "สถานะปัจจุบัน",
+                },
+              },
+
+              {
+                id: "sourceChange",
+
+                label: {
+                  en: "Content changes",
+                  th: "เมื่อ Content เปลี่ยน",
+                },
+              },
+
+              {
+                id: "result",
+
+                label: {
+                  en: "SEO result",
+                  th: "ผลลัพธ์ SEO",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "empty-seo",
+
+                currentState: {
+                  en: "SEO field is empty",
+                  th: "SEO Field ว่าง",
+                },
+
+                sourceChange: {
+                  en: "Title is entered",
+                  th: "กรอก Title",
+                },
+
+                result: {
+                  en: "SEO field receives the Title",
+                  th: "SEO Field รับค่าจาก Title",
+                },
+              },
+
+              {
+                id: "matching-seo",
+
+                currentState: {
+                  en: "SEO field equals the old Title",
+                  th: "SEO Field เท่ากับ Title เดิม",
+                },
+
+                sourceChange: {
+                  en: "Title is changed",
+                  th: "แก้ Title",
+                },
+
+                result: {
+                  en: "SEO field changes with the new Title",
+                  th: "SEO Field เปลี่ยนตาม Title ใหม่",
+                },
+              },
+
+              {
+                id: "custom-seo",
+
+                currentState: {
+                  en: "SEO field contains custom text",
+                  th: "SEO Field มีข้อความเฉพาะ",
+                },
+
+                sourceChange: {
+                  en: "Title is changed",
+                  th: "แก้ Title",
+                },
+
+                result: {
+                  en: "Custom SEO text remains unchanged",
+                  th: "ข้อความ SEO ที่แก้เองคงเดิม",
+                },
+              },
+            ],
+          },
+        ],
+      },
+
+      {
+        id: "keywords",
+
+        title: {
+          en: "Use Keywords correctly",
+          th: "ใช้ Keywords อย่างถูกต้อง",
+        },
+
+        paragraphs: {
+          en: [
+            "Keywords are short phrases describing important subjects in the content. They should reflect real topics rather than every possible search phrase.",
+            "Modern search engines primarily understand visible content and context. Adding many repeated keywords does not make a weak page rank well and may reduce metadata quality.",
+          ],
+
+          th: [
+            "Keywords คือคำหรือวลีสั้นที่อธิบายหัวข้อสำคัญของ Content ควรตรงกับเนื้อหาจริง ไม่ใช่ใส่ทุกคำที่คาดว่าคนอาจค้นหา",
+            "Search Engine สมัยใหม่ทำความเข้าใจเนื้อหาที่มองเห็นและบริบทเป็นหลัก การใส่ Keyword จำนวนมากหรือซ้ำกันไม่ได้ทำให้หน้าที่มีเนื้อหาไม่ดีติดอันดับ และอาจทำให้ Metadata ไม่มีคุณภาพ",
+          ],
+        },
+
+        images: [
+          {
+            id: "seo-keywords-image",
+
+            number: "05",
+
+            src: "/docs/configuration/seo/seo-keywords.png",
+
+            title: {
+              en: "Keyword editor",
+              th: "Keyword Editor",
+            },
+
+            alt: {
+              en: "Adding and removing SEO keywords",
+              th: "การเพิ่มและลบ SEO Keywords",
+            },
+
+            caption: {
+              en: "Enter one meaningful keyword or phrase at a time.",
+              th: "เพิ่ม Keyword หรือวลีที่มีความหมายครั้งละหนึ่งรายการ",
+            },
+          },
+        ],
+
+        steps: {
+          en: [
+            "Review the content title, type, location, services, and important subjects.",
+            "Enter one relevant keyword or phrase.",
+            "Select Add or press Enter.",
+            "Repeat only for distinct useful topics.",
+            "Select an existing keyword to remove it.",
+            "Review English and Thai Keywords independently when both languages are enabled.",
+          ],
+
+          th: [
+            "ตรวจ Title, Content Type, Location, Service และหัวข้อสำคัญ",
+            "กรอก Keyword หรือวลีที่เกี่ยวข้องหนึ่งรายการ",
+            "กด Add หรือ Enter",
+            "ทำซ้ำเฉพาะหัวข้อที่แตกต่างและมีประโยชน์",
+            "กด Keyword ที่มีอยู่เพื่อลบ",
+            "ตรวจ Keywords ภาษาอังกฤษและภาษาไทยแยกกันเมื่อเปิดสองภาษา",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Avoid duplicate words, spelling variations with no purpose, and unrelated popular terms.",
+            "Project Tags may initially populate Keywords, but editors can customize the SEO list.",
+          ],
+
+          th: [
+            "หลีกเลี่ยงคำซ้ำ คำสะกดหลายแบบโดยไม่มีเหตุผล และคำยอดนิยมที่ไม่เกี่ยวข้อง",
+            "Project Tags อาจเติม Keywords เริ่มต้น แต่ผู้ดูแลสามารถแก้ SEO Keyword List ได้",
+          ],
+        },
+      },
+
+      {
+        id: "open-graph",
+
+        title: {
+          en: "Open Graph and social sharing",
+          th: "Open Graph และ Social Sharing",
+        },
+
+        paragraphs: {
+          en: [
+            "Open Graph metadata helps platforms create a preview when someone shares a URL. A preview commonly contains a title, description, image, and destination URL.",
+            "OG metadata does not publish a social post automatically. It provides information that a compatible platform may use when a person shares the page.",
+          ],
+
+          th: [
+            "Open Graph Metadata ช่วยให้ Platform สร้าง Preview เมื่อมีผู้แชร์ URL โดยทั่วไป Preview ประกอบด้วย Title, Description, Image และ Destination URL",
+            "OG Metadata ไม่ได้สร้าง Social Post ให้อัตโนมัติ แต่เป็นข้อมูลที่ Platform ที่รองรับอาจนำไปใช้เมื่อมีผู้แชร์หน้า",
+          ],
+        },
+
+        images: [
+          {
+            id: "seo-open-graph-image",
+
+            number: "06",
+
+            src: "/docs/configuration/seo/seo-open-graph.png",
+
+            title: {
+              en: "Open Graph fields",
+              th: "Open Graph Fields",
+            },
+
+            alt: {
+              en: "Open Graph title, description, and image fields",
+              th: "ช่อง Open Graph Title, Description และ Image",
+            },
+
+            caption: {
+              en: "Use clear social text and an image that remains readable when displayed as a small preview.",
+              th: "ใช้ข้อความที่ชัดเจนและรูปที่ยังมองเห็นได้ดีเมื่อแสดงเป็น Preview ขนาดเล็ก",
+            },
+          },
+        ],
+
+        items: {
+          en: [
+            "OG Title — a concise sharing headline.",
+            "OG Description — a short reason to open the shared page.",
+            "OG Image — the visual representing the page.",
+            "Recommended image size — 1200 × 630 pixels.",
+            "Recommended ratio — approximately 1.91:1.",
+            "Recommended file size — 1 MB or less where good quality can be retained.",
+          ],
+
+          th: [
+            "OG Title — Headline แบบสั้นสำหรับการแชร์",
+            "OG Description — คำอธิบายสั้นที่ช่วยให้เข้าใจเหตุผลในการเปิดหน้า",
+            "OG Image — รูปที่ใช้เป็นตัวแทนของหน้า",
+            "ขนาดรูปแนะนำ — 1200 × 630 พิกเซล",
+            "อัตราส่วนแนะนำ — ประมาณ 1.91:1",
+            "ขนาดไฟล์แนะนำ — ไม่เกิน 1 MB หากยังรักษาคุณภาพที่ดีได้",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Platforms may cache an older preview after metadata changes.",
+            "Avoid important text near image edges because previews may crop the image.",
+            "Use only images the company owns or is authorized to publish.",
+          ],
+
+          th: [
+            "Platform อาจ Cache Preview เดิมหลังแก้ Metadata",
+            "หลีกเลี่ยงข้อความสำคัญใกล้ขอบ เพราะ Preview อาจ Crop รูป",
+            "ใช้เฉพาะรูปที่บริษัทเป็นเจ้าของหรือได้รับสิทธิ์ให้เผยแพร่",
+          ],
+        },
+      },
+
+      {
+        id: "og-image",
+
+        title: {
+          en: "Select an Open Graph Image",
+          th: "เลือก Open Graph Image",
+        },
+
+        paragraphs: {
+          en: [
+            "Select OG Image from Media Library. The shared SEO component applies the selected image to the currently enabled content languages.",
+            "Hidden localized SEO data is not intentionally overwritten when its language is disabled.",
+          ],
+
+          th: [
+            "เลือก OG Image จาก Media Library โดย Shared SEO Component จะกำหนดรูปให้ภาษาของ Content ที่เปิดใช้งานอยู่",
+            "ระบบจะไม่ตั้งใจเขียนทับ Localized SEO Data ที่ถูกซ่อนไว้เมื่อภาษานั้นไม่ได้เปิดใช้งาน",
+          ],
+        },
+
+        steps: {
+          en: [
+            "Prepare an image at approximately 1200 × 630 pixels.",
+            "Upload it to Media Library.",
+            "Select Select Image or Change Image in the SEO section.",
+            "Choose one image in Media Picker.",
+            "Confirm the selection.",
+            "Save the content.",
+            "Open the published URL and test it with an appropriate platform or debugging tool.",
+          ],
+
+          th: [
+            "เตรียมรูปขนาดประมาณ 1200 × 630 พิกเซล",
+            "อัปโหลดเข้าสู่ Media Library",
+            "กด Select Image หรือ Change Image ใน SEO Section",
+            "เลือกรูปหนึ่งรายการใน Media Picker",
+            "ยืนยันการเลือก",
+            "Save Content",
+            "เปิด Published URL และทดสอบด้วย Platform หรือ Debugging Tool ที่เหมาะสม",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Selecting Remove clears the custom OG Image. A later Cover change may populate it again according to synchronization rules.",
+          ],
+
+          th: [
+            "การกด Remove จะล้าง Custom OG Image และการเปลี่ยน Cover ภายหลังอาจเติมค่าอีกครั้งตาม Synchronization Rule",
+          ],
+        },
+      },
+
+      {
+        id: "index-follow",
+
+        title: {
+          en: "Index and Follow",
+          th: "การตั้งค่า Index และ Follow",
+        },
+
+        paragraphs: {
+          en: [
+            "Index and Follow are instructions for search crawlers. They should be changed intentionally because they affect discoverability.",
+            "They are enabled by default in supported Content SEO records.",
+          ],
+
+          th: [
+            "Index และ Follow เป็นคำแนะนำสำหรับ Search Crawler ควรเปลี่ยนอย่างตั้งใจเพราะมีผลต่อการค้นพบหน้า",
+            "ค่าทั้งสองเปิดเป็นค่าเริ่มต้นใน Content SEO ที่รองรับ",
+          ],
+        },
+
+        images: [
+          {
+            id: "seo-index-follow-image",
+
+            number: "07",
+
+            src: "/docs/configuration/seo/seo-index-follow.png",
+
+            title: {
+              en: "Search crawler controls",
+              th: "ตัวเลือกสำหรับ Search Crawler",
+            },
+
+            alt: {
+              en: "Index and Follow options in Content SEO",
+              th: "ตัวเลือก Index และ Follow ใน Content SEO",
+            },
+
+            caption: {
+              en: "Keep both enabled for normal public content intended to be discovered.",
+              th: "เปิดทั้งสองรายการสำหรับ Public Content ปกติที่ต้องการให้ค้นพบ",
+            },
+          },
+        ],
+
+        tables: [
+          {
+            id: "robots-setting-reference",
+
+            columns: [
+              {
+                id: "index",
+
+                label: "Index",
+              },
+
+              {
+                id: "follow",
+
+                label: "Follow",
+              },
+
+              {
+                id: "use",
+
+                label: {
+                  en: "Typical meaning",
+                  th: "ความหมายทั่วไป",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "index-follow",
+
+                index: "On",
+
+                follow: "On",
+
+                use: {
+                  en: "Normal public page intended for discovery",
+                  th: "Public Page ปกติที่ต้องการให้ค้นพบ",
+                },
+              },
+
+              {
+                id: "noindex-follow",
+
+                index: "Off",
+
+                follow: "On",
+
+                use: {
+                  en: "Do not request indexing, but allow link discovery",
+                  th: "ไม่ต้องการให้จัดทำดัชนี แต่อนุญาตให้ค้นพบ Link",
+                },
+              },
+
+              {
+                id: "noindex-nofollow",
+
+                index: "Off",
+
+                follow: "Off",
+
+                use: {
+                  en: "Restrictive crawler instruction for a page not intended for search",
+                  th: "คำแนะนำแบบจำกัดสำหรับหน้าที่ไม่ต้องการใช้ใน Search",
+                },
+              },
+            ],
+          },
+        ],
+
+        notes: {
+          en: [
+            "Noindex is not an access-control or confidentiality feature. Anyone with the URL may still be able to open a public page.",
+            "Search engines may take time to process a changed instruction.",
+          ],
+
+          th: [
+            "Noindex ไม่ใช่ Access Control หรือระบบรักษาความลับ ผู้ที่มี URL อาจยังเปิด Public Page ได้",
+            "Search Engine อาจใช้เวลาประมวลผล Instruction ที่เปลี่ยน",
+          ],
+        },
+      },
+
+      {
+        id: "sitemap",
+
+        title: {
+          en: "Sitemap and discoverability",
+          th: "Sitemap และการค้นพบหน้า",
+        },
+
+        paragraphs: {
+          en: [
+            "A sitemap provides a structured list of public URLs to search engines. Junsekino CMS generates entries for public company pages and eligible published content.",
+            "Project and Public Content detail pages are added only when they are not deleted, have Published status, have a publication date and slug, and have Index enabled.",
+          ],
+
+          th: [
+            "Sitemap เป็นรายการ Public URL แบบมีโครงสร้างสำหรับ Search Engine โดย Junsekino CMS สร้างรายการให้หน้าบริษัทและ Published Content ที่ผ่านเงื่อนไข",
+            "หน้า Detail ของ Project และ Public Content จะถูกเพิ่มเมื่อรายการไม่ถูกลบ มีสถานะ Published มี Published Date และ Slug และเปิด Index",
+          ],
+        },
+
+        tables: [
+          {
+            id: "sitemap-pages",
+
+            columns: [
+              {
+                id: "page",
+
+                label: {
+                  en: "Page type",
+                  th: "ประเภทหน้า",
+                },
+              },
+
+              {
+                id: "included",
+
+                label: {
+                  en: "Sitemap behavior",
+                  th: "การทำงานใน Sitemap",
+                },
+              },
+            ],
+
+            rows: [
+              {
+                id: "site-root",
+
+                page: {
+                  en: "Website root",
+                  th: "Website Root",
+                },
+
+                included: {
+                  en: "Included",
+                  th: "รวมอยู่",
+                },
+              },
+
+              {
+                id: "company-pages",
+
+                page: {
+                  en: "Company Home, About, Project, Awards, Public, Publication, Video, and Contact",
+                  th: "Company Home, About, Project, Awards, Public, Publication, Video และ Contact",
+                },
+
+                included: {
+                  en: "Included for public companies",
+                  th: "รวมสำหรับบริษัทที่เป็น Public",
+                },
+              },
+
+              {
+                id: "project-detail",
+
+                page: {
+                  en: "Project detail",
+                  th: "Project Detail",
+                },
+
+                included: {
+                  en: "Included only when eligible and Index is enabled",
+                  th: "รวมเมื่อผ่านเงื่อนไขและเปิด Index",
+                },
+              },
+
+              {
+                id: "public-detail",
+
+                page: {
+                  en: "Public Content detail",
+                  th: "Public Content Detail",
+                },
+
+                included: {
+                  en: "Included only when eligible and Index is enabled",
+                  th: "รวมเมื่อผ่านเงื่อนไขและเปิด Index",
+                },
+              },
+            ],
+          },
+        ],
+
+        notes: {
+          en: [
+            "A sitemap helps discovery but does not guarantee crawling, indexing, ranking, or traffic.",
+            "A page may need time to appear after publication.",
+          ],
+
+          th: [
+            "Sitemap ช่วยให้ค้นพบหน้า แต่ไม่รับประกันการ Crawl, Index, Ranking หรือ Traffic",
+            "หน้าอาจต้องใช้เวลาหลัง Publish ก่อนปรากฏใน Search",
+          ],
+        },
+      },
+
+      {
+        id: "canonical-url",
+
+        title: {
+          en: "Canonical URLs",
+          th: "Canonical URL",
+        },
+
+        paragraphs: {
+          en: [
+            "A canonical URL identifies the preferred URL for content that may be reachable through more than one address. It helps search engines consolidate duplicate or similar URLs.",
+            "The current shared Content SEO editor does not expose a manual Canonical URL field. Public routes and metadata should provide the appropriate canonical address through application logic.",
+            "Do not add a separate SEO Settings module only to edit canonical values without first defining URL ownership, redirects, priorities, validation, and behavior across every content type.",
+          ],
+
+          th: [
+            "Canonical URL ใช้ระบุ URL หลักของ Content ที่อาจเปิดได้จากหลาย Address ช่วยให้ Search Engine รวมสัญญาณจาก URL ที่ซ้ำหรือคล้ายกัน",
+            "Shared Content SEO Editor ปัจจุบันไม่มีช่อง Manual Canonical URL โดย Public Route และ Metadata ควรกำหนด Canonical Address ที่เหมาะสมผ่าน Application Logic",
+            "ไม่ควรเพิ่ม SEO Settings Module เพียงเพื่อแก้ Canonical โดยยังไม่ได้กำหนด URL Ownership, Redirect, Priority, Validation และพฤติกรรมของ Content ทุกประเภท",
+          ],
+        },
+
+        notes: {
+          en: [
+            "The generic SEO service supports a canonicalUrl data field, but it is not the current shared editor workflow.",
+          ],
+
+          th: [
+            "Generic SEO Service รองรับข้อมูล canonicalUrl แต่ยังไม่ใช่ Workflow ของ Shared Editor ปัจจุบัน",
+          ],
+        },
+      },
+
+      {
+        id: "seo-workflow",
+
+        title: {
+          en: "Recommended SEO workflow",
+          th: "ขั้นตอนทำ SEO ที่แนะนำ",
+        },
+
+        steps: {
+          en: [
+            "Create the content with an accurate Title, Description, Tags, and Cover.",
+            "Open the SEO section and review the automatically populated values.",
+            "Rewrite SEO Title only when a clearer search title is needed.",
+            "Rewrite SEO Description as a concise and useful page summary.",
+            "Remove irrelevant Keywords and add only meaningful topics.",
+            "Review OG Title and OG Description for social sharing.",
+            "Select a 1200 × 630 OG Image or confirm that the Cover is suitable.",
+            "Keep Index and Follow enabled for normal discoverable public pages.",
+            "Save the draft.",
+            "Preview or review the content itself.",
+            "Publish after content and SEO approval.",
+            "Open the final public URL and inspect its title, description, links, image, and mobile display.",
+          ],
+
+          th: [
+            "สร้าง Content โดยกรอก Title, Description, Tags และ Cover ให้ถูกต้อง",
+            "เปิด SEO Section และตรวจค่าที่ระบบเติมอัตโนมัติ",
+            "เขียน SEO Title ใหม่เฉพาะเมื่อต้องการชื่อสำหรับ Search ที่ชัดกว่า",
+            "เขียน SEO Description เป็นสรุปหน้าที่สั้นและมีประโยชน์",
+            "ลบ Keywords ที่ไม่เกี่ยวข้องและเพิ่มเฉพาะหัวข้อสำคัญ",
+            "ตรวจ OG Title และ OG Description สำหรับ Social Sharing",
+            "เลือกรูป OG ขนาด 1200 × 630 หรือยืนยันว่า Cover เหมาะสม",
+            "เปิด Index และ Follow สำหรับ Public Page ปกติที่ต้องการให้ค้นพบ",
+            "Save Draft",
+            "Preview หรือตรวจเนื้อหาจริง",
+            "Publish หลัง Content และ SEO ได้รับอนุมัติ",
+            "เปิด Public URL สุดท้ายแล้วตรวจ Title, Description, Link, Image และการแสดงบนมือถือ",
+          ],
+        },
+      },
+
+      {
+        id: "seo-checklist",
+
+        title: {
+          en: "SEO checklist before publishing",
+          th: "รายการตรวจสอบ SEO ก่อน Publish",
+        },
+
+        items: {
+          en: [
+            "The SEO information belongs to the correct company and content item.",
+            "SEO Title clearly identifies the page and is within 70 characters.",
+            "SEO Description accurately summarizes the page and is within 180 characters.",
+            "Keywords are relevant, concise, and not repetitive.",
+            "OG Title is within 100 characters.",
+            "OG Description is within 200 characters.",
+            "OG Image is approved, properly licensed, and suitable for a 1.91:1 preview.",
+            "English and Thai values were reviewed according to Localization.",
+            "Custom SEO values still match the latest visible content.",
+            "Index is enabled only for pages intended for search discovery.",
+            "Follow is selected according to the approved crawler behavior.",
+            "The content is Published and has a valid Slug.",
+            "The final public URL opens without an error or redirect problem.",
+            "No confidential, misleading, unsupported, duplicated, or temporary information is present.",
+            "The mobile page is readable and images load at an appropriate speed.",
+          ],
+
+          th: [
+            "SEO เป็นของบริษัทและ Content รายการที่ถูกต้อง",
+            "SEO Title ระบุหน้าได้ชัดและไม่เกิน 70 ตัวอักษร",
+            "SEO Description สรุปหน้าตามจริงและไม่เกิน 180 ตัวอักษร",
+            "Keywords เกี่ยวข้อง กระชับ และไม่ซ้ำ",
+            "OG Title ไม่เกิน 100 ตัวอักษร",
+            "OG Description ไม่เกิน 200 ตัวอักษร",
+            "OG Image ได้รับอนุมัติ มีสิทธิ์ใช้งาน และเหมาะกับ Preview อัตราส่วน 1.91:1",
+            "ตรวจข้อมูลภาษาอังกฤษและภาษาไทยตาม Localization แล้ว",
+            "Custom SEO ยังตรงกับ Visible Content ล่าสุด",
+            "เปิด Index เฉพาะหน้าที่ต้องการให้ค้นพบผ่าน Search",
+            "กำหนด Follow ตาม Crawler Behavior ที่อนุมัติ",
+            "Content มีสถานะ Published และมี Slug ที่ถูกต้อง",
+            "Public URL สุดท้ายเปิดได้โดยไม่มี Error หรือ Redirect ผิดปกติ",
+            "ไม่มีข้อมูลลับ ทำให้เข้าใจผิด ไม่มีหลักฐาน ซ้ำ หรือเป็นข้อมูลชั่วคราว",
+            "หน้า Mobile อ่านได้และรูปโหลดด้วยความเร็วที่เหมาะสม",
+          ],
+        },
+
+        notes: {
+          en: [
+            "Good SEO begins with accurate, useful, original content. Metadata cannot compensate for incomplete or misleading page content.",
+          ],
+
+          th: [
+            "SEO ที่ดีเริ่มจาก Content ที่ถูกต้อง มีประโยชน์ และเป็นต้นฉบับ Metadata ไม่สามารถชดเชยเนื้อหาที่ไม่ครบหรือทำให้เข้าใจผิดได้",
+          ],
+        },
+      },
+    ],
+  },
 };
 
 export function getDocsContent({
