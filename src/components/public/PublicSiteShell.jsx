@@ -1,5 +1,7 @@
 import PublicHeader from "@/components/public/PublicHeader";
 
+import PublicImageProtection from "@/components/public/PublicImageProtection";
+
 import PublicThemeProvider from "@/components/public/PublicThemeProvider";
 
 import { ConsentProvider } from "@/components/privacy/ConsentProvider";
@@ -222,11 +224,19 @@ export default function PublicSiteShell({
 
   children,
 }) {
-  const theme = resolvePublicTheme(company, settings);
+  const theme = resolvePublicTheme(
+    company,
+
+    settings,
+  );
 
   const navigation = resolveNavigation(settings);
 
-  const social = resolveSocial(company, settings);
+  const social = resolveSocial(
+    company,
+
+    settings,
+  );
 
   const locale = resolvePublicLocale(company);
 
@@ -242,17 +252,28 @@ export default function PublicSiteShell({
       dark={theme.dark}
     >
       <ConsentProvider companySlug={companySlug}>
-        <PublicHeader
-          company={company}
-          companySlug={companySlug}
-          companies={companies}
-          navigation={navigation}
-          projectCategories={projectCategories}
-          social={social}
-          primaryColor={theme.primary}
-        />
+        <PublicImageProtection>
+          <PublicHeader
+            company={company}
+            companySlug={companySlug}
+            companies={companies}
+            navigation={navigation}
+            projectCategories={projectCategories}
+            social={social}
+            primaryColor={theme.primary}
+          />
 
-        <main className="flex min-h-0 flex-1 flex-col">{children}</main>
+          <main
+            className="
+              flex
+              min-h-0
+              flex-1
+              flex-col
+            "
+          >
+            {children}
+          </main>
+        </PublicImageProtection>
 
         <CookieBanner locale={locale} />
 
